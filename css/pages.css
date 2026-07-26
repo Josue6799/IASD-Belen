@@ -1,0 +1,158 @@
+/* ========================================
+   ESTILOS ESPECÍFICOS DE PÁGINAS
+   IASD Belén · Iglesia Adventista
+   ======================================== */
+
+/* ==================== CREENCIAS & BUSCADOR ==================== */
+.search-creencias-box {
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    position: relative;
+}
+
+.search-creencias-box input {
+    width: 100%;
+    padding: 1rem 1.4rem 1rem 3.2rem;
+    border-radius: 3rem;
+    border: 2px solid var(--golden-light);
+    background: var(--pure-white);
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.search-creencias-box input:focus {
+    outline: none;
+    border-color: var(--golden);
+    box-shadow: 0 0 0 5px var(--golden-glow);
+}
+
+.search-creencias-box i {
+    position: absolute;
+    left: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--golden);
+    font-size: 1.2rem;
+}
+
+.creencia-card {
+    background: var(--pure-white);
+    border-radius: 1.6rem;
+    padding: 1.8rem;
+    margin-bottom: 1.6rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(201, 157, 59, 0.12);
+    border-left: 5px solid var(--golden);
+    transition: var(--transition);
+}
+
+.creencia-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+}
+
+.creencia-card h3 {
+    color: var(--deep-blue);
+    font-size: 1.25rem;
+    margin-bottom: 0.6rem;
+}
+
+.creencia-card .versiculos-box {
+    background: var(--cream);
+    padding: 1rem 1.4rem;
+    border-radius: 1rem;
+    margin-top: 1rem;
+    border-left: 4px solid var(--golden);
+}
+
+.creencia-card .versiculos-box p {
+    font-weight: 600;
+    color: var(--deep-blue);
+    font-size: 0.9rem;
+}
+
+.creencia-card .versiculos-box ul {
+    padding-left: 1.2rem;
+    line-height: 1.8;
+    color: var(--muted-text);
+    font-size: 0.88rem;
+    margin-top: 0.4rem;
+}
+
+/* ==================== CLUBES ==================== */
+.clubes-header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1.2rem;
+    border-radius: 2rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.clubes-header-badge.aventureros {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.clubes-header-badge.conquistadores {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.clubes-header-badge.guias {
+    background: #cce5ff;
+    color: #004085;
+    border: 1px solid #b8daff;
+}
+
+.calendario-club {
+    background: var(--pure-white);
+    border-radius: 2rem;
+    padding: 2.2rem;
+    margin-top: 2rem;
+    box-shadow: var(--shadow-md);
+    border: 2px solid rgba(201, 157, 59, 0.15);
+}
+
+/* ==================== CRONOGRAMA / HORARIOS ==================== */
+.horario-tabla {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 1.5rem 0;
+    background: var(--pure-white);
+    border-radius: 1.4rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.horario-tabla th {
+    background: var(--deep-blue);
+    color: white;
+    padding: 1rem 1.4rem;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.horario-tabla td {
+    padding: 1rem 1.4rem;
+    border-bottom: 1px solid var(--cream-dark);
+    font-size: 0.92rem;
+}
+
+.horario-tabla tr:last-child td {
+    border-bottom: none;
+}
+
+.horario-tabla tr:nth-child(even) td {
+    background: var(--cream);
+}
