@@ -110,24 +110,70 @@
 
         <!-- ==================== HOME ==================== -->
         <div id="home" class="page active">
-            <!-- HERO -->
-            <section class="hero">
-                <div class="hero-text">
-                    <span class="badge"><i class="fas fa-dove"></i> Gracia y Paz</span>
-                    <h1>
-                        <span class="welcome">¡BIENVENIDO!</span>
-                        <span class="church-name">Iglesia Adventista del Séptimo Día Belén</span>
+            <!-- HERO MEJORADO CON BIBLIA 30% MÁS GRANDE -->
+            <section class="hero"
+                style="background: linear-gradient(135deg, #0d2137 0%, #1a3a5c 50%, #2a4a6a 100%); padding: 4rem 3rem; border-radius: 2.8rem; margin: 1.8rem 0 2.8rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; box-shadow: 0 12px 40px rgba(0,0,0,0.2); position: relative; overflow: hidden; min-height: 350px;">
+
+                <!-- Decoración de fondo -->
+                <div
+                    style="position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(201,157,59,0.08), transparent 70%); border-radius: 50%; pointer-events: none;">
+                </div>
+                <div
+                    style="position: absolute; bottom: -150px; left: -50px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,255,255,0.03), transparent 70%); border-radius: 50%; pointer-events: none;">
+                </div>
+
+                <div class="hero-text" style="flex: 1 1 420px; position: relative; z-index: 1;">
+                    <span class="badge"
+                        style="background: var(--golden); color: var(--deep-blue); display: inline-block; padding: 0.35rem 1.4rem; border-radius: 2rem; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.5px; margin-bottom: 1.2rem;">
+                        <i class="fas fa-dove"></i> Gracia y Paz
+                    </span>
+                    <h1 style="font-size: 3.8rem; font-weight: 900; line-height: 1.1; color: white; margin: 0;">
+                        <span
+                            style="display: block; font-size: 2.6rem; color: var(--golden); font-weight: 700; letter-spacing: 1px;">¡BIENVENIDO!</span>
+                        <span
+                            style="display: block; font-size: 2.2rem; color: white; font-weight: 800; text-shadow: 0 2px 20px rgba(0,0,0,0.3);">Iglesia
+                            Adventista del</span>
+                        <span
+                            style="display: block; font-size: 2.2rem; color: #f0d68a; font-weight: 800; text-shadow: 0 2px 20px rgba(0,0,0,0.3);">Séptimo
+                            Día Belén</span>
                     </h1>
-                    <p>Un lugar de esperanza, adoración y comunidad. Todos los sábados nos reunimos para adorar a Dios.
+                    <p
+                        style="font-size: 1.15rem; color: rgba(255,255,255,0.9); margin: 1.4rem 0 2rem; max-width: 480px; line-height: 1.7; text-shadow: 0 1px 10px rgba(0,0,0,0.2);">
+                        Un lugar de esperanza, adoración y comunidad. Todos los sábados nos reunimos para adorar a Dios.
                     </p>
-                    <div class="btn-group">
-                        <button class="btn btn-primary" onclick="showPage('calendario')"><i
-                                class="fas fa-calendar-alt"></i> Ver Calendario</button>
-                        <button class="btn btn-outline" onclick="showPage('visitantes')"><i
-                                class="fas fa-user-friends"></i> ¿Eres nuevo?</button>
+                    <div class="btn-group" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="showPage('calendario')"
+                            style="padding: 0.85rem 2.2rem; border-radius: 2.5rem; font-weight: 700; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.6rem; transition: all 0.3s ease; border: none; cursor: pointer; font-family: 'Inter', sans-serif; background: var(--golden); color: white; box-shadow: 0 6px 20px rgba(201,157,59,0.4);">
+                            <i class="fas fa-calendar-alt"></i> Ver Calendario
+                        </button>
+                        <button class="btn btn-outline" onclick="showPage('visitantes')"
+                            style="padding: 0.85rem 2.2rem; border-radius: 2.5rem; font-weight: 700; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 0.6rem; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.5); cursor: pointer; font-family: 'Inter', sans-serif; background: transparent; color: white;">
+                            <i class="fas fa-user-friends"></i> ¿Eres nuevo?
+                        </button>
                     </div>
                 </div>
-                <div class="hero-image"><i class="fas fa-bible"></i></div>
+
+                <!-- HERO IMAGEN: BIBLIA 30% MÁS GRANDE -->
+                <div class="hero-image"
+                    style="flex: 1 1 300px; display: flex; justify-content: center; align-items: center; position: relative; z-index: 1;">
+
+                    <div style="position: relative; display: inline-block;">
+
+                        <!-- Círculo de fondo con gradiente y animación (30% más) -->
+                        <div
+                            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 416px; height: 416px; background: radial-gradient(circle, rgba(201,157,59,0.15), rgba(201,157,59,0) 70%); border-radius: 50%; animation: pulseGlow 3s ease-in-out infinite; pointer-events: none;">
+                        </div>
+
+                        <!-- Imagen de la Biblia con efectos (30% más) -->
+                        <img src="img/Biblia.png" alt="Biblia - Palabra de Dios"
+                            style="display: block; max-width: 312px; height: auto; max-height: 364px; position: relative; z-index: 2; border-radius: 1.2rem; box-shadow: 0 8px 40px rgba(0,0,0,0.4); border: 3px solid rgba(201,157,59,0.2); transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.5s ease, border-color 0.5s ease; object-fit: cover; background: rgba(255,255,255,0.05);" />
+
+                        <!-- Marco decorativo alrededor de la imagen (30% más) -->
+                        <div
+                            style="position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; border-radius: 1.5rem; border: 2px solid rgba(201,157,59,0.1); pointer-events: none; transition: all 0.5s ease;">
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- ENCUESTA -->
@@ -181,7 +227,6 @@
                 <button class="btn"><i class="fas fa-video"></i> Ver en vivo</button>
             </div>
         </div>
-
         <!-- ==================== CREENCIAS ==================== -->
         <div id="creencias" class="page">
             <button class="back-link" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> Volver</button>
