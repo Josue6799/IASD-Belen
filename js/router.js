@@ -5,16 +5,25 @@
 
 // Definición de páginas con sus títulos
 const PAGINAS = {
+    // Página principal
     home: { titulo: 'Inicio', nivel: 1 },
+
+    // Secciones públicas (nivel 1 - Visitante)
     creencias: { titulo: 'Las 28 Creencias Fundamentales', nivel: 1 },
     doctrinas: { titulo: 'Las 6 Doctrinas Fundamentales', nivel: 1 },
     diezmo: { titulo: 'Diezmos y Ofrendas', nivel: 1 },
     anuncios: { titulo: 'Anuncios Especiales', nivel: 1 },
     visitantes: { titulo: '¿Quiénes son los adventistas del 7° día?', nivel: 1 },
+    historia: { titulo: 'Historia de la IASD', nivel: 1 },
+    estructura: { titulo: 'Estructura Organizacional', nivel: 1 },
+
+    // Secciones de clubes (públicas pero con contenido restringido)
     clubes: { titulo: 'Clubes de la Iglesia', nivel: 1 },
     aventureros: { titulo: 'Club de Aventureros', nivel: 2 },
     conquistadores: { titulo: 'Club de Conquistadores', nivel: 2 },
     guias: { titulo: 'Guías Mayores', nivel: 2 },
+
+    // Secciones para miembros (nivel 2 - Miembro)
     calendario: { titulo: 'Calendario de Eventos', nivel: 2 },
     culto: { titulo: 'Culto Divino', nivel: 2 },
     canto: { titulo: 'Canto y Alabanza', nivel: 2 },
