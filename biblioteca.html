@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Biblioteca Virtual · IASD Belén</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap"
+        rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <!-- ✅ ESTA ES LA ÚNICA LÍNEA DE CSS QUE NECESITAS AHORA -->
+    <link rel="stylesheet" href="css/biblioteca.css" />
+</head>
+
+<body>
+
+    <div class="container">
+
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Volver al inicio
+        </a>
+
+        <div class="biblioteca-header">
+            <h1><i class="fas fa-book"></i> Catálogo de Nuestra Biblioteca</h1>
+            <div class="linea-dorada"></div>
+            <p>Estos son todos los libros disponibles en nuestra iglesia. Explora el catálogo y si deseas alguno,
+                utiliza el formulario de solicitud al final de la página.</p>
+        </div>
+
+        <div class="tabla-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Cant.</th>
+                        <th>Autor</th>
+                        <th>Categoría</th>
+                        <th>Estado</th>
+                        <th>Ubicación</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaLibrosBody">
+                    <!-- Los libros se renderizan con JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <section class="formulario-section" id="pedir-libro">
+            <h2><i class="fas fa-pen"></i> Solicita tu libro</h2>
+            <p class="subtitulo">Llena tus datos y el título del libro que deseas pedir.</p>
+
+            <form id="formSolicitud" onsubmit="enviarSolicitud(event)">
+                <div class="formulario-grid">
+                    <div>
+                        <label for="solicitanteNombre">Nombre completo</label>
+                        <input type="text" id="solicitanteNombre" placeholder="Ej: Juan Pérez" required />
+                    </div>
+                    <div>
+                        <label for="solicitanteWhatsapp">Número de WhatsApp</label>
+                        <input type="tel" id="solicitanteWhatsapp" placeholder="Ej: 300 123 4567" required />
+                    </div>
+                    <div class="full-width">
+                        <label for="solicitanteEmail">Correo electrónico</label>
+                        <input type="email" id="solicitanteEmail" placeholder="Ej: juan@email.com" required />
+                    </div>
+                    <div class="full-width">
+                        <label for="solicitanteLibro">Título del libro que deseas pedir</label>
+                        <textarea id="solicitanteLibro" placeholder="Ej: El conflicto de los siglos"
+                            required></textarea>
+                    </div>
+                    <button type="submit" class="btn-enviar">
+                        <i class="fas fa-paper-plane"></i> Enviar solicitud
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <div id="modalConfirmacion"
+            style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; visibility: hidden; transition: all 0.3s ease;">
+            <div
+                style="background: white; border-radius: 2rem; padding: 2.5rem; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); transform: translateY(20px); transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);">
+                <div style="font-size: 4rem; margin-bottom: 0.5rem;">📖</div>
+                <h3 style="color: var(--deep-blue); font-size: 1.5rem; margin-bottom: 1rem;">¡Solicitud recibida!</h3>
+                <p style="color: var(--dark-text); line-height: 1.7;">
+                    Hemos recibido tu petición. Recuerda que el libro estará disponible para ti, y cuentas con
+                    <strong style="color: var(--golden);">14 días calendario</strong> para devolverlo en perfectas
+                    condiciones.
+                    ¡Cuídalo, aprovéchalo y que Dios te bendiga a través de la lectura!
+                </p>
+                <button onclick="cerrarModalConfirmacion()"
+                    style="background: var(--golden); color: var(--deep-blue); padding: 0.8rem 2.5rem; border-radius: 2rem; border: none; font-weight: 700; font-size: 1rem; font-family: 'Inter', sans-serif; cursor: pointer; margin-top: 1.5rem; transition: all 0.3s ease;">
+                    Entendido, ¡gracias!
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const LIBROS = [
+            { id: 1, titulo: "Oye tengo algo que decirte", cant: 1, autor: "Fernando Zabala", cat: "Juvenil", estado: "Disponible", ubi: "Sección 2" },
+            { id: 2, titulo: "Fuerza para vencer", cant: 1, autor: "Alejandro Bullon", cat: "Juvenil", estado: "Disponible", ubi: "Sección 2" },
+            { id: 3, titulo: "Manual del guía mayor", cant: 1, autor: "Oscar Gonzales Corona", cat: "Juvenil", estado: "Disponible", ubi: "Sección 2" },
+            { id: 4, titulo: "Felicidad y armonía en el hogar", cant: 1, autor: "Elena G de white", cat: "Espiritu de profecía", estado: "Disponible", ubi: "Sección 2" },
+            { id: 5, titulo: "La predicación, la ciencia y el arte de presentar a Jesús", cant: 1, autor: "Pr. Edilso A. Barrera V", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 6, titulo: "Profecías de esperanza. (libro de sermones Tomo 1)", cant: 1, autor: "Édgar redondo R.", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 7, titulo: "Adelante con salud, curso bíblico de salud para niños", cant: 1, autor: "Quiero vivir sano", cat: "Salud", estado: "Disponible", ubi: "Sección 4" },
+            { id: 8, titulo: "Predíca la palabra. (16 sermones para predicadores)", cant: 1, autor: "William Barrero Sáenz", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 9, titulo: "28 Creencias adventistas", cant: 2, autor: "Asociación general", cat: "Doctrinal", estado: "Disponible", ubi: "Sección 3" },
+            { id: 10, titulo: "Eventos de los últimos días", cant: 1, autor: "Elena G de white", cat: "Espiritu de profecía", estado: "Disponible", ubi: "Sección 2" },
+            { id: 11, titulo: "Textos Bíblicos controversiales", cant: 1, autor: "Gerhard Pfandl", cat: "Doctrinal", estado: "Disponible", ubi: "Sección 3" },
+            { id: 12, titulo: "Es el alma inmortal", cant: 1, autor: "Robert Leo Odom", cat: "Doctrinal", estado: "Disponible", ubi: "Sección 3" },
+            { id: 13, titulo: "El lenguaje del amor", cant: 1, autor: "Nancy Van Pelt", cat: "Juvenil", estado: "Disponible", ubi: "Sección 2" },
+            { id: 14, titulo: "Santuario (terrenal)", cant: 1, autor: "William Barrero Sáenz", cat: "Doctrinal", estado: "Disponible", ubi: "Sección 3" },
+            { id: 15, titulo: "Santuario (Celestial)", cant: 1, autor: "William Barrero Sáenz", cat: "Doctrinal", estado: "Disponible", ubi: "Sección 3" },
+            { id: 16, titulo: "Si podemos conservarlos en la iglesia", cant: 1, autor: "Myrna Tetz y Gary L. Hopkins", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 17, titulo: "Desde el corazón", cant: 1, autor: "Elena G de white", cat: "Espiritu de profecía", estado: "Disponible", ubi: "Sección 2" },
+            { id: 18, titulo: "la próxima superpotencia mundial. (2 edición corregida)", cant: 1, autor: "Mark Finify", cat: "Profecía", estado: "En curso", ubi: "Sección 4" },
+            { id: 19, titulo: "Empoderados por el Espiritu Santo", cant: 1, autor: "William Barrero Sáenz", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 20, titulo: "revolución en la iglesia", cant: 1, autor: "Russell Burrill", cat: "Doctrinal", estado: "Disponible", ubi: "Sección 3" },
+            { id: 21, titulo: "El tesoro escondido", cant: 1, autor: "Pablo M. Claverie", cat: "Juvenil", estado: "Disponible", ubi: "Sección 2" },
+            { id: 22, titulo: "Doctrina y salud (52 temas para grupo pequeños)", cant: 1, autor: "William Barrero Sáenz", cat: "Salud", estado: "Disponible", ubi: "Sección 4" },
+            { id: 23, titulo: "¿Entiendes lo que lees?", cant: 1, autor: "J. Vladimir Polanco", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 24, titulo: "El rapto secreto un nuevo análisis", cant: 1, autor: "El centinela", cat: "Doctrinal", estado: "Disponible", ubi: "Sección 3" },
+            { id: 25, titulo: "Reavivamiento nuestra mayor necesidad", cant: 1, autor: "Elena G de white", cat: "Espiritu de profecía", estado: "Disponible", ubi: "Sección 2" },
+            { id: 26, titulo: "Conficto de los siglos (resumido)", cant: 1, autor: "Elena G de white", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 27, titulo: "Consejos para los maestros, padres y alumnos", cant: 1, autor: "Elena G de white", cat: "Espiritu de profecía", estado: "Disponible", ubi: "Sección 2" },
+            { id: 28, titulo: "Como crear una atósfera Celestial en el hogar", cant: 1, autor: "Pedro iglesias Ortega. Cecilia Moreno", cat: "Familia", estado: "Disponible", ubi: "Sección 4" },
+            { id: 29, titulo: "Fe y obra", cant: 1, autor: "Elena G de white", cat: "Espiritu de profecía", estado: "Disponible", ubi: "Sección 2" },
+            { id: 30, titulo: "servicio cristiano ", cant: 1, autor: "Elena G de white", cat: "Espiritu de profecía", estado: "Disponible", ubi: "Sección 2" },
+            { id: 31, titulo: "La educación ", cant: 1, autor: "Elena G de white", cat: "Espiritu de profecía", estado: "Disponible", ubi: "Sección 2" },
+            { id: 32, titulo: "El conflicto de los siglos", cant: 2, autor: "Elena G de white", cat: "Espiritu de profecía", estado: "Disponible", ubi: "Sección 2" },
+            { id: 33, titulo: "Nombres y titulos de Dios (52 temas para grupos pequeños)", cant: 1, autor: "William Barrero Sáenz", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 34, titulo: "Promesas 52 temas para grupos pequeños)", cant: 1, autor: "William Barrero Sáenz", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 35, titulo: "Profecías de esperanza. (libro de sermones Tomo 2)", cant: 1, autor: "William Barrero Sáenz", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 36, titulo: "Milogros (52 temas para grupos pequeños", cant: 1, autor: "William Barrero Sáenz", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 37, titulo: "El camino de la esperanza", cant: 1, autor: "Frankl. Peterson", cat: "Juvenil", estado: "Disponible", ubi: "Sección 2" },
+            { id: 38, titulo: "temas del evangelio de Juan", cant: 1, autor: "Ernest Edward Zinke", cat: "Doctrinal", estado: "Disponible", ubi: "Sección 3" },
+            { id: 39, titulo: "Aprenda todo sobre sexo con sentido", cant: 1, autor: "Enrique Chaij y francesc x. Gelabert", cat: "Juvenil", estado: "Disponible", ubi: "Sección 2" },
+            { id: 40, titulo: "El camino a Cristo", cant: 1, autor: "Elena G de white", cat: "Espiritu de profecía", estado: "Disponible", ubi: "Sección 2" },
+            { id: 41, titulo: "¿Quiénes son los adventistas del séptimo día?", cant: 1, autor: "Nancy Weber de Vyhmeister", cat: "Doctrinal", estado: "Disponible", ubi: "Sección 3" },
+            { id: 42, titulo: "Esperanza perdida / Esperanza recobrada (historia de la redención resumida)", cant: 1, autor: "Elena G de white", cat: "Espiritu de profecía", estado: "Disponible", ubi: "Sección 2" },
+            { id: 43, titulo: "Diccionario filosofico", cant: 1, autor: "Rosental Judin", cat: "Otros", estado: "En curso", ubi: "Sección 5" },
+            { id: 44, titulo: "Señales de esperanza", cant: 1, autor: "Edgar Redondo Ramírez", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 45, titulo: "¡Predica! A todo teimpo y fuera de tiempo", cant: 1, autor: "William Barrero Sáenz", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 46, titulo: "El joven y el sexo", cant: 1, autor: "Juan F. Knight", cat: "Juvenil", estado: "Disponible", ubi: "Sección 2" },
+            { id: 47, titulo: "El pacto eterno de Dios", cant: 1, autor: "Gerhard F Hasel. Michael G Hasel", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 48, titulo: "Manual del discipulado", cant: 1, autor: "Iglesia Adventista", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 49, titulo: "El poder de la esperanza", cant: 1, autor: "Julián Melgosa y Michael Berges", cat: "Salud", estado: "Disponible", ubi: "Sección 4" },
+            { id: 50, titulo: "Verdades eternas (Yo iré)", cant: 1, autor: "Asocentral", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 51, titulo: "La ultima invitación", cant: 1, autor: "Mark Finify y Steven Mosley", cat: "Obra misionera", estado: "Disponible", ubi: "Sección 1" },
+            { id: 52, titulo: "Lo que me gusta de tu religión ", cant: 1, autor: "Geoge E. Vandeman", cat: "Doctrinal", estado: "Disponible", ubi: "Sección 3" },
+            { id: 53, titulo: "La temperancia", cant: 1, autor: "Elena G de white", cat: "Espiritu de profecía", estado: "Disponible", ubi: "Sección 2" },
+            { id: 54, titulo: "Biblioteca del espiritu de profecía (Tomo 1)", cant: 1, autor: "Elena G de white", cat: "Otros", estado: "Disponible", ubi: "Sección 5" },
+            { id: 55, titulo: "Biblioteca del espiritu de profecía (Tomo 1)", cant: 1, autor: "Elena G de white", cat: "Otros", estado: "Disponible", ubi: "Sección 5" }
+        ];
+
+        function renderizarTabla() {
+            const tbody = document.getElementById('tablaLibrosBody');
+            if (!tbody) return;
+
+            let html = '';
+            LIBROS.forEach(libro => {
+                const estadoClase = libro.estado === 'Disponible' ? 'estado-disponible' : 'estado-en-curso';
+                html += `
+                    <tr>
+                        <td><strong>${libro.id}</strong></td>
+                        <td>${libro.titulo}</td>
+                        <td style="text-align: center;">${libro.cant}</td>
+                        <td>${libro.autor}</td>
+                        <td>${libro.cat}</td>
+                        <td style="text-align: center;">
+                            <span class="${estadoClase}"></span> ${libro.estado}
+                        </td>
+                        <td>${libro.ubi}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function cerrarModalConfirmacion() {
+            const modal = document.getElementById('modalConfirmacion');
+            if (modal) {
+                modal.style.opacity = '0';
+                modal.style.visibility = 'hidden';
+                document.body.style.overflow = '';
+            }
+        }
+
+        function enviarSolicitud(event) {
+            event.preventDefault();
+
+            const nombre = document.getElementById('solicitanteNombre').value.trim();
+            const whatsapp = document.getElementById('solicitanteWhatsapp').value.trim();
+            const email = document.getElementById('solicitanteEmail').value.trim();
+            const libro = document.getElementById('solicitanteLibro').value.trim();
+
+            if (!nombre || !whatsapp || !email || !libro) {
+                alert('⚠️ Por favor completa todos los campos.');
+                return;
+            }
+
+            // Mostrar modal de confirmación
+            const modal = document.getElementById('modalConfirmacion');
+            if (modal) {
+                modal.style.opacity = '1';
+                modal.style.visibility = 'visible';
+                document.body.style.overflow = 'hidden';
+            }
+
+            // Limpiar formulario
+            document.getElementById('solicitanteNombre').value = '';
+            document.getElementById('solicitanteWhatsapp').value = '';
+            document.getElementById('solicitanteEmail').value = '';
+            document.getElementById('solicitanteLibro').value = '';
+        }
+
+        // Renderizar tabla al cargar
+        document.addEventListener('DOMContentLoaded', renderizarTabla);
+    </script>
+</body>
+
+</html>

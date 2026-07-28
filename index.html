@@ -272,6 +272,41 @@
                 <button class="btn"><i class="fas fa-video"></i> Ver en vivo</button>
             </div>
 
+            <!-- ==================== BIBLIOTECA (NUEVA SECCIÓN) ==================== -->
+            <section class="biblioteca-section" id="bibliotecaInicio">
+                <div class="biblioteca-container">
+
+                    <!-- Columna Izquierda: Texto y botones -->
+                    <div class="biblioteca-texto">
+                        <span class="biblioteca-badge">📖 Nuestra Biblioteca</span>
+                        <h2 class="biblioteca-titulo">
+                            <span class="titulo-dorado">Conoce nuestro catálogo</span>
+                            <span class="titulo-blanco">y solicita tu libro favorito</span>
+                        </h2>
+                        <p class="biblioteca-descripcion">
+                            Tenemos una gran variedad de libros para nutrir tu fe y conocimiento.
+                            ¡Pide el tuyo y acompáñanos en esta aventura de aprendizaje!
+                        </p>
+                        <div class="biblioteca-botones">
+                            <a href="biblioteca.html#inicio" class="btn-biblioteca btn-dorado">
+                                <i class="fas fa-book"></i> Explorar catálogo
+                            </a>
+                            <button onclick="abrirModalPrestamo()" class="btn-biblioteca btn-transparente">
+                                <i class="fas fa-envelope"></i> Solicitar libro
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Columna Derecha: Imagen -->
+                    <div class="biblioteca-imagen">
+                        <div class="imagen-marco">
+                            <img src="img/Libro.avif" alt="Libro - Biblioteca IASD Belén" />
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
             <!-- ==================== BOTÓN PARA ABRIR MODAL ==================== -->
             <div style="text-align: center; margin: 3rem 0 1rem;">
                 <button onclick="abrirModal()"
@@ -2773,6 +2808,61 @@
                     <button id="btnGuardarModal" class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Guardar
                         Evento</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- ==================== MODAL DE PRÉSTAMO DE LIBROS ==================== -->
+        <div id="modalPrestamo" class="modal-overlay">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3><i class="fas fa-book" style="color:var(--golden);"></i> Solicitar libro</h3>
+                    <button onclick="cerrarModalPrestamo()" class="modal-close" aria-label="Cerrar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p style="color:var(--muted-text); margin-bottom:1.5rem;">Completa el formulario para solicitar el
+                        libro que deseas.</p>
+                    <form id="formPrestamo" onsubmit="enviarSolicitud(event)">
+                        <div class="form-group">
+                            <label for="inputNombreSolicitante">Nombre completo</label>
+                            <input type="text" id="inputNombreSolicitante" placeholder="Ej: Juan Pérez" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="inputTelefonoSolicitante">Número de teléfono</label>
+                            <input type="tel" id="inputTelefonoSolicitante" placeholder="Ej: 300 123 4567" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmailSolicitante">Correo electrónico</label>
+                            <input type="email" id="inputEmailSolicitante" placeholder="Ej: juan@email.com" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="inputTituloLibro">Título del libro que deseas pedir</label>
+                            <input type="text" id="inputTituloLibro" placeholder="Ej: El conflicto de los siglos"
+                                required />
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%;">
+                            <i class="fas fa-paper-plane"></i> Enviar Solicitud
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== MODAL DE CONFIRMACIÓN ==================== -->
+        <div id="modalConfirmacion" class="modal-overlay">
+            <div class="modal-card" style="text-align: center; max-width: 450px;">
+                <div style="font-size: 4rem; margin-bottom: 0.5rem;">📖</div>
+                <h3 style="color:var(--deep-blue); font-size:1.5rem; margin-bottom:1rem;">¡Solicitud recibida!</h3>
+                <p style="color:var(--dark-text); line-height:1.7;">
+                    Hemos recibido tu petición. Recuerda que el libro estará disponible para ti, y cuentas con
+                    <strong style="color:var(--golden);">14 días calendario</strong> para devolverlo en perfectas
+                    condiciones.
+                    ¡Cuídalo, aprovéchalo y que Dios te bendiga a través de la lectura!
+                </p>
+                <button onclick="cerrarModalConfirmacion()" class="btn btn-primary" style="margin-top:1.5rem;">
+                    Entendido, ¡gracias!
+                </button>
             </div>
         </div>
 

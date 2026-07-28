@@ -980,3 +980,93 @@ document.addEventListener('click', function (event) {
 });
 
 console.log('✅ Grupos pequeños - Sistema cargado correctamente');
+
+// ========================================
+// BIBLIOTECA - FUNCIONES DE PRÉSTAMO
+// ========================================
+
+/**
+ * Abre el modal de préstamo de libros
+ */
+function abrirModalPrestamo() {
+    const modal = document.getElementById('modalPrestamo');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        // Limpiar campos
+        const inputs = modal.querySelectorAll('input');
+        inputs.forEach(input => input.value = '');
+        // Enfocar primer campo
+        setTimeout(() => {
+            const primerInput = modal.querySelector('input');
+            if (primerInput) primerInput.focus();
+        }, 300);
+    }
+}
+
+/**
+ * Cierra el modal de préstamo de libros
+ */
+function cerrarModalPrestamo() {
+    const modal = document.getElementById('modalPrestamo');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+/**
+ * Abre el modal de confirmación
+ */
+function abrirModalConfirmacion() {
+    const modal = document.getElementById('modalConfirmacion');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+/**
+ * Cierra el modal de confirmación
+ */
+function cerrarModalConfirmacion() {
+    const modal = document.getElementById('modalConfirmacion');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+/**
+ * Envía la solicitud de préstamo
+ */
+function enviarSolicitud(event) {
+    event.preventDefault();
+
+    const nombre = document.getElementById('inputNombreSolicitante').value.trim();
+    const telefono = document.getElementById('inputTelefonoSolicitante').value.trim();
+    const email = document.getElementById('inputEmailSolicitante').value.trim();
+    const libro = document.getElementById('inputTituloLibro').value.trim();
+
+    if (!nombre || !telefono || !email || !libro) {
+        alert('⚠️ Por favor completa todos los campos.');
+        return;
+    }
+
+    // Cerrar modal de préstamo
+    cerrarModalPrestamo();
+
+    // Abrir modal de confirmación después de un pequeño delay
+    setTimeout(() => {
+        abrirModalConfirmacion();
+    }, 400);
+}
+
+// Exportar funciones para uso global
+window.abrirModalPrestamo = abrirModalPrestamo;
+window.cerrarModalPrestamo = cerrarModalPrestamo;
+window.abrirModalConfirmacion = abrirModalConfirmacion;
+window.cerrarModalConfirmacion = cerrarModalConfirmacion;
+window.enviarSolicitud = enviarSolicitud;
+
+console.log('✅ Biblioteca - Funciones de préstamo cargadas correctamente');

@@ -2656,3 +2656,440 @@
         font-size: 0.95rem !important;
     }
 }
+
+/* ========================================
+   BIBLIOTECA - SECCIÓN DE INICIO
+   ======================================== */
+
+/* --- Contenedor principal --- */
+.biblioteca-section {
+    margin: 3rem 0 2rem;
+    padding: 0;
+    animation: bibliotecaFadeInUp 0.8s ease forwards;
+    opacity: 0;
+}
+
+@keyframes bibliotecaFadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.biblioteca-container {
+    background: linear-gradient(145deg, #1a2a4a, #0d2137);
+    border-radius: 2.5rem;
+    padding: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+/* --- Decoración de fondo sutil --- */
+.biblioteca-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(212, 160, 56, 0.05), transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* --- Columna Izquierda: Texto --- */
+.biblioteca-texto {
+    flex: 1 1 55%;
+    min-width: 280px;
+    position: relative;
+    z-index: 2;
+}
+
+.biblioteca-badge {
+    display: inline-block;
+    background: var(--golden);
+    color: var(--deep-blue);
+    padding: 0.3rem 1.2rem;
+    border-radius: 2rem;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    margin-bottom: 1.2rem;
+    text-transform: uppercase;
+}
+
+.biblioteca-titulo {
+    margin: 0 0 0.8rem 0;
+    line-height: 1.2;
+}
+
+.biblioteca-titulo .titulo-dorado {
+    display: block;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 800;
+    color: var(--golden);
+    letter-spacing: -0.02em;
+}
+
+.biblioteca-titulo .titulo-blanco {
+    display: block;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.02em;
+}
+
+.biblioteca-descripcion {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+    max-width: 480px;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+}
+
+/* --- Botones --- */
+.biblioteca-botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.btn-biblioteca {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 2.2rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: clamp(0.85rem, 0.95vw, 0.95rem);
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-dorado {
+    background: var(--golden);
+    color: var(--deep-blue);
+    box-shadow: 0 6px 25px rgba(212, 160, 56, 0.35);
+}
+
+.btn-dorado:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 35px rgba(212, 160, 56, 0.5);
+}
+
+.btn-dorado i {
+    font-size: 1rem;
+}
+
+.btn-transparente {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-transparente:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: scale(1.03);
+}
+
+.btn-transparente i {
+    font-size: 1rem;
+}
+
+/* --- Columna Derecha: Imagen --- */
+.biblioteca-imagen {
+    flex: 1 1 35%;
+    min-width: 200px;
+    max-width: 380px;
+    position: relative;
+    z-index: 2;
+}
+
+.imagen-marco {
+    border-radius: 1.5rem;
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    padding: 0.6rem;
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    transition: all 0.4s ease;
+    animation: floatImage 4s ease-in-out infinite;
+}
+
+@keyframes floatImage {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.imagen-marco img {
+    width: 100%;
+    height: auto;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 1rem;
+    display: block;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.imagen-marco:hover {
+    border-color: rgba(212, 160, 56, 0.3);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.imagen-marco:hover img {
+    transform: scale(1.03);
+}
+
+/* ========================================
+   RESPONSIVE - BIBLIOTECA
+   ======================================== */
+
+@media (max-width: 992px) {
+    .biblioteca-container {
+        padding: 2.5rem;
+        gap: 2rem;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .biblioteca-texto {
+        flex: 1 1 100%;
+        min-width: unset;
+    }
+
+    .biblioteca-descripcion {
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .biblioteca-botones {
+        justify-content: center;
+    }
+
+    .biblioteca-imagen {
+        flex: 1 1 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .imagen-marco img {
+        max-height: 220px;
+    }
+}
+
+@media (max-width: 768px) {
+    .biblioteca-container {
+        padding: 2rem;
+        border-radius: 2rem;
+    }
+
+    .biblioteca-botones {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .btn-biblioteca {
+        width: 100%;
+        max-width: 320px;
+        justify-content: center;
+        padding: 0.8rem 1.8rem;
+    }
+
+    .biblioteca-titulo .titulo-dorado {
+        font-size: 1.8rem;
+    }
+
+    .biblioteca-titulo .titulo-blanco {
+        font-size: 1.5rem;
+    }
+
+    .biblioteca-imagen {
+        max-width: 250px;
+    }
+
+    .imagen-marco img {
+        max-height: 180px;
+    }
+}
+
+@media (max-width: 480px) {
+    .biblioteca-container {
+        padding: 1.5rem;
+        border-radius: 1.5rem;
+    }
+
+    .biblioteca-titulo .titulo-dorado {
+        font-size: 1.5rem;
+    }
+
+    .biblioteca-titulo .titulo-blanco {
+        font-size: 1.3rem;
+    }
+
+    .biblioteca-descripcion {
+        font-size: 0.9rem;
+    }
+
+    .btn-biblioteca {
+        font-size: 0.85rem;
+        padding: 0.7rem 1.5rem;
+        max-width: 280px;
+    }
+
+    .biblioteca-imagen {
+        max-width: 200px;
+    }
+
+    .imagen-marco img {
+        max-height: 150px;
+    }
+
+    .imagen-marco {
+        padding: 0.4rem;
+    }
+}
+
+/* ========================================
+   MODALES DE BIBLIOTECA (ESTILOS COMPLETOS)
+   ======================================== */
+
+/* Overlay de modales */
+#modalPrestamo.modal-overlay,
+#modalConfirmacion.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+#modalPrestamo.modal-overlay.active,
+#modalConfirmacion.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+#modalPrestamo .modal-card,
+#modalConfirmacion .modal-card {
+    background: white;
+    border-radius: 2rem;
+    padding: 2.5rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    margin: 1.5rem;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+#modalPrestamo.active .modal-card,
+#modalConfirmacion.active .modal-card {
+    transform: translateY(0);
+}
+
+/* Botón cerrar modal */
+#modalPrestamo .modal-close,
+#modalConfirmacion .modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    background: transparent;
+    border: none;
+    font-size: 1.8rem;
+    color: var(--muted-text);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+#modalPrestamo .modal-close:hover,
+#modalConfirmacion .modal-close:hover {
+    color: var(--danger);
+    transform: rotate(90deg);
+}
+
+/* Formulario del modal */
+#modalPrestamo .form-group {
+    margin-bottom: 1.2rem;
+}
+
+#modalPrestamo .form-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--deep-blue);
+    margin-bottom: 0.3rem;
+}
+
+#modalPrestamo .form-group input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 2px solid #e8e3d8;
+    border-radius: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: #faf8f5;
+    box-sizing: border-box;
+}
+
+#modalPrestamo .form-group input:focus {
+    border-color: var(--golden);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(201, 157, 59, 0.15);
+    background: white;
+}
+
+/* Responsive modales */
+@media (max-width: 768px) {
+
+    #modalPrestamo .modal-card,
+    #modalConfirmacion .modal-card {
+        padding: 1.8rem;
+        border-radius: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+
+    #modalPrestamo .modal-card,
+    #modalConfirmacion .modal-card {
+        padding: 1.2rem;
+        border-radius: 1.2rem;
+        width: 95%;
+    }
+}
