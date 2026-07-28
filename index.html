@@ -76,10 +76,12 @@
                 <button class="nav-btn" onclick="showPage('diezmo')"><i class="fas fa-hand-holding-heart"></i>
                     Diezmo</button>
 
+                <!-- ========== CRONOGRAMA CON GRUPOS PEQUEÑOS ========== -->
                 <div class="dropdown">
                     <button class="nav-btn"><i class="fas fa-clock"></i> Cronograma <i class="fas fa-chevron-down"
                             style="font-size:0.6rem;"></i></button>
-                    <ul class="dropdown-menu" style="min-width: 200px;">
+                    <ul class="dropdown-menu" style="min-width: 220px;">
+                        <!-- Submenú Culto -->
                         <li style="position: relative;">
                             <a onclick="showPage('culto')"
                                 style="display: flex; justify-content: space-between; align-items: center;">
@@ -102,6 +104,37 @@
                                 Oración</a></li>
                         <li><a onclick="showPage('miercoles-testimonio')"><i class="fas fa-comment-dots"></i> Miér. de
                                 Testimonio</a></li>
+
+                        <!-- ========== NUEVO: GRUPOS PEQUEÑOS CON SUBMENÚ ========== -->
+                        <li style="position: relative;" class="grupos-pequenos-item">
+                            <a
+                                style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                                <span><i class="fas fa-users"></i> Grupos pequeños</span>
+                                <i class="fas fa-chevron-right" style="font-size:0.6rem; color:var(--golden);"></i>
+                            </a>
+                            <!-- Submenú de Grupos Pequeños (8 opciones) -->
+                            <ul class="submenu-grupos"
+                                style="position: absolute; left: 100%; top: 0; background: var(--pure-white); min-width: 220px; border-radius: 1.2rem; padding: 0.5rem 0; box-shadow: var(--shadow-lg); border: 1px solid rgba(201,157,59,0.12); border-left: 3px solid var(--golden); list-style: none; z-index: 200; opacity: 0; visibility: hidden; transform: translateX(8px) scale(0.96); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                                <li><a onclick="mostrarGrupo('unidos_en_verdad')"><i class="fas fa-home"></i> Unidos en
+                                        Verdad</a></li>
+                                <li><a onclick="mostrarGrupo('mansion_gloriosa')"><i class="fas fa-home"></i> Mansión
+                                        Gloriosa</a></li>
+                                <li><a onclick="mostrarGrupo('mansion_gloriosa_kid')"><i class="fas fa-child"></i>
+                                        Mansión Gloriosa Kid</a></li>
+                                <li><a onclick="mostrarGrupo('aposento_alto')"><i class="fas fa-arrow-up"></i> Aposento
+                                        Alto</a></li>
+                                <li><a onclick="mostrarGrupo('jehova_jireh')"><i class="fas fa-cross"></i> Jehová
+                                        Jireh</a></li>
+                                <li><a onclick="mostrarGrupo('maranatha_1')"><i class="fas fa-star"></i> Maranatha 1</a>
+                                </li>
+                                <li><a onclick="mostrarGrupo('maranatha_2')"><i class="fas fa-star"></i> Maranatha 2</a>
+                                </li>
+                                <li><a onclick="mostrarGrupo('ah_de_venir')"><i class="fas fa-clock"></i> Ah de
+                                        Venir</a></li>
+                            </ul>
+                        </li>
+                        <!-- ========== FIN GRUPOS PEQUEÑOS ========== -->
+
                         <li>
                             <hr style="border: 0; border-top: 1px solid var(--cream-dark); margin: 0.3rem 0.5rem;">
                         </li>
@@ -1887,8 +1920,8 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem;">
 
                     <!-- Creencia 1: El Sábado -->
-                    <div
-                        style="background: var(--pure-white); padding: 1.5rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); border-left: 4px solid var(--golden); transition: all 0.3s ease;">
+                    <div class="creencia-card-hover"
+                        style="background: var(--pure-white); padding: 1.5rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); border-left: 4px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <h4 style="color: var(--deep-blue); font-size: 1rem; margin-bottom: 0.5rem;">📅 El Sábado</h4>
                         <p style="color: var(--dark-text); font-size: 0.9rem; line-height: 1.6; margin: 0;">
                             Guardamos el séptimo día de la semana (sábado) como día de reposo y adoración, siguiendo el
@@ -1897,8 +1930,8 @@
                     </div>
 
                     <!-- Creencia 2: El Santuario -->
-                    <div
-                        style="background: var(--pure-white); padding: 1.5rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); border-left: 4px solid var(--golden); transition: all 0.3s ease;">
+                    <div class="creencia-card-hover"
+                        style="background: var(--pure-white); padding: 1.5rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); border-left: 4px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <h4 style="color: var(--deep-blue); font-size: 1rem; margin-bottom: 0.5rem;">⛪ El Santuario</h4>
                         <p style="color: var(--dark-text); font-size: 0.9rem; line-height: 1.6; margin: 0;">
                             Creemos que Jesús es nuestro Sumo Sacerdote en el Santuario celestial, donde intercede por
@@ -1907,8 +1940,8 @@
                     </div>
 
                     <!-- Creencia 3: Estado de los Muertos -->
-                    <div
-                        style="background: var(--pure-white); padding: 1.5rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); border-left: 4px solid var(--golden); transition: all 0.3s ease;">
+                    <div class="creencia-card-hover"
+                        style="background: var(--pure-white); padding: 1.5rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); border-left: 4px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <h4 style="color: var(--deep-blue); font-size: 1rem; margin-bottom: 0.5rem;">💤 Estado de los
                             Muertos</h4>
                         <p style="color: var(--dark-text); font-size: 0.9rem; line-height: 1.6; margin: 0;">
@@ -1918,8 +1951,8 @@
                     </div>
 
                     <!-- Creencia 4: La Ley de Dios -->
-                    <div
-                        style="background: var(--pure-white); padding: 1.5rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); border-left: 4px solid var(--golden); transition: all 0.3s ease;">
+                    <div class="creencia-card-hover"
+                        style="background: var(--pure-white); padding: 1.5rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); border-left: 4px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <h4 style="color: var(--deep-blue); font-size: 1rem; margin-bottom: 0.5rem;">📖 La Ley de Dios
                         </h4>
                         <p style="color: var(--dark-text); font-size: 0.9rem; line-height: 1.6; margin: 0;">
@@ -1929,8 +1962,8 @@
                     </div>
 
                     <!-- Creencia 5: El Don de Profecía -->
-                    <div
-                        style="background: var(--pure-white); padding: 1.5rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); border-left: 4px solid var(--golden); transition: all 0.3s ease;">
+                    <div class="creencia-card-hover"
+                        style="background: var(--pure-white); padding: 1.5rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); border-left: 4px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <h4 style="color: var(--deep-blue); font-size: 1rem; margin-bottom: 0.5rem;">🔮 El Don de
                             Profecía</h4>
                         <p style="color: var(--dark-text); font-size: 0.9rem; line-height: 1.6; margin: 0;">
@@ -1940,8 +1973,8 @@
                     </div>
 
                     <!-- Creencia 6: Salud y Cuidado -->
-                    <div
-                        style="background: var(--pure-white); padding: 1.5rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); border-left: 4px solid var(--golden); transition: all 0.3s ease;">
+                    <div class="creencia-card-hover"
+                        style="background: var(--pure-white); padding: 1.5rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); border-left: 4px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <h4 style="color: var(--deep-blue); font-size: 1rem; margin-bottom: 0.5rem;">🥗 Salud y Cuidado
                         </h4>
                         <p style="color: var(--dark-text); font-size: 0.9rem; line-height: 1.6; margin: 0;">
@@ -1959,8 +1992,8 @@
                     <i class="fas fa-bullseye" style="color: var(--golden);"></i> Misión y Visión
                 </h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                    <div
-                        style="background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; box-shadow: var(--shadow-sm); border-left: 6px solid #2e7d32;">
+                    <div class="mv-card-hover"
+                        style="background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; box-shadow: var(--shadow-sm); border-left: 6px solid #2e7d32; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <h4 style="color: var(--deep-blue); font-size: 1.3rem; margin-bottom: 0.5rem;">🎯 Misión</h4>
                         <p style="color: var(--dark-text); line-height: 1.8; margin: 0;">
                             <strong>Proclamar el evangelio eterno</strong> a todo el mundo, preparando a un pueblo para
@@ -1968,8 +2001,8 @@
                             amor en acción.
                         </p>
                     </div>
-                    <div
-                        style="background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; box-shadow: var(--shadow-sm); border-left: 6px solid var(--golden);">
+                    <div class="mv-card-hover"
+                        style="background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; box-shadow: var(--shadow-sm); border-left: 6px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <h4 style="color: var(--deep-blue); font-size: 1.3rem; margin-bottom: 0.5rem;">👁️ Visión</h4>
                         <p style="color: var(--dark-text); line-height: 1.8; margin: 0;">
                             Ser una <strong>comunidad transformadora</strong> que refleje el amor de Cristo, que impacte
@@ -1987,8 +2020,8 @@
                     <i class="fas fa-bible" style="color: var(--golden);"></i> Versículos Clave de nuestra Fe
                 </h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem;">
-                    <div
-                        style="background: var(--cream); padding: 1.5rem; border-radius: 1.2rem; border-left: 4px solid var(--golden);">
+                    <div class="versiculo-card-hover"
+                        style="background: var(--cream); padding: 1.5rem; border-radius: 1.2rem; border-left: 4px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <p
                             style="font-style: italic; color: var(--dark-text); font-size: 0.95rem; line-height: 1.7; margin: 0;">
                             "Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo
@@ -1997,8 +2030,8 @@
                         <p style="font-weight: 600; color: var(--deep-blue); margin-top: 0.5rem; text-align: right;">—
                             Juan 3:16</p>
                     </div>
-                    <div
-                        style="background: var(--cream); padding: 1.5rem; border-radius: 1.2rem; border-left: 4px solid var(--golden);">
+                    <div class="versiculo-card-hover"
+                        style="background: var(--cream); padding: 1.5rem; border-radius: 1.2rem; border-left: 4px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <p
                             style="font-style: italic; color: var(--dark-text); font-size: 0.95rem; line-height: 1.7; margin: 0;">
                             "Acuérdate del día de reposo para santificarlo... porque en seis días hizo Jehová los cielos
@@ -2007,8 +2040,8 @@
                         <p style="font-weight: 600; color: var(--deep-blue); margin-top: 0.5rem; text-align: right;">—
                             Éxodo 20:8-11</p>
                     </div>
-                    <div
-                        style="background: var(--cream); padding: 1.5rem; border-radius: 1.2rem; border-left: 4px solid var(--golden);">
+                    <div class="versiculo-card-hover"
+                        style="background: var(--cream); padding: 1.5rem; border-radius: 1.2rem; border-left: 4px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <p
                             style="font-style: italic; color: var(--dark-text); font-size: 0.95rem; line-height: 1.7; margin: 0;">
                             "Porque el Señor mismo descenderá del cielo con voz de mando... y los muertos en Cristo
@@ -2027,8 +2060,8 @@
                     <i class="fas fa-question-circle" style="color: var(--golden);"></i> Preguntas Frecuentes
                 </h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;">
-                    <div
-                        style="background: var(--pure-white); padding: 1.2rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+                    <div class="faq-card-hover"
+                        style="background: var(--pure-white); padding: 1.2rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <h4 style="color: var(--deep-blue); font-size: 0.95rem; margin-bottom: 0.3rem;">❓ ¿Por qué
                             guardan el sábado?</h4>
                         <p style="color: var(--dark-text); font-size: 0.9rem; line-height: 1.6; margin: 0;">
@@ -2036,8 +2069,8 @@
                             para nosotros. Es un día de descanso y adoración en el que nos conectamos con el Creador.
                         </p>
                     </div>
-                    <div
-                        style="background: var(--pure-white); padding: 1.2rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+                    <div class="faq-card-hover"
+                        style="background: var(--pure-white); padding: 1.2rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <h4 style="color: var(--deep-blue); font-size: 0.95rem; margin-bottom: 0.3rem;">❓ ¿Qué creen
                             sobre la muerte?</h4>
                         <p style="color: var(--dark-text); font-size: 0.9rem; line-height: 1.6; margin: 0;">
@@ -2045,8 +2078,8 @@
                             La vida eterna es un don que se recibe en la resurrección cuando Cristo regrese.
                         </p>
                     </div>
-                    <div
-                        style="background: var(--pure-white); padding: 1.2rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+                    <div class="faq-card-hover"
+                        style="background: var(--pure-white); padding: 1.2rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <h4 style="color: var(--deep-blue); font-size: 0.95rem; margin-bottom: 0.3rem;">❓ ¿Se puede ser
                             adventista y comer de todo?</h4>
                         <p style="color: var(--dark-text); font-size: 0.9rem; line-height: 1.6; margin: 0;">
@@ -2054,8 +2087,8 @@
                             esto es una decisión personal basada en el amor al cuerpo como templo del Espíritu Santo.
                         </p>
                     </div>
-                    <div
-                        style="background: var(--pure-white); padding: 1.2rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); transition: all 0.3s ease;">
+                    <div class="faq-card-hover"
+                        style="background: var(--pure-white); padding: 1.2rem; border-radius: 1.2rem; box-shadow: var(--shadow-sm); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                         <h4 style="color: var(--deep-blue); font-size: 0.95rem; margin-bottom: 0.3rem;">❓ ¿Creen en el
                             fin del mundo?</h4>
                         <p style="color: var(--dark-text); font-size: 0.9rem; line-height: 1.6; margin: 0;">
@@ -2099,6 +2132,7 @@
         <div id="historia" class="page">
             <button class="back-link" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> Volver</button>
 
+            <!-- ========== TÍTULO PRINCIPAL ========== -->
             <div style="text-align: center; margin-bottom: 2.5rem;">
                 <span
                     style="background: var(--golden); color: var(--pure-white); padding: 0.3rem 1.5rem; border-radius: 2rem; font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; display: inline-block; margin-bottom: 0.8rem;">
@@ -2108,114 +2142,104 @@
                     <i class="fas fa-church" style="color: var(--golden);"></i>
                     La Historia de la Iglesia Adventista del Séptimo Día
                 </h2>
+                <div
+                    style="width: 80px; height: 4px; background: var(--golden); margin: 0.5rem auto 0; border-radius: 4px;">
+                </div>
                 <p style="color: var(--muted-text); max-width: 700px; margin: 0 auto; font-size: 1.05rem;">
                     Un viaje de fe, profecía y esperanza que comenzó en el siglo XIX y transformó al mundo
                 </p>
             </div>
 
             <!-- 1. El Despertar Millerita -->
-            <div class="service-box" style="border-left: 6px solid var(--golden);">
-                <h3 style="color: var(--deep-blue);"><i class="fas fa-lightbulb" style="color: var(--golden);"></i>
-                    El Despertar Millerita (1830-1844)</h3>
+            <div class="service-box historia-card-hover"
+                style="border-left: 6px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
+                <h3 style="color: var(--deep-blue);"><i class="fas fa-lightbulb" style="color: var(--golden);"></i> El
+                    Despertar Millerita (1830-1844)</h3>
                 <p style="margin-top: 0.8rem; line-height: 1.8;">
-                    A principios del siglo XIX, un gran avivamiento espiritual recorrió Estados Unidos y Europa. En
-                    este contexto,
-                    un granjero bautista llamado <strong>William Miller</strong> (1782-1849) comenzó un estudio
-                    profundo de las profecías bíblicas,
-                    especialmente del libro de Daniel. Tras años de estudio, Miller llegó a la conclusión de que la
-                    segunda venida
-                    de Cristo ocurriría alrededor del año 1843-1844.
+                    A principios del siglo XIX, un gran avivamiento espiritual recorrió Estados Unidos y Europa. En este
+                    contexto, un granjero bautista llamado <strong>William Miller</strong> (1782-1849) comenzó un
+                    estudio profundo de las profecías bíblicas, especialmente del libro de Daniel. Tras años de estudio,
+                    Miller llegó a la conclusión de que la segunda venida de Cristo ocurriría alrededor del año
+                    1843-1844.
                 </p>
                 <p style="margin-top: 0.6rem; line-height: 1.8;">
-                    Su mensaje se difundió rápidamente y miles de personas de diferentes denominaciones se unieron
-                    al
+                    Su mensaje se difundió rápidamente y miles de personas de diferentes denominaciones se unieron al
                     <strong>movimiento millerita</strong>. La esperanza del pronto regreso de Jesús llenó de gozo y
-                    expectativa
-                    a miles de creyentes que se preparaban espiritualmente para el gran día.
+                    expectativa a miles de creyentes que se preparaban espiritualmente para el gran día.
                 </p>
                 <div
                     style="background: var(--cream); padding: 1rem; border-radius: 1rem; margin-top: 1rem; border-left: 4px solid var(--golden);">
                     <p style="font-weight: 600; color: var(--deep-blue);">📖 Texto clave:</p>
-                    <p style="font-style: italic; color: var(--dark-text);">"Y él dijo: Hasta dos mil trescientas
-                        tardes y mañanas; luego el santuario será purificado." — Daniel 8:14</p>
+                    <p style="font-style: italic; color: var(--dark-text);">"Y él dijo: Hasta dos mil trescientas tardes
+                        y mañanas; luego el santuario será purificado." — Daniel 8:14</p>
                 </div>
             </div>
 
             <!-- 2. El Gran Chasco de 1844 -->
-            <div class="service-box" style="border-left: 6px solid #c0392b;">
+            <div class="service-box historia-card-hover"
+                style="border-left: 6px solid #c0392b; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                 <h3 style="color: var(--deep-blue);"><i class="fas fa-tragedy" style="color: #c0392b;"></i> El Gran
                     Chasco de 1844</h3>
                 <p style="margin-top: 0.8rem; line-height: 1.8;">
-                    El 22 de octubre de 1844, los milleritas esperaban con gran expectación el regreso de Cristo.
-                    Sin embargo,
-                    la fecha pasó y Jesús no vino. Este día es conocido como el <strong>"Gran Chasco"</strong>
-                    (Great Disappointment).
-                    Para muchos, fue un momento de profunda confusión y desilusión.
+                    El 22 de octubre de 1844, los milleritas esperaban con gran expectación el regreso de Cristo. Sin
+                    embargo, la fecha pasó y Jesús no vino. Este día es conocido como el <strong>"Gran Chasco"</strong>
+                    (Great Disappointment). Para muchos, fue un momento de profunda confusión y desilusión.
                 </p>
                 <p style="margin-top: 0.6rem; line-height: 1.8;">
-                    Sin embargo, un pequeño grupo de creyentes no abandonó su fe. Continuaron estudiando las
-                    Escrituras,
-                    convencidos de que Dios tenía un propósito en este aparente fracaso. Fue entonces cuando
-                    comenzaron a
-                    comprender que la profecía no se refería a la venida de Cristo a la tierra, sino a un evento
-                    celestial:
-                    el inicio del ministerio de Jesús en el <strong>Lugar Santísimo</strong> del Santuario
+                    Sin embargo, un pequeño grupo de creyentes no abandonó su fe. Continuaron estudiando las Escrituras,
+                    convencidos de que Dios tenía un propósito en este aparente fracaso. Fue entonces cuando comenzaron
+                    a comprender que la profecía no se refería a la venida de Cristo a la tierra, sino a un evento
+                    celestial: el inicio del ministerio de Jesús en el <strong>Lugar Santísimo</strong> del Santuario
                     celestial.
                 </p>
                 <div
                     style="background: #fef2f2; padding: 1rem; border-radius: 1rem; margin-top: 1rem; border-left: 4px solid #c0392b;">
                     <p style="font-weight: 600; color: var(--deep-blue);">📖 Texto clave:</p>
-                    <p style="font-style: italic; color: var(--dark-text);">"Hasta dos mil trescientas tardes y
-                        mañanas; luego el santuario será purificado." — Daniel 8:14 (Reinterpretado)</p>
+                    <p style="font-style: italic; color: var(--dark-text);">"Hasta dos mil trescientas tardes y mañanas;
+                        luego el santuario será purificado." — Daniel 8:14 (Reinterpretado)</p>
                 </div>
             </div>
 
             <!-- 3. La Luz del Santuario y el Juicio Investigador -->
-            <div class="service-box" style="border-left: 6px solid #2980b9;">
-                <h3 style="color: var(--deep-blue);"><i class="fas fa-temple" style="color: #2980b9;"></i> La Luz
-                    del Santuario y el Juicio Investigador</h3>
+            <div class="service-box historia-card-hover"
+                style="border-left: 6px solid #2980b9; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
+                <h3 style="color: var(--deep-blue);"><i class="fas fa-temple" style="color: #2980b9;"></i> La Luz del
+                    Santuario y el Juicio Investigador</h3>
                 <p style="margin-top: 0.8rem; line-height: 1.8;">
                     Tras el chasco, los creyentes comenzaron a entender que el Santuario terrenal era un símbolo del
-                    <strong>Santuario celestial</strong>, donde Jesús ejerce como Sumo Sacerdote. La profecía de
-                    Daniel 8:14
-                    señalaba el momento en que Cristo comenzaría su obra final de intercesión: el <strong>Juicio
+                    <strong>Santuario celestial</strong>, donde Jesús ejerce como Sumo Sacerdote. La profecía de Daniel
+                    8:14 señalaba el momento en que Cristo comenzaría su obra final de intercesión: el <strong>Juicio
                         Investigador</strong>.
                 </p>
                 <p style="margin-top: 0.6rem; line-height: 1.8;">
-                    Esta doctrina se convirtió en el fundamento de la teología adventista. El Santuario representa
-                    el plan de
-                    salvación: desde el sacrificio de Cristo en la cruz (el altar) hasta su intercesión en el cielo
-                    (el santuario)
-                    y su regreso final (la purificación de la tierra).
+                    Esta doctrina se convirtió en el fundamento de la teología adventista. El Santuario representa el
+                    plan de salvación: desde el sacrificio de Cristo en la cruz (el altar) hasta su intercesión en el
+                    cielo (el santuario) y su regreso final (la purificación de la tierra).
                 </p>
                 <div
                     style="background: var(--cream); padding: 1rem; border-radius: 1rem; margin-top: 1rem; border-left: 4px solid #2980b9;">
                     <p style="font-weight: 600; color: var(--deep-blue);">📖 Texto clave:</p>
                     <p style="font-style: italic; color: var(--dark-text);">"Tenemos tal sumo sacerdote, el cual se
-                        sentó a la diestra del trono de la Majestad en los cielos, ministro del santuario, y de
-                        aquel verdadero tabernáculo que levantó el Señor, y no el hombre." — Hebreos 8:1-2</p>
+                        sentó a la diestra del trono de la Majestad en los cielos, ministro del santuario, y de aquel
+                        verdadero tabernáculo que levantó el Señor, y no el hombre." — Hebreos 8:1-2</p>
                 </div>
             </div>
 
             <!-- 4. El Don de Profecía: Elena G. de White -->
-            <div class="service-box" style="border-left: 6px solid #8e44ad;">
+            <div class="service-box historia-card-hover"
+                style="border-left: 6px solid #8e44ad; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                 <h3 style="color: var(--deep-blue);"><i class="fas fa-bible" style="color: #8e44ad;"></i> El Don de
                     Profecía: Elena G. de White</h3>
                 <p style="margin-top: 0.8rem; line-height: 1.8;">
                     En 1844, una joven llamada <strong>Elena Harmon</strong> (luego Elena G. de White, 1827-1915)
-                    recibió su
-                    primera visión. Durante los siguientes 70 años, recibió miles de visiones y revelaciones que
-                    guiaron a la
-                    iglesia en su comprensión de las Escrituras y en su misión. Sus escritos abarcan temas
-                    teológicos, proféticos,
-                    de salud, educación y vida práctica.
+                    recibió su primera visión. Durante los siguientes 70 años, recibió miles de visiones y revelaciones
+                    que guiaron a la iglesia en su comprensión de las Escrituras y en su misión. Sus escritos abarcan
+                    temas teológicos, proféticos, de salud, educación y vida práctica.
                 </p>
                 <p style="margin-top: 0.6rem; line-height: 1.8;">
-                    Elena G. de White no es considerada una "fundadora" de la iglesia, sino una <strong>mensajera
-                        del Señor</strong>
-                    que ejerció el don de profecía. Sus escritos siempre están sujetos a la autoridad suprema de la
-                    Biblia y son
-                    una guía fiel para la vida y doctrina de la iglesia.
+                    Elena G. de White no es considerada una "fundadora" de la iglesia, sino una <strong>mensajera del
+                        Señor</strong> que ejerció el don de profecía. Sus escritos siempre están sujetos a la autoridad
+                    suprema de la Biblia y son una guía fiel para la vida y doctrina de la iglesia.
                 </p>
                 <div
                     style="background: var(--cream); padding: 1rem; border-radius: 1rem; margin-top: 1rem; border-left: 4px solid #8e44ad;">
@@ -2226,80 +2250,70 @@
             </div>
 
             <!-- 5. La Organización de la Iglesia (1863) -->
-            <div class="service-box" style="border-left: 6px solid #27ae60;">
+            <div class="service-box historia-card-hover"
+                style="border-left: 6px solid #27ae60; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                 <h3 style="color: var(--deep-blue);"><i class="fas fa-sitemap" style="color: #27ae60;"></i> La
                     Organización de la Iglesia (1863)</h3>
                 <p style="margin-top: 0.8rem; line-height: 1.8;">
                     El 21 de mayo de 1863, en Battle Creek, Michigan, se organizó formalmente la <strong>Iglesia
-                        Adventista del
-                        Séptimo Día</strong>. Un grupo de 3,500 creyentes de 125 iglesias se unieron para formar una
-                    denominación
-                    estructurada, con el objetivo de proclamar el mensaje de los tres ángeles de Apocalipsis 14 a
-                    todo el mundo.
+                        Adventista del Séptimo Día</strong>. Un grupo de 3,500 creyentes de 125 iglesias se unieron para
+                    formar una denominación estructurada, con el objetivo de proclamar el mensaje de los tres ángeles de
+                    Apocalipsis 14 a todo el mundo.
                 </p>
                 <p style="margin-top: 0.6rem; line-height: 1.8;">
-                    La organización incluía una estructura de conferencias locales, uniones y la Asociación General,
-                    que es la
-                    máxima autoridad eclesiástica. Esta estructura ha permitido que la iglesia crezca de manera
-                    ordenada y
-                    eficiente en su misión global.
+                    La organización incluía una estructura de conferencias locales, uniones y la Asociación General, que
+                    es la máxima autoridad eclesiástica. Esta estructura ha permitido que la iglesia crezca de manera
+                    ordenada y eficiente en su misión global.
                 </p>
                 <div
                     style="background: var(--cream); padding: 1rem; border-radius: 1rem; margin-top: 1rem; border-left: 4px solid #27ae60;">
                     <p style="font-weight: 600; color: var(--deep-blue);">📖 Texto clave:</p>
-                    <p style="font-style: italic; color: var(--dark-text);">"Y él mismo constituyó a unos,
-                        apóstoles; a otros, profetas; a otros, evangelistas; a otros, pastores y maestros, a fin de
-                        perfeccionar a los santos para la obra del ministerio, para la edificación del cuerpo de
-                        Cristo." — Efesios 4:11-12</p>
+                    <p style="font-style: italic; color: var(--dark-text);">"Y él mismo constituyó a unos, apóstoles; a
+                        otros, profetas; a otros, evangelistas; a otros, pastores y maestros, a fin de perfeccionar a
+                        los santos para la obra del ministerio, para la edificación del cuerpo de Cristo." — Efesios
+                        4:11-12</p>
                 </div>
             </div>
 
             <!-- 6. El Mensaje de los Tres Ángeles y la Expansión Mundial -->
-            <div class="service-box" style="border-left: 6px solid #e67e22;">
-                <h3 style="color: var(--deep-blue);"><i class="fas fa-globe-americas" style="color: #e67e22;"></i>
-                    El Mensaje de los Tres Ángeles y la Expansión Mundial</h3>
+            <div class="service-box historia-card-hover"
+                style="border-left: 6px solid #e67e22; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
+                <h3 style="color: var(--deep-blue);"><i class="fas fa-globe-americas" style="color: #e67e22;"></i> El
+                    Mensaje de los Tres Ángeles y la Expansión Mundial</h3>
                 <p style="margin-top: 0.8rem; line-height: 1.8;">
                     La iglesia adoptó como su misión central el <strong>mensaje de los tres ángeles</strong> de
-                    Apocalipsis 14:
-                    adorar al Creador, salir de Babilonia y prepararse para el juicio final. Este mensaje se ha
-                    proclamado en
-                    más de 200 países y territorios.
+                    Apocalipsis 14: adorar al Creador, salir de Babilonia y prepararse para el juicio final. Este
+                    mensaje se ha proclamado en más de 200 países y territorios.
                 </p>
                 <p style="margin-top: 0.6rem; line-height: 1.8;">
                     Hoy, la Iglesia Adventista del Séptimo Día es una de las denominaciones cristianas de más rápido
-                    crecimiento
-                    en el mundo, con más de 22 millones de miembros bautizados. Su obra incluye educación (más de
-                    7,000 escuelas),
-                    salud (más de 600 hospitales y clínicas), medios de comunicación (3ABN, Hope Channel) y una
-                    labor humanitaria
-                    que transforma vidas.
+                    crecimiento en el mundo, con más de 22 millones de miembros bautizados. Su obra incluye educación
+                    (más de 7,000 escuelas), salud (más de 600 hospitales y clínicas), medios de comunicación (3ABN,
+                    Hope Channel) y una labor humanitaria que transforma vidas.
                 </p>
                 <div
                     style="background: var(--cream); padding: 1rem; border-radius: 1rem; margin-top: 1rem; border-left: 4px solid #e67e22;">
                     <p style="font-weight: 600; color: var(--deep-blue);">📖 Texto clave:</p>
                     <p style="font-style: italic; color: var(--dark-text);">"Vi a otro ángel volar por en medio del
-                        cielo, que tenía el evangelio eterno para predicarlo a los moradores de la tierra...
-                        diciendo: Temed a Dios, y dadle gloria, porque la hora de su juicio ha llegado." —
-                        Apocalipsis 14:6-7</p>
+                        cielo, que tenía el evangelio eterno para predicarlo a los moradores de la tierra... diciendo:
+                        Temed a Dios, y dadle gloria, porque la hora de su juicio ha llegado." — Apocalipsis 14:6-7</p>
                 </div>
             </div>
 
             <!-- 7. El Mensaje de Esperanza para el Mundo -->
-            <div class="service-box" style="border-left: 6px solid var(--golden);">
+            <div class="service-box historia-card-hover"
+                style="border-left: 6px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                 <h3 style="color: var(--deep-blue);"><i class="fas fa-hope" style="color: var(--golden);"></i> Un
                     Mensaje de Esperanza para el Mundo</h3>
                 <p style="margin-top: 0.8rem; line-height: 1.8;">
                     A lo largo de su historia, la Iglesia Adventista del Séptimo Día ha mantenido su enfoque en la
-                    <strong>esperanza del pronto regreso de Jesús</strong>. Esta esperanza no es un escapismo, sino
-                    un
+                    <strong>esperanza del pronto regreso de Jesús</strong>. Esta esperanza no es un escapismo, sino un
                     llamado a vivir una vida de fe, amor y servicio en el presente.
                 </p>
                 <p style="margin-top: 0.6rem; line-height: 1.8;">
-                    La iglesia cree que el mundo está en las etapas finales del gran conflicto entre Cristo y
-                    Satanás, y que
-                    el mensaje de salvación debe ser proclamado a todo el mundo antes de que Jesús regrese. Esta
-                    convicción
-                    impulsa a los adventistas a ser luz en un mundo oscuro y a ser agentes de esperanza y
+                    La iglesia cree que el mundo está en las etapas finales del gran conflicto entre Cristo y Satanás, y
+                    que el mensaje de salvación debe ser proclamado a todo el mundo antes de que Jesús regrese. Esta
+                    convicción impulsa a los adventistas a ser luz en un mundo oscuro y a ser agentes de esperanza y
                     restauración.
                 </p>
                 <div
@@ -2309,6 +2323,7 @@
                         conmigo, para recompensar a cada uno según sea su obra." — Apocalipsis 22:12</p>
                 </div>
             </div>
+
             <!-- ========== CTA FINAL ========== -->
             <div
                 style="background: linear-gradient(135deg, var(--deep-blue), #1a2a4a); padding: 2.5rem; border-radius: 1.5rem; color: var(--pure-white); text-align: center; margin-top: 2rem;">
@@ -2371,7 +2386,7 @@
 
                 <!-- Tarjeta 1: Iglesia Local -->
                 <div class="estructura-card"
-                    style="background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 5px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    style="background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 5px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                     <h4 style="color: var(--deep-blue); font-size: 1.1rem; margin-bottom: 0.5rem;">🏛️ Iglesia Local
                     </h4>
                     <p style="color: var(--dark-text); font-size: 0.9rem; line-height: 1.7; margin: 0;">
@@ -2384,7 +2399,7 @@
 
                 <!-- Tarjeta 2: Asociación / Misión -->
                 <div class="estructura-card"
-                    style="background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 5px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    style="background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 5px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                     <h4 style="color: var(--deep-blue); font-size: 1.1rem; margin-bottom: 0.5rem;">🏢 Asociación /
                         Misión</h4>
                     <p style="color: var(--dark-text); font-size: 0.9rem; line-height: 1.7; margin: 0;">
@@ -2397,7 +2412,7 @@
 
                 <!-- Tarjeta 3: Unión -->
                 <div class="estructura-card"
-                    style="background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 5px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    style="background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 5px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                     <h4 style="color: var(--deep-blue); font-size: 1.1rem; margin-bottom: 0.5rem;">🌍 Unión</h4>
                     <p style="color: var(--dark-text); font-size: 0.9rem; line-height: 1.7; margin: 0;">
                         Oficina que orienta y ofrece apoyo al trabajo de las Asociaciones y Misiones. Es responsable por
@@ -2408,7 +2423,7 @@
 
                 <!-- Tarjeta 4: Asociación General -->
                 <div class="estructura-card"
-                    style="background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 5px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    style="background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 5px solid var(--golden); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default;">
                     <h4 style="color: var(--deep-blue); font-size: 1.1rem; margin-bottom: 0.5rem;">🌐 Asociación General
                     </h4>
                     <p style="color: var(--dark-text); font-size: 0.9rem; line-height: 1.7; margin: 0;">
@@ -2434,125 +2449,126 @@
             </p>
 
             <!-- Mapa -->
-            <div style="text-align: center; margin-bottom: 2rem;">
+            <div class="mapa-container-hover"
+                style="text-align: center; margin-bottom: 2rem; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.08); transition: all 0.5s ease; cursor: default;">
                 <img src="img/Mapa.png" alt="Mapa de Divisiones Mundiales"
-                    style="width: 100%; max-width: 1000px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); display: block; margin: 0 auto; transition: transform 0.5s ease;" />
+                    style="width: 100%; max-width: 1000px; border-radius: 20px; display: block; margin: 0 auto; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);" />
             </div>
 
             <!-- Lista de Divisiones (Grid 4 columnas) -->
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; margin-bottom: 3rem;">
 
                 <!-- División 1 -->
-                <div
-                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #2d5016; transition: all 0.3s ease;">
+                <div class="division-card-hover"
+                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #2d5016; transition: all 0.3s ease; cursor: default;">
                     <p style="margin: 0;"><strong style="color: var(--deep-blue);">División Africana
                             Centro-Occidental</strong><br><span
                             style="color: var(--muted-text); font-size: 0.85rem;">Sede: Costa de Marfil</span></p>
                 </div>
 
                 <!-- División 2 -->
-                <div
-                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #1a6b5a; transition: all 0.3s ease;">
+                <div class="division-card-hover"
+                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #1a6b5a; transition: all 0.3s ease; cursor: default;">
                     <p style="margin: 0;"><strong style="color: var(--deep-blue);">División Africana
                             Centro-Oriental</strong><br><span
                             style="color: var(--muted-text); font-size: 0.85rem;">Sede: Kenia</span></p>
                 </div>
 
                 <!-- División 3 -->
-                <div
-                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #6a1b4d; transition: all 0.3s ease;">
+                <div class="division-card-hover"
+                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #6a1b4d; transition: all 0.3s ease; cursor: default;">
                     <p style="margin: 0;"><strong style="color: var(--deep-blue);">División del Pacífico
                             Sur</strong><br><span style="color: var(--muted-text); font-size: 0.85rem;">Sede:
                             Australia</span></p>
                 </div>
 
                 <!-- División 4 -->
-                <div
-                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #d4772a; transition: all 0.3s ease;">
+                <div class="division-card-hover"
+                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #d4772a; transition: all 0.3s ease; cursor: default;">
                     <p style="margin: 0;"><strong style="color: var(--deep-blue);">División
                             Intereuropea</strong><br><span style="color: var(--muted-text); font-size: 0.85rem;">Sede:
                             Suiza</span></p>
                 </div>
 
                 <!-- División 5 -->
-                <div
-                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #1a2a4a; transition: all 0.3s ease;">
+                <div class="division-card-hover"
+                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #1a2a4a; transition: all 0.3s ease; cursor: default;">
                     <p style="margin: 0;"><strong style="color: var(--deep-blue);">División
                             Euroasiática</strong><br><span style="color: var(--muted-text); font-size: 0.85rem;">Sede:
                             Rusia</span></p>
                 </div>
 
                 <!-- ⭐ DIVISIÓN INTERAMERICANA (RESALTADA) -->
-                <div
-                    style="background: #fef9e6; padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: 0 8px 25px rgba(201,157,59,0.15); border: 2px solid var(--golden); transition: all 0.3s ease; position: relative;">
+                <div class="division-destacada-hover"
+                    style="background: #fef9e6; padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: 0 8px 25px rgba(201,157,59,0.15); border: 2px solid var(--golden); transition: all 0.3s ease; position: relative; cursor: default; animation: glow-pulse 3s ease-in-out infinite;">
                     <p style="margin: 0;">
                         <strong style="color: var(--deep-blue);">⭐ División Interamericana</strong><br>
                         <span style="color: var(--muted-text); font-size: 0.85rem;">Sede: Estados Unidos</span>
                     </p>
                     <div
-                        style="position: absolute; top: -8px; right: -8px; background: var(--golden); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; box-shadow: 0 4px 12px rgba(201,157,59,0.3);">
+                        style="position: absolute; top: -8px; right: -8px; background: var(--golden); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; box-shadow: 0 4px 12px rgba(201,157,59,0.3); animation: spin-star 4s linear infinite;">
                         ⭐</div>
                 </div>
 
                 <!-- División 7 -->
-                <div
-                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #4a8db7; transition: all 0.3s ease;">
+                <div class="division-card-hover"
+                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #4a8db7; transition: all 0.3s ease; cursor: default;">
                     <p style="margin: 0;"><strong style="color: var(--deep-blue);">División
                             Norteamericana</strong><br><span style="color: var(--muted-text); font-size: 0.85rem;">Sede:
                             Estados Unidos</span></p>
                 </div>
 
                 <!-- División 8 -->
-                <div
-                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #f4c430; transition: all 0.3s ease;">
+                <div class="division-card-hover"
+                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #f4c430; transition: all 0.3s ease; cursor: default;">
                     <p style="margin: 0;"><strong style="color: var(--deep-blue);">División Norasiática del
                             Pacífico</strong><br><span style="color: var(--muted-text); font-size: 0.85rem;">Sede: Corea
                             del Sur</span></p>
                 </div>
 
                 <!-- División 9 -->
-                <div
-                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #1a4a3a; transition: all 0.3s ease;">
+                <div class="division-card-hover"
+                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #1a4a3a; transition: all 0.3s ease; cursor: default;">
                     <p style="margin: 0;"><strong style="color: var(--deep-blue);">División Africana del Sur y del
                             Océano Índico</strong><br><span style="color: var(--muted-text); font-size: 0.85rem;">Sede:
                             Sudáfrica</span></p>
                 </div>
 
                 <!-- División 10 -->
-                <div
-                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #1a2a5a; transition: all 0.3s ease;">
+                <div class="division-card-hover"
+                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #1a2a5a; transition: all 0.3s ease; cursor: default;">
                     <p style="margin: 0;"><strong style="color: var(--deep-blue);">División
                             Sudamericana</strong><br><span style="color: var(--muted-text); font-size: 0.85rem;">Sede:
                             Brasil</span></p>
                 </div>
 
                 <!-- División 11 -->
-                <div
-                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #6a4a2a; transition: all 0.3s ease;">
+                <div class="division-card-hover"
+                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #6a4a2a; transition: all 0.3s ease; cursor: default;">
                     <p style="margin: 0;"><strong style="color: var(--deep-blue);">División
                             Sudasiática</strong><br><span style="color: var(--muted-text); font-size: 0.85rem;">Sede:
                             India</span></p>
                 </div>
 
                 <!-- División 12 -->
-                <div
-                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #5a9a6a; transition: all 0.3s ease;">
+                <div class="division-card-hover"
+                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #5a9a6a; transition: all 0.3s ease; cursor: default;">
                     <p style="margin: 0;"><strong style="color: var(--deep-blue);">División
                             Transeuropea</strong><br><span style="color: var(--muted-text); font-size: 0.85rem;">Sede:
                             Inglaterra</span></p>
                 </div>
 
                 <!-- División 13 -->
-                <div
-                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #7aaa4a; transition: all 0.3s ease;">
+                <div class="division-card-hover"
+                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #7aaa4a; transition: all 0.3s ease; cursor: default;">
                     <p style="margin: 0;"><strong style="color: var(--deep-blue);">Unión del Medio Oriente y Norte de
                             África</strong><br><span style="color: var(--muted-text); font-size: 0.85rem;">Sede:
                             Líbano</span></p>
                 </div>
 
                 <!-- División 14 -->
-                <div
-                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #c0392b; transition: all 0.3s ease;">
+                <div class="division-card-hover"
+                    style="background: var(--pure-white); padding: 1rem 1.2rem; border-radius: 1rem; box-shadow: var(--shadow-sm); border-left: 4px solid #c0392b; transition: all 0.3s ease; cursor: default;">
                     <p style="margin: 0;"><strong style="color: var(--deep-blue);">División Sudasiática del
                             Pacífico</strong><br><span style="color: var(--muted-text); font-size: 0.85rem;">Sede:
                             Filipinas</span></p>
@@ -2578,103 +2594,122 @@
 
                 <!-- Estadística 1 -->
                 <div class="estadistica-card"
-                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default; position: relative; overflow: hidden;">
                     <div
-                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden);">
+                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden); transition: all 0.4s ease;">
                         <i class="fas fa-building"></i>
                     </div>
-                    <p style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0;">212</p>
+                    <p
+                        style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0; transition: all 0.4s ease;">
+                        212</p>
                     <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">Países con presencia adventista</p>
                 </div>
 
                 <!-- Estadística 2 -->
                 <div class="estadistica-card"
-                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default; position: relative; overflow: hidden;">
                     <div
-                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden);">
+                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden); transition: all 0.4s ease;">
                         <i class="fas fa-globe-americas"></i>
                     </div>
-                    <p style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0;">22.785.195</p>
+                    <p
+                        style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0; transition: all 0.4s ease;">
+                        22.785.195</p>
                     <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">Adventistas en el mundo</p>
                 </div>
 
                 <!-- Estadística 3 -->
                 <div class="estadistica-card"
-                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default; position: relative; overflow: hidden;">
                     <div
-                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden);">
+                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden); transition: all 0.4s ease;">
                         <i class="fas fa-language"></i>
                     </div>
-                    <p style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0;">535</p>
+                    <p
+                        style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0; transition: all 0.4s ease;">
+                        535</p>
                     <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">Idiomas y dialectos utilizados</p>
                 </div>
 
                 <!-- Estadística 4 -->
                 <div class="estadistica-card"
-                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default; position: relative; overflow: hidden;">
                     <div
-                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden);">
+                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden); transition: all 0.4s ease;">
                         <i class="fas fa-graduation-cap"></i>
                     </div>
-                    <p style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0;">9.419</p>
+                    <p
+                        style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0; transition: all 0.4s ease;">
+                        9.419</p>
                     <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">Unidades educativas</p>
                 </div>
 
                 <!-- Estadística 5 -->
                 <div class="estadistica-card"
-                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default; position: relative; overflow: hidden;">
                     <div
-                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden);">
+                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden); transition: all 0.4s ease;">
                         <i class="fas fa-user-graduate"></i>
                     </div>
-                    <p style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0;">2.023.844</p>
+                    <p
+                        style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0; transition: all 0.4s ease;">
+                        2.023.844</p>
                     <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">Estudiantes</p>
                 </div>
 
                 <!-- Estadística 6 -->
                 <div class="estadistica-card"
-                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default; position: relative; overflow: hidden;">
                     <div
-                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden);">
+                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden); transition: all 0.4s ease;">
                         <i class="fas fa-hospital"></i>
                     </div>
-                    <p style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0;">229</p>
+                    <p
+                        style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0; transition: all 0.4s ease;">
+                        229</p>
                     <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">Clínicas y hospitales</p>
                 </div>
 
                 <!-- Estadística 7 -->
                 <div class="estadistica-card"
-                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default; position: relative; overflow: hidden;">
                     <div
-                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden);">
+                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden); transition: all 0.4s ease;">
                         <i class="fas fa-industry"></i>
                     </div>
-                    <p style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0;">22</p>
+                    <p
+                        style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0; transition: all 0.4s ease;">
+                        22</p>
                     <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">Industrias alimentarias</p>
                 </div>
 
                 <!-- Estadística 8 -->
                 <div class="estadistica-card"
-                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default; position: relative; overflow: hidden;">
                     <div
-                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden);">
+                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden); transition: all 0.4s ease;">
                         <i class="fas fa-book-open"></i>
                     </div>
-                    <p style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0;">57</p>
+                    <p
+                        style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0; transition: all 0.4s ease;">
+                        57</p>
                     <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">Editoriales</p>
                 </div>
 
                 <!-- Estadística 9 -->
                 <div class="estadistica-card"
-                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    style="background: linear-gradient(145deg, #131F2C, #1A2A40); padding: 1.8rem; border-radius: 1.5rem; text-align: center; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: default; position: relative; overflow: hidden;">
                     <div
-                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden);">
+                        style="background: rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.8rem; font-size: 1.5rem; color: var(--golden); transition: all 0.4s ease;">
                         <i class="fas fa-book"></i>
                     </div>
-                    <p style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0;">342</p>
+                    <p
+                        style="font-size: 2rem; font-weight: 800; color: var(--golden); margin: 0; transition: all 0.4s ease;">
+                        342</p>
                     <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">Idiomas para libros y revistas</p>
                 </div>
             </div>
+
             <!-- ========== CTA FINAL ========== -->
             <div
                 style="background: linear-gradient(135deg, var(--deep-blue), #1a2a4a); padding: 2.5rem; border-radius: 1.5rem; color: var(--pure-white); text-align: center; margin-top: 2rem;">

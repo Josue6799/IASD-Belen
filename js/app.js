@@ -768,3 +768,215 @@ window.addEventListener('scroll', function () {
 }, { passive: true });
 
 console.log('✅ Scroll Reveal - Animaciones inicializadas correctamente');
+
+// ========================================
+// GRUPOS PEQUEÑOS - DATOS Y FUNCIONALIDAD
+// ========================================
+
+// Datos de los 8 grupos pequeños
+const GRUPOS_PEQUEÑOS = {
+    'unidos_en_verdad': {
+        nombre: 'Unidos en Verdad',
+        responsable: 'ALEX CABRERA',
+        anfitrion: 'ROCIO OSPINO',
+        direccion: 'CRA 11 SUR # 71 - 51',
+        versiculo: '"Donde están dos o tres congregados en mi nombre, allí estoy yo en medio de ellos." - Mateo 18:20',
+        icono: 'fa-home'
+    },
+    'mansion_gloriosa': {
+        nombre: 'Mansión Gloriosa',
+        responsable: 'JOSE CAMPO RAMIREZ',
+        anfitrion: 'ANA TORRES',
+        direccion: 'CALLE 64 # 5A SUR 36',
+        versiculo: '"Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree no se pierda, mas tenga vida eterna" - Juan 3:16',
+        icono: 'fa-home'
+    },
+    'mansion_gloriosa_kid': {
+        nombre: 'Mansión Gloriosa Kid',
+        responsable: 'SARAY PACHECO',
+        anfitrion: 'ANA TORRES',
+        direccion: 'CALLE 64 # 5A SUR 36',
+        versiculo: '"Dejad a los niños venir a mí, y no se lo impidáis..." - Mateo 19:14',
+        icono: 'fa-child'
+    },
+    'aposento_alto': {
+        nombre: 'Aposento Alto',
+        responsable: 'LILIANA CASTRO',
+        anfitrion: 'LESBIA FUENTE',
+        direccion: 'CALLE 51 B # 3A SUR 88',
+        versiculo: '"Estad siempre gozosos. Orad sin cesar." - 1 Tesalonicenses 5:16-17',
+        icono: 'fa-arrow-up'
+    },
+    'jehova_jireh': {
+        nombre: 'Jehová Jireh',
+        responsable: 'MERLIS CONRADO TORRES',
+        anfitrion: 'VADITH TORRES',
+        direccion: 'CALLE 98C #2D-139 CONJUNTO 5 TORRE 13 GARDENIAS',
+        versiculo: '"Por nada estéis afanosos..." - Filipenses 4:6',
+        icono: 'fa-cross'
+    },
+    'maranatha_1': {
+        nombre: 'Maranatha 1',
+        responsable: 'MARTIN ALVAREZ',
+        anfitrion: 'EMILETH',
+        direccion: 'CALLE 62 CON CARRERA 1A',
+        versiculo: '"Ven, Señor Jesús." - Apocalipsis 22:20',
+        icono: 'fa-star'
+    },
+    'maranatha_2': {
+        nombre: 'Maranatha 2',
+        responsable: 'YUDIS TORRES',
+        anfitrion: 'ROSA PEREZ',
+        direccion: 'CRA 7 SUR #51B-167',
+        versiculo: '"¡Maranatha! El Señor viene." - 1 Corintios 16:22',
+        icono: 'fa-star'
+    },
+    'ah_de_venir': {
+        nombre: 'Ah de Venir',
+        responsable: 'MARLIS ALVAREZ',
+        anfitrion: 'NEREIDA ORTEGA',
+        direccion: 'CALLE 80 # 1B-35',
+        versiculo: '"El que da testimonio de estas cosas dice Ciertamente vengo en breve. Amén; sí, ven, Señor Jesús. " - Apocalipsis 22:20',
+        icono: 'fa-clock'
+    }
+};
+
+/**
+ * Muestra la tarjeta de información de un grupo
+ */
+function mostrarGrupo(grupoId) {
+    // Obtener datos del grupo
+    const grupo = GRUPOS_PEQUEÑOS[grupoId];
+    if (!grupo) {
+        console.warn('⚠️ Grupo no encontrado:', grupoId);
+        return;
+    }
+
+    // Buscar o crear contenedor de la tarjeta
+    let container = document.getElementById('grupoCardContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'grupoCardContainer';
+        container.className = 'grupo-card-container';
+
+        // Insertar después del navbar
+        const navbar = document.querySelector('.navbar');
+        if (navbar && navbar.parentNode) {
+            navbar.parentNode.insertBefore(container, navbar.nextSibling);
+        } else {
+            document.body.insertBefore(container, document.body.firstChild);
+        }
+    }
+
+    // Generar el contenido de la tarjeta
+    container.innerHTML = `
+        <div class="grupo-card">
+            <div class="titulo-grupo">
+                <i class="fas ${grupo.icono}"></i>
+                ${grupo.nombre}
+            </div>
+            
+            <div class="info-line">
+                <i class="fas fa-user"></i>
+                <span><strong>Responsable:</strong> ${grupo.responsable}</span>
+            </div>
+            
+            <div class="info-line">
+                <i class="fas fa-user-friends"></i>
+                <span><strong>Anfitrión:</strong> ${grupo.anfitrion}</span>
+            </div>
+            
+            <div class="info-line">
+                <i class="fas fa-map-pin"></i>
+                <span><strong>Ubicación:</strong> ${grupo.direccion}</span>
+            </div>
+            
+            <div class="versiculo">
+                <i class="fas fa-bible" style="margin-right: 0.5rem; opacity: 0.6;"></i>
+                ${grupo.versiculo}
+            </div>
+        </div>
+    `;
+
+    // Activar la tarjeta con animación
+    setTimeout(() => {
+        container.classList.add('active');
+    }, 50);
+
+    // Cerrar menús
+    cerrarMenus();
+
+    // Scroll suave a la tarjeta
+    setTimeout(() => {
+        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 200);
+
+    console.log(`📋 Mostrando grupo: ${grupo.nombre}`);
+}
+
+/**
+ * Cierra todos los menús desplegables
+ */
+function cerrarMenus() {
+    // Cerrar submenús de grupos en móvil
+    document.querySelectorAll('.grupos-pequenos-item.open').forEach(el => {
+        el.classList.remove('open');
+    });
+
+    // Cerrar otros dropdowns si es necesario
+    document.querySelectorAll('.dropdown.open').forEach(el => {
+        el.classList.remove('open');
+    });
+}
+
+/**
+ * Alterna la visibilidad del submenú en móviles (touch)
+ */
+function toggleSubmenuGrupos(event) {
+    event.stopPropagation();
+    const parent = event.currentTarget.closest('.grupos-pequenos-item');
+    if (parent) {
+        parent.classList.toggle('open');
+    }
+}
+
+// ========================================
+// INICIALIZAR MENÚ EN MÓVILES (TOUCH)
+// ========================================
+
+// Detectar si es dispositivo táctil
+const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+if (isTouchDevice) {
+    document.addEventListener('DOMContentLoaded', function () {
+        // Para móviles: abrir submenú con clic
+        const gruposItem = document.querySelector('.grupos-pequenos-item');
+        if (gruposItem) {
+            const link = gruposItem.querySelector('a');
+            if (link) {
+                link.addEventListener('click', toggleSubmenuGrupos);
+            }
+        }
+    });
+}
+
+// Cerrar tarjeta al hacer clic en otro lado
+document.addEventListener('click', function (event) {
+    const container = document.getElementById('grupoCardContainer');
+    if (container && container.classList.contains('active')) {
+        // Verificar si el clic fue fuera de la tarjeta y fuera del menú
+        const target = event.target;
+        const isCardClick = container.contains(target);
+        const isMenuClick = target.closest('.dropdown-menu') || target.closest('.grupos-pequenos-item');
+
+        if (!isCardClick && !isMenuClick) {
+            // Cerrar la tarjeta
+            container.classList.remove('active');
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 600);
+        }
+    }
+});
+
+console.log('✅ Grupos pequeños - Sistema cargado correctamente');

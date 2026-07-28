@@ -2170,3 +2170,489 @@
 .scroll-reveal.delay-8 {
     transition-delay: 0.8s;
 }
+
+/* ========================================
+   HOVER EFFECTS - SECCIÓN VISITANTES
+   ======================================== */
+
+/* --- TARJETAS DE CREENCIAS --- */
+.creencia-card-hover {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    cursor: default !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.creencia-card-hover:hover {
+    transform: translateY(-12px) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1) !important;
+    border-left-color: var(--golden) !important;
+}
+
+.creencia-card-hover:hover h4 {
+    color: var(--golden) !important;
+}
+
+.creencia-card-hover::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(201, 157, 59, 0.03), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.creencia-card-hover:hover::after {
+    opacity: 1;
+    animation: shimmer-card 1.5s ease-in-out;
+}
+
+/* --- TARJETAS DE MISIÓN Y VISIÓN --- */
+.mv-card-hover {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    cursor: default !important;
+}
+
+.mv-card-hover:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* --- TARJETAS DE VERSÍCULOS --- */
+.versiculo-card-hover {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    cursor: default !important;
+}
+
+.versiculo-card-hover:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important;
+    border-left-color: var(--golden) !important;
+}
+
+/* --- TARJETAS DE FAQ --- */
+.faq-card-hover {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    cursor: default !important;
+}
+
+.faq-card-hover:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important;
+    border-color: var(--golden-light) !important;
+}
+
+/* ========================================
+   HOVER EFFECTS - SECCIÓN HISTORIA
+   ======================================== */
+
+.historia-card-hover {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    cursor: default !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.historia-card-hover:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1) !important;
+}
+
+.historia-card-hover:hover h3 {
+    color: var(--golden) !important;
+}
+
+.historia-card-hover::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(201, 157, 59, 0.02), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.historia-card-hover:hover::after {
+    opacity: 1;
+    animation: shimmer-card 1.5s ease-in-out;
+}
+
+/* ========================================
+   HOVER EFFECTS - SECCIÓN ESTRUCTURA
+   ======================================== */
+
+/* --- TARJETAS DE JERARQUÍA --- */
+.estructura-card-hover {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    cursor: default !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.estructura-card-hover:hover {
+    transform: translateY(-10px) scale(1.01) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12) !important;
+    border-left-color: var(--golden) !important;
+}
+
+.estructura-card-hover:hover h4 {
+    color: var(--golden) !important;
+}
+
+.estructura-card-hover::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(201, 157, 59, 0.03), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.estructura-card-hover:hover::after {
+    opacity: 1;
+    animation: shimmer-card 1.5s ease-in-out;
+}
+
+/* --- TARJETAS DE DIVISIONES --- */
+.division-card-hover {
+    transition: all 0.3s ease !important;
+    cursor: default !important;
+}
+
+.division-card-hover:hover {
+    transform: translateY(-4px) scale(1.02) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+/* --- DIVISIÓN INTERAMERICANA (RESALTADA) --- */
+.division-destacada-hover {
+    transition: all 0.3s ease !important;
+    cursor: default !important;
+}
+
+.division-destacada-hover:hover {
+    transform: translateY(-4px) scale(1.03) !important;
+    box-shadow: 0 12px 35px rgba(201, 157, 59, 0.25) !important;
+}
+
+/* --- TARJETAS DE ESTADÍSTICAS --- */
+.estadistica-card-hover {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    cursor: default !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.estadistica-card-hover:hover {
+    transform: translateY(-8px) scale(1.02) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4) !important;
+}
+
+.estadistica-card-hover:hover .icono-circle {
+    background: rgba(201, 157, 59, 0.15) !important;
+    transform: scale(1.1) !important;
+    border-color: var(--golden) !important;
+}
+
+.estadistica-card-hover:hover .numero {
+    text-shadow: 0 0 20px rgba(201, 157, 59, 0.3) !important;
+    transform: scale(1.05) !important;
+}
+
+.estadistica-card-hover::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--golden), transparent);
+    opacity: 0;
+    transition: all 0.5s ease;
+}
+
+.estadistica-card-hover:hover::after {
+    opacity: 1;
+    animation: border-flow 2s ease-in-out infinite;
+}
+
+/* --- MAPA --- */
+.mapa-container-hover {
+    transition: all 0.5s ease !important;
+    cursor: default !important;
+}
+
+.mapa-container-hover:hover {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15) !important;
+    transform: scale(1.01) !important;
+}
+
+.mapa-container-hover:hover img {
+    transform: scale(1.02) !important;
+}
+
+/* ========================================
+   ANIMACIONES COMPARTIDAS
+   ======================================== */
+
+@keyframes shimmer-card {
+    0% {
+        transform: translateX(-100%) rotate(0deg);
+    }
+
+    100% {
+        transform: translateX(100%) rotate(0deg);
+    }
+}
+
+@keyframes border-flow {
+    0% {
+        background: linear-gradient(90deg, transparent, var(--golden), transparent);
+    }
+
+    50% {
+        background: linear-gradient(90deg, var(--golden), #f0d68a, var(--golden));
+    }
+
+    100% {
+        background: linear-gradient(90deg, transparent, var(--golden), transparent);
+    }
+}
+
+@keyframes glow-pulse {
+
+    0%,
+    100% {
+        border-color: var(--golden);
+        box-shadow: 0 8px 25px rgba(201, 157, 59, 0.15);
+    }
+
+    50% {
+        border-color: #f0d68a;
+        box-shadow: 0 8px 35px rgba(201, 157, 59, 0.3);
+    }
+}
+
+@keyframes spin-star {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========================================
+   SUBMENÚ GRUPOS PEQUEÑOS
+   ======================================== */
+
+/* Estilo para el ítem "Grupos pequeños" en el menú */
+.grupos-pequenos-item {
+    position: relative;
+}
+
+.grupos-pequenos-item>a {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    cursor: pointer !important;
+}
+
+/* Submenú de Grupos Pequeños - efecto hover */
+.grupos-pequenos-item:hover .submenu-grupos {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateX(0) scale(1) !important;
+}
+
+/* Estilos del submenú de grupos */
+.submenu-grupos {
+    position: absolute !important;
+    left: 100% !important;
+    top: 0 !important;
+    background: var(--pure-white) !important;
+    min-width: 230px !important;
+    border-radius: 1.2rem !important;
+    padding: 0.5rem 0 !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12) !important;
+    border: 1px solid rgba(201, 157, 59, 0.1) !important;
+    border-left: 3px solid var(--golden) !important;
+    list-style: none !important;
+    z-index: 200 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transform: translateX(8px) scale(0.96) !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* Items del submenú */
+.submenu-grupos li a {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.7rem !important;
+    padding: 0.6rem 1.4rem !important;
+    font-weight: 500 !important;
+    font-size: 0.85rem !important;
+    color: var(--dark-text) !important;
+    transition: all 0.25s ease !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+.submenu-grupos li a:hover {
+    background: rgba(30, 52, 78, 0.06) !important;
+    color: var(--golden) !important;
+    padding-left: 1.8rem !important;
+}
+
+.submenu-grupos li a i {
+    color: var(--golden) !important;
+    width: 1.2rem !important;
+    text-align: center !important;
+    font-size: 0.85rem !important;
+    transition: all 0.25s ease !important;
+}
+
+.submenu-grupos li a:hover i {
+    transform: scale(1.1) !important;
+}
+
+/* ========================================
+   TARJETA DE GRUPO PEQUEÑO (INFORMACIÓN)
+   ======================================== */
+
+.grupo-card-container {
+    max-height: 0 !important;
+    overflow: hidden !important;
+    transition: max-height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease, margin 0.5s ease !important;
+    opacity: 0 !important;
+    margin: 0 !important;
+}
+
+.grupo-card-container.active {
+    max-height: 600px !important;
+    opacity: 1 !important;
+    margin: 1.5rem 0 !important;
+}
+
+.grupo-card {
+    background: var(--pure-white) !important;
+    padding: 2rem 2.5rem !important;
+    border-radius: 1.6rem !important;
+    border-left: 6px solid var(--golden) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06) !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+}
+
+.grupo-card:hover {
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.1) !important;
+}
+
+.grupo-card .titulo-grupo {
+    color: var(--deep-blue) !important;
+    font-size: 1.8rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 0.3rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.8rem !important;
+}
+
+.grupo-card .titulo-grupo i {
+    color: var(--golden) !important;
+    font-size: 1.6rem !important;
+}
+
+.grupo-card .info-line {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.8rem !important;
+    padding: 0.4rem 0 !important;
+    color: var(--dark-text) !important;
+    font-size: 0.95rem !important;
+}
+
+.grupo-card .info-line i {
+    color: var(--golden) !important;
+    width: 1.4rem !important;
+    text-align: center !important;
+    font-size: 1rem !important;
+}
+
+.grupo-card .info-line strong {
+    color: var(--deep-blue) !important;
+    font-weight: 600 !important;
+}
+
+.grupo-card .versiculo {
+    margin-top: 1rem !important;
+    padding-top: 1rem !important;
+    border-top: 1px solid rgba(201, 157, 59, 0.15) !important;
+    font-style: italic !important;
+    color: var(--golden) !important;
+    font-size: 1.1rem !important;
+    line-height: 1.7 !important;
+    text-align: center !important;
+}
+
+/* Responsive para móviles (touch) */
+@media (max-width: 768px) {
+    .submenu-grupos {
+        position: static !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-left: 3px solid var(--golden) !important;
+        padding-left: 1.2rem !important;
+        display: none !important;
+        background: transparent !important;
+        min-width: 100% !important;
+        transition: none !important;
+    }
+
+    .grupos-pequenos-item.open .submenu-grupos {
+        display: block !important;
+    }
+
+    .grupo-card {
+        padding: 1.5rem !important;
+    }
+
+    .grupo-card .titulo-grupo {
+        font-size: 1.3rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .grupo-card {
+        padding: 1rem !important;
+    }
+
+    .grupo-card .titulo-grupo {
+        font-size: 1.1rem !important;
+    }
+
+    .grupo-card .info-line {
+        font-size: 0.85rem !important;
+    }
+
+    .grupo-card .versiculo {
+        font-size: 0.95rem !important;
+    }
+}
