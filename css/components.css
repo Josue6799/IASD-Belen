@@ -3093,3 +3093,275 @@
         width: 95%;
     }
 }
+
+/* ========================================
+   SISTEMA DE EVALUACIÓN Y CURSOS - ESTILOS
+   ======================================== */
+
+/* --- Botón Evaluación (flotante) --- */
+#btnEvaluacion {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 999;
+}
+
+#btnEvaluacion:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 40px rgba(30, 52, 78, 0.5);
+}
+
+#btnEvaluacion:active {
+    transform: scale(0.95);
+}
+
+/* --- Modal de Evaluación (contraseña) --- */
+#modalEvaluacion .modal-card {
+    max-width: 400px;
+}
+
+#modalEvaluacion input:focus {
+    border-color: var(--golden);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(212, 160, 56, 0.15);
+}
+
+#modalEvaluacion .btn-outline {
+    border: 2px solid var(--deep-blue);
+    color: var(--deep-blue);
+    background: transparent;
+}
+
+#modalEvaluacion .btn-outline:hover {
+    background: var(--deep-blue);
+    color: white;
+}
+
+/* --- Dashboard --- */
+#dashboardEvaluacion {
+    animation: fadeInUp 0.4s ease forwards;
+}
+
+#dashboardEvaluacion .tab-btn {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+#dashboardEvaluacion .tab-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* --- Tarjetas de cursos --- */
+.curso-card {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border: 2px solid transparent;
+}
+
+.curso-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    border-color: var(--golden);
+}
+
+.curso-card:active {
+    transform: scale(0.97);
+}
+
+/* --- Modales de inscripción --- */
+#modalInscripcion .modal-card {
+    max-width: 450px;
+}
+
+#modalInscripcion .form-group input:focus {
+    border-color: var(--golden);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(212, 160, 56, 0.15);
+}
+
+#modalInscripcion .btn-success {
+    background: #2e7d32;
+    color: white;
+}
+
+#modalInscripcion .btn-success:hover {
+    background: #1b5e20;
+}
+
+#modalInscripcion .btn-danger {
+    background: #c62828;
+    color: white;
+}
+
+#modalInscripcion .btn-danger:hover {
+    background: #b71c1c;
+}
+
+/* --- Modal Administrador --- */
+#modalAdmin .modal-card {
+    max-width: 400px;
+}
+
+/* --- Tabla de resultados --- */
+#contenidoResultados table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 400px;
+}
+
+#contenidoResultados thead tr {
+    background: var(--deep-blue);
+    color: white;
+}
+
+#contenidoResultados th {
+    padding: 0.8rem 1rem;
+    text-align: left;
+    font-weight: 600;
+}
+
+#contenidoResultados td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    color: var(--dark-text);
+}
+
+#contenidoResultados tbody tr:nth-child(even) {
+    background: #faf8f5;
+}
+
+#contenidoResultados tbody tr:hover {
+    background: rgba(30, 52, 78, 0.04);
+}
+
+/* --- Botón Modo Administrador --- */
+#dashboardEvaluacion .admin-btn {
+    background: #2e7d32;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 2rem;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+    transition: all 0.3s ease;
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 100;
+}
+
+#dashboardEvaluacion .admin-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(46, 125, 50, 0.4);
+}
+
+/* --- Responsive para Dashboard --- */
+@media (max-width: 768px) {
+    #dashboardEvaluacion {
+        padding: 0.8rem;
+    }
+
+    #dashboardEvaluacion .tab-btn {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.6rem;
+        min-width: 60px;
+    }
+
+    .curso-card {
+        padding: 1.5rem !important;
+    }
+
+    .curso-card h3 {
+        font-size: 1rem;
+    }
+
+    #btnEvaluacion {
+        width: 60px;
+        height: 60px;
+        bottom: 1.2rem;
+        right: 1.2rem;
+    }
+
+    #btnEvaluacion i {
+        font-size: 1.2rem;
+    }
+
+    #btnEvaluacion span {
+        font-size: 0.45rem;
+    }
+
+    #dashboardEvaluacion .admin-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.7rem;
+        bottom: 1.2rem;
+        right: 5.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #dashboardEvaluacion .tab-btn {
+        font-size: 0.65rem;
+        padding: 0.4rem 0.5rem;
+        min-width: 50px;
+    }
+
+    #btnEvaluacion {
+        width: 55px;
+        height: 55px;
+        bottom: 1rem;
+        right: 1rem;
+    }
+
+    #btnEvaluacion i {
+        font-size: 1rem;
+    }
+
+    #btnEvaluacion span {
+        font-size: 0.4rem;
+    }
+
+    #dashboardEvaluacion .admin-btn {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.6rem;
+        bottom: 1rem;
+        right: 4.5rem;
+    }
+
+    #modalEvaluacion .modal-card {
+        padding: 1.5rem;
+    }
+
+    #modalEvaluacion .modal-card input {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    #contenidoResultados table {
+        font-size: 0.75rem;
+        min-width: 300px;
+    }
+
+    #contenidoResultados th,
+    #contenidoResultados td {
+        padding: 0.5rem 0.6rem;
+    }
+}
+
+/* ========================================
+   BOTÓN ADMIN FLOTANTE (FIX)
+   ======================================== */
+
+.btn-admin-flotante {
+    position: fixed !important;
+    bottom: 2rem !important;
+    right: 2rem !important;
+    z-index: 9999 !important;
+}
+
+#dashboardEvaluacion button[onclick*="cerrarSesionAdmin"] {
+    position: fixed !important;
+    bottom: 2rem !important;
+    right: 2rem !important;
+    z-index: 9999 !important;
+}

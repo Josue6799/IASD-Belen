@@ -708,3 +708,616 @@
 .modal-container::-webkit-scrollbar-thumb:hover {
     background: #b8892e;
 }
+
+/* ========================================
+   SISTEMA DE EVALUACIÓN Y CURSOS - ESTILOS
+   ======================================== */
+
+/* --- Dashboard --- */
+#dashboardEvaluacion {
+    background: var(--cream, #fcfaf5);
+    animation: fadeInUp 0.4s ease forwards;
+}
+
+/* --- Encabezado del Dashboard --- */
+#dashboardEvaluacion .dashboard-header {
+    background: var(--deep-blue, #1e344e);
+    padding: 1rem 1.5rem;
+    border-radius: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+#dashboardEvaluacion .dashboard-header .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+#dashboardEvaluacion .dashboard-header .logo-area img {
+    height: 40px;
+    width: auto;
+    border-radius: 8px;
+    background: white;
+    padding: 4px;
+}
+
+#dashboardEvaluacion .dashboard-header .logo-area span {
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+#dashboardEvaluacion .dashboard-header .btn-cerrar {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 0.5rem 1.2rem;
+    border-radius: 2rem;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+#dashboardEvaluacion .dashboard-header .btn-cerrar:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+/* --- Contenedor de pestañas --- */
+#dashboardEvaluacion .tabs-container {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    background: var(--pure-white, #ffffff);
+    padding: 0.5rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+#dashboardEvaluacion .tab-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 0.7rem 1rem;
+    border: none;
+    border-radius: 1rem;
+    font-weight: 600;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    background: transparent;
+    color: var(--muted-text, #7a8494);
+    font-size: 0.9rem;
+}
+
+#dashboardEvaluacion .tab-btn:hover {
+    background: rgba(30, 52, 78, 0.05);
+    color: var(--deep-blue, #1e344e);
+    transform: translateY(-2px);
+}
+
+#dashboardEvaluacion .tab-btn.active {
+    background: var(--golden, #d4a038);
+    color: var(--deep-blue, #1e344e);
+    box-shadow: 0 4px 12px rgba(212, 160, 56, 0.25);
+}
+
+#dashboardEvaluacion .tab-btn i {
+    margin-right: 0.4rem;
+}
+
+/* --- Contenido de pestañas --- */
+#dashboardEvaluacion .tab-content {
+    display: none;
+    animation: fadeInUp 0.3s ease forwards;
+}
+
+#dashboardEvaluacion .tab-content.active {
+    display: block;
+}
+
+#dashboardEvaluacion .tab-content h2 {
+    color: var(--deep-blue, #1e344e);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+#dashboardEvaluacion .tab-content .card-content {
+    background: var(--pure-white, #ffffff);
+    padding: 2rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* --- Tarjetas de cursos --- */
+#dashboardEvaluacion .curso-card {
+    background: var(--pure-white, #ffffff);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+#dashboardEvaluacion .curso-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--golden, #d4a038), #e8c84a);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#dashboardEvaluacion .curso-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.10);
+    border-color: rgba(212, 160, 56, 0.2);
+}
+
+#dashboardEvaluacion .curso-card:hover::before {
+    opacity: 1;
+}
+
+#dashboardEvaluacion .curso-card .curso-icono {
+    font-size: 3.2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+#dashboardEvaluacion .curso-card h3 {
+    color: var(--deep-blue, #1e344e);
+    margin: 0.5rem 0 0.3rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+#dashboardEvaluacion .curso-card p {
+    color: var(--muted-text, #7a8494);
+    font-size: 0.9rem;
+    margin: 0 0 0.8rem;
+    line-height: 1.5;
+}
+
+#dashboardEvaluacion .curso-card .badge-inscribirse {
+    display: inline-block;
+    background: var(--golden, #d4a038);
+    color: var(--deep-blue, #1e344e);
+    padding: 0.3rem 1.2rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease-in-out;
+}
+
+#dashboardEvaluacion .curso-card:hover .badge-inscribirse {
+    background: var(--deep-blue, #1e344e);
+    color: var(--pure-white, #ffffff);
+    transform: scale(1.05);
+}
+
+/* --- Grid de cursos --- */
+#dashboardEvaluacion .cursos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* --- Plan de Estudios --- */
+#dashboardEvaluacion .plan-estudios {
+    background: var(--pure-white, #ffffff);
+    padding: 2rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+#dashboardEvaluacion .plan-estudios .curso-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+#dashboardEvaluacion .plan-estudios .curso-header .icono {
+    font-size: 3rem;
+}
+
+#dashboardEvaluacion .plan-estudios .curso-header h2 {
+    color: var(--deep-blue, #1e344e);
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+#dashboardEvaluacion .plan-estudios .curso-header p {
+    color: var(--muted-text, #7a8494);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+#dashboardEvaluacion .plan-estudios .descripcion-curso {
+    background: var(--cream, #fcfaf5);
+    padding: 1rem;
+    border-radius: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+#dashboardEvaluacion .plan-estudios .descripcion-curso p {
+    color: var(--dark-text, #2a3344);
+    margin: 0;
+}
+
+#dashboardEvaluacion .plan-estudios .seccion {
+    margin-bottom: 1.5rem;
+}
+
+#dashboardEvaluacion .plan-estudios .seccion h3 {
+    color: var(--deep-blue, #1e344e);
+    margin-bottom: 0.5rem;
+    border-bottom: 2px solid var(--golden, #d4a038);
+    padding-bottom: 0.3rem;
+}
+
+#dashboardEvaluacion .plan-estudios .seccion .tema-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+#dashboardEvaluacion .plan-estudios .seccion .tema-item .numero {
+    background: var(--golden, #d4a038);
+    color: var(--deep-blue, #1e344e);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+#dashboardEvaluacion .plan-estudios .seccion .tema-item span {
+    color: var(--dark-text, #2a3344);
+}
+
+#dashboardEvaluacion .plan-estudios .seccion .ayudas-placeholder {
+    background: var(--cream, #fcfaf5);
+    padding: 1rem;
+    border-radius: 1rem;
+    text-align: center;
+}
+
+#dashboardEvaluacion .plan-estudios .seccion .ayudas-placeholder p {
+    color: var(--muted-text, #7a8494);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* --- Botón Evaluación (flotante) --- */
+#btnEvaluacion {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 999;
+}
+
+#btnEvaluacion:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 40px rgba(30, 52, 78, 0.5);
+}
+
+#btnEvaluacion:active {
+    transform: scale(0.95);
+}
+
+/* --- Modal de Evaluación (contraseña) --- */
+#modalEvaluacion .modal-card {
+    max-width: 400px;
+}
+
+#modalEvaluacion input:focus {
+    border-color: var(--golden);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(212, 160, 56, 0.15);
+}
+
+#modalEvaluacion .btn-outline {
+    border: 2px solid var(--deep-blue);
+    color: var(--deep-blue);
+    background: transparent;
+}
+
+#modalEvaluacion .btn-outline:hover {
+    background: var(--deep-blue);
+    color: white;
+}
+
+/* --- Modales de inscripción --- */
+#modalInscripcion .modal-card {
+    max-width: 450px;
+}
+
+#modalInscripcion .form-group input:focus {
+    border-color: var(--golden);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(212, 160, 56, 0.15);
+}
+
+#modalInscripcion .btn-success {
+    background: #2e7d32;
+    color: white;
+}
+
+#modalInscripcion .btn-success:hover {
+    background: #1b5e20;
+}
+
+#modalInscripcion .btn-danger {
+    background: #c62828;
+    color: white;
+}
+
+#modalInscripcion .btn-danger:hover {
+    background: #b71c1c;
+}
+
+/* --- Modal Administrador --- */
+#modalAdmin .modal-card {
+    max-width: 400px;
+}
+
+/* --- Tabla de resultados --- */
+#contenidoResultados table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 400px;
+}
+
+#contenidoResultados thead tr {
+    background: var(--deep-blue);
+    color: white;
+}
+
+#contenidoResultados th {
+    padding: 0.8rem 1rem;
+    text-align: left;
+    font-weight: 600;
+}
+
+#contenidoResultados td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    color: var(--dark-text);
+}
+
+#contenidoResultados tbody tr:nth-child(even) {
+    background: #faf8f5;
+}
+
+#contenidoResultados tbody tr:hover {
+    background: rgba(30, 52, 78, 0.04);
+}
+
+/* --- Botón Modo Administrador --- */
+#dashboardEvaluacion .admin-btn {
+    background: #2e7d32;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 2rem;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+    transition: all 0.3s ease;
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 100;
+}
+
+#dashboardEvaluacion .admin-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(46, 125, 50, 0.4);
+}
+
+/* --- Animación de entrada --- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Responsive para Dashboard --- */
+@media (max-width: 768px) {
+    #dashboardEvaluacion {
+        padding: 0.8rem;
+    }
+
+    #dashboardEvaluacion .dashboard-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.8rem 1rem;
+    }
+
+    #dashboardEvaluacion .dashboard-header .logo-area span {
+        font-size: 0.9rem;
+    }
+
+    #dashboardEvaluacion .dashboard-header .btn-cerrar {
+        font-size: 0.75rem;
+        padding: 0.4rem 1rem;
+    }
+
+    #dashboardEvaluacion .tab-btn {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.6rem;
+        min-width: 60px;
+    }
+
+    #dashboardEvaluacion .cursos-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    #dashboardEvaluacion .curso-card {
+        padding: 1.5rem;
+    }
+
+    #dashboardEvaluacion .curso-card h3 {
+        font-size: 1rem;
+    }
+
+    #dashboardEvaluacion .plan-estudios {
+        padding: 1.5rem;
+    }
+
+    #dashboardEvaluacion .plan-estudios .curso-header h2 {
+        font-size: 1.4rem;
+    }
+
+    #btnEvaluacion {
+        width: 60px;
+        height: 60px;
+        bottom: 1.2rem;
+        right: 1.2rem;
+    }
+
+    #btnEvaluacion i {
+        font-size: 1.2rem;
+    }
+
+    #btnEvaluacion span {
+        font-size: 0.45rem;
+    }
+
+    #dashboardEvaluacion .admin-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.7rem;
+        bottom: 1.2rem;
+        right: 5.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #dashboardEvaluacion {
+        padding: 0.5rem;
+    }
+
+    #dashboardEvaluacion .dashboard-header {
+        padding: 0.6rem 0.8rem;
+        border-radius: 1rem;
+    }
+
+    #dashboardEvaluacion .dashboard-header .logo-area img {
+        height: 30px;
+        padding: 2px;
+    }
+
+    #dashboardEvaluacion .dashboard-header .logo-area span {
+        font-size: 0.75rem;
+    }
+
+    #dashboardEvaluacion .dashboard-header .btn-cerrar {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.8rem;
+    }
+
+    #dashboardEvaluacion .tab-btn {
+        font-size: 0.65rem;
+        padding: 0.4rem 0.5rem;
+        min-width: 50px;
+        border-radius: 0.8rem;
+    }
+
+    #dashboardEvaluacion .cursos-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #dashboardEvaluacion .tab-content .card-content {
+        padding: 1rem;
+    }
+
+    #dashboardEvaluacion .plan-estudios {
+        padding: 1rem;
+    }
+
+    #dashboardEvaluacion .plan-estudios .curso-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    #dashboardEvaluacion .plan-estudios .curso-header h2 {
+        font-size: 1.2rem;
+    }
+
+    #dashboardEvaluacion .plan-estudios .seccion .tema-item {
+        font-size: 0.85rem;
+    }
+
+    #btnEvaluacion {
+        width: 55px;
+        height: 55px;
+        bottom: 1rem;
+        right: 1rem;
+    }
+
+    #btnEvaluacion i {
+        font-size: 1rem;
+    }
+
+    #btnEvaluacion span {
+        font-size: 0.4rem;
+    }
+
+    #dashboardEvaluacion .admin-btn {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.6rem;
+        bottom: 1rem;
+        right: 4.5rem;
+    }
+
+    #modalEvaluacion .modal-card {
+        padding: 1.5rem;
+    }
+
+    #modalEvaluacion .modal-card input {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    #contenidoResultados table {
+        font-size: 0.75rem;
+        min-width: 300px;
+    }
+
+    #contenidoResultados th,
+    #contenidoResultados td {
+        padding: 0.5rem 0.6rem;
+    }
+
+    #modalInscripcion .modal-card {
+        padding: 1.2rem;
+    }
+}
