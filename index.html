@@ -3019,18 +3019,647 @@
 
     </div>
 
-    <!-- Módulos JavaScript -->
+    <!-- Módulos JavaScript (ORDEN CORRECTO) -->
     <script src="js/storage.js"></script>
+    <script src="js/app.js"></script>
     <script src="js/router.js"></script>
     <script src="js/calendar.js"></script>
     <script src="js/encuesta.js"></script>
     <script src="js/creencias.js"></script>
-
-    <!-- LMS: Sistema de Evaluación y Cursos -->
     <script src="js/LMS.js"></script>
 
-    <!-- App: Funciones Generales del Sitio (Debe ir al final) -->
-    <script src="js/app.js"></script>
+    <script>
+
+        // FORZAR FUNCIONES GLOBALES
+        window.abrirModalAdminGeneral = function () {
+            /* ========================================
+               PANEL DE ADMINISTRACIÓN GENERAL
+               IASD Belén · Iglesia Adventista
+               ======================================== */
+
+            // ===== INYECCIÓN DE ESTILOS CSS (VERSIÓN ESTABLE) =====
+            (function () {
+                const estilos = document.createElement('style');
+                estilos.textContent = `
+            /* Animaciones */
+            @keyframes fadeInUp {
+                from { opacity: 0; transform: translateY(30px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+            @keyframes slideDown {
+                from { opacity: 0; max-height: 0; }
+                to { opacity: 1; max-height: 500px; }
+            }
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+            
+            /* Overlay del modal */
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.6);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(4px);
+                animation: fadeInUp 0.3s ease;
+            }
+            
+            /* Tarjeta del admin */
+            .tarjeta-admin {
+                background: #ffffff;
+                border-radius: 1.5rem;
+                padding: 2rem;
+                border: 2px solid rgba(201,165,59,0.2);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-align: center;
+            }
+            .tarjeta-admin:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+                border-color: #c9a53b;
+            }
+            
+            /* Submenú (opciones simples) */
+            .submenu-opcion {
+                padding: 0.65rem 1rem;
+                border-radius: 0.8rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                color: #2d3748;
+                font-size: 0.9rem;
+                font-weight: 500;
+                border-bottom: 1px solid rgba(0,0,0,0.04);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            .submenu-opcion:hover {
+                background: #ffffff;
+                color: #1a3a4a;
+                padding-left: 1.3rem;
+            }
+            
+            /* ===== ESTILOS EXCLUSIVOS PARA CLUBES (ESTÁTICOS Y ORDENADOS) ===== */
+            .categoria-club {
+                padding: 0.7rem 1rem;
+                border-radius: 0.8rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                color: #1a3a4a;
+                font-size: 0.95rem;
+                font-weight: 600;
+                background: #f4f0ea;
+                margin-bottom: 0.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                border: 1px solid transparent;
+            }
+            .categoria-club:hover {
+                background: #e8e0d4;
+                border-color: #c9a53b;
+                padding-left: 1.3rem;
+            }
+
+            .sub-submenu-container {
+                overflow: hidden;
+                transition: max-height 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                margin-bottom: 0.5rem;
+                padding-left: 0.5rem;
+                border-left: 2px solid rgba(201,165,59,0.3);
+            }
+
+            .sub-submenu-opcion {
+                padding: 0.5rem 1rem 0.5rem 1.5rem;
+                border-radius: 0.6rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                color: #5a6474;
+                font-size: 0.85rem;
+                font-weight: 500;
+                border-bottom: 1px solid rgba(0,0,0,0.02);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            .sub-submenu-opcion:hover {
+                background: #ffffff;
+                color: #1a3a4a;
+                padding-left: 2rem;
+            }
+
+            /* Scrollbar personalizada */
+            #panelAdminGeneral::-webkit-scrollbar { width: 8px; }
+            #panelAdminGeneral::-webkit-scrollbar-track { background: #f1f1f1; }
+            #panelAdminGeneral::-webkit-scrollbar-thumb { background: #c9a53b; border-radius: 4px; }
+        `;
+                document.head.appendChild(estilos);
+            })();
+        }
+
+        // ===== DATOS DE LAS TARJETAS Y SUBMENÚS =====
+        const TARJETAS_ADMIN = [
+            {
+                id: 'clubes',
+                icono: '👥',
+                titulo: 'Clubes',
+                descripcion: 'Gestionar Aventureros, Conquistadores y Guías Mayores',
+                color: '#1a3a4a',
+                subopciones: [
+                    {
+                        texto: '🌟 Aventureros',
+                        accion: 'aventureros',
+                        esCategoria: true,
+                        subSubopciones: [
+                            { texto: '💰 Cuotas', accion: 'aventurerosCuotas' },
+                            { texto: '🗄️ Base de datos', accion: 'aventurerosBaseDatos' },
+                            { texto: '📅 Calendario', accion: 'aventurerosCalendario' }
+                        ]
+                    },
+                    {
+                        texto: '🏕️ Conquistadores',
+                        accion: 'conquistadores',
+                        esCategoria: true,
+                        subSubopciones: [
+                            { texto: '💰 Cuotas', accion: 'conquistadoresCuotas' },
+                            { texto: '🗄️ Base de datos', accion: 'conquistadoresBaseDatos' },
+                            { texto: '📅 Calendario', accion: 'conquistadoresCalendario' }
+                        ]
+                    },
+                    {
+                        texto: '🎓 Guías Mayores',
+                        accion: 'guiasMayores',
+                        esCategoria: true,
+                        subSubopciones: [
+                            { texto: '💰 Cuotas', accion: 'guiasMayoresCuotas' },
+                            { texto: '🗄️ Base de datos', accion: 'guiasMayoresBaseDatos' },
+                            { texto: '📅 Calendario', accion: 'guiasMayoresCalendario' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'iglesia',
+                icono: '⛪',
+                titulo: 'Iglesia',
+                descripcion: 'Gestionar Cronograma y Base de datos de la Iglesia',
+                color: '#2c5f7c',
+                subopciones: [
+                    { texto: '📅 Cronograma', accion: 'cronogramaIglesia' },
+                    { texto: '🗄️ Base de datos', accion: 'baseDatosIglesia' }
+                ]
+            },
+            {
+                id: 'biblioteca',
+                icono: '📚',
+                titulo: 'Biblioteca',
+                descripcion: 'Administrar el catálogo de libros disponibles',
+                color: '#1a3a4a',
+                subopciones: [
+                    { texto: '➕ Agregar libro', accion: 'agregarLibro' },
+                    { texto: '🗑️ Eliminar libro', accion: 'eliminarLibro' },
+                    { texto: '👁️ Ver libros pedidos', accion: 'verLibrosPedidos' }
+                ]
+            },
+            {
+                id: 'anuncios',
+                icono: '📢',
+                titulo: 'Anuncios',
+                descripcion: 'Gestionar eventos y anuncios de la iglesia',
+                color: '#2c5f7c',
+                subopciones: [
+                    { texto: '➕ Agregar eventos', accion: 'agregarEvento' },
+                    { texto: '🗑️ Quitar eventos', accion: 'quitarEvento' }
+                ]
+            }
+        ];
+
+        // ===== FUNCIONES DEL MODAL DE CONTRASEÑA =====
+
+        function abrirModalAdminGeneral() {
+            const modal = document.getElementById('modalAdminGeneral');
+            if (!modal) return;
+
+            modal.style.display = 'flex';
+            const input = document.getElementById('inputPasswordAdminGeneral');
+            const error = document.getElementById('errorPasswordAdminGeneral');
+
+            if (input) input.value = '';
+            if (error) error.style.display = 'none';
+
+            setTimeout(() => {
+                if (input) input.focus();
+            }, 300);
+        }
+
+        function cerrarModalAdminGeneral() {
+            const modal = document.getElementById('modalAdminGeneral');
+            if (!modal) return;
+
+            modal.style.display = 'none';
+
+            const input = document.getElementById('inputPasswordAdminGeneral');
+            const error = document.getElementById('errorPasswordAdminGeneral');
+            if (input) input.value = '';
+            if (error) error.style.display = 'none';
+        }
+
+        function verificarPasswordAdminGeneral() {
+            const input = document.getElementById('inputPasswordAdminGeneral');
+            if (!input) return;
+
+            const password = input.value.trim();
+            const error = document.getElementById('errorPasswordAdminGeneral');
+
+            if (password === 'admin2026') {
+                cerrarModalAdminGeneral();
+                abrirPanelAdminGeneral();
+            } else {
+                if (error) {
+                    error.style.display = 'block';
+                    error.textContent = '❌ Contraseña incorrecta';
+                }
+                input.value = '';
+                input.focus();
+
+                // Animación de shake
+                const modalCard = document.querySelector('#modalAdminGeneral .modal-card');
+                if (modalCard) {
+                    modalCard.style.animation = 'none';
+                    modalCard.offsetHeight;
+                    modalCard.style.animation = 'shake 0.5s ease';
+                }
+            }
+        }
+
+        // ===== FUNCIONES DEL PANEL DE ADMINISTRACIÓN =====
+
+        function abrirPanelAdminGeneral() {
+            const panel = document.getElementById('panelAdminGeneral');
+            if (!panel) return;
+
+            // Ocultar botón verde
+            const btnAdmin = document.getElementById('btnAdminGeneral');
+            if (btnAdmin) btnAdmin.style.display = 'none';
+
+            // Renderizar tarjetas
+            renderizarTarjetasAdmin();
+
+            // Mostrar panel
+            panel.style.display = 'block';
+
+            // Scroll al inicio
+            panel.scrollTop = 0;
+        }
+
+        function cerrarPanelAdminGeneral() {
+            const panel = document.getElementById('panelAdminGeneral');
+            if (!panel) return;
+
+            panel.style.display = 'none';
+
+            // Mostrar botón verde nuevamente
+            const btnAdmin = document.getElementById('btnAdminGeneral');
+            if (btnAdmin) btnAdmin.style.display = 'flex';
+        }
+
+        function renderizarTarjetasAdmin() {
+            const container = document.getElementById('tarjetasAdminContainer');
+            if (!container) return;
+
+            container.innerHTML = TARJETAS_ADMIN.map(tarjeta => `
+            <div id="tarjeta-${tarjeta.id}" class="tarjeta-admin" onclick="toggleSubmenuAdmin('${tarjeta.id}', event)">
+                <div style="
+                    width: 80px;
+                    height: 80px;
+                    background: linear-gradient(135deg, ${tarjeta.color} 0%, #3d7a9e 100%);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 1.2rem;
+                    font-size: 2.5rem;
+                    box-shadow: 0 8px 25px rgba(26,58,74,0.2);
+                ">
+                    ${tarjeta.icono}
+                </div>
+                <h3 style="
+                    color: #1a3a4a;
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                    margin-bottom: 0.4rem;
+                ">${tarjeta.titulo}</h3>
+                <p style="
+                    color: #5a6474;
+                    font-size: 0.88rem;
+                    line-height: 1.5;
+                    margin-bottom: 1.2rem;
+                ">${tarjeta.descripcion}</p>
+                <span style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.4rem;
+                    background: #faf8f5;
+                    color: #1a3a4a;
+                    padding: 0.4rem 1.2rem;
+                    border-radius: 2rem;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    border: 1px solid rgba(201,165,59,0.3);
+                    transition: all 0.3s ease;
+                ">
+                    <i class="fas fa-chevron-down" id="chevron-${tarjeta.id}"></i>
+                    Ver opciones
+                </span>
+                <div id="submenu-${tarjeta.id}" style="
+                    display: none;
+                    margin-top: 1rem;
+                    text-align: left;
+                    background: #faf8f5;
+                    border-radius: 1rem;
+                    padding: 0.5rem;
+                    border: 1px solid #e8e3d8;
+                    animation: slideDown 0.3s ease forwards;
+                "></div>
+            </div>
+        `).join('');
+        }
+
+        function toggleSubmenuAdmin(tarjetaId, event) {
+            event.stopPropagation();
+
+            const submenu = document.getElementById(`submenu-${tarjetaId}`);
+            const chevron = document.getElementById(`chevron-${tarjetaId}`);
+
+            if (!submenu) return;
+
+            // Cerrar todos los demás submenús
+            document.querySelectorAll('[id^="submenu-"]').forEach(sm => {
+                if (sm.id !== `submenu-${tarjetaId}`) {
+                    sm.style.display = 'none';
+                }
+            });
+
+            // Resetear todos los chevrones
+            document.querySelectorAll('[id^="chevron-"]').forEach(ch => {
+                ch.style.transform = 'rotate(0deg)';
+            });
+
+            const tarjeta = TARJETAS_ADMIN.find(t => t.id === tarjetaId);
+            if (!tarjeta) return;
+
+            if (submenu.style.display === 'block') {
+                submenu.style.display = 'none';
+                if (chevron) chevron.style.transform = 'rotate(0deg)';
+                return;
+            }
+
+            // Construir submenú
+            let html = '';
+            tarjeta.subopciones.forEach(op => {
+                if (op.esCategoria && op.subSubopciones) {
+                    // Categoría con submenú (Aventureros, Conquistadores, Guías)
+                    html += `<div class="categoria-club" onclick="toggleSubSubmenu(event, '${tarjetaId}-${op.accion}')">
+                                <span>${op.texto}</span>
+                                <i class="fas fa-chevron-down" id="chevron-${tarjetaId}-${op.accion}" style="font-size:0.7rem; transition: transform 0.3s ease;"></i>
+                            </div>`;
+                    // Contenedor de subopciones (oculto por defecto)
+                    html += `<div class="sub-submenu-container" id="sub-submenu-${tarjetaId}-${op.accion}">`;
+                    op.subSubopciones.forEach(sub => {
+                        html += `<div class="sub-submenu-opcion" onclick="ejecutarAccionAdmin('${sub.accion}', '${sub.texto}', event)">${sub.texto}</div>`;
+                    });
+                    html += `</div>`;
+                } else {
+                    // Opción simple (Iglesia, Biblioteca, Anuncios)
+                    html += `<div class="submenu-opcion" onclick="ejecutarAccionAdmin('${op.accion}', '${op.texto}', event)">${op.texto}</div>`;
+                }
+            });
+
+            submenu.innerHTML = html;
+            submenu.style.display = 'block';
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+        }
+
+        function toggleSubSubmenu(event, submenuId) {
+            event.stopPropagation();
+            const container = document.getElementById('sub-submenu-' + submenuId);
+            const chevron = document.getElementById('chevron-' + submenuId);
+            if (!container) return;
+
+            // Cerrar otros sub-submenús en la misma tarjeta
+            const parent = container.closest('[id^="submenu-"]');
+            if (parent) {
+                parent.querySelectorAll('.sub-submenu-container').forEach(c => {
+                    if (c.id !== 'sub-submenu-' + submenuId) c.style.maxHeight = '0';
+                });
+                parent.querySelectorAll('[id^="chevron-"][id*="-"]').forEach(ch => {
+                    if (ch.id !== 'chevron-' + submenuId) ch.style.transform = 'rotate(0deg)';
+                });
+            }
+
+            // Alternar el sub-submenú actual
+            if (container.style.maxHeight === '0px' || container.style.maxHeight === '') {
+                container.style.maxHeight = container.scrollHeight + 'px';
+                if (chevron) chevron.style.transform = 'rotate(180deg)';
+            } else {
+                container.style.maxHeight = '0';
+                if (chevron) chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function ejecutarAccionAdmin(accion, texto, event) {
+            event.stopPropagation();
+            alert(`Función: ${texto}`);
+            console.log(`🔧 Acción ejecutada: ${accion} - ${texto}`);
+        }
+
+        // ===== MONITOREO DE VISIBILIDAD DEL BOTÓN =====
+
+        function verificarVisibilidadBotonAdmin() {
+            const btnAdmin = document.getElementById('btnAdminGeneral');
+            const dashboardLMS = document.getElementById('dashboardEvaluacion');
+            const panelAdmin = document.getElementById('panelAdminGeneral');
+
+            if (!btnAdmin) return;
+
+            // Si el dashboard del LMS está visible o el panel de admin está abierto, ocultar botón
+            if ((dashboardLMS && dashboardLMS.style.display === 'block') ||
+                (panelAdmin && panelAdmin.style.display === 'block')) {
+                btnAdmin.style.display = 'none';
+            } else {
+                btnAdmin.style.display = 'flex';
+            }
+        }
+
+        // ===== EVENTOS GLOBALES =====
+
+        document.addEventListener('keydown', function (e) {
+            // Cerrar modal con Escape
+            if (e.key === 'Escape') {
+                const modalAdminGeneral = document.getElementById('modalAdminGeneral');
+                if (modalAdminGeneral && modalAdminGeneral.style.display === 'flex') {
+                    cerrarModalAdminGeneral();
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Evento Enter para contraseña
+            const inputPassword = document.getElementById('inputPasswordAdminGeneral');
+            if (inputPassword) {
+                inputPassword.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        verificarPasswordAdminGeneral();
+                    }
+                });
+            }
+
+            // Verificar visibilidad inicial del botón
+            verificarVisibilidadBotonAdmin();
+
+            // Monitorear cambios en el dashboard del LMS
+            const dashboardLMS = document.getElementById('dashboardEvaluacion');
+            if (dashboardLMS) {
+                const observer = new MutationObserver(function (mutations) {
+                    mutations.forEach(function (mutation) {
+                        if (mutation.attributeName === 'style') {
+                            verificarVisibilidadBotonAdmin();
+                        }
+                    });
+                });
+
+                observer.observe(dashboardLMS, {
+                    attributes: true,
+                    attributeFilter: ['style']
+                });
+            }
+
+            // Verificar periódicamente (fallback)
+            setInterval(verificarVisibilidadBotonAdmin, 2000);
+
+            console.log('✅ Admin - Panel de Administración General inicializado');
+        });
+
+        // ===== EXPORTACIONES GLOBALES (VERSIÓN QUE FUNCIONA) =====
+        window.abrirModalAdminGeneral = function () {
+            console.log("🟢 Abriendo modal...");
+
+            const modal = document.getElementById('modalAdminGeneral');
+            if (!modal) {
+                console.error("❌ No se encontró el elemento modalAdminGeneral");
+                alert("Error crítico: No se encontró el modal en el HTML. Revisa el ID.");
+                return;
+            }
+
+            // Forzar display y visibilidad
+            modal.style.display = 'flex';
+            modal.style.visibility = 'visible';
+            modal.style.opacity = '1';
+            modal.style.zIndex = '99999';
+
+            // Limpiar y enfocar
+            const input = document.getElementById('inputPasswordAdminGeneral');
+            const error = document.getElementById('errorPasswordAdminGeneral');
+
+            if (input) {
+                input.value = '';
+                setTimeout(() => input.focus(), 300);
+            }
+            if (error) error.style.display = 'none';
+
+            console.log("✅ Modal abierto correctamente");
+        };
+    </script>
+
+    <!-- ===== BOTÓN FLOTANTE ADMIN GENERAL ===== -->
+    <button id="btnAdminGeneral" onclick="abrirModalAdminGeneral()"
+        style="position: fixed; bottom: 2rem; left: 2rem; background: #2e7d32; color: white; width: 70px; height: 70px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); box-shadow: 0 8px 30px rgba(46,125,50,0.4); cursor: pointer; font-size: 0.7rem; transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Inter', sans-serif;"
+        onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 12px 35px rgba(46,125,50,0.6)';"
+        onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 8px 30px rgba(46,125,50,0.4)';">
+        <i class="fas fa-crown" style="font-size: 1.5rem;"></i>
+        <span style="font-size: 0.5rem; font-weight: 700; margin-top: 0.2rem;">Admin</span>
+    </button>
+
+    <!-- ===== MODAL CONTRASEÑA ADMIN GENERAL ===== -->
+    <div id="modalAdminGeneral" class="modal-overlay" style="z-index: 9999; display: none;">
+        <div class="modal-card"
+            style="max-width: 420px; text-align: center; background: white; border-radius: 1.5rem; padding: 2rem;">
+            <div
+                style="width: 60px; height: 60px; background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 8px 25px rgba(26,58,74,0.3);">
+                <i class="fas fa-lock" style="font-size: 1.5rem; color: #c9a53b;"></i>
+            </div>
+            <h3 style="color: #1a3a4a; font-size: 1.4rem; margin-bottom: 0.5rem;">🔐 Acceso Restringido</h3>
+            <p style="color: #5a6474; margin-bottom: 1.5rem;">Solo para Administradores</p>
+            <input type="password" id="inputPasswordAdminGeneral" placeholder="Contraseña..."
+                style="width: 100%; padding: 0.8rem 1rem; border: 2px solid #e8e3d8; border-radius: 1rem; font-family: 'Inter', sans-serif; font-size: 0.95rem; margin-bottom: 1rem; box-sizing: border-box;">
+            <div id="errorPasswordAdminGeneral"
+                style="color: #dc2626; font-size: 0.85rem; display: none; margin-bottom: 0.5rem;">❌ Contraseña
+                incorrecta</div>
+            <div style="display: flex; gap: 0.8rem; justify-content: center;">
+                <button onclick="verificarPasswordAdminGeneral()"
+                    style="flex: 1; background: linear-gradient(135deg, #d4a038 0%, #c9a53b 100%); color: #1a3a4a; padding: 0.8rem; border: none; border-radius: 2rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif;">
+                    <i class="fas fa-unlock"></i> Ingresar
+                </button>
+                <button onclick="cerrarModalAdminGeneral()"
+                    style="flex: 1; background: transparent; border: 2px solid #1a3a4a; color: #1a3a4a; padding: 0.8rem; border-radius: 2rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif;">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PANEL DE ADMINISTRACIÓN GENERAL ===== -->
+    <div id="panelAdminGeneral"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9998; background: #faf8f5; overflow-y: auto; font-family: 'Inter', sans-serif;">
+        <!-- ENCABEZADO -->
+        <div
+            style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <i class="fas fa-church" style="font-size: 2rem; color: #c9a53b;"></i>
+                <span style="color: white; font-weight: 700; font-size: 1.2rem;">IASD Belén</span>
+            </div>
+            <button onclick="cerrarPanelAdminGeneral()"
+                style="background: rgba(255,255,255,0.15); color: white; padding: 0.6rem 1.5rem; border: 1px solid rgba(255,255,255,0.3); border-radius: 2rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.85rem; transition: all 0.3s ease;">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+        </div>
+
+        <!-- CUERPO DEL PANEL -->
+        <div style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+            <h2
+                style="color: #1a3a4a; font-size: 2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem;">
+                <i class="fas fa-cog" style="color: #c9a53b;"></i> Panel de Administración
+            </h2>
+            <p style="color: #5a6474; margin-bottom: 2rem; font-size: 1rem;">Gestión general de la Iglesia IASD
+                Belén
+            </p>
+
+            <!-- TARJETAS -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;"
+                id="tarjetasAdminContainer">
+                <!-- Las tarjetas se generan dinámicamente con JavaScript -->
+            </div>
+        </div>
+
+        <!-- BOTÓN CERRAR FLOTANTE -->
+        <button onclick="cerrarPanelAdminGeneral()"
+            style="position: fixed; bottom: 2rem; right: 2rem; background: #c62828; color: white; padding: 0.8rem 1.8rem; border: none; border-radius: 2rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.9rem; z-index: 9999; box-shadow: 0 4px 20px rgba(198,40,40,0.4); transition: all 0.3s ease;">
+            <i class="fas fa-times-circle"></i> Cerrar Panel
+        </button>
+    </div>
 </body>
 
 </html>

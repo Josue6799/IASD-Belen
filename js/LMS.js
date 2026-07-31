@@ -431,6 +431,13 @@ function cerrarModalEvaluacion() {
 // ===== DASHBOARD PRINCIPAL =====
 
 function abrirDashboard() {
+    // Ocultar botón de admin general cuando se abre el LMS
+    if (typeof ocultarBotonAdminGeneral === 'function') {
+        ocultarBotonAdminGeneral();
+    }
+}
+
+function abrirDashboard() {
     cargarExamenesDesdeStorage();
     cargarExamenesRealizados();
     asegurarBotonFlotanteAdmin();
@@ -466,6 +473,15 @@ function cerrarDashboard() {
     if (panelAdmin) panelAdmin.style.display = 'none';
 
     modoAdminActivo = false;
+
+    function cerrarDashboard() {
+        // ... código existente ...
+
+        // Mostrar botón de admin general cuando se cierra el LMS
+        if (typeof mostrarBotonAdminGeneral === 'function') {
+            mostrarBotonAdminGeneral();
+        }
+    }
 }
 
 // ===== PESTAÑAS =====
