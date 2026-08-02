@@ -3183,31 +3183,19 @@
                         texto: '🌟 Aventureros',
                         accion: 'aventureros',
                         esCategoria: true,
-                        subSubopciones: [
-                            { texto: '💰 Cuotas', accion: 'aventurerosCuotas' },
-                            { texto: '🗄️ Base de datos', accion: 'aventurerosBaseDatos' },
-                            { texto: '📅 Calendario', accion: 'aventurerosCalendario' }
-                        ]
+                        clubNombre: 'Aventureros'
                     },
                     {
                         texto: '🏕️ Conquistadores',
                         accion: 'conquistadores',
                         esCategoria: true,
-                        subSubopciones: [
-                            { texto: '💰 Cuotas', accion: 'conquistadoresCuotas' },
-                            { texto: '🗄️ Base de datos', accion: 'conquistadoresBaseDatos' },
-                            { texto: '📅 Calendario', accion: 'conquistadoresCalendario' }
-                        ]
+                        clubNombre: 'Conquistadores'
                     },
                     {
                         texto: '🎓 Guías Mayores',
                         accion: 'guiasMayores',
                         esCategoria: true,
-                        subSubopciones: [
-                            { texto: '💰 Cuotas', accion: 'guiasMayoresCuotas' },
-                            { texto: '🗄️ Base de datos', accion: 'guiasMayoresBaseDatos' },
-                            { texto: '📅 Calendario', accion: 'guiasMayoresCalendario' }
-                        ]
+                        clubNombre: 'Guías Mayores'
                     }
                 ]
             },
@@ -3430,21 +3418,18 @@
             // Construir submenú
             let html = '';
             tarjeta.subopciones.forEach(op => {
-                if (op.esCategoria && op.subSubopciones) {
-                    // Categoría con submenú (Aventureros, Conquistadores, Guías)
-                    html += `<div class="categoria-club" onclick="toggleSubSubmenu(event, '${tarjetaId}-${op.accion}')">
-                                <span>${op.texto}</span>
-                                <i class="fas fa-chevron-down" id="chevron-${tarjetaId}-${op.accion}" style="font-size:0.7rem; transition: transform 0.3s ease;"></i>
-                            </div>`;
-                    // Contenedor de subopciones (oculto por defecto)
-                    html += `<div class="sub-submenu-container" id="sub-submenu-${tarjetaId}-${op.accion}">`;
-                    op.subSubopciones.forEach(sub => {
-                        html += `<div class="sub-submenu-opcion" onclick="ejecutarAccionAdmin('${sub.accion}', '${sub.texto}', event)">${sub.texto}</div>`;
-                    });
-                    html += `</div>`;
+                if (op.esCategoria && op.clubNombre) {
+                    // NUEVO: Redirige al modal flotante en lugar de desplegar sub-submenú
+                    html += `<div class="categoria-club" onclick="abrirModalClub('${op.clubNombre}', event)" style="margin-bottom: 0.8rem; border-bottom: 1px solid rgba(201,165,59,0.2); padding-bottom: 0.8rem;">
+                        <span>${op.texto}</span>
+                        <i class="fas fa-chevron-right" style="font-size:0.7rem; color:#c9a53b;"></i>
+                    </div>`;
                 } else {
                     // Opción simple (Iglesia, Biblioteca, Anuncios)
-                    html += `<div class="submenu-opcion" onclick="ejecutarAccionAdmin('${op.accion}', '${op.texto}', event)">${op.texto}</div>`;
+                    html += `<div class="submenu-opcion" onclick="ejecutarAccionAdmin('${op.accion}', '${op.texto}', event)">
+                        <i class="fas fa-circle" style="font-size:0.4rem;color:#c9a53b;flex-shrink:0;"></i>
+                        ${op.texto}
+                    </div>`;
                 }
             });
 
@@ -3452,7 +3437,6 @@
             submenu.style.display = 'block';
             if (chevron) chevron.style.transform = 'rotate(180deg)';
         }
-
         function toggleSubSubmenu(event, submenuId) {
             event.stopPropagation();
             const container = document.getElementById('sub-submenu-' + submenuId);
@@ -3659,6 +3643,384 @@
             style="position: fixed; bottom: 2rem; right: 2rem; background: #c62828; color: white; padding: 0.8rem 1.8rem; border: none; border-radius: 2rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.9rem; z-index: 9999; box-shadow: 0 4px 20px rgba(198,40,40,0.4); transition: all 0.3s ease;">
             <i class="fas fa-times-circle"></i> Cerrar Panel
         </button>
+    </div>
+
+    <!-- ===== MODAL FLOTANTE PARA CLUBES ===== -->
+    <div id="modalClubOpciones" class="modal-club-overlay" onclick="cerrarModalClub(event)">
+        <div class="modal-club-card" onclick="event.stopPropagation()">
+            <button class="modal-club-close" onclick="cerrarModalClub()" title="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="modal-club-titulo" id="modalClubTitulo">Opciones para Aventureros</h3>
+            <div class="modal-club-botones">
+                <button class="modal-club-btn cuotas" onclick="abrirCuotasClub()">
+                    <span class="btn-icono">💰</span>
+                    <span class="btn-texto">
+                        <span class="btn-titulo">Cuotas</span>
+                        <span class="btn-descripcion">Ver y gestionar pagos</span>
+                    </span>
+                </button>
+                <button class="modal-club-btn basedatos" onclick="abrirBaseDatosClub()">
+                    <span class="btn-icono">🗄️</span>
+                    <span class="btn-texto">
+                        <span class="btn-titulo">Base de datos</span>
+                        <span class="btn-descripcion">Gestionar miembros</span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ÚLTIMO SCRIPT (DEBE CONTENER TODO) ===== -->
+    <script>
+        // ===== VARIABLES GLOBALES =====
+        let clubSeleccionadoActual = '';
+        let miembroPendienteEliminar = null;
+        let storageKeyPendienteEliminar = null;
+
+        // Mapeo de nombres de club a claves de localStorage
+        const CLUBES_STORAGE = {
+            'Aventureros': 'cuotas_aventureros',
+            'Conquistadores': 'cuotas_conquistadores',
+            'Guías Mayores': 'cuotas_guias_mayores'
+        };
+
+        // Variable para almacenar la clave actual
+        let storageKeyActual = '';
+
+        // ===== FUNCIONES DEL MODAL DE CLUBES (SIN CAMBIOS) =====
+
+        function abrirModalClub(clubNombre, event) {
+            if (event) event.stopPropagation();
+            clubSeleccionadoActual = clubNombre;
+            const modal = document.getElementById('modalClubOpciones');
+            const titulo = document.getElementById('modalClubTitulo');
+            if (!modal || !titulo) return;
+            titulo.textContent = 'Opciones para ' + clubNombre;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalClub(event) {
+            if (event && event.target !== document.getElementById('modalClubOpciones')) return;
+            const modal = document.getElementById('modalClubOpciones');
+            if (!modal) return;
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            clubSeleccionadoActual = '';
+        }
+
+        // ===== FUNCIÓN PRINCIPAL DE CUOTAS =====
+        function abrirCuotasClub() {
+            // ⭐ GUARDAR el club actual antes de cerrar el modal (porque cerrarModalClub lo borra)
+            const clubActual = clubSeleccionadoActual;
+            cerrarModalClub();
+
+            const panel = document.getElementById('panelAdminGeneral');
+            if (!panel) return;
+
+            // Usar la variable guardada
+            storageKeyActual = CLUBES_STORAGE[clubActual] || 'cuotas_aventureros';
+            console.log('✅ Club:', clubActual, '→ Storage key:', storageKeyActual);
+
+            let seccionCuotas = document.getElementById('seccionCuotasClub');
+            if (!seccionCuotas) {
+                seccionCuotas = document.createElement('div');
+                seccionCuotas.id = 'seccionCuotasClub';
+                seccionCuotas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9997;overflow-y:auto;font-family:Inter,sans-serif;';
+                document.body.appendChild(seccionCuotas);
+            }
+
+            const miembros = cargarCuotas(storageKeyActual);
+            seccionCuotas.innerHTML = generarHTMLCuotas(clubActual, miembros, storageKeyActual);
+            seccionCuotas.style.display = 'block';
+            panel.style.display = 'none';
+
+            setTimeout(function () {
+                vincularEventosCuotas(storageKeyActual);
+                actualizarTotalesCuotas(storageKeyActual);
+            }, 100);
+        }
+        function cerrarSeccionCuotas() {
+            const seccionCuotas = document.getElementById('seccionCuotasClub');
+            const panel = document.getElementById('panelAdminGeneral');
+            if (seccionCuotas) seccionCuotas.style.display = 'none';
+            if (panel) panel.style.display = 'block';
+            storageKeyActual = '';
+        }
+
+        // ===== FUNCIONES AUXILIARES DE CUOTAS (MODIFICADAS) =====
+
+        function cargarCuotas(storageKey) {
+            try {
+                const data = localStorage.getItem(storageKey);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function guardarCuotas(storageKey, datos) {
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(datos));
+            } catch (e) {
+                console.warn('Error guardando cuotas:', e);
+            }
+        }
+
+        function generarMesesCuotas() {
+            const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            const resultado = [];
+            for (let anio = 2026; anio <= 2027; anio++) {
+                const mesInicio = anio === 2026 ? 7 : 0;
+                const mesFin = anio === 2027 ? 9 : 11;
+                for (let m = mesInicio; m <= mesFin; m++) {
+                    const diasEnMes = new Date(anio, m + 1, 0).getDate();
+                    const domingos = [];
+                    for (let d = 1; d <= diasEnMes; d++) {
+                        const fecha = new Date(anio, m, d);
+                        if (fecha.getDay() === 0) domingos.push(domingos.length + 1);
+                    }
+                    resultado.push({ nombre: meses[m], anio: anio, domingos: domingos, clave: anio + '_' + (m + 1) });
+                }
+            }
+            return resultado;
+        }
+
+        function generarHTMLCuotas(clubNombre, miembros, storageKey) {
+            const meses = generarMesesCuotas();
+
+            let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">';
+            html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;">💰 Cuotas - ' + clubNombre + '</h3>';
+            html += '<button onclick="cerrarSeccionCuotas()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver al Panel</button>';
+            html += '</div>';
+
+            html += '<div style="max-width:100%;margin:0 auto;padding:1rem;">';
+
+            html += '<div class="cuotas-resumen-grid">';
+            html += '<div class="cuotas-resumen-card"><div class="resumen-icono">👥</div><div class="resumen-titulo">Total de Miembros</div><div class="resumen-valor" id="cuotasTotalMiembros">' + miembros.length + '</div></div>';
+            html += '<div class="cuotas-resumen-card"><div class="resumen-icono">💰</div><div class="resumen-titulo">Total Recaudado</div><div class="resumen-valor" id="cuotasTotalGeneral">$0</div></div>';
+            html += '</div>';
+
+            html += '<div class="cuotas-form-agregar"><input type="text" id="cuotasInputNombre" placeholder="Nombre completo del miembro..."><button id="cuotasBtnAgregar"><i class="fas fa-plus"></i> Agregar Miembro</button></div>';
+
+            html += '<div class="cuotas-tabla-wrapper"><table class="cuotas-tabla">';
+            html += '<thead><tr>';
+            html += '<th class="col-nombres" rowspan="2">N°</th>';
+            html += '<th class="col-nombres" rowspan="2">NOMBRES</th>';
+            meses.forEach(function (mes) {
+                html += '<th class="col-mes" colspan="' + (mes.domingos.length + 1) + '">' + mes.nombre + ' ' + mes.anio + '</th>';
+            });
+            html += '<th class="col-total" rowspan="2">TOTAL<br>GENERAL</th>';
+            html += '<th class="col-acciones" rowspan="2"></th>';
+            html += '</tr><tr>';
+            meses.forEach(function (mes) {
+                mes.domingos.forEach(function (d) { html += '<th>D' + d + '</th>'; });
+                html += '<th class="col-total">TOTAL</th>';
+            });
+            html += '</tr></thead><tbody>';
+
+            miembros.forEach(function (miembro, idx) {
+                html += '<tr data-miembro-id="' + miembro.id + '">';
+                html += '<td class="col-nombres">' + (idx + 1) + '</td>';
+                html += '<td class="col-nombres">' + miembro.nombre + '</td>';
+                meses.forEach(function (mes) {
+                    mes.domingos.forEach(function (d) {
+                        const valor = (miembro.pagos && miembro.pagos[mes.clave] && miembro.pagos[mes.clave][d]) ? miembro.pagos[mes.clave][d] : '';
+                        html += '<td><input type="number" class="cuotas-input" data-miembro="' + miembro.id + '" data-mes="' + mes.clave + '" data-domingo="' + d + '" value="' + valor + '" placeholder="0" min="0"></td>';
+                    });
+                    html += '<td class="col-total-miembro cuotas-total-mes" data-miembro="' + miembro.id + '" data-mes="' + mes.clave + '">$0</td>';
+                });
+                html += '<td class="col-total-miembro cuotas-total-general" data-miembro="' + miembro.id + '">$0</td>';
+                html += '<td class="col-acciones"><button class="btn-eliminar-miembro" onclick="eliminarMiembroCuotas(' + miembro.id + ')" title="Eliminar miembro">🗑️</button></td>';
+                html += '</tr>';
+            });
+            html += '</tbody></table></div>';
+
+            html += '<button class="btn-guardar-cuotas" onclick="guardarYCerrarCuotas()"><i class="fas fa-save"></i> Guardar y Cerrar</button>';
+            html += '</div>';
+
+            return html;
+        }
+
+        function vincularEventosCuotas(storageKey) {
+            const btnAgregar = document.getElementById('cuotasBtnAgregar');
+            const inputNombre = document.getElementById('cuotasInputNombre');
+            if (btnAgregar && inputNombre) {
+                btnAgregar.onclick = function () { agregarMiembroCuotas(); };
+                inputNombre.onkeydown = function (e) { if (e.key === 'Enter') agregarMiembroCuotas(); };
+            }
+            document.querySelectorAll('.cuotas-input').forEach(function (input) {
+                input.addEventListener('input', function () { actualizarTotalesCuotas(storageKey); });
+            });
+        }
+
+        function guardarDatosActuales() {
+            if (!storageKeyActual) return;
+            const miembros = cargarCuotas(storageKeyActual);
+            miembros.forEach(function (miembro) {
+                if (!miembro.pagos) miembro.pagos = {};
+                document.querySelectorAll('.cuotas-input[data-miembro="' + miembro.id + '"]').forEach(function (input) {
+                    const mesClave = input.getAttribute('data-mes');
+                    const domingo = parseInt(input.getAttribute('data-domingo'));
+                    if (!miembro.pagos[mesClave]) miembro.pagos[mesClave] = {};
+                    miembro.pagos[mesClave][domingo] = parseFloat(input.value) || 0;
+                });
+            });
+            guardarCuotas(storageKeyActual, miembros);
+        }
+
+        function agregarMiembroCuotas() {
+            if (!storageKeyActual) return;
+            const inputNombre = document.getElementById('cuotasInputNombre');
+            if (!inputNombre) return;
+            const nombre = inputNombre.value.trim();
+            if (!nombre) { alert('Por favor ingresa un nombre.'); return; }
+
+            // ⭐ GUARDAR DATOS ACTUALES ANTES DE AGREGAR
+            guardarDatosActuales();
+
+            const miembros = cargarCuotas(storageKeyActual);
+            miembros.push({ id: Date.now(), nombre: nombre, pagos: {} });
+            guardarCuotas(storageKeyActual, miembros);
+            inputNombre.value = '';
+            const seccionCuotas = document.getElementById('seccionCuotasClub');
+            seccionCuotas.innerHTML = generarHTMLCuotas(clubSeleccionadoActual, miembros, storageKeyActual);
+            setTimeout(function () {
+                vincularEventosCuotas(storageKeyActual);
+                actualizarTotalesCuotas(storageKeyActual);
+            }, 100);
+        }
+
+        function eliminarMiembroCuotas(miembroId) {
+            miembroPendienteEliminar = miembroId;
+            const modal = document.getElementById('modalConfirmarEliminar');
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function confirmarEliminarMiembro() {
+            if (miembroPendienteEliminar === null || !storageKeyActual) return;
+            const miembroId = miembroPendienteEliminar;
+            let miembros = cargarCuotas(storageKeyActual);
+            miembros = miembros.filter(function (m) { return m.id !== miembroId; });
+            guardarCuotas(storageKeyActual, miembros);
+            const seccionCuotas = document.getElementById('seccionCuotasClub');
+            seccionCuotas.innerHTML = generarHTMLCuotas(clubSeleccionadoActual, miembros, storageKeyActual);
+            setTimeout(function () {
+                vincularEventosCuotas(storageKeyActual);
+                actualizarTotalesCuotas(storageKeyActual);
+            }, 100);
+            cerrarModalConfirmarEliminar();
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#c62828;color:white;padding:1rem 2rem;border-radius:2rem;font-weight:600;z-index:99999;font-family:Inter,sans-serif;box-shadow:0 8px 30px rgba(198,40,40,0.4);';
+            toast.innerHTML = '<i class="fas fa-trash"></i> Miembro eliminado correctamente';
+            document.body.appendChild(toast);
+            setTimeout(function () { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.5s ease'; setTimeout(function () { toast.remove(); }, 500); }, 2000);
+        }
+
+        function cerrarModalConfirmarEliminar(event) {
+            if (event && event.target !== document.getElementById('modalConfirmarEliminar')) return;
+            const modal = document.getElementById('modalConfirmarEliminar');
+            if (modal) { modal.classList.remove('active'); document.body.style.overflow = ''; }
+            miembroPendienteEliminar = null;
+        }
+
+        function actualizarTotalesCuotas(storageKey) {
+            const miembros = cargarCuotas(storageKey);
+            let totalGeneral = 0;
+            miembros.forEach(function (miembro) {
+                let totalMiembro = 0;
+                document.querySelectorAll('.cuotas-total-mes[data-miembro="' + miembro.id + '"]').forEach(function (td) {
+                    const mesClave = td.getAttribute('data-mes');
+                    let totalMes = 0;
+                    document.querySelectorAll('.cuotas-input[data-miembro="' + miembro.id + '"][data-mes="' + mesClave + '"]').forEach(function (input) {
+                        totalMes += parseFloat(input.value) || 0;
+                    });
+                    td.textContent = '$' + totalMes.toLocaleString('es-CO');
+                    totalMiembro += totalMes;
+                });
+                const tdGeneral = document.querySelector('.cuotas-total-general[data-miembro="' + miembro.id + '"]');
+                if (tdGeneral) tdGeneral.textContent = '$' + totalMiembro.toLocaleString('es-CO');
+                totalGeneral += totalMiembro;
+            });
+            const totalMiembrosEl = document.getElementById('cuotasTotalMiembros');
+            const totalGeneralEl = document.getElementById('cuotasTotalGeneral');
+            if (totalMiembrosEl) totalMiembrosEl.textContent = miembros.length;
+            if (totalGeneralEl) totalGeneralEl.textContent = '$' + totalGeneral.toLocaleString('es-CO');
+        }
+
+        function guardarYCerrarCuotas() {
+            if (!storageKeyActual) return;
+            const miembros = cargarCuotas(storageKeyActual);
+            miembros.forEach(function (miembro) {
+                if (!miembro.pagos) miembro.pagos = {};
+                document.querySelectorAll('.cuotas-input[data-miembro="' + miembro.id + '"]').forEach(function (input) {
+                    const mesClave = input.getAttribute('data-mes');
+                    const domingo = parseInt(input.getAttribute('data-domingo'));
+                    if (!miembro.pagos[mesClave]) miembro.pagos[mesClave] = {};
+                    miembro.pagos[mesClave][domingo] = parseFloat(input.value) || 0;
+                });
+            });
+            guardarCuotas(storageKeyActual, miembros);
+            cerrarSeccionCuotas();
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#2e7d32;color:white;padding:1rem 2rem;border-radius:2rem;font-weight:600;z-index:99999;font-family:Inter,sans-serif;box-shadow:0 8px 30px rgba(46,125,50,0.4);';
+            toast.innerHTML = '<i class="fas fa-check-circle"></i> Datos guardados correctamente';
+            document.body.appendChild(toast);
+            setTimeout(function () { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.5s ease'; setTimeout(function () { toast.remove(); }, 500); }, 2000);
+        }
+
+        function abrirBaseDatosClub() {
+            cerrarModalClub();
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);color:white;padding:1rem 2rem;border-radius:2rem;font-weight:600;z-index:99999;animation:fadeInUp 0.4s ease;font-family:Inter,sans-serif;border:2px solid #c9a53b;box-shadow:0 8px 30px rgba(0,0,0,0.3);';
+            toast.innerHTML = '<i class="fas fa-database"></i> Base de datos de ' + clubSeleccionadoActual + ' en construcción';
+            document.body.appendChild(toast);
+            setTimeout(function () { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.5s ease'; setTimeout(function () { toast.remove(); }, 500); }, 3000);
+        }
+
+        // ===== EVENTOS DE TECLADO =====
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('modalClubOpciones');
+                if (modal && modal.classList.contains('active')) cerrarModalClub();
+                const modalConfirm = document.getElementById('modalConfirmarEliminar');
+                if (modalConfirm && modalConfirm.classList.contains('active')) cerrarModalConfirmarEliminar();
+            }
+        });
+
+        // ===== EXPORTACIONES GLOBALES =====
+        window.abrirModalClub = abrirModalClub;
+        window.cerrarModalClub = cerrarModalClub;
+        window.abrirCuotasClub = abrirCuotasClub;
+        window.cerrarSeccionCuotas = cerrarSeccionCuotas;
+        window.abrirBaseDatosClub = abrirBaseDatosClub;
+        window.confirmarEliminarMiembro = confirmarEliminarMiembro;
+        window.cerrarModalConfirmarEliminar = cerrarModalConfirmarEliminar;
+    </script>
+
+    <!-- ===== MODAL DE CONFIRMACIÓN PARA ELIMINAR MIEMBRO ===== -->
+    <div id="modalConfirmarEliminar" class="modal-confirm-overlay" onclick="cerrarModalConfirmarEliminar(event)">
+        <div class="modal-confirm-card" onclick="event.stopPropagation()">
+            <button class="modal-confirm-close" onclick="cerrarModalConfirmarEliminar()" title="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-confirm-icono">⚠️</div>
+            <h3 class="modal-confirm-titulo">Confirmar eliminación</h3>
+            <p class="modal-confirm-mensaje">¿Estás seguro de que deseas eliminar a este miembro? Se borrarán todos sus
+                datos de cuotas de forma permanente.</p>
+            <div class="modal-confirm-botones">
+                <button class="modal-confirm-btn btn-confirm-si" onclick="confirmarEliminarMiembro()">
+                    <i class="fas fa-trash"></i> Sí, eliminar
+                </button>
+                <button class="modal-confirm-btn btn-confirm-no" onclick="cerrarModalConfirmarEliminar()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
     </div>
 </body>
 

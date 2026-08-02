@@ -156,3 +156,669 @@
 .horario-tabla tr:nth-child(even) td {
     background: var(--cream);
 }
+
+/* ===== SEPARADOR PARA CATEGORÍAS DE CLUBES ===== */
+.categoria-club {
+    padding: 0.8rem 1rem;
+    border-radius: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #1a3a4a;
+    font-size: 0.95rem;
+    font-weight: 600;
+    background: #f4f0ea;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid rgba(201, 165, 59, 0.15);
+    text-decoration: none;
+}
+
+.categoria-club:hover {
+    background: #e8e0d4;
+    border-color: #c9a53b;
+    transform: translateX(4px);
+}
+
+/* Línea divisoria entre categorías */
+.categoria-club+.categoria-club {
+    border-top: 1px dashed rgba(201, 165, 59, 0.3);
+    padding-top: 0.9rem;
+    margin-top: 0.1rem;
+}
+
+.categoria-club span {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.categoria-club .flecha-categoria {
+    font-size: 0.7rem;
+    color: #c9a53b;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.categoria-club:hover .flecha-categoria {
+    transform: translateX(3px);
+    color: #b8942e;
+}
+
+/* ===== MODAL FLOTANTE PARA CLUBES (MOBILE FIRST) ===== */
+.modal-club-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.25s ease;
+}
+
+.modal-club-overlay.active {
+    display: flex;
+}
+
+.modal-club-card {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    padding: 2rem 1.5rem;
+    width: 90%;
+    max-width: 450px;
+    min-height: 50vh;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+    position: relative;
+    animation: slideUp 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid rgba(201, 165, 59, 0.3);
+}
+
+.modal-club-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #f5f5f5;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.modal-club-close:hover {
+    background: #e0e0e0;
+    color: #1a3a4a;
+}
+
+.modal-club-titulo {
+    color: #1a3a4a;
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-right: 2rem;
+    line-height: 1.3;
+}
+
+.modal-club-botones {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+    justify-content: center;
+}
+
+.modal-club-btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.5rem;
+    border-radius: 1.2rem;
+    border: 2px solid transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    width: 100%;
+}
+
+.modal-club-btn .btn-icono {
+    font-size: 2rem;
+    flex-shrink: 0;
+    width: 50px;
+    text-align: center;
+}
+
+.modal-club-btn .btn-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.modal-club-btn .btn-titulo {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.modal-club-btn .btn-descripcion {
+    font-size: 0.75rem;
+    font-weight: 400;
+    opacity: 0.7;
+}
+
+/* Botón Cuotas */
+.modal-club-btn.cuotas {
+    background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%);
+    color: white;
+    border-color: #1a3a4a;
+    box-shadow: 0 6px 20px rgba(26, 58, 74, 0.3);
+}
+
+.modal-club-btn.cuotas:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(26, 58, 74, 0.4);
+}
+
+.modal-club-btn.cuotas:active {
+    transform: translateY(-1px);
+}
+
+/* Botón Base de datos */
+.modal-club-btn.basedatos {
+    background: linear-gradient(135deg, #d4a038 0%, #c9a53b 100%);
+    color: #1a3a4a;
+    border-color: #c9a53b;
+    box-shadow: 0 6px 20px rgba(201, 165, 59, 0.3);
+}
+
+.modal-club-btn.basedatos:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(201, 165, 59, 0.4);
+}
+
+.modal-club-btn.basedatos:active {
+    transform: translateY(-1px);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== RESPONSIVE: PANTALLAS GRANDES ===== */
+@media (min-width: 600px) {
+    .modal-club-card {
+        padding: 2.5rem 2rem;
+        min-height: auto;
+    }
+
+    .modal-club-titulo {
+        font-size: 1.5rem;
+    }
+
+    .modal-club-btn {
+        font-size: 1.3rem;
+        padding: 1.4rem 1.8rem;
+    }
+}
+
+/* ===== SISTEMA DE CUOTAS (TESORERÍA) ===== */
+#seccionCuotasClub {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #faf8f5;
+    z-index: 9997;
+    overflow-y: auto;
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- Tarjetas de Resumen --- */
+.cuotas-resumen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.cuotas-resumen-card {
+    background: white;
+    border-radius: 1.2rem;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 2px solid rgba(201, 165, 59, 0.15);
+}
+
+.cuotas-resumen-card .resumen-icono {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.cuotas-resumen-card .resumen-titulo {
+    color: #5a6474;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+
+.cuotas-resumen-card .resumen-valor {
+    color: #1a3a4a;
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+/* --- Formulario Agregar Miembro --- */
+.cuotas-form-agregar {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.cuotas-form-agregar input {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.8rem 1.2rem;
+    border: 2px solid #e8e3d8;
+    border-radius: 2rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.cuotas-form-agregar input:focus {
+    outline: none;
+    border-color: #c9a53b;
+    box-shadow: 0 0 0 3px rgba(201, 165, 59, 0.1);
+}
+
+.cuotas-form-agregar button {
+    padding: 0.8rem 1.8rem;
+    background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%);
+    color: white;
+    border: none;
+    border-radius: 2rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.cuotas-form-agregar button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26, 58, 74, 0.3);
+}
+
+/* --- Tabla de Cuotas --- */
+.cuotas-tabla-wrapper {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cuotas-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    min-width: 800px;
+}
+
+.cuotas-tabla thead th {
+    background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%);
+    color: white;
+    padding: 0.8rem 0.6rem;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    white-space: nowrap;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cuotas-tabla thead th.col-nombres {
+    text-align: left;
+    min-width: 150px;
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background: #1a3a4a;
+}
+
+.cuotas-tabla thead th.col-mes {
+    background: #2c5f7c;
+    font-size: 0.8rem;
+}
+
+.cuotas-tabla thead th.col-total {
+    background: #c9a53b;
+    color: #1a3a4a;
+    font-weight: 800;
+}
+
+.cuotas-tabla tbody td {
+    padding: 0.5rem 0.4rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    background: white;
+}
+
+.cuotas-tabla tbody td input {
+    width: 60px;
+    padding: 0.4rem 0.3rem;
+    border: 1px solid #e8e3d8;
+    border-radius: 0.5rem;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.cuotas-tabla tbody td input:focus {
+    outline: none;
+    border-color: #c9a53b;
+    box-shadow: 0 0 0 2px rgba(201, 165, 59, 0.15);
+    background: #fefdf9;
+}
+
+.cuotas-tabla tbody td.col-nombres {
+    text-align: left;
+    font-weight: 600;
+    color: #1a3a4a;
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background: white;
+    padding: 0.5rem 0.8rem;
+    border-right: 2px solid rgba(201, 165, 59, 0.15);
+}
+
+.cuotas-tabla tbody td.col-total-miembro {
+    font-weight: 700;
+    color: #1a3a4a;
+    background: #fdfaf3;
+}
+
+.cuotas-tabla tbody td.col-total-mes {
+    font-weight: 700;
+    color: #c9a53b;
+    background: #fdfaf3;
+}
+
+.cuotas-tabla tfoot td {
+    font-weight: 800;
+    background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%);
+    color: white;
+    padding: 0.7rem 0.6rem;
+    text-align: center;
+    font-size: 0.8rem;
+}
+
+.cuotas-tabla tbody tr:nth-child(even) td {
+    background: #fafaf9;
+}
+
+.cuotas-tabla tbody tr:nth-child(even) td.col-nombres {
+    background: #fafaf9;
+}
+
+.cuotas-tabla tbody tr:hover td {
+    background: #fef9e7;
+}
+
+.cuotas-tabla tbody tr:hover td.col-nombres {
+    background: #fef9e7;
+}
+
+/* Botón Guardar y Cerrar */
+.btn-guardar-cuotas {
+    display: block;
+    width: 100%;
+    max-width: 350px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: linear-gradient(135deg, #d4a038 0%, #c9a53b 100%);
+    color: #1a3a4a;
+    border: none;
+    border-radius: 2rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 6px 20px rgba(201, 165, 59, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-guardar-cuotas:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(201, 165, 59, 0.4);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+    .cuotas-tabla {
+        font-size: 0.7rem;
+    }
+
+    .cuotas-tabla tbody td input {
+        width: 45px;
+        font-size: 0.7rem;
+    }
+
+    .cuotas-resumen-card .resumen-valor {
+        font-size: 1.5rem;
+    }
+
+    .cuotas-form-agregar {
+        flex-direction: column;
+    }
+
+    .cuotas-form-agregar button {
+        width: 100%;
+    }
+}
+
+/* Botón eliminar miembro */
+.btn-eliminar-miembro {
+    background: #c62828;
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-eliminar-miembro:hover {
+    background: #b71c1c;
+    transform: scale(1.1);
+}
+
+.col-acciones {
+    text-align: center;
+    width: 50px;
+}
+
+/* ===== MODAL DE CONFIRMACIÓN PARA ELIMINAR ===== */
+.modal-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.65);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.25s ease;
+}
+
+.modal-confirm-overlay.active {
+    display: flex;
+}
+
+.modal-confirm-card {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    padding: 2rem 1.8rem;
+    width: 90%;
+    max-width: 430px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+    position: relative;
+    animation: slideUp 0.3s ease;
+    text-align: center;
+    border: 2px solid rgba(201, 165, 59, 0.25);
+}
+
+.modal-confirm-close {
+    position: absolute;
+    top: 0.8rem;
+    right: 0.8rem;
+    background: #f5f5f5;
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 1rem;
+    color: #888;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.modal-confirm-close:hover {
+    background: #e0e0e0;
+    color: #1a3a4a;
+}
+
+.modal-confirm-icono {
+    font-size: 3rem;
+    margin-bottom: 0.8rem;
+}
+
+.modal-confirm-titulo {
+    color: #1a3a4a;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.modal-confirm-mensaje {
+    color: #5a6474;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.8rem;
+    font-family: 'Inter', sans-serif;
+}
+
+.modal-confirm-botones {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.modal-confirm-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    border: none;
+    flex: 1;
+    min-width: 130px;
+}
+
+.btn-confirm-si {
+    background: #c62828;
+    color: white;
+    box-shadow: 0 4px 15px rgba(198, 40, 40, 0.3);
+}
+
+.btn-confirm-si:hover {
+    background: #b71c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(198, 40, 40, 0.4);
+}
+
+.btn-confirm-no {
+    background: transparent;
+    border: 2px solid #1a3a4a;
+    color: #1a3a4a;
+}
+
+.btn-confirm-no:hover {
+    background: rgba(26, 58, 74, 0.05);
+    transform: translateY(-2px);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 400px) {
+    .modal-confirm-card {
+        padding: 1.5rem 1.2rem;
+    }
+
+    .modal-confirm-botones {
+        flex-direction: column;
+    }
+
+    .modal-confirm-btn {
+        width: 100%;
+    }
+}
