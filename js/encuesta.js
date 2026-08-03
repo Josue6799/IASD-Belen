@@ -1,48 +1,69 @@
 /* ========================================
-   ENCUESTAS Y VOTACIONES (ENCUESTA MANAGER)
+   ENCUESTA PÚBLICA (Conectada al Admin)
    IASD Belén · Iglesia Adventista
    ======================================== */
 
 const EncuestaManager = {
-    DEFAULT_DATA: {
-        pregunta: "¿Cuál es tu actividad favorita en la iglesia?",
-        opciones: ["Culto Divino", "Escuela Sabática", "Sociedad de Jóvenes", "Clubes de Iglesia", "Servicio y Misión"],
-        votos: {}
-    },
 
+    // Cargar el array de encuestas que guardó el Admin
     cargar() {
-        return StorageHelper.get(StorageHelper.KEYS.ENCUESTA, this.DEFAULT_DATA);
+        try {
+            const data = localStorage.getItem('encuestasIglesia');
+            return data ? JSON.parse(data) : [];
+        } catch (e) {
+            return [];
+        }
     },
 
-    guardar(data) {
-        StorageHelper.set(StorageHelper.KEYS.ENCUESTA, data);
+    // Guardar el array (para actualizar los votos)
+    guardar(encuestas) {
+        localStorage.setItem('encuestasIglesia', JSON.stringify(encuestas));
     },
 
+    // Renderizar la primera encuesta del array
     render() {
-        const data = this.cargar();
+        const encuestas = this.cargar();
         const elPregunta = document.getElementById('preguntaEncuesta');
         const elOpciones = document.getElementById('opcionesEncuesta');
         const elResultados = document.getElementById('resultadosEncuesta');
 
-        if (elPregunta) elPregunta.textContent = data.pregunta;
+        // Si no hay encuestas, mostrar mensaje vacío
+        if (encuestas.length === 0) {
+            if (elPregunta) elPregunta.textContent = 'No hay encuestas activas en este momento.';
+            if (elOpciones) elOpciones.innerHTML = '';
+            if (elResultados) elResultados.innerHTML = '';
+            return;
+        }
 
-        // Renderizar botones de opción
+        // Tomamos la primera encuesta del array
+        const enc = encuestas[0];
+
+        // Verificar si el usuario ya votó en ESTA encuesta específica
+        const yaVotado = localStorage.getItem('yaVotado_' + enc.id);
+
+        // Mostrar la pregunta
+        if (elPregunta) elPregunta.textContent = enc.pregunta;
+
+        // Generar los botones de voto
         if (elOpciones) {
-            elOpciones.innerHTML = data.opciones.map((op, i) => `
-                <button class="opcion-btn" onclick="votar(${i})">
+            elOpciones.innerHTML = enc.opciones.map((op, i) => `
+                <button class="opcion-btn" onclick="EncuestaManager.votar(${i})" ${yaVotado ? 'disabled' : ''}>
                     ${op}
                 </button>
             `).join('');
+
+            // Si ya votó, agregar un mensaje de aviso (los botones ya están deshabilitados)
+            if (yaVotado) {
+                elOpciones.innerHTML += `<p style="margin-top:0.8rem; color:#2e7d32; font-weight:600; font-size:0.9rem;">✅ Ya has votado en esta encuesta. ¡Gracias por tu participación!</p>`;
+            }
         }
 
-        // Renderizar barra de resultados y porcentajes
+        // Generar la barra de resultados y porcentajes
         if (elResultados) {
-            const totalVotos = Object.values(data.votos).reduce((a, b) => a + b, 0);
-
-            elResultados.innerHTML = data.opciones.map((op, i) => {
-                const votosOp = data.votos[i] || 0;
+            const totalVotos = (enc.votos || []).reduce((a, b) => a + (b || 0), 0);
+            elResultados.innerHTML = enc.opciones.map((op, i) => {
+                const votosOp = enc.votos[i] || 0;
                 const porcentaje = totalVotos > 0 ? Math.round((votosOp / totalVotos) * 100) : 0;
-
                 return `
                     <div class="resultado-item">
                         <div class="info">
@@ -58,54 +79,41 @@ const EncuestaManager = {
         }
     },
 
+    // Función para votar por una opción
     votar(indexOp) {
-        const data = this.cargar();
-        if (!data.votos[indexOp]) {
-            data.votos[indexOp] = 0;
-        }
-        data.votos[indexOp]++;
-        this.guardar(data);
-        this.render();
-    },
+        const encuestas = this.cargar();
+        if (encuestas.length === 0) return;
 
-    toggleAdmin() {
-        const el = document.getElementById('adminEncuesta');
-        if (el) {
-            el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
-        }
-    },
+        const enc = encuestas[0];
 
-    guardarAdmin() {
-        const inputPregunta = document.getElementById('inputPreguntaAdmin');
-        const inputOpciones = document.getElementById('inputOpcionesAdmin');
-
-        if (!inputPregunta || !inputOpciones) return;
-
-        const nuevaPregunta = inputPregunta.value.trim();
-        const nuevasOpcionesStr = inputOpciones.value.trim();
-
-        if (!nuevaPregunta || !nuevasOpcionesStr) {
-            alert('Por favor complete la pregunta y las opciones separadas por coma.');
+        // ⚠️ Verificar si ya votó antes de procesar el voto
+        if (localStorage.getItem('yaVotado_' + enc.id)) {
+            alert('Ya has votado en esta encuesta.');
             return;
         }
 
-        const nuevasOpciones = nuevasOpcionesStr.split(',').map(o => o.trim()).filter(o => o.length > 0);
+        if (!enc.votos) enc.votos = new Array(enc.opciones.length).fill(0);
 
-        const nuevaEncuesta = {
-            pregunta: nuevaPregunta,
-            opciones: nuevasOpciones,
-            votos: {}
-        };
+        // Incrementar el voto
+        enc.votos[indexOp] = (enc.votos[indexOp] || 0) + 1;
 
-        this.guardar(nuevaEncuesta);
+        // Guardar los cambios en localStorage
+        this.guardar(encuestas);
+
+        // ✅ Marcar en el navegador del usuario que ya votó en esta encuesta
+        localStorage.setItem('yaVotado_' + enc.id, 'true');
+
+        // Volver a renderizar para mostrar el cambio y deshabilitar los botones
         this.render();
-        this.toggleAdmin();
-        alert('Encuesta actualizada con éxito.');
     }
 };
 
-// Funciones globales de compatibilidad
+// Funciones globales para que los botones del HTML la llamen
 function mostrarEncuesta() { EncuestaManager.render(); }
 function votar(index) { EncuestaManager.votar(index); }
-function toggleAdmin() { EncuestaManager.toggleAdmin(); }
-function guardarPreguntaAdmin() { EncuestaManager.guardarAdmin(); }
+
+// ===== CONEXIÓN CON EL ADMIN =====
+// Cuando el Admin agregue o elimine una encuesta, la página se actualizará sola.
+window.addEventListener('datosIglesiaActualizados', () => {
+    EncuestaManager.render();
+});

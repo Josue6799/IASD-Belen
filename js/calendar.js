@@ -26,14 +26,39 @@ const CalendarManager = {
 
     // Cargar eventos almacenados
     getEventos(type) {
-        const key = StorageHelper.getCalendarKey(type);
-        return StorageHelper.get(key, {});
-    },
+        if (type === 'general') {
+            // El calendario general lee los eventos del Admin
+            try {
+                const data = localStorage.getItem('eventosIglesia');
+                if (!data) return {};
 
-    // Guardar eventos
-    saveEventos(type, data) {
-        const key = StorageHelper.getCalendarKey(type);
-        StorageHelper.set(key, data);
+                const eventos = JSON.parse(data);
+
+                // Si los datos ya son un objeto mapa, devolverlos tal cual
+                if (typeof eventos === 'object' && !Array.isArray(eventos)) {
+                    return eventos;
+                }
+
+                // Si los datos son un Array (lista de eventos), convertir a objeto mapa
+                const mapa = {};
+                eventos.forEach(ev => {
+                    if (!mapa[ev.fecha]) {
+                        mapa[ev.fecha] = [];
+                    }
+                    // ⭐ GUARDAMOS UN OBJETO con el título y la hora
+                    mapa[ev.fecha].push({
+                        titulo: ev.titulo,
+                        hora: ev.hora || '' // Si no tiene hora, dejamos vacío
+                    });
+                });
+                return mapa;
+
+            } catch (e) { return {}; }
+        } else {
+            // Los clubes siguen usando su clave privada
+            const key = StorageHelper.getCalendarKey(type);
+            return StorageHelper.get(key, {});
+        }
     },
 
     // Renderizar calendario según tipo ('general', 'aventureros', 'conquistadores', 'guias')
@@ -124,7 +149,7 @@ const CalendarManager = {
         if (!contenedor) return;
 
         if (!stateObj.diaSeleccionado) {
-            contenedor.innerHTML = '<p style="color:var(--muted-text); font-size:0.8rem;">Haz clic en un día para ver o agregar sus eventos.</p>';
+            contenedor.innerHTML = '<p style="color:var(--muted-text); font-size:0.8rem;">Haz clic en un día para ver los eventos.</p>';
             return;
         }
 
@@ -142,21 +167,48 @@ const CalendarManager = {
         }
 
         let html = `<h4 style="font-size:0.9rem; color:var(--deep-blue); margin-bottom:0.6rem;">Eventos del ${dia} de ${this.NOMBRES_MESES[mes]}:</h4>`;
-        lista.forEach((ev, index) => {
-            html += `
-                <div class="evento-item">
-                    <span>📌 ${ev}</span>
-                    <button onclick="CalendarManager.eliminarEvento('${type}', '${fechaClave}', ${index})" class="btn-sm btn-danger">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            `;
+
+        lista.forEach((item, index) => {
+            // Si viene de un club (string) o del admin (objeto con titulo y hora)
+            const titulo = typeof item === 'string' ? item : item.titulo;
+            const hora = typeof item === 'string' ? '' : (item.hora || '');
+
+            // Formatear la hora para que se vea bonita (ej: 9:41 a. m.)
+            let horaTexto = '';
+            if (hora) {
+                const partes = hora.split(':');
+                let h = parseInt(partes[0]);
+                const m = partes[1];
+                const ampm = h >= 12 ? 'p. m.' : 'a. m.';
+                h = h % 12 || 12;
+                horaTexto = `${h}:${m} ${ampm}`;
+            }
+
+            html += `<div class="evento-item" style="display:flex; justify-content:space-between; align-items:center; padding:0.3rem 0;">`;
+            // ⭐ MOSTRAMOS EL TÍTULO Y LA HORA AL LADO
+            html += `<span>📌 ${titulo} ${horaTexto ? '<span style="font-size:0.8rem;color:#5a6474;margin-left:0.5rem;">(' + horaTexto + ')</span>' : ''}</span>`;
+
+            // Solo mostrar el botón de eliminar si NO es el calendario general
+            if (type !== 'general') {
+                html += `<button onclick="CalendarManager.eliminarEvento('${type}', '${fechaClave}', ${index})" class="btn-sm btn-danger">
+                            <i class="fas fa-trash"></i>
+                        </button>`;
+            } else {
+                html += `<span style="font-size:0.7rem; color:var(--muted-text);">(Gestionado desde Admin)</span>`;
+            }
+            html += `</div>`;
         });
         contenedor.innerHTML = html;
     },
 
     // Abrir Modal de Creación de Eventos
     abrirModalEvento(type) {
+        // 👉 Si es el calendario general, redirigir al Admin o mostrar aviso
+        if (type === 'general') {
+            alert('Los eventos del calendario general de la Iglesia se gestionan exclusivamente desde el Panel de Administración.');
+            return;
+        }
+
         const stateObj = this.state[type] || this.state.general;
         if (!stateObj.diaSeleccionado) {
             alert('Por favor selecciona primero un día en el calendario.');
@@ -178,7 +230,6 @@ const CalendarManager = {
             modal.classList.add('active');
             inputNombre.focus();
         } else {
-            // Fallback en caso de no encontrar modal
             const nombre = prompt(`Ingrese el nombre del evento para el ${dia} de ${this.NOMBRES_MESES[mes]}:`);
             if (nombre && nombre.trim()) {
                 this.guardarNuevoEvento(type, nombre.trim());
@@ -229,7 +280,7 @@ const CalendarManager = {
 
         const eventosMap = this.getEventos(type);
         const fechasConEventos = Object.keys(eventosMap)
-            .filter(f => f.startsWith(mesClavePrefix) && eventosMap[f].length > 0)
+            .filter(f => f.startsWith(mesClavePrefix) && Array.isArray(eventosMap[f]) && eventosMap[f].length > 0)
             .sort();
 
         if (fechasConEventos.length === 0) {
@@ -240,8 +291,23 @@ const CalendarManager = {
         let html = '<ul style="list-style:none; padding:0; display:flex; flex-direction:column; gap:0.4rem;">';
         fechasConEventos.forEach(fecha => {
             const diaNum = parseInt(fecha.split('-')[2]);
-            const eventos = eventosMap[fecha].join(', ');
-            html += `<li><strong>Día ${diaNum}:</strong> ${eventos}</li>`;
+            const items = eventosMap[fecha];
+
+            // Convertir cada elemento a texto correctamente
+            const textos = items.map(item => {
+                // Caso 1: Es un string simple (viene de los clubes)
+                if (typeof item === 'string') return item;
+                // Caso 2: Es un objeto con título y hora (viene del Admin)
+                if (item && typeof item === 'object' && item.titulo) {
+                    const titulo = item.titulo;
+                    const hora = item.hora ? ` (${item.hora})` : '';
+                    return titulo + hora;
+                }
+                return 'Evento';
+            });
+
+            const eventosTexto = textos.join(', ');
+            html += `<li><strong>Día ${diaNum}:</strong> ${eventosTexto}</li>`;
         });
         html += '</ul>';
         contenedor.innerHTML = html;
@@ -287,3 +353,9 @@ function eliminarEventoClub(club, dia, index) {
 function inicializarClubes() {
     ['aventureros', 'conquistadores', 'guias'].forEach(c => CalendarManager.render(c));
 }
+
+// ===== CONEXIÓN CON EL ADMIN =====
+window.addEventListener('datosIglesiaActualizados', () => {
+    // Solo recargamos el calendario general, los clubes no se tocan
+    CalendarManager.render('general');
+});

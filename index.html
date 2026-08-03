@@ -1911,9 +1911,6 @@
                 <div class="eventos-dia">
                     <h3>📋 Eventos del día</h3>
                     <div id="listaEventos"></div>
-                    <button onclick="agregarEvento()" class="btn btn-primary btn-sm" style="margin-top:0.8rem;">
-                        <i class="fas fa-plus"></i> Agregar evento
-                    </button>
                 </div>
 
                 <div
@@ -3207,6 +3204,7 @@
                 color: '#2c5f7c',
                 subopciones: [
                     { texto: '📅 Cronograma', accion: 'cronogramaIglesia' },
+                    { texto: '📋 Encuestas', accion: 'encuestasIglesia' },
                     { texto: '🗄️ Base de datos', accion: 'baseDatosIglesia' }
                 ]
             },
@@ -3299,6 +3297,9 @@
             const panel = document.getElementById('panelAdminGeneral');
             if (!panel) return;
 
+            // Bloquear scroll del body
+            document.body.style.overflow = 'hidden';
+
             // Ocultar botón verde
             const btnAdmin = document.getElementById('btnAdminGeneral');
             if (btnAdmin) btnAdmin.style.display = 'none';
@@ -3308,8 +3309,6 @@
 
             // Mostrar panel
             panel.style.display = 'block';
-
-            // Scroll al inicio
             panel.scrollTop = 0;
         }
 
@@ -3319,11 +3318,13 @@
 
             panel.style.display = 'none';
 
+            // Restaurar scroll del body
+            document.body.style.overflow = '';
+
             // Mostrar botón verde nuevamente
             const btnAdmin = document.getElementById('btnAdminGeneral');
             if (btnAdmin) btnAdmin.style.display = 'flex';
         }
-
         function renderizarTarjetasAdmin() {
             const container = document.getElementById('tarjetasAdminContainer');
             if (!container) return;
@@ -3466,8 +3467,20 @@
 
         function ejecutarAccionAdmin(accion, texto, event) {
             event.stopPropagation();
-            alert(`Función: ${texto}`);
-            console.log(`🔧 Acción ejecutada: ${accion} - ${texto}`);
+            switch (accion) {
+                case 'cronogramaIglesia':
+                    abrirCronograma();
+                    break;
+                case 'encuestasIglesia':
+                    abrirEncuestas();
+                    break;
+                case 'baseDatosIglesia':
+                    alert('Función de Base de datos en construcción');
+                    break;
+                default:
+                    alert(`Función: ${texto}`);
+                    console.log(`🔧 Acción: ${accion} - ${texto}`);
+            }
         }
 
         // ===== MONITOREO DE VISIBILIDAD DEL BOTÓN =====
@@ -3973,14 +3986,272 @@
             setTimeout(function () { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.5s ease'; setTimeout(function () { toast.remove(); }, 500); }, 2000);
         }
 
+        // ===== VARIABLES GLOBALES PARA BASE DE DATOS =====
+        let miembroBDPendienteEliminarId = null;
+        let storageKeyBDPendiente = null;
+
+        // Mapeo de nombres de club a claves de localStorage para BD
+        const CLUBES_STORAGE_BD = {
+            'Aventureros': 'bd_aventureros',
+            'Conquistadores': 'bd_conquistadores',
+            'Guías Mayores': 'bd_guias_mayores'
+        };
+
+        // ===== FUNCIÓN PRINCIPAL: ABRIR BASE DE DATOS =====
         function abrirBaseDatosClub() {
+            // Guardar club actual antes de cerrar el modal
+            const clubActual = clubSeleccionadoActual;
             cerrarModalClub();
-            const toast = document.createElement('div');
-            toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);color:white;padding:1rem 2rem;border-radius:2rem;font-weight:600;z-index:99999;animation:fadeInUp 0.4s ease;font-family:Inter,sans-serif;border:2px solid #c9a53b;box-shadow:0 8px 30px rgba(0,0,0,0.3);';
-            toast.innerHTML = '<i class="fas fa-database"></i> Base de datos de ' + clubSeleccionadoActual + ' en construcción';
-            document.body.appendChild(toast);
-            setTimeout(function () { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.5s ease'; setTimeout(function () { toast.remove(); }, 500); }, 3000);
+
+            const panel = document.getElementById('panelAdminGeneral');
+            if (!panel) return;
+
+            const storageKey = CLUBES_STORAGE_BD[clubActual] || 'bd_aventureros';
+
+            let seccionBD = document.getElementById('seccionBaseDatosClub');
+            if (!seccionBD) {
+                seccionBD = document.createElement('div');
+                seccionBD.id = 'seccionBaseDatosClub';
+                seccionBD.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9997;overflow-y:auto;font-family:Inter,sans-serif;';
+                document.body.appendChild(seccionBD);
+            }
+
+            const miembros = cargarMiembrosBD(storageKey);
+            seccionBD.innerHTML = generarHTMLBaseDatos(clubActual, miembros, storageKey);
+            seccionBD.style.display = 'block';
+            panel.style.display = 'none';
+
+            // Vincular eventos
+            setTimeout(function () {
+                vincularEventosBD(storageKey);
+            }, 100);
         }
+
+        function cerrarSeccionBD() {
+            const seccionBD = document.getElementById('seccionBaseDatosClub');
+            const panel = document.getElementById('panelAdminGeneral');
+            if (seccionBD) seccionBD.style.display = 'none';
+            if (panel) panel.style.display = 'block';
+        }
+
+        // ===== FUNCIONES DE DATOS =====
+        function cargarMiembrosBD(storageKey) {
+            try {
+                const data = localStorage.getItem(storageKey);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function guardarMiembrosBD(storageKey, datos) {
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(datos));
+            } catch (e) {
+                console.warn('Error guardando miembros BD:', e);
+            }
+        }
+
+        // ===== GENERAR HTML DE LA VISTA =====
+        function generarHTMLBaseDatos(clubNombre, miembros, storageKey) {
+            let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">';
+            html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;">🗄️ Base de datos - ' + clubNombre + '</h3>';
+            html += '<button onclick="cerrarSeccionBD()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver al Panel</button>';
+            html += '</div>';
+
+            html += '<div style="max-width:100%;margin:0 auto;padding:1rem;">';
+
+            // Tarjeta resumen
+            html += '<div class="bd-resumen-grid">';
+            html += '<div class="bd-resumen-card"><div class="resumen-icono">👥</div><div class="resumen-titulo">Total de personas</div><div class="resumen-valor" id="bdTotalPersonas">' + miembros.length + '</div></div>';
+            html += '</div>';
+
+            // Buscador
+            html += '<div class="bd-buscador-wrapper">';
+            html += '<span class="bd-icono-buscar">🔍</span>';
+            html += '<input type="text" id="bdInputBuscar" placeholder="Buscar por nombre..." oninput="filtrarMiembrosBD(\'' + storageKey + '\')">';
+            html += '</div>';
+
+            // Botón agregar
+            html += '<button class="btn-agregar-miembro" onclick="abrirModalAgregarMiembroBD(\'' + storageKey + '\')"><i class="fas fa-plus"></i> Agregar miembro</button>';
+
+            // Tabla
+            html += '<div class="bd-tabla-wrapper"><table class="bd-tabla"><thead><tr>';
+            html += '<th>Nombre</th><th>TI/CC</th><th>Tipo Sangre</th><th>Fecha Nac.</th><th>Cartillas</th><th>Especialidades</th><th>Acción</th>';
+            html += '</tr></thead><tbody id="bdTablaBody">';
+
+            miembros.forEach(function (m) {
+                html += generarFilaMiembroBD(m, storageKey);
+            });
+
+            html += '</tbody></table></div>';
+            html += '</div>';
+
+            return html;
+        }
+
+        function generarFilaMiembroBD(miembro, storageKey) {
+            return '<tr data-miembro-id="' + miembro.id + '">' +
+                '<td>' + miembro.nombre + '</td>' +
+                '<td>' + miembro.cc + '</td>' +
+                '<td>' + (miembro.tipoSangre || '-') + '</td>' +
+                '<td>' + (miembro.fechaNacimiento || '-') + '</td>' +
+                '<td>' + (miembro.cartillas || '-') + '</td>' +
+                '<td>' + (miembro.especialidades || '-') + '</td>' +
+                '<td><button class="btn-eliminar-miembro" onclick="solicitarEliminarMiembroBD(' + miembro.id + ',\'' + storageKey + '\')" title="Eliminar">🗑️</button></td>' +
+                '</tr>';
+        }
+
+        // ===== FILTRADO EN TIEMPO REAL =====
+        function filtrarMiembrosBD(storageKey) {
+            const input = document.getElementById('bdInputBuscar');
+            const termino = input ? input.value.trim().toLowerCase() : '';
+            const miembros = cargarMiembrosBD(storageKey);
+
+            const filtrados = termino === '' ? miembros : miembros.filter(function (m) {
+                return m.nombre.toLowerCase().includes(termino);
+            });
+
+            const tbody = document.getElementById('bdTablaBody');
+            if (tbody) {
+                tbody.innerHTML = filtrados.map(function (m) {
+                    return generarFilaMiembroBD(m, storageKey);
+                }).join('');
+            }
+
+            document.getElementById('bdTotalPersonas').textContent = filtrados.length;
+        }
+
+        // ===== AGREGAR MIEMBRO =====
+        function abrirModalAgregarMiembroBD(storageKey) {
+            // Guardar la clave actual para usarla al guardar
+            window._bdStorageKeyActual = storageKey;
+
+            // Limpiar formulario
+            document.getElementById('bdInputNombre').value = '';
+            document.getElementById('bdInputCC').value = '';
+            document.getElementById('bdInputTipoSangre').value = '';
+            document.getElementById('bdInputFechaNacimiento').value = '';
+            document.getElementById('bdInputCartillas').value = '';
+            document.getElementById('bdInputEspecialidades').value = '';
+
+            const modal = document.getElementById('modalAgregarMiembroBD');
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function cerrarModalAgregarMiembroBD(event) {
+            if (event && event.target !== document.getElementById('modalAgregarMiembroBD')) return;
+            const modal = document.getElementById('modalAgregarMiembroBD');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function guardarNuevoMiembroBD() {
+            const storageKey = window._bdStorageKeyActual;
+            if (!storageKey) return;
+
+            const nombre = document.getElementById('bdInputNombre').value.trim();
+            const cc = document.getElementById('bdInputCC').value.trim();
+            const tipoSangre = document.getElementById('bdInputTipoSangre').value.trim();
+            const fechaNacimiento = document.getElementById('bdInputFechaNacimiento').value;
+            const cartillas = document.getElementById('bdInputCartillas').value.trim();
+            const especialidades = document.getElementById('bdInputEspecialidades').value.trim();
+
+            if (!nombre || !cc) {
+                alert('Por favor completa al menos el nombre y TI/CC.');
+                return;
+            }
+
+            const miembros = cargarMiembrosBD(storageKey);
+            miembros.push({
+                id: Date.now(),
+                nombre: nombre,
+                cc: cc,
+                tipoSangre: tipoSangre,
+                fechaNacimiento: fechaNacimiento,
+                cartillas: cartillas,
+                especialidades: especialidades
+            });
+
+            guardarMiembrosBD(storageKey, miembros);
+            cerrarModalAgregarMiembroBD();
+
+            // Recargar la vista
+            const seccionBD = document.getElementById('seccionBaseDatosClub');
+            const clubActual = clubSeleccionadoActual || Object.keys(CLUBES_STORAGE_BD).find(k => CLUBES_STORAGE_BD[k] === storageKey) || 'Aventureros';
+            seccionBD.innerHTML = generarHTMLBaseDatos(clubActual, miembros, storageKey);
+
+            // Actualizar total
+            document.getElementById('bdTotalPersonas').textContent = miembros.length;
+
+            setTimeout(function () {
+                vincularEventosBD(storageKey);
+            }, 100);
+        }
+
+        // ===== ELIMINAR MIEMBRO =====
+        function solicitarEliminarMiembroBD(miembroId, storageKey) {
+            miembroBDPendienteEliminarId = miembroId;
+            storageKeyBDPendiente = storageKey;
+
+            const modal = document.getElementById('modalConfirmarEliminarBD');
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function confirmarEliminarMiembroBD() {
+            if (miembroBDPendienteEliminarId === null || !storageKeyBDPendiente) return;
+
+            let miembros = cargarMiembrosBD(storageKeyBDPendiente);
+            miembros = miembros.filter(function (m) { return m.id !== miembroBDPendienteEliminarId; });
+            guardarMiembrosBD(storageKeyBDPendiente, miembros);
+
+            // Recargar vista
+            const seccionBD = document.getElementById('seccionBaseDatosClub');
+            const clubActual = clubSeleccionadoActual || Object.keys(CLUBES_STORAGE_BD).find(k => CLUBES_STORAGE_BD[k] === storageKeyBDPendiente) || 'Aventureros';
+            seccionBD.innerHTML = generarHTMLBaseDatos(clubActual, miembros, storageKeyBDPendiente);
+
+            document.getElementById('bdTotalPersonas').textContent = miembros.length;
+
+            setTimeout(function () {
+                vincularEventosBD(storageKeyBDPendiente);
+            }, 100);
+
+            cerrarModalConfirmarEliminarBD();
+
+            // Toast
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#c62828;color:white;padding:1rem 2rem;border-radius:2rem;font-weight:600;z-index:99999;font-family:Inter,sans-serif;box-shadow:0 8px 30px rgba(198,40,40,0.4);';
+            toast.innerHTML = '<i class="fas fa-trash"></i> Miembro eliminado de la base de datos';
+            document.body.appendChild(toast);
+            setTimeout(function () { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.5s ease'; setTimeout(function () { toast.remove(); }, 500); }, 2000);
+        }
+
+        function cerrarModalConfirmarEliminarBD(event) {
+            if (event && event.target !== document.getElementById('modalConfirmarEliminarBD')) return;
+            const modal = document.getElementById('modalConfirmarEliminarBD');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            miembroBDPendienteEliminarId = null;
+            storageKeyBDPendiente = null;
+        }
+
+        // ===== VINCULAR EVENTOS =====
+        function vincularEventosBD(storageKey) {
+            // El buscador ya tiene oninput en el HTML
+            // Solo aseguramos que los botones de eliminar funcionen (ya tienen onclick)
+        }
+
+
 
         // ===== EVENTOS DE TECLADO =====
         document.addEventListener('keydown', function (e) {
@@ -3992,14 +4263,203 @@
             }
         });
 
-        // ===== EXPORTACIONES GLOBALES =====
-        window.abrirModalClub = abrirModalClub;
-        window.cerrarModalClub = cerrarModalClub;
-        window.abrirCuotasClub = abrirCuotasClub;
-        window.cerrarSeccionCuotas = cerrarSeccionCuotas;
+        // ===== CRONOGRAMA =====
+        const STORAGE_CRONOGRAMA = 'eventosIglesia';
+
+        function abrirCronograma() {
+            const panel = document.getElementById('panelAdminGeneral');
+            let seccion = document.getElementById('seccionCronograma');
+            if (!seccion) {
+                seccion = document.createElement('div');
+                seccion.id = 'seccionCronograma';
+                seccion.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9997;overflow-y:auto;font-family:Inter,sans-serif;';
+                document.body.appendChild(seccion);
+            }
+            seccion.innerHTML = generarHTMLCronograma();
+            seccion.style.display = 'block';
+            panel.style.display = 'none';
+            setTimeout(() => vincularEventosCronograma(), 100);
+        }
+
+        function cerrarCronograma() {
+            const seccion = document.getElementById('seccionCronograma');
+            const panel = document.getElementById('panelAdminGeneral');
+            if (seccion) seccion.style.display = 'none';
+            if (panel) panel.style.display = 'block';
+        }
+
+        function cargarEventos() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_CRONOGRAMA)) || []; }
+            catch (e) { return []; }
+        }
+        function guardarEventos(eventos) {
+            localStorage.setItem(STORAGE_CRONOGRAMA, JSON.stringify(eventos));
+        }
+
+        function generarHTMLCronograma() {
+            const eventos = cargarEventos().sort((a, b) => a.fecha.localeCompare(b.fecha));
+            let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">';
+            html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;">📅 Cronograma de la Iglesia</h3>';
+            html += '<button onclick="cerrarCronograma()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver</button></div>';
+            html += '<div style="max-width:800px;margin:0 auto;padding:1rem;">';
+            // formulario
+            html += '<div style="background:white;border-radius:1.5rem;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 15px rgba(0,0,0,0.05);">';
+            html += '<h4 style="color:#1a3a4a;margin-bottom:1rem;"><i class="fas fa-plus-circle"></i> Agregar Evento</h4>';
+            html += '<input type="text" id="eventoTitulo" placeholder="Título del evento" style="width:100%;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;margin-bottom:0.8rem;font-family:Inter,sans-serif;">';
+            html += '<div style="display:flex;gap:0.8rem;flex-wrap:wrap;">';
+            html += '<input type="date" id="eventoFecha" style="flex:1;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;font-family:Inter,sans-serif;">';
+            html += '<input type="time" id="eventoHora" style="flex:1;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;font-family:Inter,sans-serif;">';
+            html += '</div>';
+            html += '<button onclick="agregarEvento()" style="margin-top:0.8rem;width:100%;padding:0.8rem;background:linear-gradient(135deg,#d4a038 0%,#c9a53b 100%);color:#1a3a4a;border:none;border-radius:2rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;"><i class="fas fa-plus"></i> Agregar Evento</button>';
+            html += '</div>';
+            // lista
+            html += '<div>';
+            if (eventos.length === 0) {
+                html += '<p style="text-align:center;color:#5a6474;">No hay eventos programados.</p>';
+            } else {
+                eventos.forEach(ev => {
+                    html += '<div class="evento-item">';
+                    html += '<div class="evento-info"><div class="evento-titulo">' + ev.titulo + '</div>';
+                    html += '<div class="evento-fecha">' + ev.fecha + ' a las ' + ev.hora + '</div></div>';
+                    html += '<button class="btn-eliminar-miembro" onclick="eliminarEvento(' + ev.id + ')" title="Quitar">🗑️</button>';
+                    html += '</div>';
+                });
+            }
+            html += '</div></div>';
+            return html;
+        }
+
+        function agregarEvento() {
+            const titulo = document.getElementById('eventoTitulo').value.trim();
+            const fecha = document.getElementById('eventoFecha').value;
+            const hora = document.getElementById('eventoHora').value;
+            if (!titulo || !fecha || !hora) { alert('Completa todos los campos'); return; }
+            const eventos = cargarEventos();
+            eventos.push({ id: Date.now(), titulo, fecha, hora });
+            guardarEventos(eventos);
+            window.dispatchEvent(new Event('datosIglesiaActualizados'));
+            document.getElementById('seccionCronograma').innerHTML = generarHTMLCronograma();
+            setTimeout(() => vincularEventosCronograma(), 100);
+        }
+
+        function eliminarEvento(id) {
+            if (!confirm('¿Quitar este evento?')) return;
+            let eventos = cargarEventos().filter(e => e.id !== id);
+            guardarEventos(eventos);
+            window.dispatchEvent(new Event('datosIglesiaActualizados'));
+            document.getElementById('seccionCronograma').innerHTML = generarHTMLCronograma();
+            setTimeout(() => vincularEventosCronograma(), 100);
+        }
+
+        function vincularEventosCronograma() { /* los botones ya tienen onclick */ }
+
+        // ===== ENCUESTAS =====
+        const STORAGE_ENCUESTAS = 'encuestasIglesia';
+
+        function abrirEncuestas() {
+            const panel = document.getElementById('panelAdminGeneral');
+            let seccion = document.getElementById('seccionEncuestas');
+            if (!seccion) {
+                seccion = document.createElement('div');
+                seccion.id = 'seccionEncuestas';
+                seccion.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9997;overflow-y:auto;font-family:Inter,sans-serif;';
+                document.body.appendChild(seccion);
+            }
+            seccion.innerHTML = generarHTMLEncuestas();
+            seccion.style.display = 'block';
+            panel.style.display = 'none';
+        }
+
+        function cerrarEncuestas() {
+            const seccion = document.getElementById('seccionEncuestas');
+            const panel = document.getElementById('panelAdminGeneral');
+            if (seccion) seccion.style.display = 'none';
+            if (panel) panel.style.display = 'block';
+        }
+
+        function cargarEncuestas() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_ENCUESTAS)) || []; }
+            catch (e) { return []; }
+        }
+        function guardarEncuestas(encuestas) {
+            localStorage.setItem(STORAGE_ENCUESTAS, JSON.stringify(encuestas));
+        }
+
+        function generarHTMLEncuestas() {
+            const encuestas = cargarEncuestas();
+            let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">';
+            html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;">📋 Encuestas</h3>';
+            html += '<button onclick="cerrarEncuestas()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver</button></div>';
+            html += '<div style="max-width:800px;margin:0 auto;padding:1rem;">';
+            // formulario
+            html += '<div style="background:white;border-radius:1.5rem;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 15px rgba(0,0,0,0.05);">';
+            html += '<h4 style="color:#1a3a4a;margin-bottom:1rem;"><i class="fas fa-plus-circle"></i> Agregar Encuesta</h4>';
+            html += '<input type="text" id="encuestaPregunta" placeholder="Pregunta" style="width:100%;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;margin-bottom:0.8rem;font-family:Inter,sans-serif;">';
+            html += '<input type="text" id="encuestaOpciones" placeholder="Opciones (separadas por comas)" style="width:100%;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;margin-bottom:0.8rem;font-family:Inter,sans-serif;">';
+            html += '<button onclick="agregarEncuesta()" style="width:100%;padding:0.8rem;background:linear-gradient(135deg,#d4a038 0%,#c9a53b 100%);color:#1a3a4a;border:none;border-radius:2rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;"><i class="fas fa-plus"></i> Agregar Encuesta</button>';
+            html += '</div>';
+            // lista
+            encuestas.forEach(enc => {
+                html += '<div class="encuesta-card">';
+                html += '<div class="encuesta-pregunta">' + enc.pregunta + '</div>';
+                html += '<div class="opciones-votos">';
+                enc.opciones.forEach((op, i) => {
+                    html += '<div class="opcion-badge">' + op + ' <span class="votos-count">' + (enc.votos[i] || 0) + '</span></div>';
+                });
+                html += '</div>';
+                html += '<button class="btn-eliminar-miembro" onclick="eliminarEncuesta(' + enc.id + ')" style="float:right;">🗑️</button>';
+                html += '<div style="clear:both;"></div>';
+                html += '</div>';
+            });
+            if (encuestas.length === 0) html += '<p style="text-align:center;color:#5a6474;">No hay encuestas activas.</p>';
+            html += '</div>';
+            return html;
+        }
+
+        function agregarEncuesta() {
+            const pregunta = document.getElementById('encuestaPregunta').value.trim();
+            const opcionesStr = document.getElementById('encuestaOpciones').value.trim();
+            if (!pregunta || !opcionesStr) { alert('Completa todos los campos'); return; }
+            const opciones = opcionesStr.split(',').map(op => op.trim()).filter(op => op);
+            if (opciones.length === 0) { alert('Ingresa al menos una opción'); return; }
+            const encuestas = cargarEncuestas();
+            encuestas.push({
+                id: Date.now(),
+                pregunta,
+                opciones,
+                votos: new Array(opciones.length).fill(0)
+            });
+            guardarEncuestas(encuestas);
+            window.dispatchEvent(new Event('datosIglesiaActualizados'));
+            document.getElementById('seccionEncuestas').innerHTML = generarHTMLEncuestas();
+        }
+
+        function eliminarEncuesta(id) {
+            if (!confirm('¿Eliminar esta encuesta?')) return;
+            let encuestas = cargarEncuestas().filter(e => e.id !== id);
+            guardarEncuestas(encuestas);
+            window.dispatchEvent(new Event('datosIglesiaActualizados'));
+            document.getElementById('seccionEncuestas').innerHTML = generarHTMLEncuestas();
+        }
+
+        // ===== EXPORTACIONES GLOBALES ADICIONALES =====
         window.abrirBaseDatosClub = abrirBaseDatosClub;
-        window.confirmarEliminarMiembro = confirmarEliminarMiembro;
-        window.cerrarModalConfirmarEliminar = cerrarModalConfirmarEliminar;
+        window.cerrarSeccionBD = cerrarSeccionBD;
+        window.abrirModalAgregarMiembroBD = abrirModalAgregarMiembroBD;
+        window.cerrarModalAgregarMiembroBD = cerrarModalAgregarMiembroBD;
+        window.guardarNuevoMiembroBD = guardarNuevoMiembroBD;
+        window.solicitarEliminarMiembroBD = solicitarEliminarMiembroBD;
+        window.confirmarEliminarMiembroBD = confirmarEliminarMiembroBD;
+        window.cerrarModalConfirmarEliminarBD = cerrarModalConfirmarEliminarBD;
+        window.filtrarMiembrosBD = filtrarMiembrosBD;
+        window.abrirCronograma = abrirCronograma;
+        window.cerrarCronograma = cerrarCronograma;
+        window.agregarEvento = agregarEvento;
+        window.eliminarEvento = eliminarEvento;
+        window.abrirEncuestas = abrirEncuestas;
+        window.cerrarEncuestas = cerrarEncuestas;
+        window.agregarEncuesta = agregarEncuesta;
+        window.eliminarEncuesta = eliminarEncuesta;
     </script>
 
     <!-- ===== MODAL DE CONFIRMACIÓN PARA ELIMINAR MIEMBRO ===== -->
@@ -4022,6 +4482,77 @@
             </div>
         </div>
     </div>
+
+    <!-- ===== MODAL AGREGAR MIEMBRO A BASE DE DATOS ===== -->
+    <div id="modalAgregarMiembroBD" class="modal-bd-overlay" onclick="cerrarModalAgregarMiembroBD(event)">
+        <div class="modal-bd-card" onclick="event.stopPropagation()">
+            <h3><i class="fas fa-user-plus"></i> Agregar Miembro</h3>
+            <div class="form-group">
+                <label>Nombre completo *</label>
+                <input type="text" id="bdInputNombre" placeholder="Ej: Juan Pérez">
+            </div>
+            <div class="form-group">
+                <label>TI / CC *</label>
+                <input type="text" id="bdInputCC" placeholder="Ej: 1234567890">
+            </div>
+            <div class="form-group">
+                <label>Tipo de sangre</label>
+                <input type="text" id="bdInputTipoSangre" placeholder="Ej: O+">
+            </div>
+            <div class="form-group">
+                <label>Fecha de nacimiento</label>
+                <input type="date" id="bdInputFechaNacimiento">
+            </div>
+            <div class="form-group">
+                <label>Cartillas</label>
+                <input type="text" id="bdInputCartillas" placeholder="Ej: 3">
+            </div>
+            <div class="form-group">
+                <label>Especialidades</label>
+                <input type="text" id="bdInputEspecialidades" placeholder="Ej: Natación, Campismo">
+            </div>
+            <div class="modal-bd-botones">
+                <button class="btn-bd-guardar" onclick="guardarNuevoMiembroBD()">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+                <button class="btn-bd-cancelar" onclick="cerrarModalAgregarMiembroBD()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DE CONFIRMACIÓN PARA ELIMINAR MIEMBRO BD ===== -->
+    <div id="modalConfirmarEliminarBD" class="modal-confirm-overlay" onclick="cerrarModalConfirmarEliminarBD(event)">
+        <div class="modal-confirm-card" onclick="event.stopPropagation()">
+            <button class="modal-confirm-close" onclick="cerrarModalConfirmarEliminarBD()" title="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-confirm-icono">⚠️</div>
+            <h3 class="modal-confirm-titulo">Confirmar eliminación</h3>
+            <p class="modal-confirm-mensaje">¿Estás seguro de que deseas eliminar a este miembro de la base de datos?
+                Esta acción no se puede deshacer.</p>
+            <div class="modal-confirm-botones">
+                <button class="modal-confirm-btn btn-confirm-si" onclick="confirmarEliminarMiembroBD()">
+                    <i class="fas fa-trash"></i> Sí, eliminar
+                </button>
+                <button class="modal-confirm-btn btn-confirm-no" onclick="cerrarModalConfirmarEliminarBD()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SECCIÓN ENCUESTAS ===== -->
+    <div id="seccionEncuestas" style="display:none;">
+        <!-- Encabezado interno generado por JS -->
+    </div>
+
+    <!-- ===== SECCIÓN CRONOGRAMA ===== -->
+    <div id="seccionCronograma" style="display:none;">
+        <!-- Encabezado interno generado por JS -->
+    </div>
+
 </body>
 
 </html>
