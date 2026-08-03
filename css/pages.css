@@ -1228,3 +1228,558 @@
     font-size: 0.85rem;
     color: #5a6474;
 }
+
+/* Botón Calendario (modal de clubes) */
+.modal-club-btn.calendario {
+    background: linear-gradient(135deg, #1565c0 0%, #1e88e5 100%);
+    color: white;
+    border-color: #1565c0;
+    box-shadow: 0 6px 20px rgba(21, 101, 192, 0.3);
+}
+
+.modal-club-btn.calendario:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(21, 101, 192, 0.4);
+}
+
+.modal-club-btn.calendario:active {
+    transform: translateY(-1px);
+}
+
+/* ===== MODALES PERSONALIZADOS (ALERTA Y CONFIRMACIÓN) ===== */
+.modal-generico-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10003;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.25s ease;
+}
+
+.modal-generico-overlay.activo {
+    display: flex;
+}
+
+.modal-generico-card {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    padding: 2rem 1.8rem;
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(201, 165, 59, 0.3);
+    animation: slideUp 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.modal-generico-icono {
+    font-size: 2.8rem;
+    margin-bottom: 0.8rem;
+}
+
+.modal-generico-titulo {
+    color: #1a3a4a;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+}
+
+.modal-generico-mensaje {
+    color: #5a6474;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 1.8rem;
+}
+
+.modal-generico-botones {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.modal-generico-btn {
+    padding: 0.75rem 1.8rem;
+    border-radius: 2rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    border: none;
+    flex: 1;
+    min-width: 120px;
+}
+
+.btn-modal-primario {
+    background: linear-gradient(135deg, #d4a038 0%, #c9a53b 100%);
+    color: #1a3a4a;
+    box-shadow: 0 4px 15px rgba(201, 165, 59, 0.3);
+}
+
+.btn-modal-primario:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(201, 165, 59, 0.4);
+}
+
+.btn-modal-secundario {
+    background: transparent;
+    border: 2px solid #1a3a4a;
+    color: #1a3a4a;
+}
+
+.btn-modal-secundario:hover {
+    background: rgba(26, 58, 74, 0.05);
+    transform: translateY(-2px);
+}
+
+.btn-modal-peligro {
+    background: #c62828;
+    color: white;
+    box-shadow: 0 4px 15px rgba(198, 40, 40, 0.3);
+}
+
+.btn-modal-peligro:hover {
+    background: #b71c1c;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 400px) {
+    .modal-generico-card {
+        padding: 1.5rem 1.2rem;
+    }
+
+    .modal-generico-botones {
+        flex-direction: column;
+    }
+
+    .modal-generico-btn {
+        width: 100%;
+    }
+}
+
+/* Ocultar botones de agregar evento en clubes públicos */
+#aventureros .btn-primary.btn-sm[onclick*="agregarEventoClub"],
+#conquistadores .btn-primary.btn-sm[onclick*="agregarEventoClub"],
+#guias .btn-primary.btn-sm[onclick*="agregarEventoClub"] {
+    display: none !important;
+}
+
+/* Botón Descargar Excel */
+.btn-descargar-excel {
+    background: #2e7d32;
+    color: white;
+    padding: 0.4rem 1.2rem;
+    border: none;
+    border-radius: 2rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    box-shadow: 0 2px 8px rgba(46, 125, 50, 0.3);
+}
+
+.btn-descargar-excel:hover {
+    background: #256f29;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
+}
+
+/* Totales anuales */
+.cuotas-totales-anuales {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    border: 2px solid rgba(201, 165, 59, 0.15);
+}
+
+.cuotas-anual-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #1a3a4a;
+}
+
+.anual-valor {
+    background: linear-gradient(135deg, #d4a038 0%, #c9a53b 100%);
+    color: #1a3a4a;
+    padding: 0.2rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.9rem;
+}
+
+/* Botón editar miembro (Base de datos) */
+.btn-editar-miembro {
+    background: #c9a53b;
+    color: #1a3a4a;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin-right: 4px;
+}
+
+.btn-editar-miembro:hover {
+    background: #b8942e;
+    transform: scale(1.1);
+}
+
+/* Botón editar evento (calendario club) */
+.btn-editar-evento {
+    background: #1565c0;
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin-right: 4px;
+}
+
+.btn-editar-evento:hover {
+    background: #0d47a1;
+    transform: scale(1.1);
+}
+
+/* Opción de recurrencia */
+.recurrencia-opcion {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.recurrencia-opcion label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    color: #1a3a4a;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.recurrencia-opcion input[type="checkbox"] {
+    accent-color: #c9a53b;
+    width: 18px;
+    height: 18px;
+}
+
+.campo-recurrencia {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.campo-recurrencia.visible {
+    display: flex;
+}
+
+.campo-recurrencia input {
+    width: 80px;
+    padding: 0.5rem 0.8rem;
+    border: 2px solid #e8e3d8;
+    border-radius: 0.8rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+}
+
+/* Herramientas de seguridad (exportar/importar) */
+.modal-club-herramientas {
+    display: flex;
+    gap: 0.6rem;
+    justify-content: center;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.btn-herramienta {
+    padding: 0.5rem 1.2rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    border: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-herramienta.exportar {
+    background: #2e7d32;
+    color: white;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+}
+
+.btn-herramienta.exportar:hover {
+    background: #256f29;
+    transform: translateY(-1px);
+}
+
+.btn-herramienta.importar {
+    background: #1565c0;
+    color: white;
+    box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
+}
+
+.btn-herramienta.importar:hover {
+    background: #0d47a1;
+    transform: translateY(-1px);
+}
+
+/* ===== MENÚ MODERNO DE ADMINISTRACIÓN (IGLESIA) ===== */
+.admin-menu-moderno {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.2rem 0;
+}
+
+.admin-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    background: transparent;
+    border: 1px solid transparent;
+}
+
+.admin-menu-item:hover {
+    background: var(--cream);
+    border-color: rgba(201, 165, 59, 0.25);
+    transform: translateX(6px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.admin-menu-item .item-icono {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(26, 58, 74, 0.15);
+    transition: transform 0.3s ease;
+}
+
+.admin-menu-item:hover .item-icono {
+    transform: scale(1.05);
+}
+
+.admin-menu-item .item-texto {
+    flex: 1;
+    font-weight: 600;
+    color: var(--deep-blue);
+    font-size: 0.95rem;
+}
+
+.admin-menu-item .item-flecha {
+    color: var(--golden);
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+    opacity: 0.6;
+}
+
+.admin-menu-item:hover .item-flecha {
+    transform: translateX(4px);
+    opacity: 1;
+}
+
+/* ===== MODALES DE BIBLIOTECA (ADMIN) ===== */
+.modal-biblioteca-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10010;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.25s ease;
+}
+
+.modal-biblioteca-overlay.activo {
+    display: flex;
+}
+
+.modal-biblioteca-card {
+    background: var(--pure-white);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    border: 2px solid rgba(201, 157, 59, 0.25);
+    animation: slideUp 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.modal-biblioteca-card h3 {
+    color: var(--deep-blue);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+}
+
+/* Formulario agregar libro */
+.form-agregar-libro .form-group {
+    margin-bottom: 1rem;
+}
+
+.form-agregar-libro .form-group label {
+    display: block;
+    font-weight: 600;
+    color: var(--deep-blue);
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+}
+
+.form-agregar-libro .form-group input,
+.form-agregar-libro .form-group select {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 2px solid #e8e3d8;
+    border-radius: 0.8rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.form-agregar-libro .form-group input:focus,
+.form-agregar-libro .form-group select:focus {
+    outline: none;
+    border-color: var(--golden);
+    box-shadow: 0 0 0 3px var(--golden-glow);
+}
+
+/* Buscador */
+.buscador-biblioteca {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.buscador-biblioteca input {
+    width: 100%;
+    padding: 0.7rem 1rem 0.7rem 2.5rem;
+    border: 2px solid #e8e3d8;
+    border-radius: 2rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+}
+
+.buscador-biblioteca input:focus {
+    outline: none;
+    border-color: var(--golden);
+    box-shadow: 0 0 0 3px var(--golden-glow);
+}
+
+.buscador-biblioteca .icono-buscar {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--golden);
+}
+
+/* Tabla de libros */
+.tabla-libros {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.tabla-libros th {
+    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--deep-blue-light) 100%);
+    color: white;
+    padding: 0.7rem 0.6rem;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-align: left;
+}
+
+.tabla-libros td {
+    padding: 0.6rem 0.6rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.tabla-libros tr:nth-child(even) td {
+    background: #fafaf9;
+}
+
+.tabla-libros tr:hover td {
+    background: #fef9e7;
+}
+
+/* Botones de acción */
+.btn-accion-libro {
+    padding: 0.3rem 0.8rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    cursor: pointer;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s ease;
+}
+
+.btn-eliminar-libro {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-eliminar-libro:hover {
+    background: #c62828;
+    transform: scale(1.05);
+}
+
+.btn-entregar-libro {
+    background: var(--success);
+    color: white;
+}
+
+.btn-entregar-libro:hover {
+    background: #388e3c;
+    transform: scale(1.05);
+}

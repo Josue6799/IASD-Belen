@@ -105,12 +105,14 @@ const EncuestaManager = {
 
         // Volver a renderizar para mostrar el cambio y deshabilitar los botones
         this.render();
+
     }
 };
 
 // Funciones globales para que los botones del HTML la llamen
 function mostrarEncuesta() { EncuestaManager.render(); }
 function votar(index) { EncuestaManager.votar(index); }
+
 
 // ===== CONEXIÓN CON EL ADMIN =====
 // Cuando el Admin agregue o elimine una encuesta, la página se actualizará sola.

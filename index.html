@@ -3418,21 +3418,50 @@
 
             // Construir submenú
             let html = '';
-            tarjeta.subopciones.forEach(op => {
-                if (op.esCategoria && op.clubNombre) {
-                    // NUEVO: Redirige al modal flotante en lugar de desplegar sub-submenú
-                    html += `<div class="categoria-club" onclick="abrirModalClub('${op.clubNombre}', event)" style="margin-bottom: 0.8rem; border-bottom: 1px solid rgba(201,165,59,0.2); padding-bottom: 0.8rem;">
-                        <span>${op.texto}</span>
-                        <i class="fas fa-chevron-right" style="font-size:0.7rem; color:#c9a53b;"></i>
-                    </div>`;
-                } else {
-                    // Opción simple (Iglesia, Biblioteca, Anuncios)
-                    html += `<div class="submenu-opcion" onclick="ejecutarAccionAdmin('${op.accion}', '${op.texto}', event)">
-                        <i class="fas fa-circle" style="font-size:0.4rem;color:#c9a53b;flex-shrink:0;"></i>
-                        ${op.texto}
-                    </div>`;
-                }
-            });
+
+            // === DISEÑO MODERNO PARA IGLESIA (EVITA ERRORES DE SINTAXIS) ===
+            if (tarjetaId === 'iglesia') {
+                html += `
+                <div class="admin-menu-moderno">
+                    <div class="admin-menu-item" onclick="ejecutarAccionAdmin('cronogramaIglesia', '📅 Cronograma', event)">
+                        <div class="item-icono" style="background: var(--deep-blue);">
+                            <i class="fas fa-calendar-alt" style="color: white; font-size: 1.2rem;"></i>
+                        </div>
+                        <span class="item-texto">Cronograma</span>
+                        <i class="fas fa-chevron-right item-flecha"></i>
+                    </div>
+                    <div class="admin-menu-item" onclick="ejecutarAccionAdmin('encuestasIglesia', '📋 Encuestas', event)">
+                        <div class="item-icono" style="background: linear-gradient(135deg, #d4a038 0%, #c9a53b 100%);">
+                            <i class="fas fa-clipboard-list" style="color: white; font-size: 1.2rem;"></i>
+                        </div>
+                        <span class="item-texto">Encuestas</span>
+                        <i class="fas fa-chevron-right item-flecha"></i>
+                    </div>
+                    <div class="admin-menu-item" onclick="ejecutarAccionAdmin('baseDatosIglesia', '🗄️ Base de datos', event)">
+                        <div class="item-icono" style="background: var(--deep-blue);">
+                            <i class="fas fa-database" style="color: white; font-size: 1.2rem;"></i>
+                        </div>
+                        <span class="item-texto">Base de datos</span>
+                        <i class="fas fa-chevron-right item-flecha"></i>
+                    </div>
+                </div>
+                `;
+            } else {
+                // === PARA CLUBES, BIBLIOTECA, ANUNCIOS (MANTENER EL BUCLE) ===
+                tarjeta.subopciones.forEach(op => {
+                    if (op.esCategoria && op.clubNombre) {
+                        html += `<div class="categoria-club" onclick="abrirModalClub('${op.clubNombre}', event)" style="margin-bottom: 0.8rem; border-bottom: 1px solid rgba(201,165,59,0.2); padding-bottom: 0.8rem;">
+                            <span>${op.texto}</span>
+                            <i class="fas fa-chevron-right" style="font-size:0.7rem; color:#c9a53b;"></i>
+                        </div>`;
+                    } else {
+                        html += `<div class="submenu-opcion" onclick="ejecutarAccionAdmin('${op.accion}', '${op.texto}', event)">
+                            <i class="fas fa-circle" style="font-size:0.4rem;color:#c9a53b;flex-shrink:0;"></i>
+                            ${op.texto}
+                        </div>`;
+                    }
+                });
+            }
 
             submenu.innerHTML = html;
             submenu.style.display = 'block';
@@ -3476,6 +3505,15 @@
                     break;
                 case 'baseDatosIglesia':
                     alert('Función de Base de datos en construcción');
+                    break;
+                case 'agregarLibro':
+                    abrirModalAgregarLibro();
+                    break;
+                case 'eliminarLibro':
+                    abrirModalEliminarLibro();
+                    break;
+                case 'verLibrosPedidos':
+                    abrirModalVerPedidos();
                     break;
                 default:
                     alert(`Función: ${texto}`);
@@ -3665,6 +3703,13 @@
                 <i class="fas fa-times"></i>
             </button>
             <h3 class="modal-club-titulo" id="modalClubTitulo">Opciones para Aventureros</h3>
+            <div class="modal-club-herramientas">
+                <button class="btn-herramienta exportar" onclick="exportarDatosClub()">📦 Exportar datos</button>
+                <button class="btn-herramienta importar"
+                    onclick="document.getElementById('inputImportarClub').click()">📂 Importar datos</button>
+                <input type="file" id="inputImportarClub" accept=".json" style="display:none"
+                    onchange="importarDatosClub(event)">
+            </div>
             <div class="modal-club-botones">
                 <button class="modal-club-btn cuotas" onclick="abrirCuotasClub()">
                     <span class="btn-icono">💰</span>
@@ -3680,16 +3725,300 @@
                         <span class="btn-descripcion">Gestionar miembros</span>
                     </span>
                 </button>
+                <button class="modal-club-btn calendario" onclick="abrirCalendarioClub()">
+                    <span class="btn-icono">📅</span>
+                    <span class="btn-texto">
+                        <span class="btn-titulo">Calendario</span>
+                        <span class="btn-descripcion">Gestionar eventos del club</span>
+                    </span>
+                </button>
             </div>
         </div>
     </div>
 
     <!-- ===== ÚLTIMO SCRIPT (DEBE CONTENER TODO) ===== -->
     <script>
+
+        // ===== ADMIN CALENDARIO DE CLUBES =====
+        const CLUBES_STORAGE_CALENDARIO = {
+            'Aventureros': 'eventos_aventureros',
+            'Conquistadores': 'eventos_conquistadores',
+            'Guías Mayores': 'eventos_guias_mayores'
+        };
+
+        // ===== MODALES PERSONALIZADOS (reemplazo de alert/confirm) =====
+
+        // --- Modal de Alerta ---
+        function mostrarAlertaAdmin(mensaje, titulo = 'Atención') {
+            document.getElementById('modalAlertaTitulo').textContent = titulo;
+            document.getElementById('modalAlertaMensaje').textContent = mensaje;
+            document.getElementById('modalAlertaAdmin').classList.add('activo');
+        }
+
+        function cerrarModalAlerta() {
+            document.getElementById('modalAlertaAdmin').classList.remove('activo');
+        }
+
+        // --- Modal de Confirmación ---
+        let _callbackConfirm = null;
+
+        function mostrarConfirmAdmin(mensaje, titulo, callbackSi) {
+            document.getElementById('modalConfirmTitulo').textContent = titulo || 'Confirmar acción';
+            document.getElementById('modalConfirmMensaje').textContent = mensaje;
+            _callbackConfirm = callbackSi; // guardar función a ejecutar si acepta
+            document.getElementById('modalConfirmAdmin').classList.add('activo');
+
+            // Vincular botón "Sí"
+            const btnSi = document.getElementById('btnConfirmSi');
+            btnSi.onclick = function () {
+                cerrarModalConfirm();
+                if (_callbackConfirm) _callbackConfirm();
+            };
+        }
+
+        function cerrarModalConfirm() {
+            document.getElementById('modalConfirmAdmin').classList.remove('activo');
+            _callbackConfirm = null;
+        }
+
+        // Cerrar modales con Escape
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                cerrarModalAlerta();
+                cerrarModalConfirm();
+            }
+        });
+
+        // Cerrar al hacer clic fuera del modal (CORREGIDO)
+        const alertaModal = document.getElementById('modalAlertaAdmin');
+        if (alertaModal) {
+            alertaModal.addEventListener('click', function (e) {
+                if (e.target === this) cerrarModalAlerta();
+            });
+        }
+
+        const confirmModal = document.getElementById('modalConfirmAdmin');
+        if (confirmModal) {
+            confirmModal.addEventListener('click', function (e) {
+                if (e.target === this) cerrarModalConfirm();
+            });
+        }
+
+        let storageKeyCalendarioClub = '';
+
+        // ===== FUNCIÓN PARA ABRIR EL CALENDARIO DE UN CLUB (MEJORADA) =====
+        function abrirCalendarioClub() {
+            const modal = document.getElementById('modalClubOpciones');
+            const clubActual = modal ? modal.dataset.club : clubSeleccionadoActual;
+            if (!clubActual) {
+                console.error('❌ No se encontró el club activo.');
+                return;
+            }
+            cerrarModalClub();
+
+            const panel = document.getElementById('panelAdminGeneral');
+            if (!panel) return;
+
+            storageKeyCalendarioClub = CLUBES_STORAGE_CALENDARIO[clubActual] || 'eventos_aventureros';
+
+            let seccion = document.getElementById('seccionCalendarioClub');
+            if (!seccion) {
+                seccion = document.createElement('div');
+                seccion.id = 'seccionCalendarioClub';
+                seccion.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9999;overflow-y:auto;font-family:Inter,sans-serif;';
+                document.body.appendChild(seccion);
+            }
+
+            const eventos = cargarEventosClub();
+            seccion.innerHTML = generarHTMLCalendarioClub(clubActual);
+            seccion.style.display = 'block';
+            panel.style.display = 'none';
+        }
+
+        function cerrarCalendarioClub() {
+            const seccion = document.getElementById('seccionCalendarioClub');
+            const panel = document.getElementById('panelAdminGeneral');
+            if (seccion) seccion.style.display = 'none';
+            if (panel) panel.style.display = 'block';
+            storageKeyCalendarioClub = '';
+        }
+
+        function cargarEventosClub() {
+            try { return JSON.parse(localStorage.getItem(storageKeyCalendarioClub)) || []; }
+            catch (e) { return []; }
+        }
+
+        function guardarEventosClub(eventos) {
+            localStorage.setItem(storageKeyCalendarioClub, JSON.stringify(eventos));
+        }
+
+        function generarHTMLCalendarioClub(clubNombre) {
+            const eventos = cargarEventosClub().sort((a, b) => a.fecha.localeCompare(b.fecha));
+            let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">';
+            html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;">📅 Calendario - ' + clubNombre + '</h3>';
+            html += '<button onclick="cerrarCalendarioClub()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver al Panel</button></div>';
+            html += '<div style="max-width:800px;margin:0 auto;padding:1rem;">';
+            // formulario
+            html += '<div style="background:white;border-radius:1.5rem;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 15px rgba(0,0,0,0.05);">';
+            html += '<h4 style="color:#1a3a4a;margin-bottom:1rem;" id="formCalendarioTitulo"><i class="fas fa-plus-circle"></i> Agregar Evento</h4>';
+            html += '<input type="text" id="eventoClubTitulo" placeholder="Título del evento" style="width:100%;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;margin-bottom:0.8rem;font-family:Inter,sans-serif;">';
+            html += '<div style="display:flex;gap:0.8rem;flex-wrap:wrap;">';
+            html += '<input type="date" id="eventoClubFecha" style="flex:1;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;font-family:Inter,sans-serif;">';
+            html += '<input type="time" id="eventoClubHora" style="flex:1;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;font-family:Inter,sans-serif;">';
+            html += '</div>';
+            // Recurrencia
+            html += '<div class="recurrencia-opcion">';
+            html += '<label><input type="checkbox" id="eventoClubRecurrente" onchange="toggleCampoRecurrencia()"> 📅 Repetir semanalmente</label>';
+            html += '</div>';
+            html += '<div class="campo-recurrencia" id="campoRecurrencia">';
+            html += '<label style="font-weight:600;color:#1a3a4a;">Semanas a repetir:</label>';
+            html += '<input type="number" id="eventoClubSemanas" min="1" max="52" value="4">';
+            html += '</div>';
+            html += '<button onclick="agregarEventoClubAdmin()" id="btnGuardarEventoClub" style="margin-top:0.8rem;width:100%;padding:0.8rem;background:linear-gradient(135deg,#d4a038 0%,#c9a53b 100%);color:#1a3a4a;border:none;border-radius:2rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;"><i class="fas fa-plus"></i> Agregar Evento</button>';
+            html += '</div>';
+            // lista
+            html += '<div>';
+            if (eventos.length === 0) {
+                html += '<p style="text-align:center;color:#5a6474;">No hay eventos programados.</p>';
+            } else {
+                eventos.forEach(ev => {
+                    html += '<div class="evento-item">';
+                    html += '<div class="evento-info"><div class="evento-titulo">' + ev.titulo + '</div>';
+                    html += '<div class="evento-fecha">' + ev.fecha + ' a las ' + ev.hora + '</div></div>';
+                    html += '<div>';
+                    html += '<button class="btn-editar-evento" onclick="abrirEditarEventoClub(' + ev.id + ')" title="Editar">✏️</button>';
+                    html += '<button class="btn-eliminar-miembro" onclick="eliminarEventoClubAdmin(' + ev.id + ')" title="Quitar">🗑️</button>';
+                    html += '</div>';
+                    html += '</div>';
+                });
+            }
+            html += '</div></div>';
+            return html;
+        }
+
+        function toggleCampoRecurrencia() {
+            const checkbox = document.getElementById('eventoClubRecurrente');
+            const campo = document.getElementById('campoRecurrencia');
+            if (campo) {
+                campo.classList.toggle('visible', checkbox.checked);
+            }
+        }
+
+        function abrirEditarEventoClub(id) {
+            const eventos = cargarEventosClub();
+            const evento = eventos.find(e => e.id === id);
+            if (!evento) return;
+
+            document.getElementById('eventoClubTitulo').value = evento.titulo;
+            document.getElementById('eventoClubFecha').value = evento.fecha;
+            document.getElementById('eventoClubHora').value = evento.hora;
+
+            eventoPendienteEditarId = id;
+
+            document.getElementById('formCalendarioTitulo').innerHTML = '<i class="fas fa-edit"></i> Editar Evento';
+            document.getElementById('btnGuardarEventoClub').innerHTML = '<i class="fas fa-save"></i> Guardar Cambios';
+
+            // Desmarcar recurrencia al editar
+            const checkbox = document.getElementById('eventoClubRecurrente');
+            if (checkbox) checkbox.checked = false;
+            toggleCampoRecurrencia();
+        }
+
+        function agregarEventoClubAdmin() {
+            const titulo = document.getElementById('eventoClubTitulo').value.trim();
+            const fecha = document.getElementById('eventoClubFecha').value;
+            const hora = document.getElementById('eventoClubHora').value;
+            if (!titulo || !fecha || !hora) {
+                mostrarAlertaAdmin('Por favor completa todos los campos antes de agregar el evento.');
+                return;
+            }
+
+            const esRecurrente = document.getElementById('eventoClubRecurrente').checked;
+            const semanas = esRecurrente ? parseInt(document.getElementById('eventoClubSemanas').value) || 1 : 1;
+
+            const eventos = cargarEventosClub();
+
+            // Si estamos editando, eliminar el evento original y generar los nuevos (incluyendo posible recurrencia)
+            if (eventoPendienteEditarId !== null) {
+                // Eliminar el evento original
+                const indexOriginal = eventos.findIndex(e => e.id === eventoPendienteEditarId);
+                if (indexOriginal !== -1) {
+                    eventos.splice(indexOriginal, 1);
+                }
+            }
+
+            // Calcular fechas de los sábados si es recurrente
+            if (esRecurrente) {
+                const fechaBase = new Date(fecha + 'T00:00:00');
+                for (let i = 0; i < semanas; i++) {
+                    const fechaNueva = new Date(fechaBase);
+                    fechaNueva.setDate(fechaNueva.getDate() + (i * 7));
+                    const fechaStr = fechaNueva.toISOString().split('T')[0];
+                    eventos.push({
+                        id: Date.now() + i, // garantizar unicidad (suficiente mientras no se dispare en el mismo ms)
+                        titulo: titulo,
+                        fecha: fechaStr,
+                        hora: hora
+                    });
+                }
+            } else {
+                eventos.push({
+                    id: eventoPendienteEditarId !== null ? eventoPendienteEditarId : Date.now(),
+                    titulo: titulo,
+                    fecha: fecha,
+                    hora: hora
+                });
+            }
+
+            guardarEventosClub(eventos);
+
+            // Limpiar estado de edición
+            eventoPendienteEditarId = null;
+            document.getElementById('formCalendarioTitulo').innerHTML = '<i class="fas fa-plus-circle"></i> Agregar Evento';
+            document.getElementById('btnGuardarEventoClub').innerHTML = '<i class="fas fa-plus"></i> Agregar Evento';
+            document.getElementById('eventoClubTitulo').value = '';
+            document.getElementById('eventoClubFecha').value = '';
+            document.getElementById('eventoClubHora').value = '';
+            const checkbox = document.getElementById('eventoClubRecurrente');
+            if (checkbox) checkbox.checked = false;
+            toggleCampoRecurrencia();
+
+            // Refrescar vista
+            document.getElementById('seccionCalendarioClub').innerHTML = generarHTMLCalendarioClub(
+                Object.keys(CLUBES_STORAGE_CALENDARIO).find(k => CLUBES_STORAGE_CALENDARIO[k] === storageKeyCalendarioClub) || ''
+            );
+
+            const clubAfectado = Object.keys(CLUBES_STORAGE_CALENDARIO).find(k => CLUBES_STORAGE_CALENDARIO[k] === storageKeyCalendarioClub);
+            window.dispatchEvent(new CustomEvent('datosClubActualizados', { detail: { club: clubAfectado } }));
+        }
+
+        function eliminarEventoClubAdmin(id) {
+            mostrarConfirmAdmin('¿Estás seguro de que deseas quitar este evento?', 'Eliminar evento', function () {
+                let eventos = cargarEventosClub().filter(e => e.id !== id);
+                guardarEventosClub(eventos);
+                document.getElementById('seccionCalendarioClub').innerHTML = generarHTMLCalendarioClub(
+                    Object.keys(CLUBES_STORAGE_CALENDARIO).find(k => CLUBES_STORAGE_CALENDARIO[k] === storageKeyCalendarioClub) || ''
+                );
+                const clubAfectado = Object.keys(CLUBES_STORAGE_CALENDARIO).find(k => CLUBES_STORAGE_CALENDARIO[k] === storageKeyCalendarioClub);
+                window.dispatchEvent(new CustomEvent('datosClubActualizados', { detail: { club: clubAfectado } }));
+            });
+            return; // salir de la función original, ya que la eliminación se maneja en el callback
+            let eventos = cargarEventosClub().filter(e => e.id !== id);
+            guardarEventosClub(eventos);
+
+            document.getElementById('seccionCalendarioClub').innerHTML = generarHTMLCalendarioClub(
+                Object.keys(CLUBES_STORAGE_CALENDARIO).find(k => CLUBES_STORAGE_CALENDARIO[k] === storageKeyCalendarioClub) || ''
+            );
+
+            const clubAfectado = Object.keys(CLUBES_STORAGE_CALENDARIO).find(k => CLUBES_STORAGE_CALENDARIO[k] === storageKeyCalendarioClub);
+            window.dispatchEvent(new CustomEvent('datosClubActualizados', { detail: { club: clubAfectado } }));
+        }
         // ===== VARIABLES GLOBALES =====
-        let clubSeleccionadoActual = '';
         let miembroPendienteEliminar = null;
         let storageKeyPendienteEliminar = null;
+        let miembroBDPendienteEditarId = null;
+        let storageKeyBDPendienteEditar = null;
+        let eventoPendienteEditarId = null; // null = modo crear, número = modo editar
 
         // Mapeo de nombres de club a claves de localStorage
         const CLUBES_STORAGE = {
@@ -3709,6 +4038,8 @@
             const modal = document.getElementById('modalClubOpciones');
             const titulo = document.getElementById('modalClubTitulo');
             if (!modal || !titulo) return;
+            modal.dataset.club = clubNombre;
+
             titulo.textContent = 'Opciones para ' + clubNombre;
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -3723,16 +4054,19 @@
             clubSeleccionadoActual = '';
         }
 
-        // ===== FUNCIÓN PRINCIPAL DE CUOTAS =====
+        // ===== FUNCIÓN PRINCIPAL DE CUOTAS (MEJORADA) =====
         function abrirCuotasClub() {
-            // ⭐ GUARDAR el club actual antes de cerrar el modal (porque cerrarModalClub lo borra)
-            const clubActual = clubSeleccionadoActual;
+            const modal = document.getElementById('modalClubOpciones');
+            const clubActual = modal ? modal.dataset.club : clubSeleccionadoActual;
+            if (!clubActual) {
+                console.error('❌ No se encontró el club activo.');
+                return;
+            }
             cerrarModalClub();
 
             const panel = document.getElementById('panelAdminGeneral');
             if (!panel) return;
 
-            // Usar la variable guardada
             storageKeyActual = CLUBES_STORAGE[clubActual] || 'cuotas_aventureros';
             console.log('✅ Club:', clubActual, '→ Storage key:', storageKeyActual);
 
@@ -3740,7 +4074,7 @@
             if (!seccionCuotas) {
                 seccionCuotas = document.createElement('div');
                 seccionCuotas.id = 'seccionCuotasClub';
-                seccionCuotas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9997;overflow-y:auto;font-family:Inter,sans-serif;';
+                seccionCuotas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9999;overflow-y:auto;font-family:Inter,sans-serif;';
                 document.body.appendChild(seccionCuotas);
             }
 
@@ -3782,7 +4116,8 @@
         }
 
         function generarMesesCuotas() {
-            const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
             const resultado = [];
             for (let anio = 2026; anio <= 2027; anio++) {
                 const mesInicio = anio === 2026 ? 7 : 0;
@@ -3792,9 +4127,22 @@
                     const domingos = [];
                     for (let d = 1; d <= diasEnMes; d++) {
                         const fecha = new Date(anio, m, d);
-                        if (fecha.getDay() === 0) domingos.push(domingos.length + 1);
+                        if (fecha.getDay() === 0) {
+                            const numeroDomingo = domingos.length + 1;
+                            const dia = String(d).padStart(2, '0');
+                            const mesFormateado = String(m + 1).padStart(2, '0');
+                            domingos.push({
+                                numero: numeroDomingo,
+                                fechaTexto: `${dia}/${mesFormateado}`
+                            });
+                        }
                     }
-                    resultado.push({ nombre: meses[m], anio: anio, domingos: domingos, clave: anio + '_' + (m + 1) });
+                    resultado.push({
+                        nombre: meses[m],
+                        anio: anio,
+                        domingos: domingos,
+                        clave: anio + '_' + (m + 1)
+                    });
                 }
             }
             return resultado;
@@ -3803,20 +4151,27 @@
         function generarHTMLCuotas(clubNombre, miembros, storageKey) {
             const meses = generarMesesCuotas();
 
+            // Encabezado (barra superior)
             let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">';
             html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;">💰 Cuotas - ' + clubNombre + '</h3>';
+            html += '<div style="display:flex;align-items:center;gap:0.8rem;">';
+            html += '<button class="btn-descargar-excel" onclick="descargarExcelCuotas()" title="Descargar Excel">📥 Descargar Excel</button>';
             html += '<button onclick="cerrarSeccionCuotas()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver al Panel</button>';
+            html += '</div>';
             html += '</div>';
 
             html += '<div style="max-width:100%;margin:0 auto;padding:1rem;">';
 
+            // Tarjetas de resumen
             html += '<div class="cuotas-resumen-grid">';
             html += '<div class="cuotas-resumen-card"><div class="resumen-icono">👥</div><div class="resumen-titulo">Total de Miembros</div><div class="resumen-valor" id="cuotasTotalMiembros">' + miembros.length + '</div></div>';
             html += '<div class="cuotas-resumen-card"><div class="resumen-icono">💰</div><div class="resumen-titulo">Total Recaudado</div><div class="resumen-valor" id="cuotasTotalGeneral">$0</div></div>';
             html += '</div>';
 
+            // Formulario agregar miembro
             html += '<div class="cuotas-form-agregar"><input type="text" id="cuotasInputNombre" placeholder="Nombre completo del miembro..."><button id="cuotasBtnAgregar"><i class="fas fa-plus"></i> Agregar Miembro</button></div>';
 
+            // Tabla
             html += '<div class="cuotas-tabla-wrapper"><table class="cuotas-tabla">';
             html += '<thead><tr>';
             html += '<th class="col-nombres" rowspan="2">N°</th>';
@@ -3828,7 +4183,9 @@
             html += '<th class="col-acciones" rowspan="2"></th>';
             html += '</tr><tr>';
             meses.forEach(function (mes) {
-                mes.domingos.forEach(function (d) { html += '<th>D' + d + '</th>'; });
+                mes.domingos.forEach(function (d) {
+                    html += '<th>' + d.fechaTexto + '</th>';
+                });
                 html += '<th class="col-total">TOTAL</th>';
             });
             html += '</tr></thead><tbody>';
@@ -3839,8 +4196,8 @@
                 html += '<td class="col-nombres">' + miembro.nombre + '</td>';
                 meses.forEach(function (mes) {
                     mes.domingos.forEach(function (d) {
-                        const valor = (miembro.pagos && miembro.pagos[mes.clave] && miembro.pagos[mes.clave][d]) ? miembro.pagos[mes.clave][d] : '';
-                        html += '<td><input type="number" class="cuotas-input" data-miembro="' + miembro.id + '" data-mes="' + mes.clave + '" data-domingo="' + d + '" value="' + valor + '" placeholder="0" min="0"></td>';
+                        const valor = (miembro.pagos && miembro.pagos[mes.clave] && miembro.pagos[mes.clave][d.numero]) ? miembro.pagos[mes.clave][d.numero] : '';
+                        html += '<td><input type="number" class="cuotas-input" data-miembro="' + miembro.id + '" data-mes="' + mes.clave + '" data-domingo="' + d.numero + '" value="' + valor + '" placeholder="0" min="0"></td>';
                     });
                     html += '<td class="col-total-miembro cuotas-total-mes" data-miembro="' + miembro.id + '" data-mes="' + mes.clave + '">$0</td>';
                 });
@@ -3850,10 +4207,72 @@
             });
             html += '</tbody></table></div>';
 
+            // Totales anuales
+            html += '<div class="cuotas-totales-anuales" id="cuotasTotalesAnuales">';
+            html += '<div class="cuotas-anual-item"><span class="anual-label">Total recaudado 2026:</span> <span class="anual-valor" id="totalAnual2026">$0</span></div>';
+            html += '<div class="cuotas-anual-item"><span class="anual-label">Total recaudado 2027:</span> <span class="anual-valor" id="totalAnual2027">$0</span></div>';
+            html += '</div>';
+
+            // Botón guardar y cerrar
             html += '<button class="btn-guardar-cuotas" onclick="guardarYCerrarCuotas()"><i class="fas fa-save"></i> Guardar y Cerrar</button>';
             html += '</div>';
 
             return html;
+        }
+
+        function descargarExcelCuotas(clubNombre, miembros, meses) {
+            // Construir filas CSV
+            let csv = 'N°;Nombre';
+            meses.forEach(mes => {
+                mes.domingos.forEach(d => {
+                    csv += ';' + d.fechaTexto + ' (' + mes.nombre + ' ' + mes.anio + ')';
+                });
+                csv += ';Total ' + mes.nombre + ' ' + mes.anio;
+            });
+            csv += ';Total General\n';
+
+            let totalAnio2026 = 0;
+            let totalAnio2027 = 0;
+
+            miembros.forEach((miembro, idx) => {
+                let row = (idx + 1) + ';' + miembro.nombre;
+                let totalMiembro = 0;
+                meses.forEach(mes => {
+                    let totalMes = 0;
+                    mes.domingos.forEach(d => {
+                        const valor = (miembro.pagos && miembro.pagos[mes.clave] && miembro.pagos[mes.clave][d.numero]) ? miembro.pagos[mes.clave][d.numero] : 0;
+                        row += ';' + valor;
+                        totalMes += Number(valor);
+                    });
+                    row += ';' + totalMes;
+                    totalMiembro += totalMes;
+                    if (mes.anio === 2026) totalAnio2026 += totalMes;
+                    if (mes.anio === 2027) totalAnio2027 += totalMes;
+                });
+                row += ';' + totalMiembro;
+                csv += row + '\n';
+            });
+
+            // Agregar fila de totales anuales al final (opcional)
+            csv += '\nTotales anuales;';
+            meses.forEach(mes => {
+                mes.domingos.forEach(() => csv += ';');
+                csv += ';';
+            });
+            csv += ';\n';
+            csv += 'Total 2026;;' + Array(meses.reduce((acc, m) => acc + m.domingos.length + 1, 0)).join(';') + totalAnio2026 + '\n';
+            csv += 'Total 2027;;' + Array(meses.reduce((acc, m) => acc + m.domingos.length + 1, 0)).join(';') + totalAnio2027 + '\n';
+
+            // Crear Blob y descargar
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Cuotas_' + clubNombre.replace(/\s+/g, '_') + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         function vincularEventosCuotas(storageKey) {
@@ -3944,25 +4363,108 @@
         function actualizarTotalesCuotas(storageKey) {
             const miembros = cargarCuotas(storageKey);
             let totalGeneral = 0;
+            let totalAnual2026 = 0;
+            let totalAnual2027 = 0;
+
             miembros.forEach(function (miembro) {
                 let totalMiembro = 0;
                 document.querySelectorAll('.cuotas-total-mes[data-miembro="' + miembro.id + '"]').forEach(function (td) {
                     const mesClave = td.getAttribute('data-mes');
                     let totalMes = 0;
+                    const anioMes = parseInt(mesClave.split('_')[0]);
+
                     document.querySelectorAll('.cuotas-input[data-miembro="' + miembro.id + '"][data-mes="' + mesClave + '"]').forEach(function (input) {
                         totalMes += parseFloat(input.value) || 0;
                     });
+
                     td.textContent = '$' + totalMes.toLocaleString('es-CO');
                     totalMiembro += totalMes;
+
+                    // Acumular por año
+                    if (anioMes === 2026) totalAnual2026 += totalMes;
+                    else if (anioMes === 2027) totalAnual2027 += totalMes;
                 });
+
                 const tdGeneral = document.querySelector('.cuotas-total-general[data-miembro="' + miembro.id + '"]');
                 if (tdGeneral) tdGeneral.textContent = '$' + totalMiembro.toLocaleString('es-CO');
                 totalGeneral += totalMiembro;
             });
+
+            // Actualizar tarjetas de resumen general
             const totalMiembrosEl = document.getElementById('cuotasTotalMiembros');
             const totalGeneralEl = document.getElementById('cuotasTotalGeneral');
             if (totalMiembrosEl) totalMiembrosEl.textContent = miembros.length;
             if (totalGeneralEl) totalGeneralEl.textContent = '$' + totalGeneral.toLocaleString('es-CO');
+
+            // Actualizar totales anuales
+            const total2026El = document.getElementById('totalAnual2026');
+            const total2027El = document.getElementById('totalAnual2027');
+            if (total2026El) total2026El.textContent = '$' + totalAnual2026.toLocaleString('es-CO');
+            if (total2027El) total2027El.textContent = '$' + totalAnual2027.toLocaleString('es-CO');
+        }
+
+        function descargarExcelCuotas() {
+            if (!storageKeyActual) {
+                alert('No hay ningún club seleccionado.');
+                return;
+            }
+
+            const miembros = cargarCuotas(storageKeyActual);
+            if (miembros.length === 0) {
+                alert('No hay miembros para exportar.');
+                return;
+            }
+
+            const meses = generarMesesCuotas();
+            const clubNombre = Object.keys(CLUBES_STORAGE).find(k => CLUBES_STORAGE[k] === storageKeyActual) || 'Club';
+
+            // Construir el CSV
+            let csv = 'N°;Nombre';
+            meses.forEach(mes => {
+                mes.domingos.forEach(d => {
+                    csv += ';' + d.fechaTexto + ' (' + mes.nombre + ' ' + mes.anio + ')';
+                });
+                csv += ';Total ' + mes.nombre + ' ' + mes.anio;
+            });
+            csv += ';Total General\n';
+
+            let totalAnio2026 = 0;
+            let totalAnio2027 = 0;
+
+            miembros.forEach((miembro, idx) => {
+                let row = (idx + 1) + ';' + miembro.nombre;
+                let totalMiembro = 0;
+                meses.forEach(mes => {
+                    let totalMes = 0;
+                    mes.domingos.forEach(d => {
+                        const valor = (miembro.pagos && miembro.pagos[mes.clave] && miembro.pagos[mes.clave][d.numero]) ? miembro.pagos[mes.clave][d.numero] : 0;
+                        row += ';' + valor;
+                        totalMes += Number(valor);
+                    });
+                    row += ';' + totalMes;
+                    totalMiembro += totalMes;
+                    if (mes.anio === 2026) totalAnio2026 += totalMes;
+                    if (mes.anio === 2027) totalAnio2027 += totalMes;
+                });
+                row += ';' + totalMiembro;
+                csv += row + '\n';
+            });
+
+            // Totales anuales al final
+            csv += '\nTotales Anuales;;;;;;;;;;;;;;;;;;;;;;\n';
+            csv += 'Total Recaudado 2026;;;;;;;;;;;;;;;;;;;;;;' + totalAnio2026 + '\n';
+            csv += 'Total Recaudado 2027;;;;;;;;;;;;;;;;;;;;;;' + totalAnio2027 + '\n';
+
+            // Descargar el archivo
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Cuotas_' + clubNombre.replace(/\s+/g, '_') + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         function guardarYCerrarCuotas() {
@@ -3997,10 +4499,14 @@
             'Guías Mayores': 'bd_guias_mayores'
         };
 
-        // ===== FUNCIÓN PRINCIPAL: ABRIR BASE DE DATOS =====
+        // ===== FUNCIÓN PRINCIPAL: ABRIR BASE DE DATOS (MEJORADA) =====
         function abrirBaseDatosClub() {
-            // Guardar club actual antes de cerrar el modal
-            const clubActual = clubSeleccionadoActual;
+            const modal = document.getElementById('modalClubOpciones');
+            const clubActual = modal ? modal.dataset.club : clubSeleccionadoActual;
+            if (!clubActual) {
+                console.error('❌ No se encontró el club activo.');
+                return;
+            }
             cerrarModalClub();
 
             const panel = document.getElementById('panelAdminGeneral');
@@ -4012,7 +4518,7 @@
             if (!seccionBD) {
                 seccionBD = document.createElement('div');
                 seccionBD.id = 'seccionBaseDatosClub';
-                seccionBD.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9997;overflow-y:auto;font-family:Inter,sans-serif;';
+                seccionBD.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9999;overflow-y:auto;font-family:Inter,sans-serif;';
                 document.body.appendChild(seccionBD);
             }
 
@@ -4021,7 +4527,6 @@
             seccionBD.style.display = 'block';
             panel.style.display = 'none';
 
-            // Vincular eventos
             setTimeout(function () {
                 vincularEventosBD(storageKey);
             }, 100);
@@ -4098,8 +4603,36 @@
                 '<td>' + (miembro.fechaNacimiento || '-') + '</td>' +
                 '<td>' + (miembro.cartillas || '-') + '</td>' +
                 '<td>' + (miembro.especialidades || '-') + '</td>' +
-                '<td><button class="btn-eliminar-miembro" onclick="solicitarEliminarMiembroBD(' + miembro.id + ',\'' + storageKey + '\')" title="Eliminar">🗑️</button></td>' +
+                '<td>' +
+                '<button class="btn-editar-miembro" onclick="abrirModalEditarMiembroBD(' + miembro.id + ',\'' + storageKey + '\')" title="Editar">✏️</button>' +
+                '<button class="btn-eliminar-miembro" onclick="solicitarEliminarMiembroBD(' + miembro.id + ',\'' + storageKey + '\')" title="Eliminar">🗑️</button>' +
+                '</td>' +
                 '</tr>';
+        }
+
+        function abrirModalEditarMiembroBD(miembroId, storageKey) {
+            const miembros = cargarMiembrosBD(storageKey);
+            const miembro = miembros.find(m => m.id === miembroId);
+            if (!miembro) return;
+
+            // Rellenar formulario
+            document.getElementById('bdInputNombre').value = miembro.nombre;
+            document.getElementById('bdInputCC').value = miembro.cc;
+            document.getElementById('bdInputTipoSangre').value = miembro.tipoSangre || '';
+            document.getElementById('bdInputFechaNacimiento').value = miembro.fechaNacimiento || '';
+            document.getElementById('bdInputCartillas').value = miembro.cartillas || '';
+            document.getElementById('bdInputEspecialidades').value = miembro.especialidades || '';
+
+            // Guardar estado de edición
+            miembroBDPendienteEditarId = miembroId;
+            storageKeyBDPendienteEditar = storageKey;
+
+            // Cambiar título del modal
+            document.getElementById('modalBdTitulo').innerHTML = '<i class="fas fa-edit"></i> Editar Miembro';
+
+            // Abrir modal
+            document.getElementById('modalAgregarMiembroBD').classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
         // ===== FILTRADO EN TIEMPO REAL =====
@@ -4149,10 +4682,14 @@
                 modal.classList.remove('active');
                 document.body.style.overflow = '';
             }
+            // Restablecer estado de edición
+            miembroBDPendienteEditarId = null;
+            storageKeyBDPendienteEditar = null;
+            document.getElementById('modalBdTitulo').innerHTML = '<i class="fas fa-user-plus"></i> Agregar Miembro';
         }
 
         function guardarNuevoMiembroBD() {
-            const storageKey = window._bdStorageKeyActual;
+            const storageKey = storageKeyBDPendienteEditar || window._bdStorageKeyActual;
             if (!storageKey) return;
 
             const nombre = document.getElementById('bdInputNombre').value.trim();
@@ -4168,15 +4705,30 @@
             }
 
             const miembros = cargarMiembrosBD(storageKey);
-            miembros.push({
-                id: Date.now(),
-                nombre: nombre,
-                cc: cc,
-                tipoSangre: tipoSangre,
-                fechaNacimiento: fechaNacimiento,
-                cartillas: cartillas,
-                especialidades: especialidades
-            });
+
+            if (miembroBDPendienteEditarId) {
+                // Actualizar miembro existente
+                const index = miembros.findIndex(m => m.id === miembroBDPendienteEditarId);
+                if (index !== -1) {
+                    miembros[index].nombre = nombre;
+                    miembros[index].cc = cc;
+                    miembros[index].tipoSangre = tipoSangre;
+                    miembros[index].fechaNacimiento = fechaNacimiento;
+                    miembros[index].cartillas = cartillas;
+                    miembros[index].especialidades = especialidades;
+                }
+            } else {
+                // Agregar nuevo miembro
+                miembros.push({
+                    id: Date.now(),
+                    nombre: nombre,
+                    cc: cc,
+                    tipoSangre: tipoSangre,
+                    fechaNacimiento: fechaNacimiento,
+                    cartillas: cartillas,
+                    especialidades: especialidades
+                });
+            }
 
             guardarMiembrosBD(storageKey, miembros);
             cerrarModalAgregarMiembroBD();
@@ -4185,13 +4737,16 @@
             const seccionBD = document.getElementById('seccionBaseDatosClub');
             const clubActual = clubSeleccionadoActual || Object.keys(CLUBES_STORAGE_BD).find(k => CLUBES_STORAGE_BD[k] === storageKey) || 'Aventureros';
             seccionBD.innerHTML = generarHTMLBaseDatos(clubActual, miembros, storageKey);
-
-            // Actualizar total
             document.getElementById('bdTotalPersonas').textContent = miembros.length;
 
             setTimeout(function () {
                 vincularEventosBD(storageKey);
             }, 100);
+
+            // Restablecer estado de edición
+            miembroBDPendienteEditarId = null;
+            storageKeyBDPendienteEditar = null;
+            document.getElementById('modalBdTitulo').innerHTML = '<i class="fas fa-user-plus"></i> Agregar Miembro';
         }
 
         // ===== ELIMINAR MIEMBRO =====
@@ -4442,6 +4997,254 @@
             document.getElementById('seccionEncuestas').innerHTML = generarHTMLEncuestas();
         }
 
+        // ===== EXPORTAR / IMPORTAR DATOS DEL CLUB =====
+        function exportarDatosClub() {
+            const club = clubSeleccionadoActual || 'Aventureros';
+
+            // Obtener datos de las 3 secciones
+            const cuotasKey = CLUBES_STORAGE[club] || 'cuotas_aventureros';
+            const bdKey = CLUBES_STORAGE_BD[club] || 'bd_aventureros';
+            const eventosKey = CLUBES_STORAGE_CALENDARIO[club] || 'eventos_aventureros';
+
+            const cuotas = cargarCuotas(cuotasKey);
+            const bd = cargarMiembrosBD(bdKey);
+            let eventos = [];
+            try {
+                eventos = JSON.parse(localStorage.getItem(eventosKey)) || [];
+            } catch (e) {
+                eventos = [];
+            }
+
+            const backup = {
+                club: club,
+                fecha: new Date().toISOString(),
+                cuotas: cuotas,
+                bd: bd,
+                eventos: eventos
+            };
+
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const fechaStr = new Date().toISOString().split('T')[0];
+            a.download = 'Backup_' + club.replace(/\s+/g, '_') + '_' + fechaStr + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            mostrarAlertaAdmin('✅ Datos del club exportados correctamente.', 'Exportación exitosa');
+        }
+
+        function importarDatosClub(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const club = clubSeleccionadoActual || 'Aventureros';
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+
+                    // Validación básica
+                    if (!data.cuotas || !data.bd || !data.eventos) {
+                        mostrarAlertaAdmin('❌ El archivo seleccionado no es un backup válido. Debe contener las secciones: cuotas, bd, eventos.', 'Error de importación');
+                        return;
+                    }
+
+                    // Confirmar antes de sobrescribir
+                    mostrarConfirmAdmin(
+                        '¿Estás seguro de importar este backup? <strong>Se sobrescribirán todos los datos actuales</strong> de Cuotas, Base de datos y Calendario del club <strong>' + club + '</strong>.',
+                        'Confirmar importación',
+                        function () {
+                            const cuotasKey = CLUBES_STORAGE[club] || 'cuotas_aventureros';
+                            const bdKey = CLUBES_STORAGE_BD[club] || 'bd_aventureros';
+                            const eventosKey = CLUBES_STORAGE_CALENDARIO[club] || 'eventos_aventureros';
+
+                            guardarCuotas(cuotasKey, data.cuotas);
+                            guardarMiembrosBD(bdKey, data.bd);
+                            localStorage.setItem(eventosKey, JSON.stringify(data.eventos));
+
+                            // Notificar éxito
+                            const toast = document.createElement('div');
+                            toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#2e7d32;color:white;padding:1rem 2rem;border-radius:2rem;font-weight:600;z-index:99999;font-family:Inter,sans-serif;box-shadow:0 8px 30px rgba(46,125,50,0.4);';
+                            toast.innerHTML = '✅ Datos importados correctamente para ' + club;
+                            document.body.appendChild(toast);
+
+                            // Cerrar modal y refrescar
+                            cerrarModalClub();
+                            setTimeout(function () {
+                                toast.style.opacity = '0';
+                                toast.style.transition = 'opacity 0.5s ease';
+                                setTimeout(function () { toast.remove(); location.reload(); }, 500);
+                            }, 1500);
+                        }
+                    );
+                } catch (error) {
+                    mostrarAlertaAdmin('❌ El archivo seleccionado no es un JSON válido.', 'Error de lectura');
+                }
+            };
+            reader.readAsText(file);
+
+            // Limpiar el input para permitir seleccionar el mismo archivo de nuevo
+            event.target.value = '';
+        }
+
+        // ===== BIBLIOTECA =====
+        const STORAGE_LIBROS = 'libros_biblioteca';
+        const STORAGE_PEDIDOS = 'libros_pedidos';
+
+        function cargarLibros() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_LIBROS)) || []; }
+            catch (e) { return []; }
+        }
+        function guardarLibros(libros) {
+            localStorage.setItem(STORAGE_LIBROS, JSON.stringify(libros));
+        }
+        function cargarPedidos() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_PEDIDOS)) || []; }
+            catch (e) { return []; }
+        }
+        function guardarPedidos(pedidos) {
+            localStorage.setItem(STORAGE_PEDIDOS, JSON.stringify(pedidos));
+        }
+
+        // --- Agregar Libro ---
+        function abrirModalAgregarLibro() {
+            document.getElementById('inputTituloLibro').value = '';
+            document.getElementById('inputCantidadLibro').value = '1';
+            document.getElementById('inputAutorLibro').value = '';
+            document.getElementById('inputCategoriaLibro').value = '';
+            document.getElementById('inputEstadoLibro').value = 'Disponible';
+            document.getElementById('inputUbicacionLibro').value = '';
+            document.getElementById('modalAgregarLibro').classList.add('activo');
+        }
+        function cerrarModalAgregarLibro(event) {
+            if (event && event.target !== document.getElementById('modalAgregarLibro')) return;
+            document.getElementById('modalAgregarLibro').classList.remove('activo');
+        }
+        function guardarNuevoLibro() {
+            const titulo = document.getElementById('inputTituloLibro').value.trim();
+            const cantidad = parseInt(document.getElementById('inputCantidadLibro').value) || 1;
+            const autor = document.getElementById('inputAutorLibro').value.trim();
+            const categoria = document.getElementById('inputCategoriaLibro').value.trim() || 'General';
+            const estado = document.getElementById('inputEstadoLibro').value;
+            const ubicacion = document.getElementById('inputUbicacionLibro').value.trim();
+
+            if (!titulo || !autor) {
+                mostrarAlertaAdmin('Completa al menos el título y el autor.');
+                return;
+            }
+
+            const libros = cargarLibros();
+            libros.push({
+                id: Date.now(),
+                titulo,
+                cantidad,
+                autor,
+                categoria,
+                estado,
+                ubicacion
+            });
+            guardarLibros(libros);
+            cerrarModalAgregarLibro();
+            mostrarAlertaAdmin('✅ Libro agregado correctamente.');
+        }
+
+        // --- Eliminar Libro ---
+        let _librosFiltrados = [];
+
+        function abrirModalEliminarLibro() {
+            _librosFiltrados = cargarLibros();
+            document.getElementById('buscadorEliminarLibro').value = '';
+            document.getElementById('modalEliminarLibro').classList.add('activo');
+            renderizarEliminarLibro(_librosFiltrados);
+        }
+        function cerrarModalEliminarLibro(event) {
+            if (event && event.target !== document.getElementById('modalEliminarLibro')) return;
+            document.getElementById('modalEliminarLibro').classList.remove('activo');
+        }
+        function filtrarEliminarLibro() {
+            const termino = document.getElementById('buscadorEliminarLibro').value.trim().toLowerCase();
+            _librosFiltrados = cargarLibros().filter(l =>
+                l.titulo.toLowerCase().includes(termino) || l.autor.toLowerCase().includes(termino)
+            );
+            renderizarEliminarLibro(_librosFiltrados);
+        }
+        function renderizarEliminarLibro(libros) {
+            const contenedor = document.getElementById('listaEliminarLibros');
+            if (libros.length === 0) {
+                contenedor.innerHTML = '<p style="text-align:center; color:var(--muted-text);">No se encontraron libros.</p>';
+                return;
+            }
+            let html = '<table class="tabla-libros"><thead><tr><th>Título</th><th>Autor</th><th>Estado</th><th>Acción</th></tr></thead><tbody>';
+            libros.forEach(lib => {
+                html += `<tr>
+            <td>${lib.titulo}</td>
+            <td>${lib.autor}</td>
+            <td>${lib.estado}</td>
+            <td><button class="btn-accion-libro btn-eliminar-libro" onclick="confirmarEliminarLibro(${lib.id})">🗑️</button></td>
+        </tr>`;
+            });
+            html += '</tbody></table>';
+            contenedor.innerHTML = html;
+        }
+        function confirmarEliminarLibro(id) {
+            mostrarConfirmAdmin('¿Estás seguro de eliminar este libro?', 'Eliminar libro', function () {
+                let libros = cargarLibros().filter(l => l.id !== id);
+                guardarLibros(libros);
+                _librosFiltrados = libros;
+                renderizarEliminarLibro(_librosFiltrados);
+                mostrarAlertaAdmin('🗑️ Libro eliminado correctamente.');
+            });
+        }
+
+        // --- Ver Pedidos ---
+        function abrirModalVerPedidos() {
+            document.getElementById('modalVerPedidos').classList.add('activo');
+            renderizarPedidos();
+        }
+        function cerrarModalVerPedidos(event) {
+            if (event && event.target !== document.getElementById('modalVerPedidos')) return;
+            document.getElementById('modalVerPedidos').classList.remove('activo');
+        }
+        function renderizarPedidos() {
+            const pedidos = cargarPedidos().filter(p => p.estado !== 'Entregado');
+            const libros = cargarLibros();
+            const contenedor = document.getElementById('listaPedidosLibros');
+            if (pedidos.length === 0) {
+                contenedor.innerHTML = '<p style="text-align:center; color:var(--muted-text);">No hay pedidos pendientes.</p>';
+                return;
+            }
+            let html = '<table class="tabla-libros"><thead><tr><th>Solicitante</th><th>Libro</th><th>Fecha</th><th>Estado</th><th>Acción</th></tr></thead><tbody>';
+            pedidos.forEach(p => {
+                const libro = libros.find(l => l.id === p.libroId);
+                html += `<tr>
+            <td>${p.solicitante}</td>
+            <td>${libro ? libro.titulo : p.tituloLibro || 'Desconocido'}</td>
+            <td>${p.fecha ? new Date(p.fecha).toLocaleDateString('es-CO') : '-'}</td>
+            <td>${p.estado || 'Pendiente'}</td>
+            <td><button class="btn-accion-libro btn-entregar-libro" onclick="marcarEntregadoPedido(${p.id})">✅ Entregar</button></td>
+        </tr>`;
+            });
+            html += '</tbody></table>';
+            contenedor.innerHTML = html;
+        }
+        function marcarEntregadoPedido(id) {
+            let pedidos = cargarPedidos();
+            const pedido = pedidos.find(p => p.id === id);
+            if (pedido) {
+                pedido.estado = 'Entregado';
+                guardarPedidos(pedidos);
+                renderizarPedidos();
+                mostrarAlertaAdmin('✅ Pedido marcado como entregado.');
+            }
+        }
+
+
+
         // ===== EXPORTACIONES GLOBALES ADICIONALES =====
         window.abrirBaseDatosClub = abrirBaseDatosClub;
         window.cerrarSeccionBD = cerrarSeccionBD;
@@ -4460,6 +5263,28 @@
         window.cerrarEncuestas = cerrarEncuestas;
         window.agregarEncuesta = agregarEncuesta;
         window.eliminarEncuesta = eliminarEncuesta;
+        window.abrirCalendarioClub = abrirCalendarioClub;
+        window.cerrarCalendarioClub = cerrarCalendarioClub;
+        window.agregarEventoClubAdmin = agregarEventoClubAdmin;
+        window.eliminarEventoClubAdmin = eliminarEventoClubAdmin;
+        window.abrirCuotasClub = abrirCuotasClub;
+        window.cerrarSeccionCuotas = cerrarSeccionCuotas;
+        window.descargarExcelCuotas = descargarExcelCuotas;
+        window.abrirModalEditarMiembroBD = abrirModalEditarMiembroBD;
+        window.abrirEditarEventoClub = abrirEditarEventoClub;
+        window.toggleCampoRecurrencia = toggleCampoRecurrencia;
+        window.exportarDatosClub = exportarDatosClub;
+        window.importarDatosClub = importarDatosClub;
+        window.abrirModalAgregarLibro = abrirModalAgregarLibro;
+        window.cerrarModalAgregarLibro = cerrarModalAgregarLibro;
+        window.guardarNuevoLibro = guardarNuevoLibro;
+        window.abrirModalEliminarLibro = abrirModalEliminarLibro;
+        window.cerrarModalEliminarLibro = cerrarModalEliminarLibro;
+        window.confirmarEliminarLibro = confirmarEliminarLibro;
+        window.abrirModalVerPedidos = abrirModalVerPedidos;
+        window.cerrarModalVerPedidos = cerrarModalVerPedidos;
+        window.marcarEntregadoPedido = marcarEntregadoPedido;
+        window.filtrarEliminarLibro = filtrarEliminarLibro;
     </script>
 
     <!-- ===== MODAL DE CONFIRMACIÓN PARA ELIMINAR MIEMBRO ===== -->
@@ -4486,7 +5311,7 @@
     <!-- ===== MODAL AGREGAR MIEMBRO A BASE DE DATOS ===== -->
     <div id="modalAgregarMiembroBD" class="modal-bd-overlay" onclick="cerrarModalAgregarMiembroBD(event)">
         <div class="modal-bd-card" onclick="event.stopPropagation()">
-            <h3><i class="fas fa-user-plus"></i> Agregar Miembro</h3>
+            <h3 id="modalBdTitulo"><i class="fas fa-user-plus"></i> Agregar Miembro</h3>
             <div class="form-group">
                 <label>Nombre completo *</label>
                 <input type="text" id="bdInputNombre" placeholder="Ej: Juan Pérez">
@@ -4551,6 +5376,96 @@
     <!-- ===== SECCIÓN CRONOGRAMA ===== -->
     <div id="seccionCronograma" style="display:none;">
         <!-- Encabezado interno generado por JS -->
+    </div>
+
+    <!-- ===== MODAL GENÉRICO DE ALERTA ===== -->
+    <div id="modalAlertaAdmin" class="modal-generico-overlay">
+        <div class="modal-generico-card" onclick="event.stopPropagation()">
+            <div class="modal-generico-icono">⚠️</div>
+            <h3 class="modal-generico-titulo" id="modalAlertaTitulo">Atención</h3>
+            <p class="modal-generico-mensaje" id="modalAlertaMensaje"></p>
+            <div class="modal-generico-botones">
+                <button class="modal-generico-btn btn-modal-primario" onclick="cerrarModalAlerta()">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL GENÉRICO DE CONFIRMACIÓN ===== -->
+    <div id="modalConfirmAdmin" class="modal-generico-overlay">
+        <div class="modal-generico-card" onclick="event.stopPropagation()">
+            <div class="modal-generico-icono">🗑️</div>
+            <h3 class="modal-generico-titulo" id="modalConfirmTitulo">Confirmar acción</h3>
+            <p class="modal-generico-mensaje" id="modalConfirmMensaje"></p>
+            <div class="modal-generico-botones">
+                <button class="modal-generico-btn btn-modal-peligro" id="btnConfirmSi">Sí, eliminar</button>
+                <button class="modal-generico-btn btn-modal-secundario" onclick="cerrarModalConfirm()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL AGREGAR LIBRO ===== -->
+    <div id="modalAgregarLibro" class="modal-biblioteca-overlay" onclick="cerrarModalAgregarLibro(event)">
+        <div class="modal-biblioteca-card" onclick="event.stopPropagation()">
+            <h3><i class="fas fa-plus-circle"></i> Agregar Libro</h3>
+            <div class="form-agregar-libro">
+                <div class="form-group">
+                    <label>Título *</label>
+                    <input type="text" id="inputTituloLibro" placeholder="Ej: El conflicto de los siglos">
+                </div>
+                <div class="form-group">
+                    <label>Cantidad</label>
+                    <input type="number" id="inputCantidadLibro" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Autor *</label>
+                    <input type="text" id="inputAutorLibro" placeholder="Ej: Elena G. de White">
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <input type="text" id="inputCategoriaLibro" placeholder="Ej: Teología, Salud, Juvenil">
+                </div>
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select id="inputEstadoLibro">
+                        <option value="Disponible">Disponible</option>
+                        <option value="Prestado">Prestado</option>
+                        <option value="Dañado">Dañado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ubicación</label>
+                    <input type="text" id="inputUbicacionLibro" placeholder="Ej: Estante A - 3">
+                </div>
+                <button class="modal-generico-btn btn-modal-primario" onclick="guardarNuevoLibro()" style="width:100%;">
+                    <i class="fas fa-save"></i> Guardar Libro
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL ELIMINAR LIBRO ===== -->
+    <div id="modalEliminarLibro" class="modal-biblioteca-overlay" onclick="cerrarModalEliminarLibro(event)">
+        <div class="modal-biblioteca-card" onclick="event.stopPropagation()">
+            <h3><i class="fas fa-trash-alt"></i> Eliminar Libro</h3>
+            <div class="buscador-biblioteca">
+                <i class="fas fa-search icono-buscar"></i>
+                <input type="text" id="buscadorEliminarLibro" placeholder="Buscar por título o autor..."
+                    oninput="filtrarEliminarLibro()">
+            </div>
+            <div id="listaEliminarLibros" style="overflow-x:auto;">
+                <!-- Se llena dinámicamente con JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL VER LIBROS PEDIDOS ===== -->
+    <div id="modalVerPedidos" class="modal-biblioteca-overlay" onclick="cerrarModalVerPedidos(event)">
+        <div class="modal-biblioteca-card" onclick="event.stopPropagation()">
+            <h3><i class="fas fa-book-open"></i> Libros Pedidos</h3>
+            <div id="listaPedidosLibros" style="overflow-x:auto;">
+                <!-- Se llena dinámicamente con JS -->
+            </div>
+        </div>
     </div>
 
 </body>

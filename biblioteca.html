@@ -16,7 +16,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-    <!-- ✅ ESTA ES LA ÚNICA LÍNEA DE CSS QUE NECESITAS AHORA -->
+    <!-- CSS de la biblioteca -->
     <link rel="stylesheet" href="css/biblioteca.css" />
 </head>
 
@@ -106,7 +106,10 @@
     </div>
 
     <script>
-        const LIBROS = [
+        // ============================================================
+        // 1. CATÁLOGO ORIGINAL (SEMILLA) – NO LO BORRES NUNCA
+        // ============================================================
+        const LIBROS_SEMILLA = [
             { id: 1, titulo: "Oye tengo algo que decirte", cant: 1, autor: "Fernando Zabala", cat: "Juvenil", estado: "Disponible", ubi: "Sección 2" },
             { id: 2, titulo: "Fuerza para vencer", cant: 1, autor: "Alejandro Bullon", cat: "Juvenil", estado: "Disponible", ubi: "Sección 2" },
             { id: 3, titulo: "Manual del guía mayor", cant: 1, autor: "Oscar Gonzales Corona", cat: "Juvenil", estado: "Disponible", ubi: "Sección 2" },
@@ -164,30 +167,87 @@
             { id: 55, titulo: "Biblioteca del espiritu de profecía (Tomo 1)", cant: 1, autor: "Elena G de white", cat: "Otros", estado: "Disponible", ubi: "Sección 5" }
         ];
 
+        // ============================================================
+        // 2. FUNCIONES DE CARGA Y GUARDADO EN localStorage
+        // ============================================================
+
+        function cargarLibros() {
+            try {
+                const data = localStorage.getItem('libros_biblioteca');
+                if (data) {
+                    return JSON.parse(data);
+                } else {
+                    // Primera vez: guardar la semilla en localStorage
+                    localStorage.setItem('libros_biblioteca', JSON.stringify(LIBROS_SEMILLA));
+                    return LIBROS_SEMILLA;
+                }
+            } catch (e) {
+                return LIBROS_SEMILLA;
+            }
+        }
+
+        function guardarLibros(libros) {
+            localStorage.setItem('libros_biblioteca', JSON.stringify(libros));
+        }
+
+        function cargarPedidos() {
+            try {
+                return JSON.parse(localStorage.getItem('libros_pedidos')) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function guardarPedidos(pedidos) {
+            localStorage.setItem('libros_pedidos', JSON.stringify(pedidos));
+        }
+
+        // ============================================================
+        // 3. RENDERIZAR LA TABLA PÚBLICA
+        // ============================================================
+
         function renderizarTabla() {
             const tbody = document.getElementById('tablaLibrosBody');
             if (!tbody) return;
 
+            const libros = cargarLibros();
+
+            if (libros.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--muted-text);">No hay libros registrados en la biblioteca.</td></tr>';
+                return;
+            }
+
             let html = '';
-            LIBROS.forEach(libro => {
+            libros.forEach(libro => {
                 const estadoClase = libro.estado === 'Disponible' ? 'estado-disponible' : 'estado-en-curso';
+                // Adaptar los nombres de las propiedades
+                const cant = libro.cant || libro.cantidad || 1;
+                const cat = libro.cat || libro.categoria || 'General';
+                const ubi = libro.ubi || libro.ubicacion || '-';
+                const autor = libro.autor || '';
+                const estado = libro.estado || 'Disponible';
+
                 html += `
                     <tr>
                         <td><strong>${libro.id}</strong></td>
                         <td>${libro.titulo}</td>
-                        <td style="text-align: center;">${libro.cant}</td>
-                        <td>${libro.autor}</td>
-                        <td>${libro.cat}</td>
+                        <td style="text-align: center;">${cant}</td>
+                        <td>${autor}</td>
+                        <td>${cat}</td>
                         <td style="text-align: center;">
-                            <span class="${estadoClase}"></span> ${libro.estado}
+                            <span class="${estadoClase}"></span> ${estado}
                         </td>
-                        <td>${libro.ubi}</td>
+                        <td>${ubi}</td>
                     </tr>
                 `;
             });
 
             tbody.innerHTML = html;
         }
+
+        // ============================================================
+        // 4. ENVIAR SOLICITUD DE PRÉSTAMO
+        // ============================================================
 
         function cerrarModalConfirmacion() {
             const modal = document.getElementById('modalConfirmacion');
@@ -211,6 +271,18 @@
                 return;
             }
 
+            // Guardar la solicitud en localStorage para que el Admin la vea
+            const pedidos = cargarPedidos();
+            pedidos.push({
+                id: Date.now(),
+                libroId: 0, // 0 porque es una solicitud manual
+                solicitante: nombre,
+                fecha: new Date().toISOString(),
+                estado: 'Pendiente',
+                tituloLibro: libro // Guardamos el título que el usuario escribió
+            });
+            guardarPedidos(pedidos);
+
             // Mostrar modal de confirmación
             const modal = document.getElementById('modalConfirmacion');
             if (modal) {
@@ -226,8 +298,16 @@
             document.getElementById('solicitanteLibro').value = '';
         }
 
-        // Renderizar tabla al cargar
-        document.addEventListener('DOMContentLoaded', renderizarTabla);
+        // ============================================================
+        // 5. INICIALIZACIÓN Y ESCUCHA DE CAMBIOS
+        // ============================================================
+
+        document.addEventListener('DOMContentLoaded', function () {
+            renderizarTabla();
+
+            // Si el Admin agrega, edita o elimina un libro, la tabla se actualiza sola
+            window.addEventListener('datosBibliotecaActualizados', renderizarTabla);
+        });
     </script>
 </body>
 

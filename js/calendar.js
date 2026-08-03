@@ -24,40 +24,47 @@ const CalendarManager = {
         return type.charAt(0).toUpperCase() + type.slice(1);
     },
 
-    // Cargar eventos almacenados
     getEventos(type) {
         if (type === 'general') {
-            // El calendario general lee los eventos del Admin
             try {
                 const data = localStorage.getItem('eventosIglesia');
                 if (!data) return {};
-
                 const eventos = JSON.parse(data);
-
-                // Si los datos ya son un objeto mapa, devolverlos tal cual
-                if (typeof eventos === 'object' && !Array.isArray(eventos)) {
-                    return eventos;
-                }
-
-                // Si los datos son un Array (lista de eventos), convertir a objeto mapa
-                const mapa = {};
-                eventos.forEach(ev => {
-                    if (!mapa[ev.fecha]) {
-                        mapa[ev.fecha] = [];
-                    }
-                    // ⭐ GUARDAMOS UN OBJETO con el título y la hora
-                    mapa[ev.fecha].push({
-                        titulo: ev.titulo,
-                        hora: ev.hora || '' // Si no tiene hora, dejamos vacío
+                if (Array.isArray(eventos)) {
+                    const map = {};
+                    eventos.forEach(ev => {
+                        if (!map[ev.fecha]) map[ev.fecha] = [];
+                        map[ev.fecha].push({ titulo: ev.titulo, hora: ev.hora || '' });
                     });
-                });
-                return mapa;
-
-            } catch (e) { return {}; }
+                    return map;
+                }
+                return eventos;
+            } catch (e) {
+                return {};
+            }
         } else {
-            // Los clubes siguen usando su clave privada
-            const key = StorageHelper.getCalendarKey(type);
-            return StorageHelper.get(key, {});
+            const keys = {
+                'aventureros': 'eventos_aventureros',
+                'conquistadores': 'eventos_conquistadores',
+                'guias': 'eventos_guias_mayores'
+            };
+            const storageKey = keys[type] || ('eventos_' + type);
+            try {
+                const data = localStorage.getItem(storageKey);
+                if (!data) return {};
+                const eventos = JSON.parse(data);
+                if (Array.isArray(eventos)) {
+                    const map = {};
+                    eventos.forEach(ev => {
+                        if (!map[ev.fecha]) map[ev.fecha] = [];
+                        map[ev.fecha].push({ titulo: ev.titulo, hora: ev.hora || '' });
+                    });
+                    return map;
+                }
+                return eventos;
+            } catch (e) {
+                return {};
+            }
         }
     },
 
@@ -188,16 +195,18 @@ const CalendarManager = {
             // ⭐ MOSTRAMOS EL TÍTULO Y LA HORA AL LADO
             html += `<span>📌 ${titulo} ${horaTexto ? '<span style="font-size:0.8rem;color:#5a6474;margin-left:0.5rem;">(' + horaTexto + ')</span>' : ''}</span>`;
 
-            // Solo mostrar el botón de eliminar si NO es el calendario general
-            if (type !== 'general') {
+            // Solo mostrar botón de eliminar si NO es un club (el tipo 'aventureros','conquistadores','guias')
+            if (type === 'general') {
                 html += `<button onclick="CalendarManager.eliminarEvento('${type}', '${fechaClave}', ${index})" class="btn-sm btn-danger">
-                            <i class="fas fa-trash"></i>
-                        </button>`;
+                <i class="fas fa-trash"></i>
+            </button>`;
             } else {
+                // En clubes públicos no se muestra botón; se administra desde el Admin
                 html += `<span style="font-size:0.7rem; color:var(--muted-text);">(Gestionado desde Admin)</span>`;
             }
             html += `</div>`;
         });
+
         contenedor.innerHTML = html;
     },
 
@@ -358,4 +367,24 @@ function inicializarClubes() {
 window.addEventListener('datosIglesiaActualizados', () => {
     // Solo recargamos el calendario general, los clubes no se tocan
     CalendarManager.render('general');
+});
+
+// ===== CONEXIÓN CON EL ADMIN DE CLUBES =====
+window.addEventListener('datosClubActualizados', () => {
+    // Recargar los calendarios de los tres clubes para reflejar cambios
+    ['aventureros', 'conquistadores', 'guias'].forEach(type => CalendarManager.render(type));
+});
+
+// ===== ACTUALIZAR CALENDARIO DE CLUBES AL RECIBIR EVENTO DEL ADMIN =====
+window.addEventListener('datosClubActualizados', function (e) {
+    if (e.detail && e.detail.club) {
+        // Mapeo del nombre del club al tipo que usa CalendarManager
+        const mapeo = {
+            'Aventureros': 'aventureros',
+            'Conquistadores': 'conquistadores',
+            'Guías Mayores': 'guias'
+        };
+        const tipo = mapeo[e.detail.club] || e.detail.club.toLowerCase();
+        CalendarManager.render(tipo);
+    }
 });
