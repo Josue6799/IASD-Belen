@@ -149,6 +149,7 @@
                     Calendario</button>
                 <button class="nav-btn golden" onclick="showPage('anuncios')"><i class="fas fa-bullhorn"></i>
                     Anuncios</button>
+
             </div>
         </nav>
 
@@ -1911,6 +1912,7 @@
                 <div class="eventos-dia">
                     <h3>📋 Eventos del día</h3>
                     <div id="listaEventos"></div>
+
                 </div>
 
                 <div
@@ -3752,11 +3754,11 @@
         function mostrarAlertaAdmin(mensaje, titulo = 'Atención') {
             document.getElementById('modalAlertaTitulo').textContent = titulo;
             document.getElementById('modalAlertaMensaje').textContent = mensaje;
-            document.getElementById('modalAlertaAdmin').classList.add('activo');
+            document.getElementById('modalAlertaAdmin').classList.add('active');
         }
 
         function cerrarModalAlerta() {
-            document.getElementById('modalAlertaAdmin').classList.remove('activo');
+            document.getElementById('modalAlertaAdmin').classList.remove('active');
         }
 
         // --- Modal de Confirmación ---
@@ -3766,7 +3768,7 @@
             document.getElementById('modalConfirmTitulo').textContent = titulo || 'Confirmar acción';
             document.getElementById('modalConfirmMensaje').textContent = mensaje;
             _callbackConfirm = callbackSi; // guardar función a ejecutar si acepta
-            document.getElementById('modalConfirmAdmin').classList.add('activo');
+            document.getElementById('modalConfirmAdmin').classList.add('active');
 
             // Vincular botón "Sí"
             const btnSi = document.getElementById('btnConfirmSi');
@@ -3777,7 +3779,7 @@
         }
 
         function cerrarModalConfirm() {
-            document.getElementById('modalConfirmAdmin').classList.remove('activo');
+            document.getElementById('modalConfirmAdmin').classList.remove('active');
             _callbackConfirm = null;
         }
 
@@ -5095,6 +5097,7 @@
         // ===== BIBLIOTECA =====
         const STORAGE_LIBROS = 'libros_biblioteca';
         const STORAGE_PEDIDOS = 'libros_pedidos';
+        let libroPendienteEditarId = null;
 
         function cargarLibros() {
             try { return JSON.parse(localStorage.getItem(STORAGE_LIBROS)) || []; }
@@ -5102,7 +5105,10 @@
         }
         function guardarLibros(libros) {
             localStorage.setItem(STORAGE_LIBROS, JSON.stringify(libros));
+            // ⚡ ESTA LÍNEA ES LA QUE FALTABA:
+            window.dispatchEvent(new Event('datosBibliotecaActualizados'));
         }
+
         function cargarPedidos() {
             try { return JSON.parse(localStorage.getItem(STORAGE_PEDIDOS)) || []; }
             catch (e) { return []; }
@@ -5113,17 +5119,44 @@
 
         // --- Agregar Libro ---
         function abrirModalAgregarLibro() {
+            libroPendienteEditarId = null; // ✅ Limpia el estado de edición
             document.getElementById('inputTituloLibro').value = '';
             document.getElementById('inputCantidadLibro').value = '1';
             document.getElementById('inputAutorLibro').value = '';
             document.getElementById('inputCategoriaLibro').value = '';
             document.getElementById('inputEstadoLibro').value = 'Disponible';
             document.getElementById('inputUbicacionLibro').value = '';
-            document.getElementById('modalAgregarLibro').classList.add('activo');
+            document.getElementById('modalBiblioTitulo').innerHTML = '<i class="fas fa-plus-circle"></i> Agregar Libro'; // ✅ Restaura título
+            document.getElementById('btnGuardarLibro').innerHTML = '<i class="fas fa-save"></i> Guardar Libro'; // ✅ Restaura botón
+            document.getElementById('modalAgregarLibro').classList.add('active');
         }
         function cerrarModalAgregarLibro(event) {
             if (event && event.target !== document.getElementById('modalAgregarLibro')) return;
-            document.getElementById('modalAgregarLibro').classList.remove('activo');
+            document.getElementById('modalAgregarLibro').classList.remove('active');
+            libroPendienteEditarId = null;
+        }
+        function abrirModalEditarLibro(id) {
+            const libros = cargarLibros();
+            const libro = libros.find(l => l.id === id);
+            if (!libro) return;
+
+            // Cargar datos en el formulario
+            document.getElementById('inputTituloLibro').value = libro.titulo;
+            document.getElementById('inputCantidadLibro').value = libro.cantidad || 1;
+            document.getElementById('inputAutorLibro').value = libro.autor;
+            document.getElementById('inputCategoriaLibro').value = libro.categoria || '';
+            document.getElementById('inputEstadoLibro').value = libro.estado || 'Disponible';
+            document.getElementById('inputUbicacionLibro').value = libro.ubicacion || '';
+
+            // Guardar el ID para saber que estamos editando
+            libroPendienteEditarId = id;
+
+
+            // Cambiar título y botón del modal
+            document.getElementById('modalBiblioTitulo').innerHTML = '<i class="fas fa-edit"></i> Editar Libro';
+            document.getElementById('btnGuardarLibro').innerHTML = '<i class="fas fa-save"></i> Actualizar Libro';
+
+            document.getElementById('modalAgregarLibro').classList.add('active');
         }
         function guardarNuevoLibro() {
             const titulo = document.getElementById('inputTituloLibro').value.trim();
@@ -5139,32 +5172,48 @@
             }
 
             const libros = cargarLibros();
-            libros.push({
-                id: Date.now(),
-                titulo,
-                cantidad,
-                autor,
-                categoria,
-                estado,
-                ubicacion
-            });
+
+            // ⚡ LÓGICA PARA EDITAR (SI TIENE UN ID PENDIENTE)
+            if (libroPendienteEditarId !== null) {
+                const idx = libros.findIndex(l => l.id === libroPendienteEditarId);
+                if (idx !== -1) {
+                    libros[idx].titulo = titulo;
+                    libros[idx].cantidad = cantidad;
+                    libros[idx].autor = autor;
+                    libros[idx].categoria = categoria;
+                    libros[idx].estado = estado;
+                    libros[idx].ubicacion = ubicacion;
+                }
+                libroPendienteEditarId = null; // Limpiar el estado de edición
+            } else {
+                // Agregar nuevo libro
+                libros.push({
+                    id: Date.now(),
+                    titulo,
+                    cantidad,
+                    autor,
+                    categoria,
+                    estado,
+                    ubicacion
+                });
+            }
+
             guardarLibros(libros);
             cerrarModalAgregarLibro();
-            mostrarAlertaAdmin('✅ Libro agregado correctamente.');
+            mostrarAlertaAdmin('✅ Libro guardado correctamente.');
         }
-
         // --- Eliminar Libro ---
         let _librosFiltrados = [];
 
         function abrirModalEliminarLibro() {
             _librosFiltrados = cargarLibros();
             document.getElementById('buscadorEliminarLibro').value = '';
-            document.getElementById('modalEliminarLibro').classList.add('activo');
+            document.getElementById('modalEliminarLibro').classList.add('active');
             renderizarEliminarLibro(_librosFiltrados);
         }
         function cerrarModalEliminarLibro(event) {
             if (event && event.target !== document.getElementById('modalEliminarLibro')) return;
-            document.getElementById('modalEliminarLibro').classList.remove('activo');
+            document.getElementById('modalEliminarLibro').classList.remove('active');
         }
         function filtrarEliminarLibro() {
             const termino = document.getElementById('buscadorEliminarLibro').value.trim().toLowerCase();
@@ -5179,13 +5228,16 @@
                 contenedor.innerHTML = '<p style="text-align:center; color:var(--muted-text);">No se encontraron libros.</p>';
                 return;
             }
-            let html = '<table class="tabla-libros"><thead><tr><th>Título</th><th>Autor</th><th>Estado</th><th>Acción</th></tr></thead><tbody>';
+            let html = '<table class="tabla-libros"><thead><tr><th>Título</th><th>Autor</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>';
             libros.forEach(lib => {
                 html += `<tr>
             <td>${lib.titulo}</td>
             <td>${lib.autor}</td>
-            <td>${lib.estado}</td>
-            <td><button class="btn-accion-libro btn-eliminar-libro" onclick="confirmarEliminarLibro(${lib.id})">🗑️</button></td>
+            <td>${lib.estado || 'Disponible'}</td>
+            <td>
+                <button class="btn-accion-libro btn-editar-libro" onclick="abrirModalEditarLibro(${lib.id})">✏️</button>
+                <button class="btn-accion-libro btn-eliminar-libro" onclick="confirmarEliminarLibro(${lib.id})">🗑️</button>
+            </td>
         </tr>`;
             });
             html += '</tbody></table>';
@@ -5203,12 +5255,12 @@
 
         // --- Ver Pedidos ---
         function abrirModalVerPedidos() {
-            document.getElementById('modalVerPedidos').classList.add('activo');
+            document.getElementById('modalVerPedidos').classList.add('active');
             renderizarPedidos();
         }
         function cerrarModalVerPedidos(event) {
             if (event && event.target !== document.getElementById('modalVerPedidos')) return;
-            document.getElementById('modalVerPedidos').classList.remove('activo');
+            document.getElementById('modalVerPedidos').classList.remove('active');
         }
         function renderizarPedidos() {
             const pedidos = cargarPedidos().filter(p => p.estado !== 'Entregado');
@@ -5285,6 +5337,7 @@
         window.cerrarModalVerPedidos = cerrarModalVerPedidos;
         window.marcarEntregadoPedido = marcarEntregadoPedido;
         window.filtrarEliminarLibro = filtrarEliminarLibro;
+        window.abrirModalEditarLibro = abrirModalEditarLibro;
     </script>
 
     <!-- ===== MODAL DE CONFIRMACIÓN PARA ELIMINAR MIEMBRO ===== -->
@@ -5406,7 +5459,8 @@
     <!-- ===== MODAL AGREGAR LIBRO ===== -->
     <div id="modalAgregarLibro" class="modal-biblioteca-overlay" onclick="cerrarModalAgregarLibro(event)">
         <div class="modal-biblioteca-card" onclick="event.stopPropagation()">
-            <h3><i class="fas fa-plus-circle"></i> Agregar Libro</h3>
+            <!-- ✅ AGREGADO: id="modalBiblioTitulo" -->
+            <h3 id="modalBiblioTitulo"><i class="fas fa-plus-circle"></i> Agregar Libro</h3>
             <div class="form-agregar-libro">
                 <div class="form-group">
                     <label>Título *</label>
@@ -5436,7 +5490,9 @@
                     <label>Ubicación</label>
                     <input type="text" id="inputUbicacionLibro" placeholder="Ej: Estante A - 3">
                 </div>
-                <button class="modal-generico-btn btn-modal-primario" onclick="guardarNuevoLibro()" style="width:100%;">
+                <!-- ✅ AGREGADO: id="btnGuardarLibro" -->
+                <button id="btnGuardarLibro" class="modal-generico-btn btn-modal-primario" onclick="guardarNuevoLibro()"
+                    style="width:100%;">
                     <i class="fas fa-save"></i> Guardar Libro
                 </button>
             </div>

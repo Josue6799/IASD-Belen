@@ -1638,7 +1638,7 @@
     animation: fadeIn 0.25s ease;
 }
 
-.modal-biblioteca-overlay.activo {
+.modal-biblioteca-overlay.active {
     display: flex;
 }
 
