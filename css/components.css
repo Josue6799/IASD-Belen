@@ -3349,19 +3349,38 @@
 }
 
 /* ========================================
-   BOTÓN ADMIN FLOTANTE (FIX)
+   BOTÓN ADMIN FLOTANTE Y NOTIFICACIONES TOAST (FIX)
    ======================================== */
 
 .btn-admin-flotante {
     position: fixed !important;
     bottom: 2rem !important;
     right: 2rem !important;
-    z-index: 9999 !important;
+    z-index: 10000 !important;
 }
 
-#dashboardEvaluacion button[onclick*="cerrarSesionAdmin"] {
-    position: fixed !important;
-    bottom: 2rem !important;
-    right: 2rem !important;
-    z-index: 9999 !important;
+#lmsToast {
+    animation: lmsToastFadeIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes lmsToastFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 20px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+    }
+}
+
+@keyframes lmsToastFadeOut {
+    from {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translate(-50%, 20px) scale(0.9);
+    }
 }

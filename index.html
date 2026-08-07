@@ -356,7 +356,7 @@
         <!-- ==================== DASHBOARD DE EVALUACIÓN ==================== -->
         <div id="dashboardEvaluacion"
             style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--cream); z-index: 9998; overflow-y: auto; padding: 1rem; animation: fadeInUp 0.4s ease forwards;">
-
+            <div id="btnAdminLMSContainer"></div>
             <!-- Encabezado LMS con Estado Online/Offline y Campana de Notificaciones -->
             <div
                 style="background: var(--deep-blue); padding: 1rem 1.5rem; border-radius: 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.8rem;">
@@ -470,13 +470,7 @@
                     Todos los derechos reservados</p>
             </div>
 
-            <!-- Botón Modo Administrador (Visible únicamente dentro del LMS) -->
-            <button id="btnAdminLMS" onclick="abrirModalAdmin()"
-                style="position: fixed; bottom: 2rem; right: 2rem; background: #2e7d32; color: white; padding: 0.75rem 1.4rem; border-radius: 2rem; border: none; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 15px rgba(46,125,50,0.4); transition: all 0.3s ease; z-index: 10000; display: flex; align-items: center; gap: 0.6rem;"
-                onmouseover="this.style.transform='translateY(-3px) scale(1.05)'; this.style.boxShadow='0 8px 25px rgba(46,125,50,0.6)';"
-                onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 4px 15px rgba(46,125,50,0.4)';">
-                <i class="fas fa-cog"></i> Modo Administrador
-            </button>
+
         </div>
 
         <!-- ===== MODAL DE INSCRIPCIÓN ===== -->
@@ -5704,6 +5698,10 @@
         window.cerrarModalQuitarAnuncio = cerrarModalQuitarAnuncio;
         window.filtrarAnunciosQuitar = filtrarAnunciosQuitar;
         window.confirmarEliminarAnuncio = confirmarEliminarAnuncio;
+        window.abrirModalCrearExamen = abrirModalCrearExamen;
+        window.abrirModalEditarExamenes = abrirModalEditarExamenes;
+        window.abrirModalGestionarResultados = abrirModalGestionarResultados;
+        window.abrirModalGestionarPlanEstudios = abrirModalGestionarPlanEstudios;
 
     </script>
 

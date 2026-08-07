@@ -3,7 +3,7 @@
    IASD Belén · Iglesia Adventista
    ======================================== */
 
-// ===== BASE DE DATOS DE EXÁMENES (CON DATOS INICIALES DE EJEMPLO) =====
+// ===== BASE DE DATOS DE EXÁMENES (DATOS INICIALES DE EJEMPLO) =====
 let DB_EXAMENES = [];
 let nextExamId = 200;
 
@@ -233,45 +233,65 @@ let cursoSeleccionadoRevision = 'todos';
 let editandoExamenIndex = -1;
 let examenActualParaRendir = null;
 
-// ===== CONTROL CENTRALIZADO DE SCROLL Y MODALES (SOLUCIÓN DEFINITIVA PROBLEMA 1) =====
+// ===== CONTROL CENTRALIZADO DE SCROLL Y MODALES (SOLUCIÓN DEFINITIVA CON VISIBILIDAD GARANTIZADA) =====
 const modalesAbiertos = new Set();
 
-// Reemplaza las funciones existentes con estas
+function mostrarElementoModal(el) {
+    if (!el) return;
+    el.classList.add('active');
+    el.style.display = 'flex';
+    el.style.visibility = 'visible';
+    el.style.opacity = '1';
+    el.style.zIndex = '100050';
+}
+
+function ocultarElementoModal(el) {
+    if (!el) return;
+    el.classList.remove('active');
+    el.style.display = 'none';
+    el.style.visibility = 'hidden';
+    el.style.opacity = '0';
+}
+
 function bloquearScroll(idModal) {
     if (idModal) modalesAbiertos.add(idModal);
     document.body.style.overflow = 'hidden';
-    // No modificar el overflow del dashboard, solo del body
+    const dashboard = document.getElementById('dashboardEvaluacion');
+    if (dashboard && dashboard.style.display !== 'none') {
+        dashboard.style.overflow = 'hidden';
+    }
 }
 
 function desbloquearScroll(idModal) {
     if (idModal) modalesAbiertos.delete(idModal);
 
-    // Verificar si hay modales abiertos en el DOM
-    const modalesActivos = document.querySelectorAll('.modal-overlay[style*="display: flex"], .modal-overlay.active');
-    if (modalesActivos.length === 0 && modalesAbiertos.size === 0) {
-        document.body.style.overflow = '';
+    const modalesOverlay = document.querySelectorAll('.modal-overlay');
+    let hayVisibles = false;
+    modalesOverlay.forEach(m => {
+        if (m.classList.contains('active')) hayVisibles = true;
+        const styleDisplay = m.style.display || window.getComputedStyle(m).display;
+        const visibility = m.style.visibility || window.getComputedStyle(m).visibility;
+        if ((styleDisplay === 'flex' || styleDisplay === 'block') && visibility !== 'hidden') {
+            hayVisibles = true;
+        }
+    });
+
+    if (modalesAbiertos.size === 0 && !hayVisibles) {
+        const dashboard = document.getElementById('dashboardEvaluacion');
+        if (dashboard && dashboard.style.display !== 'none') {
+            document.body.style.overflow = 'hidden';
+            dashboard.style.overflow = 'auto';
+        } else {
+            document.body.style.overflow = '';
+        }
     }
 }
-
-// En el listener de Escape, asegurar que se limpia todo
-document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') {
-        // Cerrar todos los modales
-        document.querySelectorAll('.modal-overlay').forEach(m => {
-            m.style.display = 'none';
-            m.classList.remove('active');
-        });
-        modalesAbiertos.clear();
-        document.body.style.overflow = '';
-    }
-});
 
 // Listener Tecla Escape: Cierra modales sin causar doble barra de desplazamiento
 document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
         document.querySelectorAll('.modal-overlay').forEach(m => {
-            m.style.display = 'none';
-            m.classList.remove('active');
+            ocultarElementoModal(m);
         });
         modalesAbiertos.clear();
 
@@ -314,7 +334,6 @@ function examenYaRealizado(curso, tituloExamen) {
 }
 
 // ===== PERSISTENCIA Y CURSOS =====
-// Modifica cargarExamenesDesdeStorage para que siempre haya exámenes
 function cargarExamenesDesdeStorage() {
     try {
         const data = localStorage.getItem('db_examenes');
@@ -326,7 +345,6 @@ function cargarExamenesDesdeStorage() {
                 return;
             }
         }
-        // Si no hay datos o están vacíos, cargar los exámenes de ejemplo
         DB_EXAMENES = JSON.parse(JSON.stringify(DB_EXAMENES_DEFAULT));
         guardarExamenesEnStorage();
     } catch (e) {
@@ -400,7 +418,7 @@ function mostrarToast(mensaje, tipo = 'info') {
         font-family: 'Inter', sans-serif;
         font-size: 0.9rem;
         font-weight: 600;
-        z-index: 100050;
+        z-index: 100090;
         box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         animation: fadeInUp 0.3s ease forwards;
         display: flex;
@@ -430,11 +448,11 @@ function mostrarModalGenerico(titulo, mensaje, botones = [], permitirCerrar = tr
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 0, 0.75);
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 100010;
+        z-index: 100050;
         animation: fadeIn 0.3s ease;
         backdrop-filter: blur(5px);
     `;
@@ -497,6 +515,7 @@ function mostrarModalGenerico(titulo, mensaje, botones = [], permitirCerrar = tr
     `;
 
     document.body.appendChild(modal);
+    mostrarElementoModal(modal);
 
     botones.forEach((btn, index) => {
         const btnElement = modal.querySelector(`.btn-modal-${index}`);
@@ -515,7 +534,10 @@ function mostrarModalGenerico(titulo, mensaje, botones = [], permitirCerrar = tr
 
 function cerrarModalGenerico() {
     const modal = document.getElementById('modalGenerico');
-    if (modal) modal.remove();
+    if (modal) {
+        ocultarElementoModal(modal);
+        modal.remove();
+    }
     desbloquearScroll('modalGenerico');
 }
 
@@ -533,11 +555,11 @@ function mostrarModalBienvenida(curso) {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 0, 0.75);
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 100020;
+        z-index: 100050;
         animation: fadeIn 0.3s ease;
         backdrop-filter: blur(5px);
     `;
@@ -579,11 +601,15 @@ function mostrarModalBienvenida(curso) {
     `;
 
     document.body.appendChild(modal);
+    mostrarElementoModal(modal);
 }
 
 function cerrarModalBienvenida() {
     const modal = document.getElementById('modalBienvenida');
-    if (modal) modal.remove();
+    if (modal) {
+        ocultarElementoModal(modal);
+        modal.remove();
+    }
     desbloquearScroll('modalBienvenida');
 }
 
@@ -592,17 +618,19 @@ function asegurarBotonFlotanteAdmin() {
     const dashboard = document.getElementById('dashboardEvaluacion');
     if (!dashboard) return;
 
-    // Eliminar cualquier botón existente para evitar duplicados
-    const btnExistente = document.getElementById('btnAdminLMS');
-    if (btnExistente) btnExistente.remove();
+    let btnAdmin = document.getElementById('btnAdminLMS');
+    if (!btnAdmin) {
+        btnAdmin = document.createElement('button');
+        btnAdmin.id = 'btnAdminLMS';
+        btnAdmin.innerHTML = '<i class="fas fa-cog"></i> Modo Administrador';
+        document.body.appendChild(btnAdmin);
+    }
 
-    const btnAdmin = document.createElement('button');
-    btnAdmin.id = 'btnAdminLMS';
-    btnAdmin.innerHTML = '<i class="fas fa-cog"></i> Modo Administrador';
     btnAdmin.onclick = function (e) {
-        e.stopPropagation();
+        if (e) e.stopPropagation();
         abrirModalAdmin();
     };
+
     btnAdmin.style.cssText = `
         position: fixed;
         bottom: 2rem;
@@ -632,39 +660,49 @@ function asegurarBotonFlotanteAdmin() {
         this.style.boxShadow = '0 4px 15px rgba(46,125,50,0.4)';
     };
 
-    // Añadir al body, no al dashboard, para que sea fijo y no dependa del scroll del dashboard
-    document.body.appendChild(btnAdmin);
-
-    // Mostrar u ocultar según el estado del dashboard
     const isVisible = dashboard.style.display !== 'none' && !modoAdminActivo;
     btnAdmin.style.display = isVisible ? 'flex' : 'none';
 }
 
 // ===== NAVEGACIÓN Y APERTURA DE EVALUACIÓN =====
 function abrirModalEvaluacion() {
-    bloquearScroll('modalEvaluacion');
-    document.getElementById('modalEvaluacion').classList.add('active');
-    document.getElementById('inputPasswordEvaluacion').value = '';
-    document.getElementById('errorPasswordEvaluacion').style.display = 'none';
-    setTimeout(() => document.getElementById('inputPasswordEvaluacion').focus(), 300);
+    const modal = document.getElementById('modalEvaluacion');
+    if (modal) {
+        bloquearScroll('modalEvaluacion');
+        mostrarElementoModal(modal);
+        const pwdInput = document.getElementById('inputPasswordEvaluacion');
+        if (pwdInput) pwdInput.value = '';
+        const errDiv = document.getElementById('errorPasswordEvaluacion');
+        if (errDiv) errDiv.style.display = 'none';
+        setTimeout(() => { if (pwdInput) pwdInput.focus(); }, 300);
+    }
 }
 
 function verificarPasswordEvaluacion() {
-    const password = document.getElementById('inputPasswordEvaluacion').value.trim();
+    const pwdInput = document.getElementById('inputPasswordEvaluacion');
+    const password = pwdInput ? pwdInput.value.trim() : '';
     if (password === 'eval2026') {
         cerrarModalEvaluacion();
         abrirDashboard();
     } else {
-        document.getElementById('errorPasswordEvaluacion').style.display = 'block';
-        document.getElementById('inputPasswordEvaluacion').value = '';
-        document.getElementById('inputPasswordEvaluacion').focus();
+        const errorDiv = document.getElementById('errorPasswordEvaluacion');
+        if (errorDiv) errorDiv.style.display = 'block';
+        if (pwdInput) {
+            pwdInput.value = '';
+            pwdInput.focus();
+        }
     }
 }
 
 function cerrarModalEvaluacion() {
-    document.getElementById('modalEvaluacion').classList.remove('active');
-    document.getElementById('inputPasswordEvaluacion').value = '';
-    document.getElementById('errorPasswordEvaluacion').style.display = 'none';
+    const modal = document.getElementById('modalEvaluacion');
+    if (modal) {
+        ocultarElementoModal(modal);
+        const pwdInput = document.getElementById('inputPasswordEvaluacion');
+        if (pwdInput) pwdInput.value = '';
+        const errDiv = document.getElementById('errorPasswordEvaluacion');
+        if (errDiv) errDiv.style.display = 'none';
+    }
     desbloquearScroll('modalEvaluacion');
 }
 
@@ -977,15 +1015,16 @@ function verPlanEstudios(curso) {
             ${ayudasHTML.length > 0 ? ayudasHTML : '<p style="color:#888;">Aún no se han configurado recursos para este curso.</p>'}
         `;
     }
+
     if (modal) {
-        modal.classList.add('active');
+        mostrarElementoModal(modal);
     }
 }
 
 function cerrarModalPlanEstudios() {
     const modal = document.getElementById('modalPlanEstudios');
     if (modal) {
-        modal.classList.remove('active');
+        ocultarElementoModal(modal);
     }
     desbloquearScroll('modalPlanEstudios');
 }
@@ -1032,8 +1071,8 @@ function iniciarFlujoIdentidad() {
         modal.className = 'modal-overlay';
         modal.style.cssText = `
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;
-            z-index: 100010; backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
         `;
         modal.innerHTML = `
             <div class="modal-card" style="background: white; border-radius: 1.5rem; padding: 2rem; max-width: 420px; width: 90%; box-shadow: 0 25px 60px rgba(0,0,0,0.3); border: 2px solid var(--golden);">
@@ -1065,12 +1104,12 @@ function iniciarFlujoIdentidad() {
         document.getElementById('inputGrupoAlumno').value = identidadExistente.grupo || 'Clase Belén';
     }
 
-    modal.style.display = 'flex';
+    mostrarElementoModal(modal);
 }
 
 function cancelarIdentidad() {
     const modal = document.getElementById('modalIdentidadAlumno');
-    if (modal) modal.style.display = 'none';
+    if (modal) ocultarElementoModal(modal);
     desbloquearScroll('modalIdentidadAlumno');
     examenActualParaRendir = null;
 }
@@ -1088,7 +1127,7 @@ function verificarIdentidadYRendir() {
     guardarIdentidadAlumno(nombre, documento, grupo);
 
     const modal = document.getElementById('modalIdentidadAlumno');
-    if (modal) modal.style.display = 'none';
+    if (modal) ocultarElementoModal(modal);
     desbloquearScroll('modalIdentidadAlumno');
 
     if (examenActualParaRendir) {
@@ -1122,7 +1161,7 @@ function rendirExamen(curso, examen) {
         modal.style.cssText = `
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center;
-            z-index: 100010; backdrop-filter: blur(5px);
+            z-index: 100050; backdrop-filter: blur(5px);
         `;
         modal.innerHTML = `
             <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 750px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
@@ -1210,12 +1249,12 @@ function rendirExamen(curso, examen) {
         </button>
     `;
 
-    modal.style.display = 'flex';
+    mostrarElementoModal(modal);
 }
 
 function cerrarModalRendirExamen() {
     const modal = document.getElementById('modalRendirExamen');
-    if (modal) modal.style.display = 'none';
+    if (modal) ocultarElementoModal(modal);
     desbloquearScroll('modalRendirExamen');
 }
 
@@ -1343,7 +1382,7 @@ function mostrarModalRetroalimentacion(intento) {
         modal.style.cssText = `
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;
-            z-index: 100020; backdrop-filter: blur(5px);
+            z-index: 100050; backdrop-filter: blur(5px);
         `;
         modal.innerHTML = `
             <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 650px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
@@ -1381,12 +1420,12 @@ function mostrarModalRetroalimentacion(intento) {
         </button>
     `;
 
-    modal.style.display = 'flex';
+    mostrarElementoModal(modal);
 }
 
 function cerrarModalRetroalimentacion() {
     const modal = document.getElementById('modalRetroalimentacion');
-    if (modal) modal.style.display = 'none';
+    if (modal) ocultarElementoModal(modal);
     desbloquearScroll('modalRetroalimentacion');
 }
 
@@ -1654,7 +1693,7 @@ function abrirModalNotificacionesLMS() {
         modal.style.cssText = `
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;
-            z-index: 100020; backdrop-filter: blur(5px);
+            z-index: 100050; backdrop-filter: blur(5px);
         `;
         modal.innerHTML = `
             <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
@@ -1679,12 +1718,12 @@ function abrirModalNotificacionesLMS() {
     `).join('');
 
     document.getElementById('bodyNotificacionesLMS').innerHTML = itemsHTML.length > 0 ? itemsHTML : '<p style="text-align: center; color: #777; font-family: \'Inter\', sans-serif;">No tienes notificaciones recientes.</p>';
-    modal.style.display = 'flex';
+    mostrarElementoModal(modal);
 }
 
 function cerrarModalNotificacionesLMS() {
     const modal = document.getElementById('modalNotificacionesLMS');
-    if (modal) modal.style.display = 'none';
+    if (modal) ocultarElementoModal(modal);
     desbloquearScroll('modalNotificacionesLMS');
 }
 
@@ -1717,16 +1756,13 @@ window.addEventListener('offline', () => {
 
 // ===== PANEL DE ADMINISTRACIÓN (MODO ADMINISTRADOR SOLUCIÓN GARANTIZADA) =====
 function abrirModalAdmin() {
-    // Si ya está en modo admin, mostrar el panel directamente
     if (modoAdminActivo) {
         mostrarPanelAdmin();
         return;
     }
 
-    // Bloquear scroll para evitar desplazamiento
     bloquearScroll('modalAdminPassword');
 
-    // Buscar o crear el modal de contraseña
     let modalAdminPassword = document.getElementById('modalAdminPassword');
     if (!modalAdminPassword) {
         modalAdminPassword = document.createElement('div');
@@ -1794,7 +1830,7 @@ function abrirModalAdmin() {
                         cursor: pointer;
                         font-family: 'Inter', sans-serif;
                         transition: all 0.3s ease;
-                    " onmouseover="this.style.transform='scale(1.02)';" onmouseout="this.style.transform='scale(1)';">Ingresar</button>
+                    ">Ingresar</button>
                     <button onclick="cerrarModalAdminPassword()" class="btn btn-outline" style="
                         flex:1;
                         padding: 0.75rem;
@@ -1806,28 +1842,23 @@ function abrirModalAdmin() {
                         font-weight: 700;
                         font-family: 'Inter', sans-serif;
                         transition: all 0.3s ease;
-                    " onmouseover="this.style.background='var(--deep-blue)'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='var(--deep-blue)';">Salir</button>
+                    ">Salir</button>
                 </div>
             </div>
         `;
         document.body.appendChild(modalAdminPassword);
 
-        // Evento Enter para el input
         modalAdminPassword.querySelector('#inputPasswordAdmin').addEventListener('keydown', function (e) {
             if (e.key === 'Enter') verificarPasswordAdmin();
         });
     }
 
-    // Limpiar campos y mostrar el modal
     const pwdInput = document.getElementById('inputPasswordAdmin');
     if (pwdInput) pwdInput.value = '';
     const errDiv = document.getElementById('errorPasswordAdmin');
     if (errDiv) errDiv.style.display = 'none';
 
-    modalAdminPassword.style.display = 'flex';
-    // Forzar que el modal esté visible (puede ser sobrescrito por otras reglas)
-    modalAdminPassword.style.visibility = 'visible';
-    modalAdminPassword.style.opacity = '1';
+    mostrarElementoModal(modalAdminPassword);
 
     setTimeout(() => {
         const input = document.getElementById('inputPasswordAdmin');
@@ -1838,9 +1869,7 @@ function abrirModalAdmin() {
 function cerrarModalAdminPassword() {
     const modal = document.getElementById('modalAdminPassword');
     if (modal) {
-        modal.style.display = 'none';
-        modal.style.visibility = 'hidden';
-        modal.style.opacity = '0';
+        ocultarElementoModal(modal);
     }
     desbloquearScroll('modalAdminPassword');
 }
@@ -1868,16 +1897,11 @@ function verificarPasswordAdmin() {
 
 function mostrarPanelAdmin() {
     const dashboard = document.getElementById('dashboardEvaluacion');
-    if (!dashboard) {
-        console.warn('⚠️ Dashboard no encontrado');
-        return;
-    }
+    if (!dashboard) return;
 
-    // Ocultar pestañas y contenido
     document.querySelectorAll('.tab-btn').forEach(btn => btn.style.display = 'none');
     document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
 
-    // Buscar o crear el panel admin
     let panelAdmin = document.getElementById('panelAdmin');
     if (!panelAdmin) {
         panelAdmin = document.createElement('div');
@@ -1896,7 +1920,7 @@ function mostrarPanelAdmin() {
             <h2 style="color: var(--deep-blue); font-size: 1.6rem; margin: 0; display: flex; align-items: center; gap: 0.6rem; font-family: 'Inter', sans-serif;">
                 <i class="fas fa-cog" style="color: var(--golden);"></i> Panel de Administración LMS
             </h2>
-            <button onclick="cerrarSesionAdmin()" style="
+            <button id="btnCerrarSesionAdmin" onclick="cerrarSesionAdmin()" style="
                 background: #c62828;
                 color: white;
                 padding: 0.6rem 1.4rem;
@@ -1911,8 +1935,8 @@ function mostrarPanelAdmin() {
             </button>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-bottom: 2rem;">
-            <button onclick="abrirModalCrearExamen()" style="
+        <div id="adminCardContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-bottom: 2rem;">
+            <div class="admin-card" onclick="abrirModalCrearExamen()" style="
                 background: var(--pure-white);
                 padding: 1.8rem;
                 border-radius: 1.5rem;
@@ -1928,9 +1952,9 @@ function mostrarPanelAdmin() {
                 <div style="font-size: 2.5rem;">📝</div>
                 <h4 style="color: var(--deep-blue); margin: 0; font-family: 'Inter', sans-serif;">Crear Nuevo Examen</h4>
                 <p style="color: var(--muted-text); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">Preguntas dinámicas o bancos aleatorios</p>
-            </button>
+            </div>
 
-            <button onclick="abrirModalEditarExamenes()" style="
+            <div class="admin-card" onclick="abrirModalEditarExamenes()" style="
                 background: var(--pure-white);
                 padding: 1.8rem;
                 border-radius: 1.5rem;
@@ -1946,9 +1970,9 @@ function mostrarPanelAdmin() {
                 <div style="font-size: 2.5rem;">✏️</div>
                 <h4 style="color: var(--deep-blue); margin: 0; font-family: 'Inter', sans-serif;">Editar / Eliminar Exámenes</h4>
                 <p style="color: var(--muted-text); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">Modifica o elimina exámenes existentes</p>
-            </button>
+            </div>
 
-            <button onclick="abrirModalGestionarResultados()" style="
+            <div class="admin-card" onclick="abrirModalGestionarResultados()" style="
                 background: var(--pure-white);
                 padding: 1.8rem;
                 border-radius: 1.5rem;
@@ -1964,9 +1988,9 @@ function mostrarPanelAdmin() {
                 <div style="font-size: 2.5rem;">📊</div>
                 <h4 style="color: var(--deep-blue); margin: 0; font-family: 'Inter', sans-serif;">Gestionar Resultados</h4>
                 <p style="color: var(--muted-text); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">Califica entregas y revisa exámenes</p>
-            </button>
+            </div>
 
-            <button onclick="abrirModalGestionarPlanEstudios()" style="
+            <div class="admin-card" onclick="abrirModalGestionarPlanEstudios()" style="
                 background: var(--pure-white);
                 padding: 1.8rem;
                 border-radius: 1.5rem;
@@ -1982,18 +2006,12 @@ function mostrarPanelAdmin() {
                 <div style="font-size: 2.5rem;">📚</div>
                 <h4 style="color: var(--deep-blue); margin: 0; font-family: 'Inter', sans-serif;">Plan de Estudios y Ayudas</h4>
                 <p style="color: var(--muted-text); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">Agrega/Edita temas y materiales</p>
-            </button>
+            </div>
         </div>
     `;
 
     panelAdmin.style.display = 'block';
-    // Asegurar que el panel sea visible
-    panelAdmin.style.visibility = 'visible';
-    panelAdmin.style.opacity = '1';
-
-    // Ocultar el botón flotante mientras está en modo admin (opcional)
-    const btnAdmin = document.getElementById('btnAdminLMS');
-    if (btnAdmin) btnAdmin.style.display = 'none';
+    asegurarBotonFlotanteAdmin();
 }
 
 function cerrarSesionAdmin() {
@@ -2017,7 +2035,7 @@ function abrirModalGestionarPlanEstudios() {
         modal.style.cssText = `
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;
-            z-index: 100000; backdrop-filter: blur(5px);
+            z-index: 100050; backdrop-filter: blur(5px);
         `;
         modal.innerHTML = `
             <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 680px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
@@ -2048,12 +2066,12 @@ function abrirModalGestionarPlanEstudios() {
         sel.value = 'Obra Misionera';
         cargarEdicionPlanEstudios('Obra Misionera');
     }
-    modal.style.display = 'flex';
+    mostrarElementoModal(modal);
 }
 
 function cerrarModalGestionarPlanEstudios() {
     const modal = document.getElementById('modalGestionarPlanEstudios');
-    if (modal) modal.style.display = 'none';
+    if (modal) ocultarElementoModal(modal);
     desbloquearScroll('modalGestionarPlanEstudios');
 }
 
@@ -2180,7 +2198,7 @@ function abrirModalEditarExamenes() {
         modal.style.cssText = `
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
-            z-index: 100000; backdrop-filter: blur(5px);
+            z-index: 100050; backdrop-filter: blur(5px);
         `;
         modal.innerHTML = `
             <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 600px; width: 95%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
@@ -2209,12 +2227,12 @@ function abrirModalEditarExamenes() {
 
     document.getElementById('selectCursoEditar').value = '';
     document.getElementById('listaExamenesEditar').innerHTML = '';
-    modal.style.display = 'flex';
+    mostrarElementoModal(modal);
 }
 
 function cerrarModalEditarExamenes() {
     const modal = document.getElementById('modalEditarExamenes');
-    if (modal) modal.style.display = 'none';
+    if (modal) ocultarElementoModal(modal);
     desbloquearScroll('modalEditarExamenes');
 }
 
@@ -2263,7 +2281,7 @@ function eliminarExamenDirecto(examId) {
 
     mostrarModalGenerico(
         '🗑️ Confirmar eliminación',
-        `¿Estás seguro de eliminar el examen "<strong>${examen.titulo}</strong>"? esta acción no se puede deshacer.`,
+        `¿Estás seguro de eliminar el examen "<strong>${examen.titulo}</strong>"? Esta acción no se puede deshacer.`,
         [
             {
                 texto: '✓ Sí, eliminar',
@@ -2297,7 +2315,7 @@ function abrirModalCrearExamenForm(examenObj) {
         modal.style.cssText = `
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;
-            z-index: 100000; backdrop-filter: blur(5px);
+            z-index: 100050; backdrop-filter: blur(5px);
         `;
         modal.innerHTML = `
             <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 680px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
@@ -2385,12 +2403,12 @@ function abrirModalCrearExamenForm(examenObj) {
         agregarPreguntaDinamicaForm();
     }
 
-    modal.style.display = 'flex';
+    mostrarElementoModal(modal);
 }
 
 function cerrarModalCrearExamenForm() {
     const modal = document.getElementById('modalCrearExamenForm');
-    if (modal) modal.style.display = 'none';
+    if (modal) ocultarElementoModal(modal);
     desbloquearScroll('modalCrearExamenForm');
 }
 
@@ -2564,7 +2582,7 @@ function abrirModalGestionarResultados() {
         modal.style.cssText = `
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
-            z-index: 100000; backdrop-filter: blur(5px);
+            z-index: 100050; backdrop-filter: blur(5px);
         `;
         modal.innerHTML = `
             <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 680px; width: 95%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
@@ -2593,12 +2611,12 @@ function abrirModalGestionarResultados() {
 
     document.getElementById('selectCursoResultadosAdmin').value = 'todos';
     cargarEntregasResultadosAdmin('todos');
-    modal.style.display = 'flex';
+    mostrarElementoModal(modal);
 }
 
 function cerrarModalGestionarResultados() {
     const modal = document.getElementById('modalGestionarResultados');
-    if (modal) modal.style.display = 'none';
+    if (modal) ocultarElementoModal(modal);
     desbloquearScroll('modalGestionarResultados');
 }
 
@@ -2655,7 +2673,7 @@ function verExamenResultadoAdmin(intentoIndex) {
         modal.style.cssText = `
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;
-            z-index: 100020; backdrop-filter: blur(5px);
+            z-index: 100050; backdrop-filter: blur(5px);
         `;
         modal.innerHTML = `
             <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 750px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.5);">
@@ -2719,12 +2737,12 @@ function verExamenResultadoAdmin(intentoIndex) {
         </div>
     `;
 
-    modal.style.display = 'flex';
+    mostrarElementoModal(modal);
 }
 
 function cerrarModalVerExamenResultadoAdmin() {
     const modal = document.getElementById('modalVerExamenResultadoAdmin');
-    if (modal) modal.style.display = 'none';
+    if (modal) ocultarElementoModal(modal);
     desbloquearScroll('modalVerExamenResultadoAdmin');
 }
 
@@ -2772,7 +2790,7 @@ document.addEventListener('DOMContentLoaded', function () {
     actualizarBadgesNotificaciones();
 });
 
-// Exportaciones globales
+// Exportaciones globales absolutas
 window.abrirModalEvaluacion = abrirModalEvaluacion;
 window.verificarPasswordEvaluacion = verificarPasswordEvaluacion;
 window.cerrarModalEvaluacion = cerrarModalEvaluacion;
@@ -2800,6 +2818,8 @@ window.mostrarModalRetroalimentacion = mostrarModalRetroalimentacion;
 window.cerrarModalRetroalimentacion = cerrarModalRetroalimentacion;
 window.mostrarModalBienvenida = mostrarModalBienvenida;
 window.cerrarModalBienvenida = cerrarModalBienvenida;
+window.mostrarModalGenerico = mostrarModalGenerico;
+window.cerrarModalGenerico = cerrarModalGenerico;
 window.generarCertificadoPDF = generarCertificadoPDF;
 window.abrirModalNotificacionesLMS = abrirModalNotificacionesLMS;
 window.cerrarModalNotificacionesLMS = cerrarModalNotificacionesLMS;
