@@ -431,13 +431,6 @@ function cerrarModalEvaluacion() {
 // ===== DASHBOARD PRINCIPAL =====
 
 function abrirDashboard() {
-    // Ocultar botón de admin general cuando se abre el LMS
-    if (typeof ocultarBotonAdminGeneral === 'function') {
-        ocultarBotonAdminGeneral();
-    }
-}
-
-function abrirDashboard() {
     cargarExamenesDesdeStorage();
     cargarExamenesRealizados();
     asegurarBotonFlotanteAdmin();
@@ -456,31 +449,34 @@ function abrirDashboard() {
 }
 
 function cerrarDashboard() {
+    // Ocultar el dashboard
     document.getElementById('dashboardEvaluacion').style.display = 'none';
     document.body.style.overflow = '';
+
+    // Restaurar pestañas
     document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
     document.getElementById('contenidoPrincipal').style.display = 'block';
+
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.style.background = 'transparent';
         btn.style.color = 'var(--muted-text)';
+        btn.style.display = 'flex'; // Asegurar visibilidad
     });
-    document.querySelector('.tab-btn[data-tab="principal"]').style.background = 'var(--golden)';
-    document.querySelector('.tab-btn[data-tab="principal"]').style.color = 'var(--deep-blue)';
+    const principalBtn = document.querySelector('.tab-btn[data-tab="principal"]');
+    if (principalBtn) {
+        principalBtn.style.background = 'var(--golden)';
+        principalBtn.style.color = 'var(--deep-blue)';
+    }
 
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.style.display = 'flex');
-
+    // Ocultar panel admin
     const panelAdmin = document.getElementById('panelAdmin');
     if (panelAdmin) panelAdmin.style.display = 'none';
 
     modoAdminActivo = false;
 
-    function cerrarDashboard() {
-        // ... código existente ...
-
-        // Mostrar botón de admin general cuando se cierra el LMS
-        if (typeof mostrarBotonAdminGeneral === 'function') {
-            mostrarBotonAdminGeneral();
-        }
+    // Mostrar botón de admin general (si existe la función)
+    if (typeof mostrarBotonAdminGeneral === 'function') {
+        mostrarBotonAdminGeneral();
     }
 }
 
@@ -1703,6 +1699,9 @@ function enviarMatricula(curso) {
         return;
     }
 
+    // 🔥 NUEVO: Guardar identidad del alumno
+    guardarIdentidadAlumno(nombre, whatsapp);
+
     inscribirCurso(curso);
     cerrarModalInscripcion();
     renderizarPrincipal();
@@ -2442,6 +2441,10 @@ function eliminarPregunta(id) {
 }
 
 function guardarExamenCompleto() {
+    // Obtener el examen existente si estamos editando
+    const examenExistente = (editandoExamenIndex >= 0 && editandoExamenIndex < DB_EXAMENES.length)
+        ? DB_EXAMENES[editandoExamenIndex]
+        : null;
     const curso = document.getElementById('selectCursoExamenPro').value;
     const titulo = document.getElementById('inputTituloExamenPro').value.trim();
     const fecha = document.getElementById('inputFechaExamenPro').value;

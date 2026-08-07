@@ -2015,6 +2015,7 @@
                     PM
                 </p>
             </div>
+            <div id="anunciosContainer"></div>
         </div>
 
         <!-- ==================== VISITANTES ==================== -->
@@ -3230,7 +3231,8 @@
                 color: '#2c5f7c',
                 subopciones: [
                     { texto: '➕ Agregar eventos', accion: 'agregarEvento' },
-                    { texto: '🗑️ Quitar eventos', accion: 'quitarEvento' }
+                    { texto: '🗑️ Quitar eventos', accion: 'quitarEvento' },
+                    { texto: '✏️ Editar anuncios', accion: 'editarAnuncios' },
                 ]
             }
         ];
@@ -3517,6 +3519,15 @@
                 case 'verLibrosPedidos':
                     abrirModalVerPedidos();
                     break;
+                case 'agregarEvento':
+                    abrirModalAgregarAnuncio();
+                    break;
+                case 'quitarEvento':
+                    abrirModalQuitarAnuncio(); // ✅ AHORA LLAMA A LA FUNCIÓN REAL
+                    break;
+                case 'editarAnuncios':
+                    mostrarAlertaAdmin('Función de Editar anuncios en construcción');
+                    break;
                 default:
                     alert(`Función: ${texto}`);
                     console.log(`🔧 Acción: ${accion} - ${texto}`);
@@ -3753,7 +3764,7 @@
         // --- Modal de Alerta ---
         function mostrarAlertaAdmin(mensaje, titulo = 'Atención') {
             document.getElementById('modalAlertaTitulo').textContent = titulo;
-            document.getElementById('modalAlertaMensaje').textContent = mensaje;
+            document.getElementById('modalAlertaMensaje').innerHTML = mensaje; // ✅ CAMBIADO A innerHTML
             document.getElementById('modalAlertaAdmin').classList.add('active');
         }
 
@@ -3766,11 +3777,10 @@
 
         function mostrarConfirmAdmin(mensaje, titulo, callbackSi) {
             document.getElementById('modalConfirmTitulo').textContent = titulo || 'Confirmar acción';
-            document.getElementById('modalConfirmMensaje').textContent = mensaje;
-            _callbackConfirm = callbackSi; // guardar función a ejecutar si acepta
+            document.getElementById('modalConfirmMensaje').innerHTML = mensaje; // ✅ CAMBIADO A innerHTML
+            _callbackConfirm = callbackSi;
             document.getElementById('modalConfirmAdmin').classList.add('active');
 
-            // Vincular botón "Sí"
             const btnSi = document.getElementById('btnConfirmSi');
             btnSi.onclick = function () {
                 cerrarModalConfirm();
@@ -5295,6 +5305,296 @@
             }
         }
 
+        // ===== ANUNCIOS / EVENTOS =====
+        const STORAGE_ANUNCIOS = 'anuncios_eventos';
+
+        function cargarAnuncios() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_ANUNCIOS)) || []; }
+            catch (e) { return []; }
+        }
+        function guardarAnuncios(anuncios) {
+            localStorage.setItem(STORAGE_ANUNCIOS, JSON.stringify(anuncios));
+            window.dispatchEvent(new Event('datosAnunciosActualizados'));
+        }
+
+        function abrirModalAgregarAnuncio() {
+            document.getElementById('anuncioTitulo').value = '';
+            document.getElementById('anuncioFechaInicio').value = '';
+            document.getElementById('anuncioHoraInicio').value = '';
+            document.getElementById('anuncioFechaFin').value = '';
+            document.getElementById('anuncioHoraFin').value = '';
+            document.getElementById('anuncioUbicacion').value = '';
+            document.getElementById('anuncioCategoria').value = 'Culto';
+            document.getElementById('anuncioImagen').value = '';
+            document.getElementById('anuncioContenido').value = '';
+            document.getElementById('modalAgregarAnuncio').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalAgregarAnuncio(event) {
+            if (event && event.target !== document.getElementById('modalAgregarAnuncio')) return;
+            document.getElementById('modalAgregarAnuncio').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function guardarNuevoAnuncio() {
+            const titulo = document.getElementById('anuncioTitulo').value.trim();
+            const fechaInicio = document.getElementById('anuncioFechaInicio').value;
+            const horaInicio = document.getElementById('anuncioHoraInicio').value;
+            const fechaFin = document.getElementById('anuncioFechaFin').value;
+            const horaFin = document.getElementById('anuncioHoraFin').value;
+            const ubicacion = document.getElementById('anuncioUbicacion').value.trim();
+            const categoria = document.getElementById('anuncioCategoria').value;
+            const imagen = document.getElementById('anuncioImagen').value.trim();
+            const contenido = document.getElementById('anuncioContenido').value.trim();
+
+            if (!titulo || !fechaInicio || !contenido) {
+                mostrarAlertaAdmin('Completa al menos el título, la fecha de inicio y el contenido.');
+                return;
+            }
+
+            const anuncios = cargarAnuncios();
+            anuncios.push({
+                id: Date.now(),
+                titulo,
+                contenido,
+                fechaInicio,
+                horaInicio: horaInicio || '00:00',
+                fechaFin: fechaFin || fechaInicio,
+                horaFin: horaFin || horaInicio || '00:00',
+                ubicacion: ubicacion || 'Templo Principal',
+                imagen: imagen || '',
+                categoria
+            });
+
+            guardarAnuncios(anuncios);
+            window.dispatchEvent(new Event('datosAnunciosActualizados'));
+            cerrarModalAgregarAnuncio();
+            mostrarAlertaAdmin('✅ Anuncio publicado correctamente.');
+        }
+
+        function generarVistaPreviaAnuncio() {
+            const titulo = document.getElementById('anuncioTitulo').value.trim();
+            const fechaInicio = document.getElementById('anuncioFechaInicio').value;
+            const horaInicio = document.getElementById('anuncioHoraInicio').value;
+            const fechaFin = document.getElementById('anuncioFechaFin').value;
+            const horaFin = document.getElementById('anuncioHoraFin').value;
+            const ubicacion = document.getElementById('anuncioUbicacion').value.trim();
+            const categoria = document.getElementById('anuncioCategoria').value;
+            const imagen = document.getElementById('anuncioImagen').value.trim();
+            const contenido = document.getElementById('anuncioContenido').value.trim();
+
+            if (!titulo || !contenido) {
+                mostrarAlertaAdmin('Escribe al menos un título y contenido para la vista previa.');
+                return;
+            }
+
+            const fechaStr = fechaInicio
+                ? new Date(fechaInicio + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })
+                : 'Fecha no especificada';
+
+            let html = '';
+            if (imagen) html += `<img src="${imagen}" alt="${titulo}" style="width:100%; border-radius:1rem; margin-bottom:1rem;">`;
+            html += `<span style="background: var(--golden); color: var(--deep-blue); padding:0.2rem 1rem; border-radius:1rem; font-size:0.75rem; font-weight:600;">${categoria}</span>`;
+            html += `<h2 style="margin-top:0.5rem;">${titulo}</h2>`;
+            html += `<div class="evento-meta">📅 ${fechaStr} · 🕐 ${horaInicio || '--:--'} | 📍 ${ubicacion || 'Templo Principal'}</div>`;
+            html += `<div class="evento-contenido">${contenido.replace(/\n/g, '<br>')}</div>`;
+            if (fechaFin && fechaFin !== fechaInicio) {
+                html += `<p style="color: var(--muted-text); font-size:0.85rem;">Finaliza: ${new Date(fechaFin + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })}</p>`;
+            }
+
+            document.getElementById('vistaPreviaContenido').innerHTML = html;
+            document.getElementById('modalVistaPrevia').classList.add('active');
+        }
+
+        function cerrarVistaPrevia(event) {
+            if (event && event.target !== document.getElementById('modalVistaPrevia')) return;
+            document.getElementById('modalVistaPrevia').classList.remove('active');
+        }
+
+        // ===== RENDERIZAR ANUNCIOS PÚBLICOS =====
+        function renderizarAnunciosPublicos() {
+            console.log("🔄 Intentando renderizar anuncios..."); // Para saber si el código se ejecuta
+            const container = document.getElementById('anunciosContainer');
+            if (!container) {
+                console.error("❌ ERROR: No se encontró el elemento #anunciosContainer en el HTML.");
+                return;
+            }
+
+            // Leer anuncios desde localStorage
+            const anuncios = (() => {
+                try {
+                    return JSON.parse(localStorage.getItem('anuncios_eventos')) || [];
+                } catch (e) {
+                    return [];
+                }
+            })();
+
+            console.log("📢 Anuncios encontrados en localStorage:", anuncios.length);
+
+            anuncios.sort((a, b) => (b.fechaInicio || '').localeCompare(a.fechaInicio || ''));
+
+            if (anuncios.length === 0) {
+                container.innerHTML = `
+            <div style="text-align:center; padding:3rem 1rem; color: var(--muted-text);">
+                <i class="fas fa-bullhorn" style="font-size:3rem; display:block; margin-bottom:1rem; opacity:0.5;"></i>
+                <p>No hay anuncios o eventos programados actualmente.</p>
+            </div>`;
+                return;
+            }
+
+            let html = '';
+            anuncios.forEach(a => {
+                const fechaInicio = a.fechaInicio ? new Date(a.fechaInicio + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+                const horaInicio = a.horaInicio || '';
+                const fechaFin = a.fechaFin && a.fechaFin !== a.fechaInicio ? new Date(a.fechaFin + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+                const ubicacion = a.ubicacion || 'Templo Principal';
+                const categoria = a.categoria || 'Anuncio General';
+                const contenido = (a.contenido || '').replace(/\n/g, '<br>');
+                const imagen = a.imagen || '';
+
+                html += `
+        <div class="anuncio-card" style="
+            background: var(--pure-white);
+            border-radius: 1.5rem;
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border-left: 5px solid var(--golden);
+            transition: var(--transition);
+        ">
+            ${imagen ? `<img src="${imagen}" alt="${a.titulo}" style="width:100%; max-height:250px; object-fit:cover; border-radius:1rem; margin-bottom:1rem;">` : ''}
+            
+            <span style="
+                background: var(--golden);
+                color: var(--deep-blue);
+                padding: 0.2rem 1rem;
+                border-radius: 2rem;
+                font-size: 0.75rem;
+                font-weight: 700;
+                display: inline-block;
+                margin-bottom: 0.5rem;
+            ">${categoria}</span>
+            
+            <h3 style="color: var(--deep-blue); font-size: 1.4rem; margin: 0.5rem 0;">${a.titulo}</h3>
+            
+            <div style="color: var(--muted-text); font-size: 0.9rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.8rem;">
+                <span><i class="far fa-calendar-alt" style="color: var(--golden);"></i> ${fechaInicio} ${horaInicio ? '· 🕐 ' + horaInicio : ''}</span>
+                ${fechaFin ? `<span><i class="fas fa-hourglass-end" style="color: var(--golden);"></i> Finaliza: ${fechaFin}</span>` : ''}
+                <span><i class="fas fa-map-marker-alt" style="color: var(--golden);"></i> ${ubicacion}</span>
+            </div>
+            
+            <div style="color: var(--dark-text); line-height: 1.7;">
+                ${contenido}
+            </div>
+        </div>`;
+            });
+
+            container.innerHTML = html;
+            console.log("✅ Anuncios renderizados exitosamente.");
+        }
+
+        // Escuchar cambios del Admin
+        window.addEventListener('datosAnunciosActualizados', renderizarAnunciosPublicos);
+
+        // Renderizar al cargar la página
+        document.addEventListener('DOMContentLoaded', renderizarAnunciosPublicos);
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(renderizarAnunciosPublicos, 1);
+        }
+
+        // ===== QUITAR ANUNCIOS / EVENTOS =====
+        function abrirModalQuitarAnuncio() {
+            // Cargar los anuncios y renderizar la lista
+            const anuncios = cargarAnuncios().sort((a, b) => (b.fechaInicio || '').localeCompare(a.fechaInicio || ''));
+            renderizarListaQuitar(anuncios);
+            document.getElementById('buscadorQuitarAnuncio').value = '';
+            document.getElementById('modalQuitarAnuncio').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarModalQuitarAnuncio(event) {
+            if (event && event.target !== document.getElementById('modalQuitarAnuncio')) return;
+            document.getElementById('modalQuitarAnuncio').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function filtrarAnunciosQuitar() {
+            const termino = document.getElementById('buscadorQuitarAnuncio').value.trim().toLowerCase();
+            const anuncios = cargarAnuncios().filter(a =>
+                a.titulo.toLowerCase().includes(termino) ||
+                a.categoria.toLowerCase().includes(termino)
+            ).sort((a, b) => (b.fechaInicio || '').localeCompare(a.fechaInicio || ''));
+            renderizarListaQuitar(anuncios);
+        }
+
+        function renderizarListaQuitar(anuncios) {
+            const container = document.getElementById('listaQuitarAnuncios');
+            if (!container) {
+                console.error('❌ Contenedor #listaQuitarAnuncios no encontrado');
+                return;
+            }
+
+            if (!anuncios || anuncios.length === 0) {
+                container.innerHTML = `
+            <div style="padding: 2rem; text-align: center; color: var(--muted-text);">
+                <i class="fas fa-check-circle" style="font-size: 2rem; color: #2e7d32; display: block; margin-bottom: 0.5rem;"></i>
+                No hay anuncios para eliminar.
+            </div>
+        `;
+                return;
+            }
+
+            let html = `<table class="tabla-quitar"><thead><tr><th>Título</th><th>Categoría</th><th>Fecha</th><th>Acción</th></tr></thead><tbody>`;
+            anuncios.forEach(a => {
+                const fecha = a.fechaInicio ? new Date(a.fechaInicio + 'T00:00:00').toLocaleDateString('es-CO') : 'Sin fecha';
+                // Escapar el título para evitar inyección HTML
+                const tituloEscapado = a.titulo.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                html += `
+            <tr data-anuncio-id="${a.id}">
+                <td><strong>${tituloEscapado}</strong></td>
+                <td>${a.categoria}</td>
+                <td>${fecha}</td>
+                <td><button class="btn-eliminar-anuncio" data-id="${a.id}" title="Eliminar anuncio">🗑️</button></td>
+            </tr>
+        `;
+            });
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+
+            // Delegación de eventos en el contenedor (más seguro que onclick)
+            container.querySelectorAll('.btn-eliminar-anuncio').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    const id = parseInt(this.dataset.id, 10);
+                    if (isNaN(id)) {
+                        console.error('ID inválido:', this.dataset.id);
+                        return;
+                    }
+                    console.log('🖱️ Botón eliminar presionado para id:', id);
+                    confirmarEliminarAnuncio(id);
+                });
+            });
+        }
+        function confirmarEliminarAnuncio(id) {
+            const anuncios = cargarAnuncios();
+            const anuncio = anuncios.find(a => a.id === id);
+            if (!anuncio) return;
+
+            mostrarConfirmAdmin(
+                `¿Estás seguro de que deseas eliminar el anuncio "<strong>${anuncio.titulo}</strong>"? Esta acción no se puede deshacer.`,
+                'Eliminar anuncio',
+                function () {
+                    // ✅ Filtrar y guardar
+                    let nuevosAnuncios = anuncios.filter(a => a.id !== id);
+                    console.log('🔍 Antes de guardar, anuncios restantes:', nuevosAnuncios.length);
+                    guardarAnuncios(nuevosAnuncios);
+
+                    // ✅ Actualizar el modal inmediatamente
+                    renderizarListaQuitar(nuevosAnuncios.sort((a, b) => (b.fechaInicio || '').localeCompare(a.fechaInicio || '')));
+                }
+            );
+        }
 
 
         // ===== EXPORTACIONES GLOBALES ADICIONALES =====
@@ -5338,6 +5638,16 @@
         window.marcarEntregadoPedido = marcarEntregadoPedido;
         window.filtrarEliminarLibro = filtrarEliminarLibro;
         window.abrirModalEditarLibro = abrirModalEditarLibro;
+        window.abrirModalAgregarAnuncio = abrirModalAgregarAnuncio;
+        window.cerrarModalAgregarAnuncio = cerrarModalAgregarAnuncio;
+        window.guardarNuevoAnuncio = guardarNuevoAnuncio;
+        window.generarVistaPreviaAnuncio = generarVistaPreviaAnuncio;
+        window.cerrarVistaPrevia = cerrarVistaPrevia;
+        window.abrirModalQuitarAnuncio = abrirModalQuitarAnuncio;
+        window.cerrarModalQuitarAnuncio = cerrarModalQuitarAnuncio;
+        window.filtrarAnunciosQuitar = filtrarAnunciosQuitar;
+        window.confirmarEliminarAnuncio = confirmarEliminarAnuncio;
+
     </script>
 
     <!-- ===== MODAL DE CONFIRMACIÓN PARA ELIMINAR MIEMBRO ===== -->
@@ -5443,15 +5753,17 @@
         </div>
     </div>
 
-    <!-- ===== MODAL GENÉRICO DE CONFIRMACIÓN ===== -->
-    <div id="modalConfirmAdmin" class="modal-generico-overlay">
-        <div class="modal-generico-card" onclick="event.stopPropagation()">
-            <div class="modal-generico-icono">🗑️</div>
-            <h3 class="modal-generico-titulo" id="modalConfirmTitulo">Confirmar acción</h3>
-            <p class="modal-generico-mensaje" id="modalConfirmMensaje"></p>
-            <div class="modal-generico-botones">
-                <button class="modal-generico-btn btn-modal-peligro" id="btnConfirmSi">Sí, eliminar</button>
-                <button class="modal-generico-btn btn-modal-secundario" onclick="cerrarModalConfirm()">Cancelar</button>
+    <!-- ===== MODAL GENÉRICO DE CONFIRMACIÓN (PROFESIONAL) ===== -->
+    <div id="modalConfirmAdmin" class="modal-confirm-overlay" onclick="cerrarModalConfirm()">
+        <div class="modal-confirm-card" onclick="event.stopPropagation()">
+            <div class="modal-confirm-icono">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h3 class="modal-confirm-titulo" id="modalConfirmTitulo">Confirmar acción</h3>
+            <p class="modal-confirm-mensaje" id="modalConfirmMensaje"></p>
+            <div class="modal-confirm-botones">
+                <button class="modal-confirm-btn btn-confirm-si" id="btnConfirmSi">Sí, eliminar</button>
+                <button class="modal-confirm-btn btn-confirm-no" onclick="cerrarModalConfirm()">Cancelar</button>
             </div>
         </div>
     </div>
@@ -5519,6 +5831,96 @@
         <div class="modal-biblioteca-card" onclick="event.stopPropagation()">
             <h3><i class="fas fa-book-open"></i> Libros Pedidos</h3>
             <div id="listaPedidosLibros" style="overflow-x:auto;">
+                <!-- Se llena dinámicamente con JS -->
+            </div>
+        </div>
+    </div>
+    <!-- ===== MODAL AGREGAR ANUNCIO / EVENTO ===== -->
+    <div id="modalAgregarAnuncio" class="modal-anuncio-overlay" onclick="cerrarModalAgregarAnuncio(event)">
+        <div class="modal-anuncio-card" onclick="event.stopPropagation()">
+            <h3><i class="fas fa-bullhorn"></i> Publicar Nuevo Anuncio</h3>
+            <p class="modal-anuncio-subtitulo">Completa los campos para crear un anuncio o evento de la iglesia</p>
+
+            <div class="form-anuncio-grid">
+                <div class="form-group full-width">
+                    <label>Título del evento *</label>
+                    <input type="text" id="anuncioTitulo" placeholder="Ej: Culto de Oración Especial">
+                </div>
+                <div class="form-group">
+                    <label>Fecha de inicio *</label>
+                    <input type="date" id="anuncioFechaInicio">
+                </div>
+                <div class="form-group">
+                    <label>Hora de inicio *</label>
+                    <input type="time" id="anuncioHoraInicio">
+                </div>
+                <div class="form-group">
+                    <label>Fecha de fin</label>
+                    <input type="date" id="anuncioFechaFin">
+                </div>
+                <div class="form-group">
+                    <label>Hora de fin</label>
+                    <input type="time" id="anuncioHoraFin">
+                </div>
+                <div class="form-group">
+                    <label>Ubicación</label>
+                    <input type="text" id="anuncioUbicacion" placeholder="Templo Principal">
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <select id="anuncioCategoria">
+                        <option value="Culto">Culto</option>
+                        <option value="Sociedad de Jóvenes">Sociedad de Jóvenes</option>
+                        <option value="Reunión de Oración">Reunión de Oración</option>
+                        <option value="Anuncio General">Anuncio General</option>
+                        <option value="Grupos Pequeños">Grupos Pequeños</option>
+                        <option value="Clubes">Clubes</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label>Imagen destacada (URL)</label>
+                    <input type="url" id="anuncioImagen" placeholder="https://... (opcional)">
+                </div>
+                <div class="form-group full-width">
+                    <label>Contenido del anuncio *</label>
+                    <textarea id="anuncioContenido" rows="4"
+                        placeholder="Escribe la descripción del evento o anuncio..."></textarea>
+                </div>
+            </div>
+
+            <div class="anuncio-botones">
+                <button class="btn-publicar-anuncio" onclick="guardarNuevoAnuncio()">
+                    <i class="fas fa-paper-plane"></i> Publicar Evento
+                </button>
+                <button class="btn-vista-previa" onclick="generarVistaPreviaAnuncio()">
+                    <i class="fas fa-eye"></i> Vista previa
+                </button>
+                <button class="btn-cancelar-anuncio" onclick="cerrarModalAgregarAnuncio()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL VISTA PREVIA DE ANUNCIO ===== -->
+    <div id="modalVistaPrevia" class="modal-vista-previa" onclick="cerrarVistaPrevia(event)">
+        <div class="vista-previa-card" onclick="event.stopPropagation()" id="vistaPreviaContenido">
+            <!-- Se llena dinámicamente con JS -->
+        </div>
+    </div>
+
+    <!-- ===== MODAL QUITAR ANUNCIOS / EVENTOS ===== -->
+    <div id="modalQuitarAnuncio" class="modal-quitar-overlay" onclick="cerrarModalQuitarAnuncio(event)">
+        <div class="modal-quitar-card" onclick="event.stopPropagation()">
+            <h3><i class="fas fa-trash-alt" style="color: #c62828;"></i> Quitar Eventos</h3>
+
+            <div class="buscador-quitar-wrapper">
+                <i class="fas fa-search icono-buscar"></i>
+                <input type="text" id="buscadorQuitarAnuncio" placeholder="Buscar por título o categoría..."
+                    oninput="filtrarAnunciosQuitar()">
+            </div>
+
+            <div id="listaQuitarAnuncios" class="tabla-quitar-wrapper">
                 <!-- Se llena dinámicamente con JS -->
             </div>
         </div>
