@@ -265,10 +265,10 @@
             <!-- HIGHLIGHT -->
             <div class="highlight-box">
                 <div>
-                    <h2><i class="far fa-clock"></i> Sábado 8:00 A.M.</h2>
-                    <p><strong>Escuela Sabática · Culto Divino 11:00 AM</strong></p>
-                    <p style="margin-top:0.5rem;"><i class="fas fa-users"></i> <strong>Sociedad de Jóvenes 4:00
-                            P.M.</strong></p>
+                    <h2><i class="far fa-clock"></i> Cultos de Adoración</h2>
+                    <p><strong>Sábado: 8:00 - 11:30 A.M.</strong> (Escuela Sabática · Culto Divino)</p>
+                    <p style="margin-top:0.3rem;"><i class="fas fa-users"></i> <strong>Sociedad de Jóvenes (Sáb): 4:00 - 6:00 P.M.</strong></p>
+                    <p style="margin-top:0.3rem;"><i class="fas fa-praying-hands"></i> <strong>Lunes de Oración & Miércoles de Testimonio: 7:00 - 8:00 P.M.</strong></p>
                 </div>
                 <button class="btn"><i class="fas fa-video"></i> Ver en vivo</button>
             </div>
@@ -531,8 +531,8 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="modalEmail">Correo electrónico</label>
-                                <input type="email" id="modalEmail" placeholder="Ej: juan@email.com" required />
+                                <label for="modalEmail">Correo electrónico (opcional)</label>
+                                <input type="email" id="modalEmail" placeholder="Ej: juan@email.com" />
                             </div>
 
                             <button type="submit" class="btn-enviar">
@@ -549,15 +549,18 @@
                             <i class="fas fa-map-pin"></i>
                             <div>
                                 <strong>Dirección:</strong>
-                                <p>Calle 24 #12-18, Barrio Belén</p>
+                                <p>6 sur 51B 48, Barrio: 7 de abril</p>
                             </div>
                         </div>
 
                         <div class="info-item">
                             <i class="fas fa-calendar-alt"></i>
                             <div>
-                                <strong>Te esperamos todos los sábados</strong>
-                                <p>Escuela Sabática 8:00 AM · Culto 11:00 AM</p>
+                                <strong>Horarios de Cultos:</strong>
+                                <p><strong>Sábado:</strong> 8:00 ‑ 11:30 a.m.</p>
+                                <p><strong>Sociedad de Jóvenes (Sábado):</strong> 4:00 ‑ 6:00 p.m.</p>
+                                <p><strong>Lunes de Oración:</strong> 7:00 ‑ 8:00 p.m.</p>
+                                <p><strong>Miércoles de Testimonio:</strong> 7:00 ‑ 8:00 p.m.</p>
                             </div>
                         </div>
 
@@ -565,20 +568,54 @@
                             <i class="fas fa-church"></i>
                             <div>
                                 <strong>¡Ven y sé parte de nuestra familia!</strong>
-                                <p>Un lugar de esperanza y comunidad</p>
+                                <p>Un lugar de esperanza y comunidad. Te esperamos con los brazos abiertos.</p>
                             </div>
                         </div>
 
                         <div
                             style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(0,0,0,0.05); text-align: center;">
-                            <p style="font-size: 0.9rem; color: var(--golden); font-weight: 600;">
-                                <i class="fas fa-heart" style="color: var(--golden);"></i> Te esperamos con los
-                                brazos abiertos
+                            <p style="font-size: 0.9rem; color: var(--golden); font-weight: 600; font-style: italic; margin-bottom: 0.3rem;">
+                                "Porque donde están dos o tres congregados en mi nombre, allí estoy yo en medio de ellos."
                             </p>
+                            <span style="font-size: 0.8rem; color: var(--muted-text); font-weight: 500;">— Mateo 18:20</span>
                         </div>
                     </div>
 
                 </div>
+            </div>
+        </div>
+
+        <!-- ==================== MODAL CONFIRMACIÓN CONTACTO ==================== -->
+        <div id="modalConfirmacionContacto" class="modal-overlay" onclick="cerrarModalConfirmacionContacto(event)">
+            <div class="modal-card" style="max-width: 480px; border-radius: 1.8rem; border: 2px solid rgba(201,165,59,0.3); padding: 2.2rem 1.8rem; text-align: center; background: white; box-shadow: 0 25px 60px rgba(0,0,0,0.3);" onclick="event.stopPropagation()">
+                
+                <div style="width: 75px; height: 75px; background: linear-gradient(135deg, var(--cream, #fef9e6), #fff5d6); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem; border: 2px solid var(--golden, #c9a53b); color: var(--golden, #c9a53b); font-size: 2.2rem; box-shadow: 0 6px 20px rgba(201,165,59,0.25);">
+                    <i class="fas fa-hands-praying"></i>
+                </div>
+
+                <h3 style="color: var(--deep-blue, #1a3a4a); font-size: 1.4rem; font-weight: 700; margin-bottom: 0.8rem; font-family: 'Inter', sans-serif;">
+                    🙏 <span id="confirmacionNombreTexto">¡Gracias!</span>
+                </h3>
+
+                <p style="color: #5a6474; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.2rem; font-family: 'Inter', sans-serif;">
+                    Hemos recibido tu mensaje con alegría. Un asesor se pondrá en contacto contigo muy pronto para acompañarte en este camino de fe.
+                </p>
+
+                <div style="background: var(--cream, #faf4e8); border-left: 4px solid var(--golden, #c9a53b); padding: 1rem; border-radius: 0.8rem; margin-bottom: 1.5rem; text-align: center;">
+                    <p style="font-size: 0.88rem; color: var(--deep-blue, #1a3a4a); font-style: italic; font-weight: 600; margin-bottom: 0.3rem; line-height: 1.5;">
+                        "Porque donde están dos o tres congregados en mi nombre, allí estoy yo en medio de ellos."
+                    </p>
+                    <span style="font-size: 0.8rem; color: var(--golden, #c9a53b); font-weight: 700;">— Mateo 18:20</span>
+                </div>
+
+                <div style="margin-bottom: 1.5rem; font-size: 0.85rem; font-weight: 600; color: var(--deep-blue, #1a3a4a);">
+                    <i class="fas fa-church" style="color: var(--golden, #c9a53b); margin-right: 0.4rem;"></i>
+                    Iglesia Adventista del Séptimo Día · Belén
+                </div>
+
+                <button type="button" onclick="cerrarModalConfirmacionContacto()" style="background: linear-gradient(135deg, #d4a038 0%, #c9a53b 100%); color: var(--deep-blue, #1a3a4a); border: none; padding: 0.8rem 2.5rem; border-radius: 2rem; font-weight: 700; font-size: 1rem; cursor: pointer; font-family: 'Inter', sans-serif; box-shadow: 0 4px 15px rgba(201,157,59,0.3); transition: all 0.3s ease;">
+                    Entendido
+                </button>
             </div>
         </div>
 

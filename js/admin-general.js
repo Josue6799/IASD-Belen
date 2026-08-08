@@ -181,7 +181,8 @@ const TARJETAS_ADMIN = [
         subopciones: [
             { texto: '📅 Cronograma', accion: 'cronogramaIglesia' },
             { texto: '📋 Encuestas', accion: 'encuestasIglesia' },
-            { texto: '🗄️ Base de datos', accion: 'baseDatosIglesia' }
+            { texto: '🗄️ Base de datos', accion: 'baseDatosIglesia' },
+            { texto: '👥 Ver interesados', accion: 'verInteresados' }
         ]
     },
     {
@@ -421,6 +422,13 @@ function toggleSubmenuAdmin(tarjetaId, event) {
                 <span class="item-texto">Base de datos</span>
                 <i class="fas fa-chevron-right item-flecha"></i>
             </div>
+            <div class="admin-menu-item" onclick="ejecutarAccionAdmin('verInteresados', '👥 Ver interesados', event)">
+                <div class="item-icono" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%);">
+                    <i class="fas fa-users" style="color: white; font-size: 1.2rem;"></i>
+                </div>
+                <span class="item-texto">Ver interesados</span>
+                <i class="fas fa-chevron-right item-flecha"></i>
+            </div>
         </div>
         `;
     } else {
@@ -483,6 +491,9 @@ function ejecutarAccionAdmin(accion, texto, event) {
             break;
         case 'baseDatosIglesia':
             alert('Función de Base de datos en construcción');
+            break;
+        case 'verInteresados':
+            abrirVerInteresados();
             break;
         case 'agregarLibro':
             abrirModalAgregarLibro();
@@ -2692,6 +2703,153 @@ function confirmarEliminarAnuncio(id) {
 
 
 // ===== EXPORTACIONES GLOBALES ADICIONALES =====
+// ===== SECCIÓN: VER INTERESADOS (¡QUEREMOS CONOCERTE!) =====
+const STORAGE_INTERESADOS = 'interesados';
+
+function abrirVerInteresados() {
+    const panel = document.getElementById('panelAdminGeneral');
+    let seccion = document.getElementById('seccionVerInteresados');
+    if (!seccion) {
+        seccion = document.createElement('div');
+        seccion.id = 'seccionVerInteresados';
+        seccion.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9997;overflow-y:auto;font-family:Inter,sans-serif;';
+        document.body.appendChild(seccion);
+    }
+    seccion.innerHTML = generarHTMLInteresados();
+    seccion.style.display = 'block';
+    if (panel) panel.style.display = 'none';
+}
+
+function cerrarVerInteresados() {
+    const seccion = document.getElementById('seccionVerInteresados');
+    const panel = document.getElementById('panelAdminGeneral');
+    if (seccion) seccion.style.display = 'none';
+    if (panel) panel.style.display = 'block';
+}
+
+function cargarInteresados() {
+    try {
+        return JSON.parse(localStorage.getItem(STORAGE_INTERESADOS)) || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function guardarInteresados(lista) {
+    localStorage.setItem(STORAGE_INTERESADOS, JSON.stringify(lista));
+}
+
+function toggleContactadoInteresado(id) {
+    const lista = cargarInteresados();
+    const index = lista.findIndex(item => item.id === id);
+    if (index !== -1) {
+        lista[index].contactado = !lista[index].contactado;
+        guardarInteresados(lista);
+        const seccion = document.getElementById('seccionVerInteresados');
+        if (seccion) seccion.innerHTML = generarHTMLInteresados();
+    }
+}
+
+function eliminarInteresado(id) {
+    if (confirm('¿Estás seguro de que deseas eliminar a este interesado de la lista?')) {
+        let lista = cargarInteresados();
+        lista = lista.filter(item => item.id !== id);
+        guardarInteresados(lista);
+        const seccion = document.getElementById('seccionVerInteresados');
+        if (seccion) seccion.innerHTML = generarHTMLInteresados();
+    }
+}
+
+function generarHTMLInteresados() {
+    const lista = cargarInteresados().reverse();
+    const total = lista.length;
+    const contactados = lista.filter(i => i.contactado).length;
+    const pendientes = total - contactados;
+
+    let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;box-shadow:0 4px 15px rgba(0,0,0,0.1);">';
+    html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;display:flex;align-items:center;gap:0.5rem;"><i class="fas fa-users"></i> Personas Interesadas (¡Queremos conocerte!)</h3>';
+    html += '<button onclick="cerrarVerInteresados()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;transition:all 0.2s;"><i class="fas fa-arrow-left"></i> Volver</button></div>';
+
+    html += '<div style="max-width:1100px;margin:1.5rem auto;padding:0 1rem;">';
+
+    // Métricas
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1rem;margin-bottom:1.5rem;">';
+    html += '<div style="background:white;padding:1.2rem;border-radius:1.2rem;box-shadow:0 4px 12px rgba(0,0,0,0.04);border-left:5px solid #2c5f7c;">';
+    html += '<div style="font-size:0.85rem;color:#666;font-weight:600;">Total Registros</div>';
+    html += '<div style="font-size:1.8rem;font-weight:800;color:#1a3a4a;">' + total + '</div>';
+    html += '</div>';
+    
+    html += '<div style="background:white;padding:1.2rem;border-radius:1.2rem;box-shadow:0 4px 12px rgba(0,0,0,0.04);border-left:5px solid #d4a038;">';
+    html += '<div style="font-size:0.85rem;color:#666;font-weight:600;">Pendientes</div>';
+    html += '<div style="font-size:1.8rem;font-weight:800;color:#d4a038;">' + pendientes + '</div>';
+    html += '</div>';
+
+    html += '<div style="background:white;padding:1.2rem;border-radius:1.2rem;box-shadow:0 4px 12px rgba(0,0,0,0.04);border-left:5px solid #28a745;">';
+    html += '<div style="font-size:0.85rem;color:#666;font-weight:600;">Contactados</div>';
+    html += '<div style="font-size:1.8rem;font-weight:800;color:#28a745;">' + contactados + '</div>';
+    html += '</div>';
+    html += '</div>';
+
+    // Tabla de datos
+    html += '<div style="background:white;border-radius:1.5rem;padding:1.5rem;box-shadow:0 4px 20px rgba(0,0,0,0.06);overflow:hidden;">';
+    if (lista.length === 0) {
+        html += '<div style="text-align:center;padding:3rem 1rem;color:#666;">';
+        html += '<i class="fas fa-inbox" style="font-size:3rem;color:#ccc;margin-bottom:1rem;"></i>';
+        html += '<p style="font-size:1.1rem;margin:0;">No hay personas registradas por el momento.</p>';
+        html += '<p style="font-size:0.9rem;color:#999;margin-top:0.3rem;">Cuando los visitantes envíen el formulario "¡Queremos conocerte!", aparecerán aquí.</p>';
+        html += '</div>';
+    } else {
+        html += '<div style="overflow-x:auto;">';
+        html += '<table style="width:100%;border-collapse:collapse;text-align:left;font-size:0.95rem;">';
+        html += '<thead><tr style="border-bottom:2px solid #eee;color:#1a3a4a;font-weight:700;">';
+        html += '<th style="padding:1rem 0.8rem;">#</th>';
+        html += '<th style="padding:1rem 0.8rem;">Nombre Completo</th>';
+        html += '<th style="padding:1rem 0.8rem;">WhatsApp</th>';
+        html += '<th style="padding:1rem 0.8rem;">Correo Electrónico</th>';
+        html += '<th style="padding:1rem 0.8rem;">Fecha</th>';
+        html += '<th style="padding:1rem 0.8rem;">Estado</th>';
+        html += '<th style="padding:1rem 0.8rem;text-align:center;">Acciones</th>';
+        html += '</tr></thead><tbody>';
+
+        lista.forEach((item, index) => {
+            const estadoBadge = item.contactado 
+                ? '<span style="background:#e6f4ea;color:#137333;padding:0.3rem 0.8rem;border-radius:1rem;font-size:0.8rem;font-weight:700;display:inline-block;"><i class="fas fa-check-circle"></i> Contactado</span>'
+                : '<span style="background:#fef7e0;color:#b06000;padding:0.3rem 0.8rem;border-radius:1rem;font-size:0.8rem;font-weight:700;display:inline-block;"><i class="fas fa-clock"></i> Pendiente</span>';
+            
+            const btnContactoText = item.contactado ? 'Marcar pendiente' : 'Marcar contactado';
+            const btnContactoColor = item.contactado ? '#6c757d' : '#28a745';
+            const btnContactoIcon = item.contactado ? 'fa-undo' : 'fa-check';
+
+            const cleanWa = (item.whatsapp || '').replace(/\\D/g, '');
+            const waLink = cleanWa ? `<a href="https://wa.me/${cleanWa}" target="_blank" style="color:#25D366;text-decoration:none;font-weight:600;"><i class="fab fa-whatsapp"></i> ${item.whatsapp}</a>` : (item.whatsapp || '-');
+
+            html += `<tr style="border-bottom:1px solid #f0f0f0;">
+                <td style="padding:0.9rem 0.8rem;color:#888;">${total - index}</td>
+                <td style="padding:0.9rem 0.8rem;font-weight:600;color:#1a3a4a;">${item.nombre}</td>
+                <td style="padding:0.9rem 0.8rem;">${waLink}</td>
+                <td style="padding:0.9rem 0.8rem;color:#555;">${item.email || 'No proporcionado'}</td>
+                <td style="padding:0.9rem 0.8rem;color:#777;font-size:0.85rem;">${item.fecha}</td>
+                <td style="padding:0.9rem 0.8rem;">${estadoBadge}</td>
+                <td style="padding:0.9rem 0.8rem;text-align:center;">
+                    <div style="display:flex;gap:0.4rem;justify-content:center;">
+                        <button onclick="toggleContactadoInteresado(${item.id})" title="${btnContactoText}" style="background:${btnContactoColor};color:white;border:none;padding:0.4rem 0.8rem;border-radius:0.5rem;cursor:pointer;font-size:0.8rem;font-weight:600;">
+                            <i class="fas ${btnContactoIcon}"></i>
+                        </button>
+                        <button onclick="eliminarInteresado(${item.id})" title="Eliminar" style="background:#dc3545;color:white;border:none;padding:0.4rem 0.8rem;border-radius:0.5rem;cursor:pointer;font-size:0.8rem;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+        });
+
+        html += '</tbody></table></div>';
+    }
+
+    html += '</div></div>';
+    return html;
+}
+
 window.abrirBaseDatosClub = abrirBaseDatosClub;
 window.cerrarSeccionBD = cerrarSeccionBD;
 window.abrirModalAgregarMiembroBD = abrirModalAgregarMiembroBD;
@@ -2709,6 +2867,11 @@ window.abrirEncuestas = abrirEncuestas;
 window.cerrarEncuestas = cerrarEncuestas;
 window.agregarEncuesta = agregarEncuesta;
 window.eliminarEncuesta = eliminarEncuesta;
+window.abrirVerInteresados = abrirVerInteresados;
+window.cerrarVerInteresados = cerrarVerInteresados;
+window.generarHTMLInteresados = generarHTMLInteresados;
+window.toggleContactadoInteresado = toggleContactadoInteresado;
+window.eliminarInteresado = eliminarInteresado;
 window.abrirCalendarioClub = abrirCalendarioClub;
 window.cerrarCalendarioClub = cerrarCalendarioClub;
 window.agregarEventoClubAdmin = agregarEventoClubAdmin;

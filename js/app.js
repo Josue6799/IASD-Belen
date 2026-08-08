@@ -293,38 +293,99 @@ function cerrarModal() {
     }
 }
 
+function abrirModalConfirmacionContacto(nombre) {
+    const modal = document.getElementById('modalConfirmacionContacto');
+    const textoNombre = document.getElementById('confirmacionNombreTexto');
+    if (textoNombre) {
+        if (nombre && nombre.trim() !== '') {
+            textoNombre.textContent = `¡Gracias, ${nombre.trim()}!`;
+        } else {
+            textoNombre.textContent = '¡Gracias!';
+        }
+    }
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function cerrarModalConfirmacionContacto(event) {
+    if (event && event.target && event.target.id !== 'modalConfirmacionContacto' && event.target.className !== 'modal-overlay') {
+        return;
+    }
+    const modal = document.getElementById('modalConfirmacionContacto');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
 document.addEventListener('click', function (event) {
     const modal = document.getElementById('modalContacto');
     if (modal && event.target === modal) {
         cerrarModal();
+    }
+    const modalConfirmacion = document.getElementById('modalConfirmacionContacto');
+    if (modalConfirmacion && event.target === modalConfirmacion) {
+        cerrarModalConfirmacionContacto(event);
     }
 });
 
 document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
         cerrarModal();
+        cerrarModalConfirmacionContacto();
     }
 });
 
 function enviarFormulario(event) {
     event.preventDefault();
 
-    const nombre = document.getElementById('modalNombre').value.trim();
-    const whatsapp = document.getElementById('modalWhatsapp').value.trim();
-    const email = document.getElementById('modalEmail').value.trim();
+    const nombreInput = document.getElementById('modalNombre');
+    const whatsappInput = document.getElementById('modalWhatsapp');
+    const emailInput = document.getElementById('modalEmail');
 
-    if (!nombre || !whatsapp || !email) {
-        alert('⚠️ Por favor completa todos los campos.');
+    const nombre = nombreInput ? nombreInput.value.trim() : '';
+    const whatsapp = whatsappInput ? whatsappInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+
+    if (!nombre || !whatsapp) {
+        alert('⚠️ Por favor completa los campos obligatorios (Nombre completo y WhatsApp).');
         return;
     }
 
-    alert('✅ ¡Gracias por contactarnos! Un asesor se comunicará contigo pronto.');
+    try {
+        const interesados = JSON.parse(localStorage.getItem('interesados')) || [];
+        const nuevoInteresado = {
+            id: Date.now(),
+            nombre: nombre,
+            whatsapp: whatsapp,
+            email: email || 'No proporcionado',
+            fecha: new Date().toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' }),
+            contactado: false
+        };
 
-    document.getElementById('modalNombre').value = '';
-    document.getElementById('modalWhatsapp').value = '';
-    document.getElementById('modalEmail').value = '';
+        interesados.push(nuevoInteresado);
+        localStorage.setItem('interesados', JSON.stringify(interesados));
+
+        // Si la sección de administración de interesados está visible, actualizarla
+        const seccion = document.getElementById('seccionVerInteresados');
+        if (seccion && seccion.style.display !== 'none' && typeof window.generarHTMLInteresados === 'function') {
+            seccion.innerHTML = window.generarHTMLInteresados();
+        }
+    } catch (e) {
+        console.error('Error al guardar interesado en localStorage:', e);
+    }
 
     cerrarModal();
+
+    if (nombreInput) nombreInput.value = '';
+    if (whatsappInput) whatsappInput.value = '';
+    if (emailInput) emailInput.value = '';
+
+    setTimeout(() => {
+        abrirModalConfirmacionContacto(nombre);
+    }, 200);
 }
 
 // ========================================
@@ -901,6 +962,8 @@ window.abrirModalPrestamo = abrirModalPrestamo;
 window.cerrarModalPrestamo = cerrarModalPrestamo;
 window.abrirModalConfirmacion = abrirModalConfirmacion;
 window.cerrarModalConfirmacion = cerrarModalConfirmacion;
+window.abrirModalConfirmacionContacto = abrirModalConfirmacionContacto;
+window.cerrarModalConfirmacionContacto = cerrarModalConfirmacionContacto;
 window.enviarSolicitud = enviarSolicitud;
 
 console.log('✅ app.js (Iglesia) cargado correctamente');
