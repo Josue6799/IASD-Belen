@@ -637,8 +637,11 @@ function mostrarConfirmAdmin(mensaje, titulo, callbackSi) {
 
     const btnSi = document.getElementById('btnConfirmSi');
     btnSi.onclick = function () {
+        const callback = _callbackConfirm;
         cerrarModalConfirm();
-        if (_callbackConfirm) _callbackConfirm();
+        if (typeof callback === 'function') {
+            callback();
+        }
     };
 }
 
@@ -675,17 +678,18 @@ let storageKeyCalendarioClub = '';
 // ===== FUNCIÓN PARA ABRIR EL CALENDARIO DE UN CLUB (MEJORADA) =====
 function abrirCalendarioClub() {
     const modal = document.getElementById('modalClubOpciones');
-    const clubActual = modal ? modal.dataset.club : clubSeleccionadoActual;
+    const clubActual = (modal && modal.dataset.club) ? modal.dataset.club : clubSeleccionadoActual;
     if (!clubActual) {
         console.error('❌ No se encontró el club activo.');
         return;
     }
+
+    storageKeyCalendarioClub = CLUBES_STORAGE_CALENDARIO[clubActual] || 'eventos_aventureros';
+
     cerrarModalClub();
 
     const panel = document.getElementById('panelAdminGeneral');
     if (!panel) return;
-
-    storageKeyCalendarioClub = CLUBES_STORAGE_CALENDARIO[clubActual] || 'eventos_aventureros';
 
     let seccion = document.getElementById('seccionCalendarioClub');
     if (!seccion) {
@@ -772,7 +776,7 @@ function toggleCampoRecurrencia() {
 
 function abrirEditarEventoClub(id) {
     const eventos = cargarEventosClub();
-    const evento = eventos.find(e => e.id === id);
+    const evento = eventos.find(e => String(e.id) === String(id));
     if (!evento) return;
 
     document.getElementById('eventoClubTitulo').value = evento.titulo;
@@ -807,7 +811,7 @@ function agregarEventoClubAdmin() {
     // Si estamos editando, eliminar el evento original y generar los nuevos (incluyendo posible recurrencia)
     if (eventoPendienteEditarId !== null) {
         // Eliminar el evento original
-        const indexOriginal = eventos.findIndex(e => e.id === eventoPendienteEditarId);
+        const indexOriginal = eventos.findIndex(e => String(e.id) === String(eventoPendienteEditarId));
         if (indexOriginal !== -1) {
             eventos.splice(indexOriginal, 1);
         }
@@ -850,34 +854,41 @@ function agregarEventoClubAdmin() {
     toggleCampoRecurrencia();
 
     // Refrescar vista
-    document.getElementById('seccionCalendarioClub').innerHTML = generarHTMLCalendarioClub(
-        Object.keys(CLUBES_STORAGE_CALENDARIO).find(k => CLUBES_STORAGE_CALENDARIO[k] === storageKeyCalendarioClub) || ''
-    );
+    const clubAfectado = Object.keys(CLUBES_STORAGE_CALENDARIO).find(k => CLUBES_STORAGE_CALENDARIO[k] === storageKeyCalendarioClub) || '';
+    const seccion = document.getElementById('seccionCalendarioClub');
+    if (seccion) {
+        seccion.innerHTML = generarHTMLCalendarioClub(clubAfectado);
+    }
 
-    const clubAfectado = Object.keys(CLUBES_STORAGE_CALENDARIO).find(k => CLUBES_STORAGE_CALENDARIO[k] === storageKeyCalendarioClub);
     window.dispatchEvent(new CustomEvent('datosClubActualizados', { detail: { club: clubAfectado } }));
+    window.dispatchEvent(new Event('datosClubActualizados'));
 }
 
 function eliminarEventoClubAdmin(id) {
     mostrarConfirmAdmin('¿Estás seguro de que deseas quitar este evento?', 'Eliminar evento', function () {
-        let eventos = cargarEventosClub().filter(e => e.id !== id);
+        let eventos = cargarEventosClub().filter(e => String(e.id) !== String(id));
         guardarEventosClub(eventos);
-        document.getElementById('seccionCalendarioClub').innerHTML = generarHTMLCalendarioClub(
-            Object.keys(CLUBES_STORAGE_CALENDARIO).find(k => CLUBES_STORAGE_CALENDARIO[k] === storageKeyCalendarioClub) || ''
-        );
-        const clubAfectado = Object.keys(CLUBES_STORAGE_CALENDARIO).find(k => CLUBES_STORAGE_CALENDARIO[k] === storageKeyCalendarioClub);
+
+        const clubAfectado = Object.keys(CLUBES_STORAGE_CALENDARIO).find(k => CLUBES_STORAGE_CALENDARIO[k] === storageKeyCalendarioClub) || '';
+        const seccion = document.getElementById('seccionCalendarioClub');
+        if (seccion) {
+            seccion.innerHTML = generarHTMLCalendarioClub(clubAfectado);
+        }
+
         window.dispatchEvent(new CustomEvent('datosClubActualizados', { detail: { club: clubAfectado } }));
+        window.dispatchEvent(new Event('datosClubActualizados'));
+
+        // Toast de confirmación de eliminación exitosa
+        const toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#c62828;color:white;padding:1rem 2rem;border-radius:2rem;font-weight:600;z-index:99999;font-family:Inter,sans-serif;box-shadow:0 8px 30px rgba(198,40,40,0.4);';
+        toast.innerHTML = '<i class="fas fa-trash"></i> Evento eliminado correctamente';
+        document.body.appendChild(toast);
+        setTimeout(function () {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.5s ease';
+            setTimeout(function () { toast.remove(); }, 500);
+        }, 2000);
     });
-    return; // salir de la función original, ya que la eliminación se maneja en el callback
-    let eventos = cargarEventosClub().filter(e => e.id !== id);
-    guardarEventosClub(eventos);
-
-    document.getElementById('seccionCalendarioClub').innerHTML = generarHTMLCalendarioClub(
-        Object.keys(CLUBES_STORAGE_CALENDARIO).find(k => CLUBES_STORAGE_CALENDARIO[k] === storageKeyCalendarioClub) || ''
-    );
-
-    const clubAfectado = Object.keys(CLUBES_STORAGE_CALENDARIO).find(k => CLUBES_STORAGE_CALENDARIO[k] === storageKeyCalendarioClub);
-    window.dispatchEvent(new CustomEvent('datosClubActualizados', { detail: { club: clubAfectado } }));
 }
 // ===== VARIABLES GLOBALES =====
 let miembroPendienteEliminar = null;
@@ -1905,67 +1916,102 @@ function importarDatosClub(event) {
 const STORAGE_LIBROS = 'libros_biblioteca';
 const STORAGE_PEDIDOS = 'libros_pedidos';
 let libroPendienteEditarId = null;
+let filtroPedidosTabActual = 'Pendientes'; // 'Pendientes' o 'Todos'
 
 function cargarLibros() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_LIBROS)) || []; }
-    catch (e) { return []; }
+    try {
+        const data = localStorage.getItem(STORAGE_LIBROS);
+        return data ? JSON.parse(data) : [];
+    } catch (e) {
+        return [];
+    }
 }
+
 function guardarLibros(libros) {
     localStorage.setItem(STORAGE_LIBROS, JSON.stringify(libros));
-    // ⚡ ESTA LÍNEA ES LA QUE FALTABA:
+    window.dispatchEvent(new CustomEvent('datosBibliotecaActualizados'));
     window.dispatchEvent(new Event('datosBibliotecaActualizados'));
 }
 
 function cargarPedidos() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_PEDIDOS)) || []; }
-    catch (e) { return []; }
-}
-function guardarPedidos(pedidos) {
-    localStorage.setItem(STORAGE_PEDIDOS, JSON.stringify(pedidos));
+    try {
+        const data = localStorage.getItem(STORAGE_PEDIDOS);
+        return data ? JSON.parse(data) : [];
+    } catch (e) {
+        return [];
+    }
 }
 
-// --- Agregar Libro ---
+function guardarPedidos(pedidos) {
+    localStorage.setItem(STORAGE_PEDIDOS, JSON.stringify(pedidos));
+    window.dispatchEvent(new CustomEvent('datosBibliotecaActualizados'));
+    window.dispatchEvent(new Event('datosBibliotecaActualizados'));
+}
+
+// --- Agregar / Editar Libro ---
 function abrirModalAgregarLibro() {
-    libroPendienteEditarId = null; // ✅ Limpia el estado de edición
+    libroPendienteEditarId = null;
+    const inputId = document.getElementById('inputIdLibro');
+    if (inputId) {
+        inputId.value = '';
+        inputId.disabled = false;
+    }
     document.getElementById('inputTituloLibro').value = '';
     document.getElementById('inputCantidadLibro').value = '1';
     document.getElementById('inputAutorLibro').value = '';
     document.getElementById('inputCategoriaLibro').value = '';
     document.getElementById('inputEstadoLibro').value = 'Disponible';
     document.getElementById('inputUbicacionLibro').value = '';
-    document.getElementById('modalBiblioTitulo').innerHTML = '<i class="fas fa-plus-circle"></i> Agregar Libro'; // ✅ Restaura título
-    document.getElementById('btnGuardarLibro').innerHTML = '<i class="fas fa-save"></i> Guardar Libro'; // ✅ Restaura botón
+
+    const tituloEl = document.getElementById('modalBiblioTitulo');
+    const btnEl = document.getElementById('btnGuardarLibro');
+    if (tituloEl) tituloEl.innerHTML = '<i class="fas fa-plus-circle"></i> Agregar Libro';
+    if (btnEl) btnEl.innerHTML = '<i class="fas fa-save"></i> Guardar Libro';
+
     document.getElementById('modalAgregarLibro').classList.add('active');
 }
+
 function cerrarModalAgregarLibro(event) {
     if (event && event.target !== document.getElementById('modalAgregarLibro')) return;
     document.getElementById('modalAgregarLibro').classList.remove('active');
     libroPendienteEditarId = null;
 }
+
 function abrirModalEditarLibro(id) {
     const libros = cargarLibros();
-    const libro = libros.find(l => l.id === id);
+    const libro = libros.find(l => String(l.id) === String(id));
     if (!libro) return;
 
-    // Cargar datos en el formulario
-    document.getElementById('inputTituloLibro').value = libro.titulo;
-    document.getElementById('inputCantidadLibro').value = libro.cantidad || 1;
-    document.getElementById('inputAutorLibro').value = libro.autor;
-    document.getElementById('inputCategoriaLibro').value = libro.categoria || '';
-    document.getElementById('inputEstadoLibro').value = libro.estado || 'Disponible';
-    document.getElementById('inputUbicacionLibro').value = libro.ubicacion || '';
+    const inputId = document.getElementById('inputIdLibro');
+    if (inputId) {
+        inputId.value = libro.id !== undefined ? libro.id : id;
+        inputId.disabled = true;
+    }
 
-    // Guardar el ID para saber que estamos editando
+    document.getElementById('inputTituloLibro').value = libro.titulo || '';
+    document.getElementById('inputCantidadLibro').value = libro.cant || libro.cantidad || 1;
+    document.getElementById('inputAutorLibro').value = libro.autor || '';
+    document.getElementById('inputCategoriaLibro').value = libro.cat || libro.categoria || '';
+    document.getElementById('inputEstadoLibro').value = libro.estado || 'Disponible';
+    document.getElementById('inputUbicacionLibro').value = libro.ubi || libro.ubicacion || '';
+
     libroPendienteEditarId = id;
 
+    const tituloEl = document.getElementById('modalBiblioTitulo');
+    const btnEl = document.getElementById('btnGuardarLibro');
+    if (tituloEl) tituloEl.innerHTML = '<i class="fas fa-edit"></i> Editar Libro';
+    if (btnEl) btnEl.innerHTML = '<i class="fas fa-save"></i> Guardar Cambios';
 
-    // Cambiar título y botón del modal
-    document.getElementById('modalBiblioTitulo').innerHTML = '<i class="fas fa-edit"></i> Editar Libro';
-    document.getElementById('btnGuardarLibro').innerHTML = '<i class="fas fa-save"></i> Actualizar Libro';
+    // Cerrar modal de eliminar si está abierto
+    const modalEliminar = document.getElementById('modalEliminarLibro');
+    if (modalEliminar) modalEliminar.classList.remove('active');
 
     document.getElementById('modalAgregarLibro').classList.add('active');
 }
+
 function guardarNuevoLibro() {
+    const inputId = document.getElementById('inputIdLibro');
+    const idVal = inputId ? inputId.value.trim() : '';
     const titulo = document.getElementById('inputTituloLibro').value.trim();
     const cantidad = parseInt(document.getElementById('inputCantidadLibro').value) || 1;
     const autor = document.getElementById('inputAutorLibro').value.trim();
@@ -1973,157 +2019,370 @@ function guardarNuevoLibro() {
     const estado = document.getElementById('inputEstadoLibro').value;
     const ubicacion = document.getElementById('inputUbicacionLibro').value.trim();
 
+    if (!idVal) {
+        mostrarAlertaAdmin('⚠️ El ID del libro es obligatorio.');
+        return;
+    }
+
     if (!titulo || !autor) {
-        mostrarAlertaAdmin('Completa al menos el título y el autor.');
+        mostrarAlertaAdmin('⚠️ El título y el autor son campos obligatorios.');
         return;
     }
 
     const libros = cargarLibros();
 
-    // ⚡ LÓGICA PARA EDITAR (SI TIENE UN ID PENDIENTE)
     if (libroPendienteEditarId !== null) {
-        const idx = libros.findIndex(l => l.id === libroPendienteEditarId);
+        const idx = libros.findIndex(l => String(l.id) === String(libroPendienteEditarId));
         if (idx !== -1) {
             libros[idx].titulo = titulo;
             libros[idx].cantidad = cantidad;
+            libros[idx].cant = cantidad;
             libros[idx].autor = autor;
             libros[idx].categoria = categoria;
+            libros[idx].cat = categoria;
             libros[idx].estado = estado;
             libros[idx].ubicacion = ubicacion;
+            libros[idx].ubi = ubicacion;
         }
-        libroPendienteEditarId = null; // Limpiar el estado de edición
+        libroPendienteEditarId = null;
     } else {
-        // Agregar nuevo libro
+        // Verificar que no exista otro libro con el mismo ID
+        const existe = libros.some(l => String(l.id).toLowerCase() === idVal.toLowerCase());
+        if (existe) {
+            mostrarAlertaAdmin('⚠️ Ya existe un libro con este ID. Por favor, ingresa un ID diferente.');
+            return;
+        }
+
+        const idFinal = isNaN(idVal) ? idVal : Number(idVal);
+
         libros.push({
-            id: Date.now(),
-            titulo,
-            cantidad,
-            autor,
-            categoria,
-            estado,
-            ubicacion
+            id: idFinal,
+            titulo: titulo,
+            cantidad: cantidad,
+            cant: cantidad,
+            autor: autor,
+            categoria: categoria,
+            cat: categoria,
+            estado: estado,
+            ubicacion: ubicacion,
+            ubi: ubicacion
         });
     }
 
     guardarLibros(libros);
     cerrarModalAgregarLibro();
-    mostrarAlertaAdmin('✅ Libro guardado correctamente.');
+    mostrarToastBiblio('<i class="fas fa-check-circle"></i> Libro guardado correctamente');
+
+    // Refrescar lista de gestión si está abierta
+    filtrarEliminarLibro();
 }
-// --- Eliminar Libro ---
+
+// --- Toast de Biblioteca ---
+function mostrarToastBiblio(mensaje, bg = '#2e7d32') {
+    const toast = document.createElement('div');
+    toast.style.cssText = `position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:${bg};color:white;padding:0.8rem 1.8rem;border-radius:2rem;font-weight:600;z-index:99999;font-family:Inter,sans-serif;box-shadow:0 8px 25px rgba(0,0,0,0.25);display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;`;
+    toast.innerHTML = mensaje;
+    document.body.appendChild(toast);
+    setTimeout(function () {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.5s ease';
+        setTimeout(function () { toast.remove(); }, 500);
+    }, 2000);
+}
+
+// --- Gestor / Eliminar / Editar Libros ---
 let _librosFiltrados = [];
 
 function abrirModalEliminarLibro() {
     _librosFiltrados = cargarLibros();
-    document.getElementById('buscadorEliminarLibro').value = '';
+    const buscador = document.getElementById('buscadorEliminarLibro');
+    if (buscador) buscador.value = '';
     document.getElementById('modalEliminarLibro').classList.add('active');
     renderizarEliminarLibro(_librosFiltrados);
 }
+
 function cerrarModalEliminarLibro(event) {
     if (event && event.target !== document.getElementById('modalEliminarLibro')) return;
     document.getElementById('modalEliminarLibro').classList.remove('active');
 }
+
 function filtrarEliminarLibro() {
-    const termino = document.getElementById('buscadorEliminarLibro').value.trim().toLowerCase();
-    _librosFiltrados = cargarLibros().filter(l =>
-        l.titulo.toLowerCase().includes(termino) || l.autor.toLowerCase().includes(termino)
+    const buscador = document.getElementById('buscadorEliminarLibro');
+    const termino = buscador ? buscador.value.trim().toLowerCase() : '';
+    const libros = cargarLibros();
+    _librosFiltrados = libros.filter(l =>
+        (l.titulo && l.titulo.toLowerCase().includes(termino)) ||
+        (l.autor && l.autor.toLowerCase().includes(termino)) ||
+        ((l.categoria || l.cat) && (l.categoria || l.cat).toLowerCase().includes(termino))
     );
     renderizarEliminarLibro(_librosFiltrados);
 }
+
 function renderizarEliminarLibro(libros) {
     const contenedor = document.getElementById('listaEliminarLibros');
+    if (!contenedor) return;
+
     if (libros.length === 0) {
-        contenedor.innerHTML = '<p style="text-align:center; color:var(--muted-text);">No se encontraron libros.</p>';
+        contenedor.innerHTML = '<p style="text-align:center; color:#5a6474; padding:2rem 1rem;">No se encontraron libros registrados.</p>';
         return;
     }
-    let html = '<table class="tabla-libros"><thead><tr><th>Título</th><th>Autor</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>';
-    libros.forEach(lib => {
-        html += `<tr>
-    <td>${lib.titulo}</td>
-    <td>${lib.autor}</td>
-    <td>${lib.estado || 'Disponible'}</td>
-    <td>
-        <button class="btn-accion-libro btn-editar-libro" onclick="abrirModalEditarLibro(${lib.id})">✏️</button>
-        <button class="btn-accion-libro btn-eliminar-libro" onclick="confirmarEliminarLibro(${lib.id})">🗑️</button>
-    </td>
-</tr>`;
+
+    let html = '<div style="overflow-x:auto;"><table class="tabla-libros" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:600px;">';
+    html += '<thead><tr style="background:#1a3a4a; color:white; text-align:left;">';
+    html += '<th style="padding:0.7rem;">Título</th>';
+    html += '<th style="padding:0.7rem;">Autor</th>';
+    html += '<th style="padding:0.7rem; text-align:center;">Cant.</th>';
+    html += '<th style="padding:0.7rem;">Estado</th>';
+    html += '<th style="padding:0.7rem; text-align:center;">Acciones</th>';
+    html += '</tr></thead><tbody>';
+
+    libros.forEach((lib, index) => {
+        const bgRow = index % 2 === 0 ? '#ffffff' : '#f9f8f5';
+        const cant = lib.cant || lib.cantidad || 1;
+        const estado = lib.estado || 'Disponible';
+        const estadoBadgeClass = estado === 'Disponible'
+            ? 'background:#e8f5e9; color:#2e7d32; padding:0.2rem 0.6rem; border-radius:1rem; font-weight:600; font-size:0.75rem;'
+            : 'background:#fff3e0; color:#e65100; padding:0.2rem 0.6rem; border-radius:1rem; font-weight:600; font-size:0.75rem;';
+
+        html += `<tr style="background:${bgRow}; border-bottom:1px solid #eee;">
+            <td style="padding:0.7rem; font-weight:600; color:#1a3a4a;">${lib.titulo}</td>
+            <td style="padding:0.7rem; color:#5a6474;">${lib.autor || '-'}</td>
+            <td style="padding:0.7rem; text-align:center; font-weight:600;">${cant}</td>
+            <td style="padding:0.7rem;"><span style="${estadoBadgeClass}">${estado}</span></td>
+            <td style="padding:0.7rem; text-align:center; white-space:nowrap;">
+                <button type="button" onclick="abrirModalEditarLibro(${lib.id})" style="background:#f0a800; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;" title="Editar libro">✏️ Editar</button>
+                <button type="button" onclick="confirmarEliminarLibro(${lib.id})" style="background:#c62828; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar libro">🗑️ Eliminar</button>
+            </td>
+        </tr>`;
     });
-    html += '</tbody></table>';
+
+    html += '</tbody></table></div>';
     contenedor.innerHTML = html;
 }
+
 function confirmarEliminarLibro(id) {
-    mostrarConfirmAdmin('¿Estás seguro de eliminar este libro?', 'Eliminar libro', function () {
-        let libros = cargarLibros().filter(l => l.id !== id);
-        guardarLibros(libros);
-        _librosFiltrados = libros;
-        renderizarEliminarLibro(_librosFiltrados);
-        mostrarAlertaAdmin('🗑️ Libro eliminado correctamente.');
+    const libros = cargarLibros();
+    const libro = libros.find(l => String(l.id) === String(id));
+    const tituloLibro = libro ? libro.titulo : 'este libro';
+
+    mostrarConfirmAdmin(`¿Estás seguro de que deseas eliminar <strong>"${tituloLibro}"</strong> de la biblioteca?`, 'Eliminar libro', function () {
+        let nuevosLibros = cargarLibros().filter(l => String(l.id) !== String(id));
+        guardarLibros(nuevosLibros);
+        _librosFiltrados = nuevosLibros;
+        filtrarEliminarLibro();
+        mostrarToastBiblio('<i class="fas fa-trash"></i> Libro eliminado correctamente', '#c62828');
     });
 }
 
-// --- Ver Pedidos ---
+// --- Ver Libros Pedidos ---
 function abrirModalVerPedidos() {
+    filtroPedidosTabActual = 'Pendientes';
+    actualizarBotonesTabPedidos();
     document.getElementById('modalVerPedidos').classList.add('active');
     renderizarPedidos();
 }
+
 function cerrarModalVerPedidos(event) {
     if (event && event.target !== document.getElementById('modalVerPedidos')) return;
     document.getElementById('modalVerPedidos').classList.remove('active');
 }
+
+function filtrarPedidosTab(tab) {
+    filtroPedidosTabActual = tab;
+    actualizarBotonesTabPedidos();
+    renderizarPedidos();
+}
+
+function actualizarBotonesTabPedidos() {
+    const btnPend = document.getElementById('btnFiltroPedidosPendientes');
+    const btnTodos = document.getElementById('btnFiltroPedidosTodos');
+    if (btnPend && btnTodos) {
+        if (filtroPedidosTabActual === 'Pendientes') {
+            btnPend.style.background = '#1a3a4a';
+            btnPend.style.color = 'white';
+            btnPend.style.border = 'none';
+            btnTodos.style.background = 'white';
+            btnTodos.style.color = '#1a3a4a';
+            btnTodos.style.border = '1px solid #1a3a4a';
+        } else {
+            btnTodos.style.background = '#1a3a4a';
+            btnTodos.style.color = 'white';
+            btnTodos.style.border = 'none';
+            btnPend.style.background = 'white';
+            btnPend.style.color = '#1a3a4a';
+            btnPend.style.border = '1px solid #1a3a4a';
+        }
+    }
+}
+
 function renderizarPedidos() {
-    const pedidos = cargarPedidos().filter(p => p.estado !== 'Entregado');
+    const todosPedidos = cargarPedidos();
     const libros = cargarLibros();
     const contenedor = document.getElementById('listaPedidosLibros');
+    if (!contenedor) return;
+
+    let pedidos = todosPedidos;
+    if (filtroPedidosTabActual === 'Pendientes') {
+        pedidos = todosPedidos.filter(p => p.estado !== 'Entregado' && p.estado !== 'Cancelado');
+    }
+
     if (pedidos.length === 0) {
-        contenedor.innerHTML = '<p style="text-align:center; color:var(--muted-text);">No hay pedidos pendientes.</p>';
+        const msj = filtroPedidosTabActual === 'Pendientes'
+            ? 'No hay solicitudes de préstamos pendientes.'
+            : 'No se encontraron registros de pedidos.';
+        contenedor.innerHTML = `<p style="text-align:center; color:#5a6474; padding:2rem 1rem;">${msj}</p>`;
         return;
     }
-    let html = '<table class="tabla-libros"><thead><tr><th>Solicitante</th><th>Libro</th><th>Fecha</th><th>Estado</th><th>Acción</th></tr></thead><tbody>';
-    pedidos.forEach(p => {
-        const libro = libros.find(l => l.id === p.libroId);
-        html += `<tr>
-    <td>${p.solicitante}</td>
-    <td>${libro ? libro.titulo : p.tituloLibro || 'Desconocido'}</td>
-    <td>${p.fecha ? new Date(p.fecha).toLocaleDateString('es-CO') : '-'}</td>
-    <td>${p.estado || 'Pendiente'}</td>
-    <td><button class="btn-accion-libro btn-entregar-libro" onclick="marcarEntregadoPedido(${p.id})">✅ Entregar</button></td>
-</tr>`;
+
+    let html = '<div style="overflow-x:auto;"><table class="tabla-libros" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:680px;">';
+    html += '<thead><tr style="background:#1a3a4a; color:white; text-align:left;">';
+    html += '<th style="padding:0.7rem;">Solicitante</th>';
+    html += '<th style="padding:0.7rem;">Contacto</th>';
+    html += '<th style="padding:0.7rem;">Libro Solicitado</th>';
+    html += '<th style="padding:0.7rem;">Fecha</th>';
+    html += '<th style="padding:0.7rem;">Estado</th>';
+    html += '<th style="padding:0.7rem; text-align:center;">Acciones</th>';
+    html += '</tr></thead><tbody>';
+
+    pedidos.forEach((p, index) => {
+        const bgRow = index % 2 === 0 ? '#ffffff' : '#f9f8f5';
+        const libroEncontrado = libros.find(l => String(l.id) === String(p.libroId));
+        const tituloLibro = libroEncontrado ? libroEncontrado.titulo : (p.tituloLibro || 'Libro sin título');
+        const fechaTexto = p.fecha ? new Date(p.fecha).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+        const estado = p.estado || 'Pendiente';
+
+        let estadoBadge = '<span style="background:#fff3e0; color:#e65100; padding:0.2rem 0.6rem; border-radius:1rem; font-weight:600; font-size:0.75rem;">Pendiente</span>';
+        if (estado === 'Entregado') {
+            estadoBadge = '<span style="background:#e8f5e9; color:#2e7d32; padding:0.2rem 0.6rem; border-radius:1rem; font-weight:600; font-size:0.75rem;">Entregado</span>';
+        } else if (estado === 'Cancelado') {
+            estadoBadge = '<span style="background:#ffebee; color:#c62828; padding:0.2rem 0.6rem; border-radius:1rem; font-weight:600; font-size:0.75rem;">Cancelado</span>';
+        }
+
+        const telefonoHtml = p.telefono ? `<div>📱 ${p.telefono}</div>` : '';
+        const emailHtml = p.email ? `<div style="font-size:0.75rem; color:#5a6474;">✉️ ${p.email}</div>` : '';
+
+        html += `<tr style="background:${bgRow}; border-bottom:1px solid #eee;">
+            <td style="padding:0.7rem; font-weight:600; color:#1a3a4a;">${p.solicitante || 'Anónimo'}</td>
+            <td style="padding:0.7rem; color:#1a3a4a;">${telefonoHtml}${emailHtml || '-'}</td>
+            <td style="padding:0.7rem; font-weight:600; color:#2c5f7c;">${tituloLibro}</td>
+            <td style="padding:0.7rem; color:#5a6474; white-space:nowrap;">${fechaTexto}</td>
+            <td style="padding:0.7rem;">${estadoBadge}</td>
+            <td style="padding:0.7rem; text-align:center; white-space:nowrap;">`;
+
+        if (estado !== 'Entregado') {
+            html += `<button type="button" class="btn-accion-libro btn-entregar-libro" onclick="marcarEntregadoPedido(${p.id})" style="background:#2e7d32; color:white; border:none; padding:0.4rem 0.8rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;">✅ Entregar</button>`;
+        }
+        if (estado !== 'Cancelado' && estado !== 'Entregado') {
+            html += `<button type="button" onclick="cancelarPedido(${p.id})" style="background:#757575; color:white; border:none; padding:0.4rem 0.6rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;">❌ Cancelar</button>`;
+        }
+        if (estado === 'Entregado') {
+            html += `<span style="color:#2e7d32; font-weight:600; font-size:0.8rem;">✔️ Completado</span>`;
+        }
+
+        html += `</td></tr>`;
     });
-    html += '</tbody></table>';
+
+    html += '</tbody></table></div>';
     contenedor.innerHTML = html;
 }
+
 function marcarEntregadoPedido(id) {
     let pedidos = cargarPedidos();
-    const pedido = pedidos.find(p => p.id === id);
+    const pedido = pedidos.find(p => String(p.id) === String(id));
     if (pedido) {
         pedido.estado = 'Entregado';
         guardarPedidos(pedidos);
         renderizarPedidos();
-        mostrarAlertaAdmin('✅ Pedido marcado como entregado.');
+        mostrarToastBiblio('<i class="fas fa-check-circle"></i> Pedido marcado como entregado');
     }
 }
 
+function cancelarPedido(id) {
+    let pedidos = cargarPedidos();
+    const pedido = pedidos.find(p => String(p.id) === String(id));
+    if (pedido) {
+        pedido.estado = 'Cancelado';
+        guardarPedidos(pedidos);
+        renderizarPedidos();
+        mostrarToastBiblio('<i class="fas fa-ban"></i> Pedido cancelado', '#757575');
+    }
+}
+
+// Sincronización en tiempo real para Biblioteca
+window.addEventListener('datosBibliotecaActualizados', function () {
+    const modalEliminar = document.getElementById('modalEliminarLibro');
+    if (modalEliminar && modalEliminar.classList.contains('active')) {
+        filtrarEliminarLibro();
+    }
+    const modalPedidos = document.getElementById('modalVerPedidos');
+    if (modalPedidos && modalPedidos.classList.contains('active')) {
+        renderizarPedidos();
+    }
+});
+
+window.addEventListener('storage', function (e) {
+    if (e.key === 'libros_biblioteca' || e.key === 'libros_pedidos') {
+        const modalEliminar = document.getElementById('modalEliminarLibro');
+        if (modalEliminar && modalEliminar.classList.contains('active')) {
+            filtrarEliminarLibro();
+        }
+        const modalPedidos = document.getElementById('modalVerPedidos');
+        if (modalPedidos && modalPedidos.classList.contains('active')) {
+            renderizarPedidos();
+        }
+    }
+});
+
 // ===== ANUNCIOS / EVENTOS =====
 const STORAGE_ANUNCIOS = 'anuncios_eventos';
+let anuncioPendienteEditarId = null;
 
 function cargarAnuncios() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_ANUNCIOS)) || []; }
-    catch (e) { return []; }
+    try {
+        const data = localStorage.getItem(STORAGE_ANUNCIOS);
+        return data ? JSON.parse(data) : [];
+    } catch (e) {
+        return [];
+    }
 }
+
 function guardarAnuncios(anuncios) {
     localStorage.setItem(STORAGE_ANUNCIOS, JSON.stringify(anuncios));
+    window.dispatchEvent(new CustomEvent('datosAnunciosActualizados'));
     window.dispatchEvent(new Event('datosAnunciosActualizados'));
 }
 
+// --- Toast de Anuncios ---
+function mostrarToastAnuncios(mensaje, bg = '#2e7d32') {
+    const toast = document.createElement('div');
+    toast.style.cssText = `position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:${bg};color:white;padding:0.8rem 1.8rem;border-radius:2rem;font-weight:600;z-index:99999;font-family:Inter,sans-serif;box-shadow:0 8px 25px rgba(0,0,0,0.25);display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;`;
+    toast.innerHTML = mensaje;
+    document.body.appendChild(toast);
+    setTimeout(function () {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.5s ease';
+        setTimeout(function () { toast.remove(); }, 500);
+    }, 2000);
+}
+
+// --- Agregar / Editar Anuncio ---
 function abrirModalAgregarAnuncio() {
+    anuncioPendienteEditarId = null;
     document.getElementById('anuncioTitulo').value = '';
     document.getElementById('anuncioFechaInicio').value = '';
     document.getElementById('anuncioHoraInicio').value = '';
     document.getElementById('anuncioFechaFin').value = '';
     document.getElementById('anuncioHoraFin').value = '';
-    document.getElementById('anuncioUbicacion').value = '';
+    document.getElementById('anuncioUbicacion').value = 'Templo Principal';
     document.getElementById('anuncioCategoria').value = 'Culto';
     document.getElementById('anuncioImagen').value = '';
     document.getElementById('anuncioContenido').value = '';
+
+    const tituloEl = document.getElementById('modalAnuncioTitulo');
+    const btnEl = document.getElementById('btnGuardarAnuncio');
+    if (tituloEl) tituloEl.innerHTML = '<i class="fas fa-bullhorn"></i> Publicar Nuevo Anuncio';
+    if (btnEl) btnEl.innerHTML = '<i class="fas fa-paper-plane"></i> Publicar Evento';
+
     document.getElementById('modalAgregarAnuncio').classList.add('active');
     document.body.style.overflow = 'hidden';
 }
@@ -2132,6 +2391,36 @@ function cerrarModalAgregarAnuncio(event) {
     if (event && event.target !== document.getElementById('modalAgregarAnuncio')) return;
     document.getElementById('modalAgregarAnuncio').classList.remove('active');
     document.body.style.overflow = '';
+    anuncioPendienteEditarId = null;
+}
+
+function abrirModalEditarAnuncio(id) {
+    const anuncios = cargarAnuncios();
+    const anuncio = anuncios.find(a => String(a.id) === String(id));
+    if (!anuncio) return;
+
+    document.getElementById('anuncioTitulo').value = anuncio.titulo || '';
+    document.getElementById('anuncioFechaInicio').value = anuncio.fechaInicio || '';
+    document.getElementById('anuncioHoraInicio').value = anuncio.horaInicio || '';
+    document.getElementById('anuncioFechaFin').value = anuncio.fechaFin || '';
+    document.getElementById('anuncioHoraFin').value = anuncio.horaFin || '';
+    document.getElementById('anuncioUbicacion').value = anuncio.ubicacion || 'Templo Principal';
+    document.getElementById('anuncioCategoria').value = anuncio.categoria || 'Culto';
+    document.getElementById('anuncioImagen').value = anuncio.imagen || '';
+    document.getElementById('anuncioContenido').value = anuncio.contenido || '';
+
+    anuncioPendienteEditarId = id;
+
+    const tituloEl = document.getElementById('modalAnuncioTitulo');
+    const btnEl = document.getElementById('btnGuardarAnuncio');
+    if (tituloEl) tituloEl.innerHTML = '<i class="fas fa-edit"></i> Editar Anuncio';
+    if (btnEl) btnEl.innerHTML = '<i class="fas fa-save"></i> Guardar Cambios';
+
+    const modalQuitar = document.getElementById('modalQuitarAnuncio');
+    if (modalQuitar) modalQuitar.classList.remove('active');
+
+    document.getElementById('modalAgregarAnuncio').classList.add('active');
+    document.body.style.overflow = 'hidden';
 }
 
 function guardarNuevoAnuncio() {
@@ -2146,28 +2435,51 @@ function guardarNuevoAnuncio() {
     const contenido = document.getElementById('anuncioContenido').value.trim();
 
     if (!titulo || !fechaInicio || !contenido) {
-        mostrarAlertaAdmin('Completa al menos el título, la fecha de inicio y el contenido.');
+        mostrarAlertaAdmin('⚠️ Completa los campos obligatorios: título del evento, fecha de inicio y contenido.');
+        return;
+    }
+
+    if (fechaFin && fechaInicio && fechaFin < fechaInicio) {
+        mostrarAlertaAdmin('⚠️ La fecha de fin no puede ser anterior a la fecha de inicio.');
         return;
     }
 
     const anuncios = cargarAnuncios();
-    anuncios.push({
-        id: Date.now(),
-        titulo,
-        contenido,
-        fechaInicio,
-        horaInicio: horaInicio || '00:00',
-        fechaFin: fechaFin || fechaInicio,
-        horaFin: horaFin || horaInicio || '00:00',
-        ubicacion: ubicacion || 'Templo Principal',
-        imagen: imagen || '',
-        categoria
-    });
+
+    if (anuncioPendienteEditarId !== null) {
+        const idx = anuncios.findIndex(a => String(a.id) === String(anuncioPendienteEditarId));
+        if (idx !== -1) {
+            anuncios[idx].titulo = titulo;
+            anuncios[idx].fechaInicio = fechaInicio;
+            anuncios[idx].horaInicio = horaInicio || '00:00';
+            anuncios[idx].fechaFin = fechaFin || fechaInicio;
+            anuncios[idx].horaFin = horaFin || horaInicio || '00:00';
+            anuncios[idx].ubicacion = ubicacion || 'Templo Principal';
+            anuncios[idx].categoria = categoria;
+            anuncios[idx].imagen = imagen;
+            anuncios[idx].contenido = contenido;
+        }
+        anuncioPendienteEditarId = null;
+    } else {
+        anuncios.push({
+            id: Date.now(),
+            titulo: titulo,
+            contenido: contenido,
+            fechaInicio: fechaInicio,
+            horaInicio: horaInicio || '00:00',
+            fechaFin: fechaFin || fechaInicio,
+            horaFin: horaFin || horaInicio || '00:00',
+            ubicacion: ubicacion || 'Templo Principal',
+            imagen: imagen || '',
+            categoria: categoria
+        });
+    }
 
     guardarAnuncios(anuncios);
-    window.dispatchEvent(new Event('datosAnunciosActualizados'));
     cerrarModalAgregarAnuncio();
-    mostrarAlertaAdmin('✅ Anuncio publicado correctamente.');
+    mostrarToastAnuncios('<i class="fas fa-check-circle"></i> Anuncio o evento guardado correctamente');
+
+    filtrarAnunciosQuitar();
 }
 
 function generarVistaPreviaAnuncio() {
@@ -2175,14 +2487,13 @@ function generarVistaPreviaAnuncio() {
     const fechaInicio = document.getElementById('anuncioFechaInicio').value;
     const horaInicio = document.getElementById('anuncioHoraInicio').value;
     const fechaFin = document.getElementById('anuncioFechaFin').value;
-    const horaFin = document.getElementById('anuncioHoraFin').value;
     const ubicacion = document.getElementById('anuncioUbicacion').value.trim();
     const categoria = document.getElementById('anuncioCategoria').value;
     const imagen = document.getElementById('anuncioImagen').value.trim();
     const contenido = document.getElementById('anuncioContenido').value.trim();
 
     if (!titulo || !contenido) {
-        mostrarAlertaAdmin('Escribe al menos un título y contenido para la vista previa.');
+        mostrarAlertaAdmin('⚠️ Escribe al menos un título y contenido para ver la vista previa.');
         return;
     }
 
@@ -2191,14 +2502,18 @@ function generarVistaPreviaAnuncio() {
         : 'Fecha no especificada';
 
     let html = '';
-    if (imagen) html += `<img src="${imagen}" alt="${titulo}" style="width:100%; border-radius:1rem; margin-bottom:1rem;">`;
-    html += `<span style="background: var(--golden); color: var(--deep-blue); padding:0.2rem 1rem; border-radius:1rem; font-size:0.75rem; font-weight:600;">${categoria}</span>`;
-    html += `<h2 style="margin-top:0.5rem;">${titulo}</h2>`;
-    html += `<div class="evento-meta">📅 ${fechaStr} · 🕐 ${horaInicio || '--:--'} | 📍 ${ubicacion || 'Templo Principal'}</div>`;
-    html += `<div class="evento-contenido">${contenido.replace(/\n/g, '<br>')}</div>`;
+    if (imagen) html += `<img src="${imagen}" alt="${titulo}" style="width:100%; max-height:260px; object-fit:cover; border-radius:1rem; margin-bottom:1rem;">`;
+    html += `<span style="background: var(--golden, #c99d3b); color: var(--deep-blue, #1a3a4a); padding:0.2rem 1rem; border-radius:1rem; font-size:0.75rem; font-weight:700; display:inline-block; margin-bottom:0.5rem;">${categoria}</span>`;
+    html += `<h3 style="color:#1a3a4a; margin-top:0.3rem; margin-bottom:0.8rem; font-size:1.4rem;">${titulo}</h3>`;
+    html += `<div style="color:#5a6474; font-size:0.9rem; margin-bottom:1rem; display:flex; flex-wrap:wrap; gap:0.8rem;">`;
+    html += `<span>📅 ${fechaStr} ${horaInicio ? '· 🕐 ' + horaInicio : ''}</span>`;
+    html += `<span>📍 ${ubicacion || 'Templo Principal'}</span>`;
     if (fechaFin && fechaFin !== fechaInicio) {
-        html += `<p style="color: var(--muted-text); font-size:0.85rem;">Finaliza: ${new Date(fechaFin + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })}</p>`;
+        const fechaFinStr = new Date(fechaFin + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+        html += `<span>🏁 Finaliza: ${fechaFinStr}</span>`;
     }
+    html += `</div>`;
+    html += `<div style="color:#2c3e50; line-height:1.7; font-size:0.95rem;">${contenido.replace(/\n/g, '<br>')}</div>`;
 
     document.getElementById('vistaPreviaContenido').innerHTML = html;
     document.getElementById('modalVistaPrevia').classList.add('active');
@@ -2211,25 +2526,10 @@ function cerrarVistaPrevia(event) {
 
 // ===== RENDERIZAR ANUNCIOS PÚBLICOS =====
 function renderizarAnunciosPublicos() {
-    console.log("🔄 Intentando renderizar anuncios..."); // Para saber si el código se ejecuta
     const container = document.getElementById('anunciosContainer');
-    if (!container) {
-        console.error("❌ ERROR: No se encontró el elemento #anunciosContainer en el HTML.");
-        return;
-    }
+    if (!container) return;
 
-    // Leer anuncios desde localStorage
-    const anuncios = (() => {
-        try {
-            return JSON.parse(localStorage.getItem('anuncios_eventos')) || [];
-        } catch (e) {
-            return [];
-        }
-    })();
-
-    console.log("📢 Anuncios encontrados en localStorage:", anuncios.length);
-
-    anuncios.sort((a, b) => (b.fechaInicio || '').localeCompare(a.fechaInicio || ''));
+    const anuncios = cargarAnuncios().sort((a, b) => (b.fechaInicio || '').localeCompare(a.fechaInicio || ''));
 
     if (anuncios.length === 0) {
         container.innerHTML = `
@@ -2288,11 +2588,15 @@ function renderizarAnunciosPublicos() {
     });
 
     container.innerHTML = html;
-    console.log("✅ Anuncios renderizados exitosamente.");
 }
 
 // Escuchar cambios del Admin
 window.addEventListener('datosAnunciosActualizados', renderizarAnunciosPublicos);
+window.addEventListener('storage', function (e) {
+    if (e.key === STORAGE_ANUNCIOS) {
+        renderizarAnunciosPublicos();
+    }
+});
 
 // Renderizar al cargar la página
 document.addEventListener('DOMContentLoaded', renderizarAnunciosPublicos);
@@ -2300,12 +2604,12 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     setTimeout(renderizarAnunciosPublicos, 1);
 }
 
-// ===== QUITAR ANUNCIOS / EVENTOS =====
+// ===== QUITAR / EDITAR ANUNCIOS =====
 function abrirModalQuitarAnuncio() {
-    // Cargar los anuncios y renderizar la lista
+    const buscador = document.getElementById('buscadorQuitarAnuncio');
+    if (buscador) buscador.value = '';
     const anuncios = cargarAnuncios().sort((a, b) => (b.fechaInicio || '').localeCompare(a.fechaInicio || ''));
     renderizarListaQuitar(anuncios);
-    document.getElementById('buscadorQuitarAnuncio').value = '';
     document.getElementById('modalQuitarAnuncio').classList.add('active');
     document.body.style.overflow = 'hidden';
 }
@@ -2317,78 +2621,71 @@ function cerrarModalQuitarAnuncio(event) {
 }
 
 function filtrarAnunciosQuitar() {
-    const termino = document.getElementById('buscadorQuitarAnuncio').value.trim().toLowerCase();
+    const buscador = document.getElementById('buscadorQuitarAnuncio');
+    const termino = buscador ? buscador.value.trim().toLowerCase() : '';
     const anuncios = cargarAnuncios().filter(a =>
-        a.titulo.toLowerCase().includes(termino) ||
-        a.categoria.toLowerCase().includes(termino)
+        (a.titulo && a.titulo.toLowerCase().includes(termino)) ||
+        (a.categoria && a.categoria.toLowerCase().includes(termino)) ||
+        (a.ubicacion && a.ubicacion.toLowerCase().includes(termino))
     ).sort((a, b) => (b.fechaInicio || '').localeCompare(a.fechaInicio || ''));
     renderizarListaQuitar(anuncios);
 }
 
 function renderizarListaQuitar(anuncios) {
     const container = document.getElementById('listaQuitarAnuncios');
-    if (!container) {
-        console.error('❌ Contenedor #listaQuitarAnuncios no encontrado');
-        return;
-    }
+    if (!container) return;
 
     if (!anuncios || anuncios.length === 0) {
         container.innerHTML = `
     <div style="padding: 2rem; text-align: center; color: var(--muted-text);">
-        <i class="fas fa-check-circle" style="font-size: 2rem; color: #2e7d32; display: block; margin-bottom: 0.5rem;"></i>
-        No hay anuncios para eliminar.
-    </div>
-`;
+        <i class="fas fa-bullhorn" style="font-size: 2rem; color: #5a6474; display: block; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+        No hay anuncios registrados.
+    </div>`;
         return;
     }
 
-    let html = `<table class="tabla-quitar"><thead><tr><th>Título</th><th>Categoría</th><th>Fecha</th><th>Acción</th></tr></thead><tbody>`;
-    anuncios.forEach(a => {
-        const fecha = a.fechaInicio ? new Date(a.fechaInicio + 'T00:00:00').toLocaleDateString('es-CO') : 'Sin fecha';
-        // Escapar el título para evitar inyección HTML
-        const tituloEscapado = a.titulo.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        html += `
-    <tr data-anuncio-id="${a.id}">
-        <td><strong>${tituloEscapado}</strong></td>
-        <td>${a.categoria}</td>
-        <td>${fecha}</td>
-        <td><button class="btn-eliminar-anuncio" data-id="${a.id}" title="Eliminar anuncio">🗑️</button></td>
-    </tr>
-`;
-    });
-    html += `</tbody></table>`;
-    container.innerHTML = html;
+    let html = `<div style="overflow-x:auto;"><table class="tabla-quitar" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:600px;">`;
+    html += `<thead><tr style="background:#1a3a4a; color:white; text-align:left;">`;
+    html += `<th style="padding:0.7rem;">Título</th>`;
+    html += `<th style="padding:0.7rem;">Categoría</th>`;
+    html += `<th style="padding:0.7rem;">Fecha Inicio</th>`;
+    html += `<th style="padding:0.7rem; text-align:center;">Acciones</th>`;
+    html += `</tr></thead><tbody>`;
 
-    // Delegación de eventos en el contenedor (más seguro que onclick)
-    container.querySelectorAll('.btn-eliminar-anuncio').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            const id = parseInt(this.dataset.id, 10);
-            if (isNaN(id)) {
-                console.error('ID inválido:', this.dataset.id);
-                return;
-            }
-            console.log('🖱️ Botón eliminar presionado para id:', id);
-            confirmarEliminarAnuncio(id);
-        });
+    anuncios.forEach((a, index) => {
+        const bgRow = index % 2 === 0 ? '#ffffff' : '#f9f8f5';
+        const fecha = a.fechaInicio ? new Date(a.fechaInicio + 'T00:00:00').toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Sin fecha';
+        const tituloEscapado = a.titulo.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+        html += `
+    <tr style="background:${bgRow}; border-bottom:1px solid #eee;">
+        <td style="padding:0.7rem; font-weight:600; color:#1a3a4a;">${tituloEscapado}</td>
+        <td style="padding:0.7rem; color:#5a6474;">${a.categoria || 'Anuncio General'}</td>
+        <td style="padding:0.7rem; color:#5a6474; white-space:nowrap;">${fecha}</td>
+        <td style="padding:0.7rem; text-align:center; white-space:nowrap;">
+            <button type="button" onclick="abrirModalEditarAnuncio(${a.id})" style="background:#f0a800; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;" title="Editar anuncio">✏️ Editar</button>
+            <button type="button" onclick="confirmarEliminarAnuncio(${a.id})" style="background:#c62828; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar anuncio">🗑️ Eliminar</button>
+        </td>
+    </tr>`;
     });
+
+    html += `</tbody></table></div>`;
+    container.innerHTML = html;
 }
+
 function confirmarEliminarAnuncio(id) {
     const anuncios = cargarAnuncios();
-    const anuncio = anuncios.find(a => a.id === id);
+    const anuncio = anuncios.find(a => String(a.id) === String(id));
     if (!anuncio) return;
 
     mostrarConfirmAdmin(
-        `¿Estás seguro de que deseas eliminar el anuncio "<strong>${anuncio.titulo}</strong>"? Esta acción no se puede deshacer.`,
+        `¿Estás seguro de que deseas eliminar el anuncio "<strong>${anuncio.titulo}</strong>"? esta acción afectará la página principal.`,
         'Eliminar anuncio',
         function () {
-            // ✅ Filtrar y guardar
-            let nuevosAnuncios = anuncios.filter(a => a.id !== id);
-            console.log('🔍 Antes de guardar, anuncios restantes:', nuevosAnuncios.length);
+            let nuevosAnuncios = cargarAnuncios().filter(a => String(a.id) !== String(id));
             guardarAnuncios(nuevosAnuncios);
-
-            // ✅ Actualizar el modal inmediatamente
-            renderizarListaQuitar(nuevosAnuncios.sort((a, b) => (b.fechaInicio || '').localeCompare(a.fechaInicio || '')));
+            filtrarAnunciosQuitar();
+            mostrarToastAnuncios('<i class="fas fa-trash"></i> Anuncio eliminado correctamente', '#c62828');
         }
     );
 }
@@ -2433,6 +2730,8 @@ window.confirmarEliminarLibro = confirmarEliminarLibro;
 window.abrirModalVerPedidos = abrirModalVerPedidos;
 window.cerrarModalVerPedidos = cerrarModalVerPedidos;
 window.marcarEntregadoPedido = marcarEntregadoPedido;
+window.cancelarPedido = cancelarPedido;
+window.filtrarPedidosTab = filtrarPedidosTab;
 window.filtrarEliminarLibro = filtrarEliminarLibro;
 window.abrirModalEditarLibro = abrirModalEditarLibro;
 window.abrirModalAgregarAnuncio = abrirModalAgregarAnuncio;
@@ -2443,6 +2742,7 @@ window.cerrarVistaPrevia = cerrarVistaPrevia;
 window.abrirModalQuitarAnuncio = abrirModalQuitarAnuncio;
 window.cerrarModalQuitarAnuncio = cerrarModalQuitarAnuncio;
 window.filtrarAnunciosQuitar = filtrarAnunciosQuitar;
+window.abrirModalEditarAnuncio = abrirModalEditarAnuncio;
 window.confirmarEliminarAnuncio = confirmarEliminarAnuncio;
 if (typeof abrirModalCrearExamen !== 'undefined') window.abrirModalCrearExamen = abrirModalCrearExamen;
 if (typeof abrirModalEditarExamenes !== 'undefined') window.abrirModalEditarExamenes = abrirModalEditarExamenes;

@@ -33,6 +33,10 @@
             <div class="linea-dorada"></div>
             <p>Estos son todos los libros disponibles en nuestra iglesia. Explora el catálogo y si deseas alguno,
                 utiliza el formulario de solicitud al final de la página.</p>
+        <!-- Buscador en tiempo real -->
+        <div style="margin-bottom: 1.5rem; position: relative; max-width: 550px;">
+            <i class="fas fa-search" style="position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: #c99d3b; font-size: 1rem;"></i>
+            <input type="text" id="buscadorBibliotecaPublica" oninput="filtrarBibliotecaPublica()" placeholder="Buscar por título, autor o categoría..." style="width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem; border: 2px solid #e8e3d8; border-radius: 2rem; font-family: 'Inter', sans-serif; font-size: 0.95rem; outline: none; transition: all 0.3s ease; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.03);" />
         </div>
 
         <div class="tabla-wrapper">
@@ -61,19 +65,19 @@
             <form id="formSolicitud" onsubmit="enviarSolicitud(event)">
                 <div class="formulario-grid">
                     <div>
-                        <label for="solicitanteNombre">Nombre completo</label>
+                        <label for="solicitanteNombre">Nombre completo *</label>
                         <input type="text" id="solicitanteNombre" placeholder="Ej: Juan Pérez" required />
                     </div>
                     <div>
-                        <label for="solicitanteWhatsapp">Número de WhatsApp</label>
-                        <input type="tel" id="solicitanteWhatsapp" placeholder="Ej: 300 123 4567" required />
+                        <label for="solicitanteWhatsapp">Número de WhatsApp (Opcional)</label>
+                        <input type="tel" id="solicitanteWhatsapp" placeholder="Ej: 300 123 4567" />
                     </div>
                     <div class="full-width">
-                        <label for="solicitanteEmail">Correo electrónico</label>
-                        <input type="email" id="solicitanteEmail" placeholder="Ej: juan@email.com" required />
+                        <label for="solicitanteEmail">Correo electrónico (Opcional)</label>
+                        <input type="email" id="solicitanteEmail" placeholder="Ej: juan@email.com" />
                     </div>
                     <div class="full-width">
-                        <label for="solicitanteLibro">Título del libro que deseas pedir</label>
+                        <label for="solicitanteLibro">Título del libro que deseas pedir *</label>
                         <textarea id="solicitanteLibro" placeholder="Ej: El conflicto de los siglos"
                             required></textarea>
                     </div>
@@ -200,20 +204,37 @@
 
         function guardarPedidos(pedidos) {
             localStorage.setItem('libros_pedidos', JSON.stringify(pedidos));
+            window.dispatchEvent(new CustomEvent('datosBibliotecaActualizados'));
+            window.dispatchEvent(new Event('datosBibliotecaActualizados'));
         }
 
         // ============================================================
         // 3. RENDERIZAR LA TABLA PÚBLICA
         // ============================================================
 
+        function filtrarBibliotecaPublica() {
+            renderizarTabla();
+        }
+
         function renderizarTabla() {
             const tbody = document.getElementById('tablaLibrosBody');
             if (!tbody) return;
 
-            const libros = cargarLibros();
+            const todosLibros = cargarLibros();
+            const buscador = document.getElementById('buscadorBibliotecaPublica');
+            const termino = buscador ? buscador.value.trim().toLowerCase() : '';
+
+            const libros = todosLibros.filter(libro => {
+                if (!termino) return true;
+                const titulo = (libro.titulo || '').toLowerCase();
+                const autor = (libro.autor || '').toLowerCase();
+                const cat = (libro.cat || libro.categoria || '').toLowerCase();
+                const idStr = String(libro.id || '').toLowerCase();
+                return titulo.includes(termino) || autor.includes(termino) || cat.includes(termino) || idStr.includes(termino);
+            });
 
             if (libros.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--muted-text);">No hay libros registrados en la biblioteca.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--muted-text);">No se encontraron libros que coincidan con la búsqueda.</td></tr>';
                 return;
             }
 
@@ -266,8 +287,8 @@
             const email = document.getElementById('solicitanteEmail').value.trim();
             const libro = document.getElementById('solicitanteLibro').value.trim();
 
-            if (!nombre || !whatsapp || !email || !libro) {
-                alert('⚠️ Por favor completa todos los campos.');
+            if (!nombre || !libro) {
+                alert('⚠️ Por favor ingresa tu nombre completo y el título del libro.');
                 return;
             }
 
@@ -275,11 +296,13 @@
             const pedidos = cargarPedidos();
             pedidos.push({
                 id: Date.now(),
-                libroId: 0, // 0 porque es una solicitud manual
+                libroId: 0,
                 solicitante: nombre,
+                telefono: whatsapp || 'No especificado',
+                email: email || 'No especificado',
                 fecha: new Date().toISOString(),
                 estado: 'Pendiente',
-                tituloLibro: libro // Guardamos el título que el usuario escribió
+                tituloLibro: libro
             });
             guardarPedidos(pedidos);
 
@@ -305,8 +328,13 @@
         document.addEventListener('DOMContentLoaded', function () {
             renderizarTabla();
 
-            // Si el Admin agrega, edita o elimina un libro, la tabla se actualiza sola
+            // Sincronización en tiempo real ante eventos en la misma pestaña y entre pestañas
             window.addEventListener('datosBibliotecaActualizados', renderizarTabla);
+            window.addEventListener('storage', function (e) {
+                if (e.key === 'libros_biblioteca' || e.key === 'libros_pedidos') {
+                    renderizarTabla();
+                }
+            });
         });
     </script>
 </body>

@@ -826,21 +826,54 @@ function cerrarModalConfirmacion() {
 function enviarSolicitud(event) {
     event.preventDefault();
 
-    const nombre = document.getElementById('inputNombreSolicitante').value.trim();
-    const telefono = document.getElementById('inputTelefonoSolicitante').value.trim();
-    const email = document.getElementById('inputEmailSolicitante').value.trim();
-    const libro = document.getElementById('inputTituloLibro').value.trim();
+    const nombreInput = document.getElementById('inputNombreSolicitante');
+    const telefonoInput = document.getElementById('inputTelefonoSolicitante');
+    const emailInput = document.getElementById('inputEmailSolicitante');
+    const libroInput = document.getElementById('inputTituloLibroPrestamo');
 
-    if (!nombre || !telefono || !email || !libro) {
-        alert('⚠️ Por favor completa todos los campos.');
+    const nombre = nombreInput ? nombreInput.value.trim() : '';
+    const telefono = telefonoInput ? telefonoInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const libro = libroInput ? libroInput.value.trim() : '';
+
+    if (!nombre || !libro) {
+        alert('⚠️ Por favor ingresa tu nombre completo y el título del libro.');
         return;
     }
+
+    // Guardar el pedido en localStorage con la clave libros_pedidos
+    try {
+        const pedidos = JSON.parse(localStorage.getItem('libros_pedidos')) || [];
+        pedidos.push({
+            id: Date.now(),
+            libroId: 0,
+            solicitante: nombre,
+            telefono: telefono || 'No especificado',
+            email: email || 'No especificado',
+            fecha: new Date().toISOString(),
+            estado: 'Pendiente',
+            tituloLibro: libro
+        });
+        localStorage.setItem('libros_pedidos', JSON.stringify(pedidos));
+
+        // Notificar cambios para sincronizar con el panel del administrador
+        window.dispatchEvent(new CustomEvent('datosBibliotecaActualizados'));
+        window.dispatchEvent(new Event('datosBibliotecaActualizados'));
+    } catch (e) {
+        console.error('❌ Error al guardar el pedido de libro:', e);
+    }
+
+    // Limpiar campos del formulario
+    if (nombreInput) nombreInput.value = '';
+    if (telefonoInput) telefonoInput.value = '';
+    if (emailInput) emailInput.value = '';
+    if (libroInput) libroInput.value = '';
 
     cerrarModalPrestamo();
 
     setTimeout(() => {
         abrirModalConfirmacion();
-    }, 400);
+    }, 300);
 }
 
 // ========================================

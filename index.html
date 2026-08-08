@@ -3010,20 +3010,20 @@
                         libro que deseas.</p>
                     <form id="formPrestamo" onsubmit="enviarSolicitud(event)">
                         <div class="form-group">
-                            <label for="inputNombreSolicitante">Nombre completo</label>
+                            <label for="inputNombreSolicitante">Nombre completo *</label>
                             <input type="text" id="inputNombreSolicitante" placeholder="Ej: Juan Pérez" required />
                         </div>
                         <div class="form-group">
-                            <label for="inputTelefonoSolicitante">Número de teléfono</label>
-                            <input type="tel" id="inputTelefonoSolicitante" placeholder="Ej: 300 123 4567" required />
+                            <label for="inputTelefonoSolicitante">Número de teléfono (Opcional)</label>
+                            <input type="tel" id="inputTelefonoSolicitante" placeholder="Ej: 300 123 4567" />
                         </div>
                         <div class="form-group">
-                            <label for="inputEmailSolicitante">Correo electrónico</label>
-                            <input type="email" id="inputEmailSolicitante" placeholder="Ej: juan@email.com" required />
+                            <label for="inputEmailSolicitante">Correo electrónico (Opcional)</label>
+                            <input type="email" id="inputEmailSolicitante" placeholder="Ej: juan@email.com" />
                         </div>
                         <div class="form-group">
-                            <label for="inputTituloLibro">Título del libro que deseas pedir</label>
-                            <input type="text" id="inputTituloLibro" placeholder="Ej: El conflicto de los siglos"
+                            <label for="inputTituloLibroPrestamo">Título del libro que deseas pedir *</label>
+                            <input type="text" id="inputTituloLibroPrestamo" placeholder="Ej: El conflicto de los siglos"
                                 required />
                         </div>
                         <button type="submit" class="btn btn-primary" style="width:100%;">
@@ -3315,59 +3315,69 @@
         </div>
     </div>
 
-    <!-- ===== MODAL AGREGAR LIBRO ===== -->
+    <!-- ===== MODAL AGREGAR / EDITAR LIBRO ===== -->
     <div id="modalAgregarLibro" class="modal-biblioteca-overlay" onclick="cerrarModalAgregarLibro(event)">
         <div class="modal-biblioteca-card" onclick="event.stopPropagation()">
-            <!-- ✅ AGREGADO: id="modalBiblioTitulo" -->
-            <h3 id="modalBiblioTitulo"><i class="fas fa-plus-circle"></i> Agregar Libro</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
+                <h3 id="modalBiblioTitulo" style="margin:0; text-align:left; color:#1a3a4a; font-size:1.2rem;"><i class="fas fa-plus-circle"></i> Agregar Libro</h3>
+                <button type="button" onclick="cerrarModalAgregarLibro()" style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;" title="Cerrar">&times;</button>
+            </div>
             <div class="form-agregar-libro">
-                <div class="form-group">
-                    <label>Título *</label>
-                    <input type="text" id="inputTituloLibro" placeholder="Ej: El conflicto de los siglos">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:0.8rem;">
+                    <div class="form-group">
+                        <label style="font-weight:600; color:#1a3a4a; font-size:0.85rem;">ID del libro *</label>
+                        <input type="text" id="inputIdLibro" placeholder="Ej: 56 o LIB-001">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label style="font-weight:600; color:#1a3a4a; font-size:0.85rem;">Título del libro *</label>
+                        <input type="text" id="inputTituloLibro" placeholder="Ej: El conflicto de los siglos">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight:600; color:#1a3a4a; font-size:0.85rem;">Autor *</label>
+                        <input type="text" id="inputAutorLibro" placeholder="Ej: Elena G. de White">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight:600; color:#1a3a4a; font-size:0.85rem;">Cantidad</label>
+                        <input type="number" id="inputCantidadLibro" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight:600; color:#1a3a4a; font-size:0.85rem;">Categoría</label>
+                        <input type="text" id="inputCategoriaLibro" placeholder="Ej: Teología, Salud, Juvenil">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight:600; color:#1a3a4a; font-size:0.85rem;">Estado</label>
+                        <select id="inputEstadoLibro">
+                            <option value="Disponible">Disponible</option>
+                            <option value="Prestado">Prestado</option>
+                            <option value="Dañado">Dañado</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label style="font-weight:600; color:#1a3a4a; font-size:0.85rem;">Ubicación (Estante/Sección)</label>
+                        <input type="text" id="inputUbicacionLibro" placeholder="Ej: Sección 2 - Estante A">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Cantidad</label>
-                    <input type="number" id="inputCantidadLibro" value="1" min="1">
-                </div>
-                <div class="form-group">
-                    <label>Autor *</label>
-                    <input type="text" id="inputAutorLibro" placeholder="Ej: Elena G. de White">
-                </div>
-                <div class="form-group">
-                    <label>Categoría</label>
-                    <input type="text" id="inputCategoriaLibro" placeholder="Ej: Teología, Salud, Juvenil">
-                </div>
-                <div class="form-group">
-                    <label>Estado</label>
-                    <select id="inputEstadoLibro">
-                        <option value="Disponible">Disponible</option>
-                        <option value="Prestado">Prestado</option>
-                        <option value="Dañado">Dañado</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Ubicación</label>
-                    <input type="text" id="inputUbicacionLibro" placeholder="Ej: Estante A - 3">
-                </div>
-                <!-- ✅ AGREGADO: id="btnGuardarLibro" -->
                 <button id="btnGuardarLibro" class="modal-generico-btn btn-modal-primario" onclick="guardarNuevoLibro()"
-                    style="width:100%;">
+                    style="width:100%; margin-top:1rem; padding:0.8rem; border-radius:2rem; font-weight:700; font-family:Inter,sans-serif; background:linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); color:white; border:none; cursor:pointer;">
                     <i class="fas fa-save"></i> Guardar Libro
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- ===== MODAL ELIMINAR LIBRO ===== -->
+    <!-- ===== MODAL ELIMINAR / EDITAR LIBROS ===== -->
     <div id="modalEliminarLibro" class="modal-biblioteca-overlay" onclick="cerrarModalEliminarLibro(event)">
-        <div class="modal-biblioteca-card" onclick="event.stopPropagation()">
-            <h3><i class="fas fa-trash-alt"></i> Eliminar Libro</h3>
+        <div class="modal-biblioteca-card" onclick="event.stopPropagation()" style="max-width:780px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
+                <h3 style="margin:0; text-align:left; color:#1a3a4a; font-size:1.2rem;"><i class="fas fa-book"></i> Catálogo y Gestión de Libros</h3>
+                <button type="button" onclick="cerrarModalEliminarLibro()" style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;" title="Cerrar">&times;</button>
+            </div>
             <div class="buscador-biblioteca">
                 <i class="fas fa-search icono-buscar"></i>
-                <input type="text" id="buscadorEliminarLibro" placeholder="Buscar por título o autor..."
+                <input type="text" id="buscadorEliminarLibro" placeholder="Buscar por título, autor o categoría..."
                     oninput="filtrarEliminarLibro()">
             </div>
-            <div id="listaEliminarLibros" style="overflow-x:auto;">
+            <div id="listaEliminarLibros" style="overflow-x:auto; max-height:60vh;">
                 <!-- Se llena dinámicamente con JS -->
             </div>
         </div>
@@ -3375,18 +3385,28 @@
 
     <!-- ===== MODAL VER LIBROS PEDIDOS ===== -->
     <div id="modalVerPedidos" class="modal-biblioteca-overlay" onclick="cerrarModalVerPedidos(event)">
-        <div class="modal-biblioteca-card" onclick="event.stopPropagation()">
-            <h3><i class="fas fa-book-open"></i> Libros Pedidos</h3>
-            <div id="listaPedidosLibros" style="overflow-x:auto;">
+        <div class="modal-biblioteca-card" onclick="event.stopPropagation()" style="max-width:880px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
+                <h3 style="margin:0; text-align:left; color:#1a3a4a; font-size:1.2rem;"><i class="fas fa-book-open"></i> Solicitudes de Préstamo de Libros</h3>
+                <button type="button" onclick="cerrarModalVerPedidos()" style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;" title="Cerrar">&times;</button>
+            </div>
+            <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+                <button id="btnFiltroPedidosPendientes" onclick="filtrarPedidosTab('Pendientes')" style="padding:0.4rem 1.2rem; border-radius:1.5rem; border:none; background:#1a3a4a; color:white; font-weight:600; cursor:pointer; font-size:0.85rem; font-family:Inter,sans-serif;">Pendientes</button>
+                <button id="btnFiltroPedidosTodos" onclick="filtrarPedidosTab('Todos')" style="padding:0.4rem 1.2rem; border-radius:1.5rem; border:1px solid #1a3a4a; background:white; color:#1a3a4a; font-weight:600; cursor:pointer; font-size:0.85rem; font-family:Inter,sans-serif;">Todos los pedidos</button>
+            </div>
+            <div id="listaPedidosLibros" style="overflow-x:auto; max-height:60vh;">
                 <!-- Se llena dinámicamente con JS -->
             </div>
         </div>
     </div>
-    <!-- ===== MODAL AGREGAR ANUNCIO / EVENTO ===== -->
+    <!-- ===== MODAL AGREGAR / EDITAR ANUNCIO ===== -->
     <div id="modalAgregarAnuncio" class="modal-anuncio-overlay" onclick="cerrarModalAgregarAnuncio(event)">
         <div class="modal-anuncio-card" onclick="event.stopPropagation()">
-            <h3><i class="fas fa-bullhorn"></i> Publicar Nuevo Anuncio</h3>
-            <p class="modal-anuncio-subtitulo">Completa los campos para crear un anuncio o evento de la iglesia</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
+                <h3 id="modalAnuncioTitulo" style="margin:0; text-align:left; color:#1a3a4a; font-size:1.3rem;"><i class="fas fa-bullhorn"></i> Publicar Nuevo Anuncio</h3>
+                <button type="button" onclick="cerrarModalAgregarAnuncio()" style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;" title="Cerrar">&times;</button>
+            </div>
+            <p class="modal-anuncio-subtitulo" style="text-align:left; margin-bottom:1.2rem;">Completa los campos para crear o editar un anuncio de la iglesia</p>
 
             <div class="form-anuncio-grid">
                 <div class="form-group full-width">
@@ -3436,7 +3456,7 @@
             </div>
 
             <div class="anuncio-botones">
-                <button class="btn-publicar-anuncio" onclick="guardarNuevoAnuncio()">
+                <button id="btnGuardarAnuncio" class="btn-publicar-anuncio" onclick="guardarNuevoAnuncio()">
                     <i class="fas fa-paper-plane"></i> Publicar Evento
                 </button>
                 <button class="btn-vista-previa" onclick="generarVistaPreviaAnuncio()">
@@ -3451,15 +3471,24 @@
 
     <!-- ===== MODAL VISTA PREVIA DE ANUNCIO ===== -->
     <div id="modalVistaPrevia" class="modal-vista-previa" onclick="cerrarVistaPrevia(event)">
-        <div class="vista-previa-card" onclick="event.stopPropagation()" id="vistaPreviaContenido">
-            <!-- Se llena dinámicamente con JS -->
+        <div class="vista-previa-card" onclick="event.stopPropagation()" style="position:relative; max-width:650px; width:92%; max-height:85vh; overflow-y:auto; padding:2rem; background:white; border-radius:1.8rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.6rem;">
+                <h4 style="margin:0; color:#1a3a4a; font-size:1.1rem;"><i class="fas fa-eye"></i> Vista Previa del Anuncio</h4>
+                <button type="button" onclick="cerrarVistaPrevia()" style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;" title="Cerrar">&times;</button>
+            </div>
+            <div id="vistaPreviaContenido">
+                <!-- Se llena dinámicamente con JS -->
+            </div>
         </div>
     </div>
 
-    <!-- ===== MODAL QUITAR ANUNCIOS / EVENTOS ===== -->
+    <!-- ===== MODAL QUITAR / EDITAR ANUNCIOS Y EVENTOS ===== -->
     <div id="modalQuitarAnuncio" class="modal-quitar-overlay" onclick="cerrarModalQuitarAnuncio(event)">
-        <div class="modal-quitar-card" onclick="event.stopPropagation()">
-            <h3><i class="fas fa-trash-alt" style="color: #c62828;"></i> Quitar Eventos</h3>
+        <div class="modal-quitar-card" onclick="event.stopPropagation()" style="max-width:800px; width:92%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
+                <h3 style="margin:0; text-align:left; color:#1a3a4a; font-size:1.2rem;"><i class="fas fa-bullhorn" style="color: #d4a038;"></i> Gestión de Anuncios y Eventos</h3>
+                <button type="button" onclick="cerrarModalQuitarAnuncio()" style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;" title="Cerrar">&times;</button>
+            </div>
 
             <div class="buscador-quitar-wrapper">
                 <i class="fas fa-search icono-buscar"></i>
@@ -3467,7 +3496,7 @@
                     oninput="filtrarAnunciosQuitar()">
             </div>
 
-            <div id="listaQuitarAnuncios" class="tabla-quitar-wrapper">
+            <div id="listaQuitarAnuncios" class="tabla-quitar-wrapper" style="overflow-x:auto; max-height:60vh;">
                 <!-- Se llena dinámicamente con JS -->
             </div>
         </div>
