@@ -3388,3 +3388,129 @@
         transform: translate(-50%, 20px) scale(0.9);
     }
 }
+
+/* ========================================
+   SISTEMA DE BLOQUEO DE CALENDARIOS Y ENCUESTA
+   ======================================== */
+.bloqueado-candado {
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.bloqueado-candado > *:not(.overlay-candado) {
+    filter: blur(8px) !important;
+    pointer-events: none !important;
+    user-select: none !important;
+    transition: filter 0.4s ease !important;
+}
+
+.overlay-candado {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(11, 43, 79, 0.55) !important;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 50 !important;
+    border-radius: inherit;
+    padding: 1.5rem;
+    animation: fadeInLock 0.3s ease-out;
+}
+
+.overlay-candado-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.14);
+    padding: 1.5rem 2rem;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    max-width: 90%;
+}
+
+.candado-icono-wrapper {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--golden) 0%, var(--golden-light) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--deep-blue);
+    font-size: 1.3rem;
+    box-shadow: 0 4px 16px rgba(201, 157, 59, 0.45);
+}
+
+.candado-titulo {
+    color: var(--pure-white);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.btn-ver-candado {
+    background: linear-gradient(135deg, var(--golden) 0%, var(--golden-light) 100%) !important;
+    color: var(--deep-blue) !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    padding: 0.75rem 2.2rem !important;
+    border-radius: var(--radius-btn) !important;
+    border: 2px solid rgba(255, 255, 255, 0.85) !important;
+    box-shadow: 0 6px 20px rgba(201, 157, 59, 0.45) !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.btn-ver-candado:hover {
+    transform: translateY(-3px) scale(1.04) !important;
+    box-shadow: 0 10px 28px rgba(201, 157, 59, 0.65) !important;
+    background: var(--golden-light) !important;
+}
+
+.btn-ver-candado:active {
+    transform: translateY(-1px) scale(0.98) !important;
+}
+
+.seccion-desbloqueada {
+    position: relative;
+}
+
+.seccion-desbloqueada > * {
+    filter: none !important;
+    pointer-events: auto !important;
+    user-select: auto !important;
+}
+
+.seccion-desbloqueada .overlay-candado {
+    display: none !important;
+}
+
+@keyframes fadeInLock {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

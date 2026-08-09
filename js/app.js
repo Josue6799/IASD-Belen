@@ -966,4 +966,148 @@ window.abrirModalConfirmacionContacto = abrirModalConfirmacionContacto;
 window.cerrarModalConfirmacionContacto = cerrarModalConfirmacionContacto;
 window.enviarSolicitud = enviarSolicitud;
 
+/* ========================================
+   SISTEMA DE DESBLOQUEO DE CALENDARIOS Y ENCUESTA
+   Contraseña requerida: eval2026
+   ======================================== */
+const LLAVE_SESSION_DESBLOQUEADO = 'calendariosDesbloqueados';
+const PASSWORD_CORRECTA_CANDADO = 'eval2026';
+
+function estaDesbloqueadoCandado() {
+    return sessionStorage.getItem(LLAVE_SESSION_DESBLOQUEADO) === 'true';
+}
+
+function obtenerSeccionesRestringidas() {
+    return document.querySelectorAll('.calendario-wrapper, .calendario-club, #encuestaBox');
+}
+
+function aplicarEstadoBloqueoCandado() {
+    const unlocked = estaDesbloqueadoCandado();
+    const secciones = obtenerSeccionesRestringidas();
+
+    secciones.forEach(seccion => {
+        if (unlocked) {
+            seccion.classList.remove('bloqueado-candado');
+            seccion.classList.add('seccion-desbloqueada');
+            const overlay = seccion.querySelector('.overlay-candado');
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+        } else {
+            seccion.classList.add('bloqueado-candado');
+            seccion.classList.remove('seccion-desbloqueada');
+
+            let overlay = seccion.querySelector('.overlay-candado');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.className = 'overlay-candado';
+                overlay.innerHTML = `
+                    <div class="overlay-candado-content">
+                        <div class="candado-icono-wrapper">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <span class="candado-titulo">Contenido Protegido</span>
+                        <button type="button" class="btn-ver-candado" onclick="abrirModalDesbloqueoCandado()">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                    </div>
+                `;
+                seccion.appendChild(overlay);
+            } else {
+                overlay.style.display = 'flex';
+            }
+        }
+    });
+}
+
+function abrirModalDesbloqueoCandado() {
+    const modal = document.getElementById('modalDesbloqueoCandado');
+    const input = document.getElementById('inputPasswordCandado');
+    const errorDiv = document.getElementById('errorPasswordCandado');
+
+    if (modal) {
+        if (input) {
+            input.value = '';
+        }
+        if (errorDiv) {
+            errorDiv.style.display = 'none';
+        }
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+        setTimeout(() => {
+            if (input) input.focus();
+        }, 100);
+    }
+}
+
+function cerrarModalDesbloqueoCandado() {
+    const modal = document.getElementById('modalDesbloqueoCandado');
+    const errorDiv = document.getElementById('errorPasswordCandado');
+    const input = document.getElementById('inputPasswordCandado');
+
+    if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+    }
+    if (errorDiv) {
+        errorDiv.style.display = 'none';
+    }
+    if (input) {
+        input.value = '';
+    }
+}
+
+function verificarPasswordCandado() {
+    const input = document.getElementById('inputPasswordCandado');
+    const errorDiv = document.getElementById('errorPasswordCandado');
+
+    if (!input) return;
+
+    const pass = input.value.trim();
+
+    if (pass === PASSWORD_CORRECTA_CANDADO) {
+        sessionStorage.setItem(LLAVE_SESSION_DESBLOQUEADO, 'true');
+        aplicarEstadoBloqueoCandado();
+        cerrarModalDesbloqueoCandado();
+    } else {
+        if (errorDiv) {
+            errorDiv.style.display = 'block';
+        }
+        input.value = '';
+        input.focus();
+    }
+}
+
+// Event Listeners e Inicialización Global
+document.addEventListener('DOMContentLoaded', () => {
+    aplicarEstadoBloqueoCandado();
+
+    // Backdrop click
+    const modal = document.getElementById('modalDesbloqueoCandado');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                cerrarModalDesbloqueoCandado();
+            }
+        });
+    }
+
+    // Tecla Enter en el input de contraseña
+    const input = document.getElementById('inputPasswordCandado');
+    if (input) {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verificarPasswordCandado();
+            }
+        });
+    }
+});
+
+// Exportar a window
+window.abrirModalDesbloqueoCandado = abrirModalDesbloqueoCandado;
+window.cerrarModalDesbloqueoCandado = cerrarModalDesbloqueoCandado;
+window.verificarPasswordCandado = verificarPasswordCandado;
+window.aplicarEstadoBloqueoCandado = aplicarEstadoBloqueoCandado;
+
 console.log('✅ app.js (Iglesia) cargado correctamente');
