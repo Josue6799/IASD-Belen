@@ -2163,10 +2163,30 @@ function eliminarEncuesta(id) {
 }
 
 // ===== EXPORTAR / IMPORTAR DATOS DEL CLUB =====
-function exportarDatosClub() {
-    const club = clubSeleccionadoActual || 'Aventureros';
 
-    // Obtener datos de las 3 secciones
+function obtenerClubActivoModal() {
+    const modal = document.getElementById('modalClubOpciones');
+    if (modal && modal.dataset && modal.dataset.club) {
+        return modal.dataset.club;
+    }
+    return clubSeleccionadoActual || 'Aventureros';
+}
+
+function mostrarToastExitoClub(mensaje) {
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#2e7d32;color:white;padding:1rem 2rem;border-radius:2rem;font-weight:600;z-index:99999;font-family:Inter,sans-serif;box-shadow:0 8px 30px rgba(46,125,50,0.4);transition:opacity 0.5s ease;';
+    toast.innerHTML = mensaje;
+    document.body.appendChild(toast);
+    setTimeout(function () {
+        toast.style.opacity = '0';
+        setTimeout(function () { toast.remove(); }, 500);
+    }, 2500);
+}
+
+function exportarDatosClub() {
+    const club = obtenerClubActivoModal();
+
+    // Obtener claves de storage para las 3 secciones
     const cuotasKey = CLUBES_STORAGE[club] || 'cuotas_aventureros';
     const bdKey = CLUBES_STORAGE_BD[club] || 'bd_aventureros';
     const eventosKey = CLUBES_STORAGE_CALENDARIO[club] || 'eventos_aventureros';
@@ -2175,87 +2195,146 @@ function exportarDatosClub() {
     const bd = cargarMiembrosBD(bdKey);
     let eventos = [];
     try {
-        eventos = JSON.parse(localStorage.getItem(eventosKey)) || [];
+        const rawEventos = localStorage.getItem(eventosKey);
+        eventos = rawEventos ? JSON.parse(rawEventos) : [];
     } catch (e) {
         eventos = [];
+    }
+
+    // Verificar si el club no tiene datos para exportar
+    const cuotasVacias = !Array.isArray(cuotas) || cuotas.length === 0;
+    const bdVacia = !Array.isArray(bd) || bd.length === 0;
+    const eventosVacios = !Array.isArray(eventos) || eventos.length === 0;
+
+    if (cuotasVacias && bdVacia && eventosVacios) {
+        mostrarAlertaAdmin('El club <strong>' + club + '</strong> no tiene datos registrados (cuotas, base de datos ni calendario) para exportar.', 'Sin datos para exportar');
+        return;
     }
 
     const backup = {
         club: club,
         fecha: new Date().toISOString(),
-        cuotas: cuotas,
-        bd: bd,
-        eventos: eventos
+        cuotas: Array.isArray(cuotas) ? cuotas : [],
+        bd: Array.isArray(bd) ? bd : [],
+        eventos: Array.isArray(eventos) ? eventos : []
     };
+
+    const fechaStr = new Date().toISOString().split('T')[0];
+    const nombreArchivo = 'Backup_' + club.replace(/\s+/g, '_') + '_' + fechaStr + '.json';
 
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const fechaStr = new Date().toISOString().split('T')[0];
-    a.download = 'Backup_' + club.replace(/\s+/g, '_') + '_' + fechaStr + '.json';
+    a.download = nombreArchivo;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    mostrarAlertaAdmin('✅ Datos del club exportados correctamente.', 'Exportación exitosa');
+    mostrarToastExitoClub('✅ Datos del club ' + club + ' exportados correctamente.');
 }
 
 function importarDatosClub(event) {
-    const file = event.target.files[0];
+    const input = event ? event.target : document.getElementById('inputImportarClub');
+    const file = input && input.files ? input.files[0] : null;
     if (!file) return;
 
-    const club = clubSeleccionadoActual || 'Aventureros';
+    const club = obtenerClubActivoModal();
 
     const reader = new FileReader();
-    reader.onload = function (e) {
-        try {
-            const data = JSON.parse(e.target.result);
 
-            // Validación básica
-            if (!data.cuotas || !data.bd || !data.eventos) {
-                mostrarAlertaAdmin('❌ El archivo seleccionado no es un backup válido. Debe contener las secciones: cuotas, bd, eventos.', 'Error de importación');
-                return;
-            }
-
-            // Confirmar antes de sobrescribir
-            mostrarConfirmAdmin(
-                '¿Estás seguro de importar este backup? <strong>Se sobrescribirán todos los datos actuales</strong> de Cuotas, Base de datos y Calendario del club <strong>' + club + '</strong>.',
-                'Confirmar importación',
-                function () {
-                    const cuotasKey = CLUBES_STORAGE[club] || 'cuotas_aventureros';
-                    const bdKey = CLUBES_STORAGE_BD[club] || 'bd_aventureros';
-                    const eventosKey = CLUBES_STORAGE_CALENDARIO[club] || 'eventos_aventureros';
-
-                    guardarCuotas(cuotasKey, data.cuotas);
-                    guardarMiembrosBD(bdKey, data.bd);
-                    localStorage.setItem(eventosKey, JSON.stringify(data.eventos));
-
-                    // Notificar éxito
-                    const toast = document.createElement('div');
-                    toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#2e7d32;color:white;padding:1rem 2rem;border-radius:2rem;font-weight:600;z-index:99999;font-family:Inter,sans-serif;box-shadow:0 8px 30px rgba(46,125,50,0.4);';
-                    toast.innerHTML = '✅ Datos importados correctamente para ' + club;
-                    document.body.appendChild(toast);
-
-                    // Cerrar modal y refrescar
-                    cerrarModalClub();
-                    setTimeout(function () {
-                        toast.style.opacity = '0';
-                        toast.style.transition = 'opacity 0.5s ease';
-                        setTimeout(function () { toast.remove(); location.reload(); }, 500);
-                    }, 1500);
-                }
-            );
-        } catch (error) {
-            mostrarAlertaAdmin('❌ El archivo seleccionado no es un JSON válido.', 'Error de lectura');
-        }
+    reader.onerror = function () {
+        if (input) input.value = '';
+        mostrarAlertaAdmin('No se pudo leer el archivo. Inténtalo de nuevo.', 'Error al leer el archivo');
     };
-    reader.readAsText(file);
 
-    // Limpiar el input para permitir seleccionar el mismo archivo de nuevo
-    event.target.value = '';
+    reader.onload = function (e) {
+        if (input) input.value = '';
+
+        let data;
+        try {
+            data = JSON.parse(e.target.result);
+        } catch (error) {
+            mostrarAlertaAdmin('El archivo seleccionado no es un backup válido. Asegúrate de que sea un archivo JSON exportado desde el sistema.', 'Archivo no válido');
+            return;
+        }
+
+        // 1. Validar objeto JSON y propiedades requeridas
+        if (!data || typeof data !== 'object' || Array.isArray(data) ||
+            !('club' in data) || !('cuotas' in data) || !('bd' in data) || !('eventos' in data)) {
+            mostrarAlertaAdmin('El archivo seleccionado no es un backup válido. Asegúrate de que sea un archivo JSON exportado desde el sistema.', 'Archivo no válido');
+            return;
+        }
+
+        // 2. Validar que pertenezca al mismo club
+        if (data.club !== club) {
+            const clubArchivo = data.club || 'desconocido';
+            mostrarAlertaAdmin('Este archivo pertenece al club ' + clubArchivo + ', no a ' + club + '.', 'Club incorrecto');
+            return;
+        }
+
+        // 3. Validar que el formato de las secciones no esté corrupto
+        if (!Array.isArray(data.cuotas) || !Array.isArray(data.bd) || !Array.isArray(data.eventos)) {
+            mostrarAlertaAdmin('El archivo está corrupto o tiene un formato incorrecto.', 'Archivo corrupto');
+            return;
+        }
+
+        // 4. Modal de confirmación antes de sobrescribir
+        const mensajeConfirm = '¿Estás seguro de importar este backup? Se sobrescribirán todos los datos actuales del club ' + club + '. Esta acción no se puede deshacer.';
+
+        mostrarConfirmAdmin(
+            mensajeConfirm,
+            'Confirmar importación',
+            function () {
+                const cuotasKey = CLUBES_STORAGE[club] || 'cuotas_aventureros';
+                const bdKey = CLUBES_STORAGE_BD[club] || 'bd_aventureros';
+                const eventosKey = CLUBES_STORAGE_CALENDARIO[club] || 'eventos_aventureros';
+
+                // Guardar en localStorage
+                guardarCuotas(cuotasKey, data.cuotas);
+                guardarMiembrosBD(bdKey, data.bd);
+                try {
+                    localStorage.setItem(eventosKey, JSON.stringify(data.eventos));
+                } catch (err) {
+                    console.error('Error guardando eventos en localStorage:', err);
+                }
+
+                // Disparar eventos de actualización
+                window.dispatchEvent(new CustomEvent('datosClubActualizados', { detail: { club: club } }));
+                window.dispatchEvent(new Event('datosClubActualizados'));
+
+                // Actualizar las vistas si alguna sección del club está visible actualmente
+                const seccionCuotas = document.getElementById('seccionCuotasClub');
+                if (seccionCuotas && seccionCuotas.style.display !== 'none') {
+                    const miembrosCuotas = cargarCuotas(cuotasKey);
+                    seccionCuotas.innerHTML = generarHTMLCuotas(club, miembrosCuotas, cuotasKey);
+                    vincularEventosCuotas(cuotasKey);
+                    actualizarTotalesCuotas(cuotasKey);
+                }
+
+                const seccionBD = document.getElementById('seccionBaseDatosClub');
+                if (seccionBD && seccionBD.style.display !== 'none') {
+                    const miembrosBD = cargarMiembrosBD(bdKey);
+                    seccionBD.innerHTML = generarHTMLBaseDatos(club, miembrosBD, bdKey);
+                    vincularEventosBD(bdKey);
+                }
+
+                const seccionCal = document.getElementById('seccionCalendarioClub');
+                if (seccionCal && seccionCal.style.display !== 'none') {
+                    seccionCal.innerHTML = generarHTMLCalendarioClub(club);
+                }
+
+                // Notificar éxito y cerrar modal de opciones del club
+                mostrarToastExitoClub('✅ Datos importados correctamente para ' + club);
+                cerrarModalClub();
+            }
+        );
+    };
+
+    reader.readAsText(file);
 }
+
 
 // ===== BIBLIOTECA =====
 const STORAGE_LIBROS = 'libros_biblioteca';

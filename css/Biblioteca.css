@@ -297,34 +297,77 @@ body {
 
 @media (max-width: 768px) {
     .container {
-        padding: 1rem;
+        padding: 1rem 0.8rem;
     }
 
-    .tabla-wrapper {
-        padding: 0.8rem;
-    }
-
-    .formulario-section {
-        padding: 1.8rem;
+    .back-link {
+        min-height: 44px;
     }
 
     .biblioteca-header h1 {
-        font-size: 1.8rem;
+        font-size: 1.7rem;
+    }
+
+    #buscadorBibliotecaPublica {
+        min-height: 44px;
+        font-size: 16px !important; /* Previene auto-zoom en iOS Safari */
+    }
+
+    .tabla-wrapper {
+        padding: 0.6rem;
+        border-radius: 1.2rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tabla-wrapper table {
+        min-width: 580px;
+    }
+
+    .formulario-section {
+        padding: 1.6rem 1.1rem;
+        border-radius: 1.4rem;
+    }
+
+    .formulario-grid input,
+    .formulario-grid textarea {
+        min-height: 44px;
+        font-size: 16px !important;
+    }
+
+    .btn-enviar {
+        min-height: 44px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    #modalConfirmacion > div {
+        width: 95% !important;
+        max-width: 95% !important;
+        padding: 1.5rem 1.2rem !important;
+        border-radius: 1.6rem !important;
+        max-height: 88vh !important;
+        overflow-y: auto !important;
+    }
+
+    #modalConfirmacion button {
+        width: 100% !important;
+        min-height: 44px !important;
     }
 }
 
 @media (max-width: 480px) {
     .formulario-section {
-        padding: 1.2rem;
+        padding: 1.2rem 0.95rem;
     }
 
     .tabla-wrapper table {
-        font-size: 0.75rem;
-        min-width: 600px;
+        font-size: 0.78rem;
+        min-width: 520px;
     }
 
     .tabla-wrapper th,
     .tabla-wrapper td {
-        padding: 0.5rem 0.6rem;
+        padding: 0.5rem 0.55rem;
     }
 }

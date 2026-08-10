@@ -64,9 +64,8 @@ function showPage(pageId) {
         }
     });
 
-    // 5. Cerrar menú móvil si está abierto
-    const navLinks = document.getElementById('navLinks');
-    if (navLinks) navLinks.classList.remove('open');
+    // 5. Cerrar menú móvil y dropdowns si están abiertos
+    cerrarMenuMovilYDropdowns();
 
     // 6. Ocultar mensaje de acceso denegado si existe
     const mensaje = document.getElementById('mensajeAccesoDenegado');
@@ -91,16 +90,64 @@ function showPage(pageId) {
     console.log(`📄 Página mostrada: ${pageId} - ${titulo}`);
 }
 
+function cerrarMenuMovilYDropdowns() {
+    const navLinks = document.getElementById('navLinks');
+    if (navLinks) navLinks.classList.remove('open');
+    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.dropdown-menu li').forEach(li => li.classList.remove('open'));
+}
+
 function toggleMobileMenu() {
     const navLinks = document.getElementById('navLinks');
     if (navLinks) {
-        navLinks.classList.toggle('open');
+        const isOpening = !navLinks.classList.contains('open');
+        if (!isOpening) {
+            cerrarMenuMovilYDropdowns();
+        } else {
+            navLinks.classList.add('open');
+        }
     }
 }
+
+// Configuración de interacción para desplegables en móviles
+document.addEventListener('DOMContentLoaded', function () {
+    // Escuchar clic en botones principales de dropdown en móviles
+    const dropdownBtns = document.querySelectorAll('.dropdown > .nav-btn');
+    dropdownBtns.forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            if (window.innerWidth <= 768) {
+                const parentDropdown = this.closest('.dropdown');
+                if (parentDropdown) {
+                    const isAlreadyOpen = parentDropdown.classList.contains('open');
+                    // Cerrar otros dropdowns de primer nivel
+                    document.querySelectorAll('.dropdown').forEach(d => {
+                        if (d !== parentDropdown) d.classList.remove('open');
+                    });
+                    parentDropdown.classList.toggle('open', !isAlreadyOpen);
+                }
+            }
+        });
+    });
+
+    // Escuchar clic en enlaces con submenús anidados (ej. Grupos pequeños, Culto) en móviles
+    const nestedSubmenuLinks = document.querySelectorAll('.dropdown-menu li > a');
+    nestedSubmenuLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+            const parentLi = this.parentElement;
+            const subList = parentLi.querySelector('ul');
+            if (window.innerWidth <= 768 && subList) {
+                e.stopPropagation();
+                const isSubOpen = parentLi.classList.contains('open');
+                parentLi.classList.toggle('open', !isSubOpen);
+            }
+        });
+    });
+});
 
 // Exportar funciones
 window.showPage = showPage;
 window.toggleMobileMenu = toggleMobileMenu;
+window.cerrarMenuMovilYDropdowns = cerrarMenuMovilYDropdowns;
 window.PAGINAS = PAGINAS;
 
 console.log('✅ Router.js cargado correctamente');

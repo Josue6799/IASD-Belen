@@ -849,6 +849,9 @@ function cerrarGrupoCard() {
 }
 
 function mostrarGrupo(grupoId) {
+    if (typeof window.cerrarMenuMovilYDropdowns === 'function') {
+        window.cerrarMenuMovilYDropdowns();
+    }
     const grupo = GRUPOS_PEQUEÑOS[grupoId];
     if (!grupo) {
         console.warn('⚠️ Grupo no encontrado:', grupoId);
