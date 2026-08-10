@@ -78,7 +78,7 @@
 
                 <!-- ========== CRONOGRAMA CON GRUPOS PEQUEÑOS ========== -->
                 <div class="dropdown">
-                    <button class="nav-btn"><i class="fas fa-clock"></i> Cronograma <i class="fas fa-chevron-down"
+                    <button class="nav-btn" onclick="showPage('cronograma')"><i class="fas fa-clock"></i> Cronograma <i class="fas fa-chevron-down"
                             style="font-size:0.6rem;"></i></button>
                     <ul class="dropdown-menu" style="min-width: 220px;">
                         <!-- Submenú Culto -->
@@ -93,7 +93,7 @@
                                 <li><a onclick="showPage('canto')"><i class="fas fa-music"></i> Canto</a></li>
                                 <li><a onclick="showPage('escuela-sabatica')"><i class="fas fa-book-open"></i> Escuela
                                         Sabática</a></li>
-                                <li><a onclick="showPage('culto')"><i class="fas fa-globe-americas"></i> Minuto
+                                <li><a onclick="showPage('minuto-misionero')"><i class="fas fa-globe-americas"></i> Minuto
                                         Misionero</a></li>
                                 <li><a onclick="showPage('culto')"><i class="fas fa-bible"></i> Predica</a></li>
                             </ul>
@@ -270,7 +270,7 @@
                     <p style="margin-top:0.3rem;"><i class="fas fa-users"></i> <strong>Sociedad de Jóvenes (Sáb): 4:00 - 6:00 P.M.</strong></p>
                     <p style="margin-top:0.3rem;"><i class="fas fa-praying-hands"></i> <strong>Lunes de Oración & Miércoles de Testimonio: 7:00 - 8:00 P.M.</strong></p>
                 </div>
-                <button class="btn"><i class="fas fa-video"></i> Ver en vivo</button>
+                <button class="btn" onclick="abrirEnVivo()"><i class="fas fa-video"></i> Ver en vivo</button>
             </div>
 
             <!-- ==================== BIBLIOTECA (NUEVA SECCIÓN) ==================== -->
@@ -3011,6 +3011,16 @@
             </div>
         </div>
 
+        <!-- ==================== PÁGINAS DE CRONOGRAMA PÚBLICO Y ACTIVIDADES ==================== -->
+        <div id="cronograma" class="page"></div>
+        <div id="culto" class="page"></div>
+        <div id="canto" class="page"></div>
+        <div id="escuela-sabatica" class="page"></div>
+        <div id="minuto-misionero" class="page"></div>
+        <div id="sociedad-jovenes" class="page"></div>
+        <div id="lunes-oracion" class="page"></div>
+        <div id="miercoles-testimonio" class="page"></div>
+
         <!-- ==================== MODAL AGREGAR EVENTO ==================== -->
         <div id="modalEvento" class="modal-backdrop">
             <div class="modal-card">
@@ -3574,6 +3584,43 @@
             </div>
 
             <div id="listaQuitarAnuncios" class="tabla-quitar-wrapper" style="overflow-x:auto; max-height:60vh;">
+                <!-- Se llena dinámicamente con JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== BOTÓN FLOTANTE "EN VIVO" ===== -->
+    <button id="btnFlotanteEnVivo" class="btn-flotante-envivo envivo-inactivo" onclick="abrirEnVivo()" title="Ver En Vivo">
+        <i class="fas fa-video" id="iconoFlotanteEnVivo" style="color: #c9a53b;"></i>
+        <span id="textoFlotanteEnVivo">En Vivo</span>
+    </button>
+
+    <!-- ===== MODAL DEL SISTEMA DE TRANSMISIONES "EN VIVO" ===== -->
+    <div id="modalEnVivo" class="envivo-modal-overlay" style="display: none;" onclick="cerrarEnVivo(event)">
+        <div class="envivo-modal-card" onclick="event.stopPropagation()">
+            <div class="envivo-header">
+                <h2 id="envivoTituloModal">
+                    <i class="fas fa-broadcast-tower" style="color:#c9a53b;"></i> Transmisiones En Vivo
+                </h2>
+                <button type="button" class="envivo-close-btn" onclick="cerrarEnVivo()" title="Cerrar">&times;</button>
+            </div>
+            <div class="envivo-body" id="envivoBodyContenido">
+                <!-- Se llena dinámicamente con JS (Vista de Categorías o Vista por Categoría) -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DE ADMINISTRACIÓN: GESTIONAR TRANSMISIONES ===== -->
+    <div id="modalGestionarTransmisiones" class="modal-quitar-overlay" style="display: none;" onclick="cerrarModalGestionarTransmisiones(event)">
+        <div class="modal-quitar-card" onclick="event.stopPropagation()" style="max-width: 900px; width: 95%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
+                <h3 style="margin:0; text-align:left; color:#1a3a4a; font-size:1.3rem;">
+                    <i class="fas fa-video" style="color: #e53e3e;"></i> Gestión de Transmisiones En Vivo
+                </h3>
+                <button type="button" onclick="cerrarModalGestionarTransmisiones()" style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;" title="Cerrar">&times;</button>
+            </div>
+            
+            <div id="adminTransmisionesContenido">
                 <!-- Se llena dinámicamente con JS -->
             </div>
         </div>

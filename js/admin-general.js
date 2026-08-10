@@ -179,8 +179,10 @@ const TARJETAS_ADMIN = [
         descripcion: 'Gestionar Cronograma y Base de datos de la Iglesia',
         color: '#2c5f7c',
         subopciones: [
-            { texto: '📅 Cronograma', accion: 'cronogramaIglesia' },
+            { texto: '📅 Gestionar Cronograma', accion: 'cronogramaIglesia' },
             { texto: '📋 Encuestas', accion: 'encuestasIglesia' },
+            { texto: '📅 Calendario', accion: 'calendarioIglesia' },
+            { texto: '📹 Gestionar Transmisiones', accion: 'gestionarTransmisiones' },
             { texto: '🗄️ Base de datos', accion: 'baseDatosIglesia' },
             { texto: '👥 Ver interesados', accion: 'verInteresados' }
         ]
@@ -415,6 +417,20 @@ function toggleSubmenuAdmin(tarjetaId, event) {
                 <span class="item-texto">Encuestas</span>
                 <i class="fas fa-chevron-right item-flecha"></i>
             </div>
+            <div class="admin-menu-item" onclick="ejecutarAccionAdmin('calendarioIglesia', '📅 Calendario', event)">
+                <div class="item-icono" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%);">
+                    <i class="fas fa-calendar-week" style="color: white; font-size: 1.2rem;"></i>
+                </div>
+                <span class="item-texto">Calendario</span>
+                <i class="fas fa-chevron-right item-flecha"></i>
+            </div>
+            <div class="admin-menu-item" onclick="ejecutarAccionAdmin('gestionarTransmisiones', '📹 Gestionar Transmisiones', event)">
+                <div class="item-icono" style="background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);">
+                    <i class="fas fa-video" style="color: white; font-size: 1.2rem;"></i>
+                </div>
+                <span class="item-texto">Gestionar Transmisiones</span>
+                <i class="fas fa-chevron-right item-flecha"></i>
+            </div>
             <div class="admin-menu-item" onclick="ejecutarAccionAdmin('baseDatosIglesia', '🗄️ Base de datos', event)">
                 <div class="item-icono" style="background: var(--deep-blue);">
                     <i class="fas fa-database" style="color: white; font-size: 1.2rem;"></i>
@@ -488,6 +504,12 @@ function ejecutarAccionAdmin(accion, texto, event) {
             break;
         case 'encuestasIglesia':
             abrirEncuestas();
+            break;
+        case 'calendarioIglesia':
+            abrirCalendarioIglesiaAdmin();
+            break;
+        case 'gestionarTransmisiones':
+            abrirModalGestionarTransmisiones();
             break;
         case 'baseDatosIglesia':
             alert('Función de Base de datos en construcción');
@@ -626,15 +648,53 @@ const CLUBES_STORAGE_CALENDARIO = {
 
 // ===== MODALES PERSONALIZADOS (reemplazo de alert/confirm) =====
 
+// ===== CONTROL CENTRALIZADO DE SCROLL Y MODALES DEL ADMIN =====
+const adminModalesAbiertos = new Set();
+
+function bloquearScrollAdmin(idModal) {
+    if (idModal) adminModalesAbiertos.add(idModal);
+    document.body.style.overflow = 'hidden';
+}
+
+function desbloquearScrollAdmin(idModal) {
+    if (idModal) adminModalesAbiertos.delete(idModal);
+
+    const algunModalVisible = [
+        document.getElementById('panelAdminGeneral'),
+        document.getElementById('modalGestionarTransmisiones'),
+        document.getElementById('modalAlertaAdmin'),
+        document.getElementById('modalConfirmAdmin'),
+        document.getElementById('seccionCalendarioIglesia'),
+        document.getElementById('seccionCalendarioClub'),
+        document.getElementById('seccionCuotasClub'),
+        document.getElementById('seccionBaseDatosClub'),
+        document.getElementById('modalAgregarAnuncio'),
+        document.getElementById('modalQuitarAnuncio')
+    ].some(el => {
+        if (!el) return false;
+        if (el.classList.contains('active')) return true;
+        const style = window.getComputedStyle(el);
+        return style.display !== 'none' && style.visibility !== 'hidden';
+    });
+
+    if (adminModalesAbiertos.size === 0 && !algunModalVisible) {
+        document.body.style.overflow = '';
+    } else {
+        document.body.style.overflow = 'hidden';
+    }
+}
+
 // --- Modal de Alerta ---
 function mostrarAlertaAdmin(mensaje, titulo = 'Atención') {
     document.getElementById('modalAlertaTitulo').textContent = titulo;
-    document.getElementById('modalAlertaMensaje').innerHTML = mensaje; // ✅ CAMBIADO A innerHTML
+    document.getElementById('modalAlertaMensaje').innerHTML = mensaje;
+    bloquearScrollAdmin('modalAlertaAdmin');
     document.getElementById('modalAlertaAdmin').classList.add('active');
 }
 
 function cerrarModalAlerta() {
     document.getElementById('modalAlertaAdmin').classList.remove('active');
+    desbloquearScrollAdmin('modalAlertaAdmin');
 }
 
 // --- Modal de Confirmación ---
@@ -642,8 +702,9 @@ let _callbackConfirm = null;
 
 function mostrarConfirmAdmin(mensaje, titulo, callbackSi) {
     document.getElementById('modalConfirmTitulo').textContent = titulo || 'Confirmar acción';
-    document.getElementById('modalConfirmMensaje').innerHTML = mensaje; // ✅ CAMBIADO A innerHTML
+    document.getElementById('modalConfirmMensaje').innerHTML = mensaje;
     _callbackConfirm = callbackSi;
+    bloquearScrollAdmin('modalConfirmAdmin');
     document.getElementById('modalConfirmAdmin').classList.add('active');
 
     const btnSi = document.getElementById('btnConfirmSi');
@@ -659,13 +720,59 @@ function mostrarConfirmAdmin(mensaje, titulo, callbackSi) {
 function cerrarModalConfirm() {
     document.getElementById('modalConfirmAdmin').classList.remove('active');
     _callbackConfirm = null;
+    desbloquearScrollAdmin('modalConfirmAdmin');
 }
 
 // Cerrar modales con Escape
 document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
-        cerrarModalAlerta();
-        cerrarModalConfirm();
+        const alerta = document.getElementById('modalAlertaAdmin');
+        if (alerta && (alerta.classList.contains('active') || alerta.style.display === 'flex')) {
+            cerrarModalAlerta();
+            return;
+        }
+
+        const confirm = document.getElementById('modalConfirmAdmin');
+        if (confirm && (confirm.classList.contains('active') || confirm.style.display === 'flex')) {
+            cerrarModalConfirm();
+            return;
+        }
+
+        const calIglesia = document.getElementById('seccionCalendarioIglesia');
+        if (calIglesia && calIglesia.style.display !== 'none' && calIglesia.style.display !== '') {
+            cerrarCalendarioIglesiaAdmin();
+            return;
+        }
+
+        const calClub = document.getElementById('seccionCalendarioClub');
+        if (calClub && calClub.style.display !== 'none' && calClub.style.display !== '') {
+            cerrarCalendarioClub();
+            return;
+        }
+
+        const cuotas = document.getElementById('seccionCuotasClub');
+        if (cuotas && cuotas.style.display !== 'none' && cuotas.style.display !== '') {
+            cerrarCuotasClub();
+            return;
+        }
+
+        const bdClub = document.getElementById('seccionBaseDatosClub');
+        if (bdClub && bdClub.style.display !== 'none' && bdClub.style.display !== '') {
+            cerrarBaseDatosClub();
+            return;
+        }
+
+        const trans = document.getElementById('modalGestionarTransmisiones');
+        if (trans && trans.style.display !== 'none' && trans.style.display !== '') {
+            cerrarModalGestionarTransmisiones();
+            return;
+        }
+
+        const panel = document.getElementById('panelAdminGeneral');
+        if (panel && panel.style.display !== 'none' && panel.style.display !== '') {
+            cerrarPanelAdminGeneral();
+            return;
+        }
     }
 });
 
@@ -1649,8 +1756,81 @@ document.addEventListener('keydown', function (e) {
     }
 });
 
-// ===== CRONOGRAMA =====
-const STORAGE_CRONOGRAMA = 'eventosIglesia';
+// ===== CRONOGRAMA DE PREDICADORES Y ACTIVIDADES POR FECHA =====
+const STORAGE_PREDICADORES_FECHAS = 'cronograma_predicadores_fechas';
+const STORAGE_CRONOGRAMA = 'eventosIglesia'; // Mantener compatibilidad con eventos genéricos
+
+let mesAnnoAdminCronograma = '2026-08'; // Mes/año seleccionado en admin por defecto
+
+const ESTRUCTURA_ACTIVIDADES = [
+    {
+        categoria: 'Culto',
+        icono: 'fa-pray',
+        actividades: [
+            { nombre: 'Canto', diaSemana: 6, diaNombre: 'Sábados' },
+            { nombre: 'Escuela Sabática', diaSemana: 6, diaNombre: 'Sábados' },
+            { nombre: 'Minuto Misionero', diaSemana: 6, diaNombre: 'Sábados' },
+            { nombre: 'Predica', diaSemana: 6, diaNombre: 'Sábados' }
+        ]
+    },
+    {
+        categoria: 'Sociedad de Jóvenes',
+        icono: 'fa-users',
+        actividades: [
+            { nombre: 'Sociedad de Jóvenes', diaSemana: 6, diaNombre: 'Sábados (tarde)' }
+        ]
+    },
+    {
+        categoria: 'Reuniones de Oración',
+        icono: 'fa-hands-praying',
+        actividades: [
+            { nombre: 'Lunes de Oración', diaSemana: 1, diaNombre: 'Lunes' },
+            { nombre: 'Miércoles de Testimonio', diaSemana: 3, diaNombre: 'Miércoles' }
+        ]
+    },
+    {
+        categoria: 'Grupos Pequeños',
+        icono: 'fa-home',
+        actividades: [
+            { nombre: 'Unidos en Verdad', diaSemana: 2, diaNombre: 'Martes' },
+            { nombre: 'Mansión Gloriosa', diaSemana: 2, diaNombre: 'Martes' },
+            { nombre: 'Mansión Gloriosa Kid', diaSemana: 2, diaNombre: 'Martes' },
+            { nombre: 'Aposento Alto', diaSemana: 2, diaNombre: 'Martes' },
+            { nombre: 'Jehová Jireh', diaSemana: 2, diaNombre: 'Martes' },
+            { nombre: 'Maranatha 1', diaSemana: 2, diaNombre: 'Martes' },
+            { nombre: 'Maranatha 2', diaSemana: 2, diaNombre: 'Martes' },
+            { nombre: 'Ah de Venir', diaSemana: 2, diaNombre: 'Martes' }
+        ]
+    }
+];
+
+function cargarPredicadoresFechas() {
+    try {
+        return JSON.parse(localStorage.getItem(STORAGE_PREDICADORES_FECHAS)) || {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function guardarPredicadoresFechas(data) {
+    localStorage.setItem(STORAGE_PREDICADORES_FECHAS, JSON.stringify(data));
+    window.dispatchEvent(new Event('datosCronogramaActualizados'));
+    window.dispatchEvent(new Event('datosIglesiaActualizados'));
+}
+
+function calcularFechasDelMes(ano, mesIndex, diaSemanaTarget) {
+    const fechas = [];
+    const numDias = new Date(ano, mesIndex + 1, 0).getDate();
+    for (let d = 1; d <= numDias; d++) {
+        const fecha = new Date(ano, mesIndex, d);
+        if (fecha.getDay() === diaSemanaTarget) {
+            const mm = String(mesIndex + 1).padStart(2, '0');
+            const dd = String(d).padStart(2, '0');
+            fechas.push(`${ano}-${mm}-${dd}`);
+        }
+    }
+    return fechas;
+}
 
 function abrirCronograma() {
     const panel = document.getElementById('panelAdminGeneral');
@@ -1661,10 +1841,17 @@ function abrirCronograma() {
         seccion.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9997;overflow-y:auto;font-family:Inter,sans-serif;';
         document.body.appendChild(seccion);
     }
-    seccion.innerHTML = generarHTMLCronograma();
+
+    // Inicializar mes por defecto al actual si no está seteado
+    if (!mesAnnoAdminCronograma) {
+        const hoy = new Date();
+        const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+        mesAnnoAdminCronograma = `${hoy.getFullYear()}-${mm}`;
+    }
+
+    seccion.innerHTML = generarHTMLCronograma(mesAnnoAdminCronograma);
     seccion.style.display = 'block';
-    panel.style.display = 'none';
-    setTimeout(() => vincularEventosCronograma(), 100);
+    if (panel) panel.style.display = 'none';
 }
 
 function cerrarCronograma() {
@@ -1674,70 +1861,217 @@ function cerrarCronograma() {
     if (panel) panel.style.display = 'block';
 }
 
-function cargarEventos() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_CRONOGRAMA)) || []; }
-    catch (e) { return []; }
-}
-function guardarEventos(eventos) {
-    localStorage.setItem(STORAGE_CRONOGRAMA, JSON.stringify(eventos));
+function cambiarMesCronogramaAdmin(nuevoMes) {
+    if (!nuevoMes) return;
+    mesAnnoAdminCronograma = nuevoMes;
+    const seccion = document.getElementById('seccionCronograma');
+    if (seccion) {
+        seccion.innerHTML = generarHTMLCronograma(mesAnnoAdminCronograma);
+    }
 }
 
-function generarHTMLCronograma() {
-    const eventos = cargarEventos().sort((a, b) => a.fecha.localeCompare(b.fecha));
-    let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">';
-    html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;">📅 Cronograma de la Iglesia</h3>';
-    html += '<button onclick="cerrarCronograma()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver</button></div>';
-    html += '<div style="max-width:800px;margin:0 auto;padding:1rem;">';
-    // formulario
-    html += '<div style="background:white;border-radius:1.5rem;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 15px rgba(0,0,0,0.05);">';
-    html += '<h4 style="color:#1a3a4a;margin-bottom:1rem;"><i class="fas fa-plus-circle"></i> Agregar Evento</h4>';
-    html += '<input type="text" id="eventoTitulo" placeholder="Título del evento" style="width:100%;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;margin-bottom:0.8rem;font-family:Inter,sans-serif;">';
-    html += '<div style="display:flex;gap:0.8rem;flex-wrap:wrap;">';
-    html += '<input type="date" id="eventoFecha" style="flex:1;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;font-family:Inter,sans-serif;">';
-    html += '<input type="time" id="eventoHora" style="flex:1;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;font-family:Inter,sans-serif;">';
-    html += '</div>';
-    html += '<button onclick="agregarEvento()" style="margin-top:0.8rem;width:100%;padding:0.8rem;background:linear-gradient(135deg,#d4a038 0%,#c9a53b 100%);color:#1a3a4a;border:none;border-radius:2rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;"><i class="fas fa-plus"></i> Agregar Evento</button>';
-    html += '</div>';
-    // lista
-    html += '<div>';
-    if (eventos.length === 0) {
-        html += '<p style="text-align:center;color:#5a6474;">No hay eventos programados.</p>';
+function guardarPredicadorFecha(actividad, fecha, valor) {
+    const data = cargarPredicadoresFechas();
+    if (!data[actividad]) data[actividad] = {};
+    const texto = valor.trim();
+    if (texto === '') {
+        delete data[actividad][fecha];
     } else {
-        eventos.forEach(ev => {
-            html += '<div class="evento-item">';
-            html += '<div class="evento-info"><div class="evento-titulo">' + ev.titulo + '</div>';
-            html += '<div class="evento-fecha">' + ev.fecha + ' a las ' + ev.hora + '</div></div>';
-            html += '<button class="btn-eliminar-miembro" onclick="eliminarEvento(' + ev.id + ')" title="Quitar">🗑️</button>';
-            html += '</div>';
-        });
+        data[actividad][fecha] = texto;
     }
-    html += '</div></div>';
+    guardarPredicadoresFechas(data);
+}
+
+function guardarActividadMes(actividad) {
+    const data = cargarPredicadoresFechas();
+    if (!data[actividad]) data[actividad] = {};
+
+    const inputs = document.querySelectorAll(`.input-predicador[data-actividad="${actividad}"]`);
+    inputs.forEach(inp => {
+        const fecha = inp.dataset.fecha;
+        const val = inp.value.trim();
+        if (val === '') {
+            delete data[actividad][fecha];
+        } else {
+            data[actividad][fecha] = val;
+        }
+    });
+
+    guardarPredicadoresFechas(data);
+    mostrarFeedbackAdmin(`¡Predicadores guardados para "${actividad}"!`);
+}
+
+function guardarTodoElMes() {
+    const data = cargarPredicadoresFechas();
+    const inputs = document.querySelectorAll('.input-predicador');
+    inputs.forEach(inp => {
+        const actividad = inp.dataset.actividad;
+        const fecha = inp.dataset.fecha;
+        const val = inp.value.trim();
+        if (!data[actividad]) data[actividad] = {};
+
+        if (val === '') {
+            delete data[actividad][fecha];
+        } else {
+            data[actividad][fecha] = val;
+        }
+    });
+
+    guardarPredicadoresFechas(data);
+    mostrarFeedbackAdmin('¡Todos los predicadores del mes han sido guardados con éxito!');
+}
+
+function mostrarFeedbackAdmin(mensaje) {
+    let msgEl = document.getElementById('cronogramaToastAdmin');
+    if (!msgEl) {
+        msgEl = document.createElement('div');
+        msgEl.id = 'cronogramaToastAdmin';
+        msgEl.style.cssText = 'position:fixed;bottom:2rem;right:2rem;background:#1b5e20;color:white;padding:1rem 1.8rem;border-radius:2rem;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,0.3);z-index:10000;display:flex;align-items:center;gap:0.8rem;font-size:0.95rem;transition:all 0.3s ease;';
+        document.body.appendChild(msgEl);
+    }
+    msgEl.innerHTML = `<i class="fas fa-check-circle" style="font-size:1.3rem;color:#a5d6a7;"></i> ${mensaje}`;
+    msgEl.style.opacity = '1';
+    msgEl.style.transform = 'translateY(0)';
+    setTimeout(() => {
+        msgEl.style.opacity = '0';
+        msgEl.style.transform = 'translateY(20px)';
+    }, 3000);
+}
+
+function generarHTMLCronograma(mesAnno) {
+    const parts = mesAnno.split('-');
+    const ano = parseInt(parts[0], 10);
+    const mesIndex = parseInt(parts[1], 10) - 1;
+
+    const nombresMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const mesNombre = nombresMeses[mesIndex] || '';
+
+    const dataGuardada = cargarPredicadoresFechas();
+
+    let html = `
+    <div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1.2rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.25);">
+        <div style="display:flex;align-items:center;gap:0.8rem;">
+            <i class="fas fa-calendar-alt" style="color:#c9a53b;font-size:1.6rem;"></i>
+            <div>
+                <h3 style="color:white;margin:0;font-size:1.2rem;font-weight:700;">📅 Gestión de Predicadores por Fecha</h3>
+                <span style="color:rgba(255,255,255,0.7);font-size:0.85rem;">Asignación detallada para el cronograma de la iglesia</span>
+            </div>
+        </div>
+        <button onclick="cerrarCronograma()" style="background:rgba(255,255,255,0.18);color:white;border:1px solid rgba(255,255,255,0.3);padding:0.6rem 1.4rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;font-size:0.9rem;transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.18)'">
+            <i class="fas fa-arrow-left"></i> Volver al Panel
+        </button>
+    </div>
+
+    <div style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem;">
+        <!-- BARRA CONTROLES GENERALES -->
+        <div style="background:white;border-radius:1.5rem;padding:1.5rem 2rem;margin-bottom:2rem;box-shadow:0 6px 25px rgba(0,0,0,0.06);display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1.2rem;border-left:5px solid #c9a53b;">
+            <div>
+                <label style="font-weight:700;color:#1a3a4a;font-size:0.95rem;margin-right:0.8rem;display:block;margin-bottom:0.4rem;">
+                    <i class="fas fa-calendar-day" style="color:#c9a53b;"></i> Seleccionar Mes y Año:
+                </label>
+                <input type="month" value="${mesAnno}" onchange="cambiarMesCronogramaAdmin(this.value)" style="padding:0.6rem 1rem;border:2px solid #e2e8f0;border-radius:0.8rem;font-family:Inter,sans-serif;font-size:1rem;font-weight:600;color:#1a3a4a;outline:none;cursor:pointer;">
+            </div>
+            <div style="display:flex;align-items:center;gap:1rem;">
+                <span style="font-size:1.1rem;font-weight:700;color:#2c5f7c;background:#f0f7ff;padding:0.5rem 1.2rem;border-radius:1rem;border:1px solid rgba(44,95,124,0.15);">
+                    📆 ${mesNombre} ${ano}
+                </span>
+                <button onclick="guardarTodoElMes()" style="background:linear-gradient(135deg,#2e7d32 0%,#388e3c 100%);color:white;border:none;padding:0.75rem 1.6rem;border-radius:2rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;box-shadow:0 4px 15px rgba(46,125,50,0.3);transition:all 0.2s ease;">
+                    <i class="fas fa-save"></i> Guardar Todo el Mes
+                </button>
+            </div>
+        </div>
+
+        <!-- LISTA DE CATEGORÍAS Y ACTIVIDADES -->
+        <div style="display:flex;flex-direction:column;gap:2rem;">
+    `;
+
+    ESTRUCTURA_ACTIVIDADES.forEach(cat => {
+        html += `
+        <div style="background:white;border-radius:1.6rem;padding:1.8rem;box-shadow:0 6px 25px rgba(0,0,0,0.05);border:1px solid #edf2f7;">
+            <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:1.5rem;padding-bottom:0.8rem;border-bottom:2px solid #f1f5f9;">
+                <div style="width:42px;height:42px;background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c9a53b;">
+                    <i class="fas ${cat.icono}" style="font-size:1.2rem;"></i>
+                </div>
+                <h4 style="margin:0;font-size:1.3rem;color:#1a3a4a;font-weight:700;">Categoría: ${cat.categoria}</h4>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:1.5rem;">
+        `;
+
+        cat.actividades.forEach(act => {
+            const actNombre = act.nombre;
+            const diaSemana = act.diaSemana;
+            const diaNombre = act.diaNombre;
+
+            const fechasDelMes = calcularFechasDelMes(ano, mesIndex, diaSemana);
+            const actData = dataGuardada[actNombre] || {};
+
+            html += `
+            <div style="background:#fafbfc;border:1px solid #e2e8f0;border-radius:1.2rem;padding:1.3rem;display:flex;flex-direction:column;justify-space-between;">
+                <div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;gap:0.5rem;">
+                        <h5 style="margin:0;font-size:1.1rem;color:#1a3a4a;font-weight:700;">${actNombre}</h5>
+                        <span style="background:#e0f2fe;color:#0369a1;font-size:0.75rem;font-weight:700;padding:0.3rem 0.7rem;border-radius:1rem;">
+                            📌 ${diaNombre}
+                        </span>
+                    </div>
+
+                    <div style="display:flex;flex-direction:column;gap:0.8rem;margin-bottom:1.2rem;">
+            `;
+
+            if (fechasDelMes.length === 0) {
+                html += `<p style="font-size:0.85rem;color:#64748b;margin:0;">No hay fechas registradas para este mes.</p>`;
+            } else {
+                fechasDelMes.forEach(fechaStr => {
+                    const [fAno, fMes, fDia] = fechaStr.split('-');
+                    const fechaFormateada = `${fDia}/${fMes}/${fAno}`;
+                    const valorActual = actData[fechaStr] || '';
+
+                    html += `
+                    <div style="display:flex;align-items:center;gap:0.8rem;background:white;padding:0.6rem 0.9rem;border-radius:0.8rem;border:1px solid #cbd5e1;">
+                        <span style="font-weight:700;color:#334155;font-size:0.88rem;min-width:90px;">
+                            📅 ${fechaFormateada}
+                        </span>
+                        <input type="text" 
+                               class="input-predicador" 
+                               data-actividad="${actNombre}" 
+                               data-fecha="${fechaStr}" 
+                               value="${valorActual}" 
+                               placeholder="Predicador o encargado..." 
+                               onblur="guardarPredicadorFecha('${actNombre}', '${fechaStr}', this.value)" 
+                               style="flex:1;padding:0.45rem 0.8rem;border:1px solid #cbd5e1;border-radius:0.6rem;font-family:Inter,sans-serif;font-size:0.85rem;outline:none;transition:border-color 0.2s ease;" 
+                               onfocus="this.style.borderColor='#c9a53b'">
+                    </div>
+                    `;
+                });
+            }
+
+            html += `
+                    </div>
+                </div>
+                <button onclick="guardarActividadMes('${actNombre}')" style="width:100%;background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);color:white;border:none;padding:0.6rem;border-radius:0.8rem;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s ease;">
+                    <i class="fas fa-save"></i> Guardar ${actNombre}
+                </button>
+            </div>
+            `;
+        });
+
+        html += `
+            </div>
+        </div>
+        `;
+    });
+
+    html += `
+        </div>
+    </div>
+    `;
+
     return html;
 }
 
-function agregarEvento() {
-    const titulo = document.getElementById('eventoTitulo').value.trim();
-    const fecha = document.getElementById('eventoFecha').value;
-    const hora = document.getElementById('eventoHora').value;
-    if (!titulo || !fecha || !hora) { alert('Completa todos los campos'); return; }
-    const eventos = cargarEventos();
-    eventos.push({ id: Date.now(), titulo, fecha, hora });
-    guardarEventos(eventos);
-    window.dispatchEvent(new Event('datosIglesiaActualizados'));
-    document.getElementById('seccionCronograma').innerHTML = generarHTMLCronograma();
-    setTimeout(() => vincularEventosCronograma(), 100);
-}
+function vincularEventosCronograma() { /* Los handlers inline onblur y onclick manejan todo limpiamente */ }
 
-function eliminarEvento(id) {
-    if (!confirm('¿Quitar este evento?')) return;
-    let eventos = cargarEventos().filter(e => e.id !== id);
-    guardarEventos(eventos);
-    window.dispatchEvent(new Event('datosIglesiaActualizados'));
-    document.getElementById('seccionCronograma').innerHTML = generarHTMLCronograma();
-    setTimeout(() => vincularEventosCronograma(), 100);
-}
-
-function vincularEventosCronograma() { /* los botones ya tienen onclick */ }
 
 // ===== ENCUESTAS =====
 const STORAGE_ENCUESTAS = 'encuestasIglesia';
@@ -2911,3 +3245,601 @@ if (typeof abrirModalCrearExamen !== 'undefined') window.abrirModalCrearExamen =
 if (typeof abrirModalEditarExamenes !== 'undefined') window.abrirModalEditarExamenes = abrirModalEditarExamenes;
 if (typeof abrirModalGestionarResultados !== 'undefined') window.abrirModalGestionarResultados = abrirModalGestionarResultados;
 if (typeof abrirModalGestionarPlanEstudios !== 'undefined') window.abrirModalGestionarPlanEstudios = abrirModalGestionarPlanEstudios;
+
+/* ========================================
+   GESTIÓN DE TRANSMISIONES EN VIVO (PANEL ADMIN)
+   ======================================== */
+
+let transmisionEditandoId = null;
+
+function abrirModalGestionarTransmisiones() {
+    const modal = document.getElementById('modalGestionarTransmisiones');
+    if (!modal) return;
+    document.body.style.overflow = 'hidden';
+    modal.style.display = 'flex';
+    transmisionEditandoId = null;
+    renderizarAdminTransmisiones();
+}
+
+function cerrarModalGestionarTransmisiones(e) {
+    if (e && e.target && e.target !== document.getElementById('modalGestionarTransmisiones')) {
+        // mantener abierto si clic es dentro del modal
+    }
+    const modal = document.getElementById('modalGestionarTransmisiones');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
+function renderizarAdminTransmisiones() {
+    const container = document.getElementById('adminTransmisionesContenido');
+    if (!container) return;
+
+    const transmisiones = typeof obtenerTransmisiones === 'function' ? obtenerTransmisiones() : [];
+
+    let transEdit = null;
+    if (transmisionEditandoId) {
+        transEdit = transmisiones.find(t => t.id === transmisionEditandoId);
+    }
+
+    const fechaHoy = new Date().toISOString().split('T')[0];
+
+    let html = `
+    <!-- FORMULARIO DE AGREGAR / EDITAR TRANSMISIÓN -->
+    <div style="background: #faf8f5; border: 1px solid rgba(201,165,59,0.3); border-radius: 1.2rem; padding: 1.5rem; margin-bottom: 2rem;">
+        <h4 style="margin: 0 0 1rem; color: #1a3a4a; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="${transEdit ? 'fas fa-edit' : 'fas fa-plus-circle'}" style="color: #c9a53b;"></i>
+            ${transEdit ? 'Editar Transmisión' : 'Agregar Nueva Transmisión'}
+        </h4>
+
+        <form id="formTransmisionAdmin" onsubmit="guardarTransmisionForm(event)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+            <div>
+                <label style="display:block; font-weight:600; font-size:0.85rem; color:#1a3a4a; margin-bottom:0.3rem;">Categoría *</label>
+                <select id="transCategoria" required style="width:100%; padding:0.65rem; border-radius:0.6rem; border:1px solid #cbd5e1; font-family:Inter,sans-serif;">
+                    <option value="Sábado (Culto)" ${transEdit && transEdit.categoria === 'Sábado (Culto)' ? 'selected' : ''}>🎥 Sábado (Culto)</option>
+                    <option value="Sociedad de Jóvenes" ${transEdit && transEdit.categoria === 'Sociedad de Jóvenes' ? 'selected' : ''}>🙌 Sociedad de Jóvenes</option>
+                    <option value="Lunes de Oración" ${transEdit && transEdit.categoria === 'Lunes de Oración' ? 'selected' : ''}>🙏 Lunes de Oración</option>
+                    <option value="Miércoles de Testimonio" ${transEdit && transEdit.categoria === 'Miércoles de Testimonio' ? 'selected' : ''}>✝️ Miércoles de Testimonio</option>
+                    <option value="Campaña" ${transEdit && transEdit.categoria === 'Campaña' ? 'selected' : ''}>📢 Campaña</option>
+                </select>
+            </div>
+
+            <div style="grid-column: span 2;">
+                <label style="display:block; font-weight:600; font-size:0.85rem; color:#1a3a4a; margin-bottom:0.3rem;">Título de la transmisión *</label>
+                <input type="text" id="transTitulo" placeholder="Ej: Culto Divino de Adoración" value="${transEdit ? transEdit.titulo : ''}" required style="width:100%; padding:0.65rem; border-radius:0.6rem; border:1px solid #cbd5e1; font-family:Inter,sans-serif;">
+            </div>
+
+            <div>
+                <label style="display:block; font-weight:600; font-size:0.85rem; color:#1a3a4a; margin-bottom:0.3rem;">Fecha de transmisión *</label>
+                <input type="date" id="transFecha" value="${transEdit ? transEdit.fecha : fechaHoy}" required style="width:100%; padding:0.65rem; border-radius:0.6rem; border:1px solid #cbd5e1; font-family:Inter,sans-serif;">
+            </div>
+
+            <div>
+                <label style="display:block; font-weight:600; font-size:0.85rem; color:#1a3a4a; margin-bottom:0.3rem;">Plataforma *</label>
+                <select id="transPlataforma" required style="width:100%; padding:0.65rem; border-radius:0.6rem; border:1px solid #cbd5e1; font-family:Inter,sans-serif;">
+                    <option value="youtube" ${transEdit && transEdit.plataforma === 'youtube' ? 'selected' : ''}>YouTube</option>
+                    <option value="facebook" ${transEdit && transEdit.plataforma === 'facebook' ? 'selected' : ''}>Facebook</option>
+                </select>
+            </div>
+
+            <div style="grid-column: span 2;">
+                <label style="display:block; font-weight:600; font-size:0.85rem; color:#1a3a4a; margin-bottom:0.3rem;">URL o ID del video *</label>
+                <input type="text" id="transVideoId" placeholder="Para YouTube: dQw4w9WgXcQ o URL completa. Para Facebook: URL completa" value="${transEdit ? transEdit.videoId : ''}" required style="width:100%; padding:0.65rem; border-radius:0.6rem; border:1px solid #cbd5e1; font-family:Inter,sans-serif;">
+            </div>
+
+            <div style="grid-column: 1 / -1;">
+                <label style="display:block; font-weight:600; font-size:0.85rem; color:#1a3a4a; margin-bottom:0.3rem;">Descripción (Opcional)</label>
+                <textarea id="transDescripcion" rows="2" placeholder="Breve descripción del tema o predicador..." style="width:100%; padding:0.65rem; border-radius:0.6rem; border:1px solid #cbd5e1; font-family:Inter,sans-serif;">${transEdit && transEdit.descripcion ? transEdit.descripcion : ''}</textarea>
+            </div>
+
+            <div style="display:flex; gap:1.5rem; align-items:center; grid-column: 1 / -1; background:white; padding:0.8rem; border-radius:0.6rem; border:1px solid #e2e8f0;">
+                <label style="display:inline-flex; align-items:center; gap:0.5rem; font-weight:600; font-size:0.88rem; color:#1a3a4a; cursor:pointer;">
+                    <input type="checkbox" id="transDestacado" ${transEdit && transEdit.destacado ? 'checked' : ''}>
+                    ⭐ Marcar como Destacado
+                </label>
+                <label style="display:inline-flex; align-items:center; gap:0.5rem; font-weight:600; font-size:0.88rem; color:#c53030; cursor:pointer;">
+                    <input type="checkbox" id="transEnVivo" ${transEdit && transEdit.enVivo ? 'checked' : ''}>
+                    🔴 Marcar como EN VIVO (Transmitiendo actualmente)
+                </label>
+            </div>
+
+            <div style="grid-column: 1 / -1; display:flex; gap:0.8rem; justify-content:flex-end; margin-top:0.5rem;">
+                ${transEdit ? `
+                <button type="button" onclick="cancelarEdicionTransmision()" style="background:#e2e8f0; color:#475569; border:none; padding:0.7rem 1.2rem; border-radius:0.8rem; font-weight:600; cursor:pointer; font-family:Inter,sans-serif;">
+                    Cancelar Edición
+                </button>
+                ` : ''}
+                <button type="submit" style="background:linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); color:white; border:none; padding:0.7rem 1.6rem; border-radius:0.8rem; font-weight:700; cursor:pointer; font-family:Inter,sans-serif;">
+                    <i class="fas fa-save"></i> ${transEdit ? 'Guardar Cambios' : 'Publicar Transmisión'}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- LISTA DE TRANSMISIONES EXISTENTES -->
+    <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.8rem;">
+            <h4 style="margin:0; color:#1a3a4a; font-size:1.1rem;">
+                <i class="fas fa-list"></i> Transmisiones Registradas (${transmisiones.length})
+            </h4>
+            <select id="filtroCategoriaAdmin" onchange="filtrarTransmisionesAdminList(this.value)" style="padding:0.45rem 0.8rem; border-radius:0.6rem; border:1px solid #cbd5e1; font-size:0.85rem; font-family:Inter,sans-serif;">
+                <option value="TODAS">Todas las categorías</option>
+                <option value="Sábado (Culto)">🎥 Sábado (Culto)</option>
+                <option value="Sociedad de Jóvenes">🙌 Sociedad de Jóvenes</option>
+                <option value="Lunes de Oración">🙏 Lunes de Oración</option>
+                <option value="Miércoles de Testimonio">✝️ Miércoles de Testimonio</option>
+                <option value="Campaña">📢 Campaña</option>
+            </select>
+        </div>
+
+        <div id="tablaTransmisionesAdminWrapper" style="overflow-x:auto; max-height:45vh; border:1px solid #e2e8f0; border-radius:0.8rem;">
+            ${generarTablaTransmisionesAdminHTML(transmisiones)}
+        </div>
+    </div>
+    `;
+
+    container.innerHTML = html;
+}
+
+function generarTablaTransmisionesAdminHTML(lista) {
+    if (!lista || lista.length === 0) {
+        return `
+        <div style="text-align:center; padding:2rem; color:#64748b;">
+            <i class="fas fa-inbox" style="font-size:2rem; margin-bottom:0.5rem;"></i>
+            <p style="margin:0;">No hay transmisiones registradas en el sistema.</p>
+        </div>
+        `;
+    }
+
+    // Ordenar por fecha descendente
+    lista.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+    let html = `
+    <table class="tabla-cronograma" style="width:100%; border-collapse:collapse; text-align:left;">
+        <thead>
+            <tr style="background:#1a3a4a; color:white;">
+                <th style="padding:0.75rem 0.8rem;">Categoría</th>
+                <th style="padding:0.75rem 0.8rem;">Título</th>
+                <th style="padding:0.75rem 0.8rem;">Fecha</th>
+                <th style="padding:0.75rem 0.8rem;">Plataforma</th>
+                <th style="padding:0.75rem 0.8rem; text-align:center;">Estados</th>
+                <th style="padding:0.75rem 0.8rem; text-align:center;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+
+    lista.forEach(t => {
+        html += `
+        <tr style="border-bottom:1px solid #e2e8f0;">
+            <td style="padding:0.65rem 0.8rem; font-weight:600; color:#1a3a4a; font-size:0.85rem;">${t.categoria}</td>
+            <td style="padding:0.65rem 0.8rem; font-weight:700; color:#2c5f7c; font-size:0.88rem;">${t.titulo}</td>
+            <td style="padding:0.65rem 0.8rem; font-size:0.85rem; color:#475569;">${t.fecha}</td>
+            <td style="padding:0.65rem 0.8rem;">
+                <span class="envivo-plat-badge envivo-plat-${t.plataforma}" style="position:static; font-size:0.65rem;">
+                    <i class="fab fa-${t.plataforma}"></i> ${t.plataforma}
+                </span>
+            </td>
+            <td style="padding:0.65rem 0.8rem; text-align:center; font-size:0.85rem;">
+                ${t.enVivo ? '<span class="badge-live-pulse" style="font-size:0.65rem; padding:0.2rem 0.5rem; margin-right:0.3rem;">🔴 EN VIVO</span>' : ''}
+                ${t.destacado ? '<span style="background:#fef3c7; color:#b45309; padding:0.2rem 0.5rem; border-radius:1rem; font-size:0.7rem; font-weight:700;">⭐ Destacado</span>' : ''}
+                ${!t.enVivo && !t.destacado ? '<span style="color:#94a3b8;">⏹️ Normal</span>' : ''}
+            </td>
+            <td style="padding:0.65rem 0.8rem; text-align:center;">
+                <div style="display:flex; gap:0.4rem; justify-content:center;">
+                    <button onclick="editarTransmisionAdmin(${t.id})" style="background:#e0f2fe; color:#0369a1; border:none; padding:0.35rem 0.7rem; border-radius:0.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Editar">
+                        ✏️ Editar
+                    </button>
+                    <button onclick="eliminarTransmisionAdmin(${t.id})" style="background:#fee2e2; color:#991b1b; border:none; padding:0.35rem 0.7rem; border-radius:0.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar">
+                        🗑️ Eliminar
+                    </button>
+                </div>
+            </td>
+        </tr>
+        `;
+    });
+
+    html += `
+        </tbody>
+    </table>
+    `;
+
+    return html;
+}
+
+function filtrarTransmisionesAdminList(cat) {
+    const transmisiones = typeof obtenerTransmisiones === 'function' ? obtenerTransmisiones() : [];
+    const filtradas = cat === 'TODAS' ? transmisiones : transmisiones.filter(t => t.categoria === cat);
+    const wrapper = document.getElementById('tablaTransmisionesAdminWrapper');
+    if (wrapper) {
+        wrapper.innerHTML = generarTablaTransmisionesAdminHTML(filtradas);
+    }
+}
+
+function guardarTransmisionForm(e) {
+    e.preventDefault();
+
+    const categoria = document.getElementById('transCategoria').value;
+    const titulo = document.getElementById('transTitulo').value.trim();
+    const fecha = document.getElementById('transFecha').value;
+    const plataforma = document.getElementById('transPlataforma').value;
+    const videoId = document.getElementById('transVideoId').value.trim();
+    const descripcion = document.getElementById('transDescripcion').value.trim();
+    const destacado = document.getElementById('transDestacado').checked;
+    const enVivo = document.getElementById('transEnVivo').checked;
+
+    if (!titulo || !fecha || !videoId) {
+        alert('⚠️ Por favor complete todos los campos obligatorios (*)');
+        return;
+    }
+
+    let transmisiones = typeof obtenerTransmisiones === 'function' ? obtenerTransmisiones() : [];
+
+    // Si se marca enVivo en una categoría, podemos desmarcar las otras en la misma categoría si se desea
+    if (enVivo) {
+        transmisiones.forEach(t => {
+            if (t.categoria === categoria) {
+                t.enVivo = false;
+            }
+        });
+    }
+
+    if (transmisionEditandoId) {
+        const idx = transmisiones.findIndex(t => t.id === transmisionEditandoId);
+        if (idx !== -1) {
+            transmisiones[idx] = {
+                ...transmisiones[idx],
+                categoria,
+                titulo,
+                fecha,
+                plataforma,
+                videoId,
+                descripcion,
+                destacado,
+                enVivo
+            };
+        }
+        transmisionEditandoId = null;
+        alert('✅ Transmisión actualizada correctamente');
+    } else {
+        const nuevaTrans = {
+            id: Date.now(),
+            categoria,
+            titulo,
+            fecha,
+            plataforma,
+            videoId,
+            descripcion,
+            destacado,
+            enVivo,
+            fechaCreacion: new Date().toISOString()
+        };
+        transmisiones.push(nuevaTrans);
+        alert('✅ Transmisión agregada correctamente');
+    }
+
+    if (typeof guardarTransmisiones === 'function') {
+        guardarTransmisiones(transmisiones);
+    } else {
+        localStorage.setItem('transmisiones', JSON.stringify(transmisiones));
+    }
+
+    renderizarAdminTransmisiones();
+    if (typeof renderizarVistaCategoriasEnVivo === 'function') {
+        renderizarVistaCategoriasEnVivo();
+    }
+}
+
+function editarTransmisionAdmin(id) {
+    transmisionEditandoId = id;
+    renderizarAdminTransmisiones();
+    const form = document.getElementById('formTransmisionAdmin');
+    if (form) form.scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelarEdicionTransmision() {
+    transmisionEditandoId = null;
+    renderizarAdminTransmisiones();
+}
+
+function eliminarTransmisionAdmin(id) {
+    const transmisiones = typeof obtenerTransmisiones === 'function' ? obtenerTransmisiones() : [];
+    const t = transmisiones.find(x => x.id === id);
+    const nombre = t ? t.titulo : 'esta transmisión';
+
+    if (confirm(`¿Está seguro de eliminar ${nombre}? Esta acción no se puede deshacer.`)) {
+        const filtradas = transmisiones.filter(x => x.id !== id);
+        if (typeof guardarTransmisiones === 'function') {
+            guardarTransmisiones(filtradas);
+        } else {
+            localStorage.setItem('transmisiones', JSON.stringify(filtradas));
+        }
+
+        if (transmisionEditandoId === id) transmisionEditandoId = null;
+
+        renderizarAdminTransmisiones();
+        if (typeof renderizarVistaCategoriasEnVivo === 'function') {
+            renderizarVistaCategoriasEnVivo();
+        }
+        alert('🗑️ Transmisión eliminada correctamente');
+    }
+}
+
+// Exportar a window
+window.abrirModalGestionarTransmisiones = abrirModalGestionarTransmisiones;
+window.cerrarModalGestionarTransmisiones = cerrarModalGestionarTransmisiones;
+window.guardarTransmisionForm = guardarTransmisionForm;
+window.editarTransmisionAdmin = editarTransmisionAdmin;
+window.cancelarEdicionTransmision = cancelarEdicionTransmision;
+window.eliminarTransmisionAdmin = eliminarTransmisionAdmin;
+window.filtrarTransmisionesAdminList = filtrarTransmisionesAdminList;
+
+/* ========================================
+   GESTIÓN DE CALENDARIO GENERAL DE LA IGLESIA (ADMIN)
+   ======================================== */
+
+let eventoIglesiaPendienteEditarId = null;
+
+function abrirCalendarioIglesiaAdmin() {
+    const panel = document.getElementById('panelAdminGeneral');
+    if (!panel) return;
+
+    bloquearScrollAdmin('seccionCalendarioIglesia');
+
+    let seccion = document.getElementById('seccionCalendarioIglesia');
+    if (!seccion) {
+        seccion = document.createElement('div');
+        seccion.id = 'seccionCalendarioIglesia';
+        seccion.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9999;overflow-y:auto;font-family:Inter,sans-serif;';
+        document.body.appendChild(seccion);
+    }
+
+    eventoIglesiaPendienteEditarId = null;
+    seccion.innerHTML = generarHTMLCalendarioIglesia();
+    seccion.style.display = 'block';
+    panel.style.display = 'none';
+}
+
+function cerrarCalendarioIglesiaAdmin() {
+    const seccion = document.getElementById('seccionCalendarioIglesia');
+    const panel = document.getElementById('panelAdminGeneral');
+    if (seccion) seccion.style.display = 'none';
+    if (panel) panel.style.display = 'block';
+    eventoIglesiaPendienteEditarId = null;
+    desbloquearScrollAdmin('seccionCalendarioIglesia');
+}
+
+function cargarEventosIglesiaAdmin() {
+    try {
+        const raw = localStorage.getItem('eventosIglesia');
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+        const lista = [];
+        Object.keys(parsed).forEach(f => {
+            if (Array.isArray(parsed[f])) {
+                parsed[f].forEach((item) => {
+                    lista.push({
+                        id: Date.now() + Math.random(),
+                        titulo: typeof item === 'string' ? item : item.titulo,
+                        fecha: f,
+                        hora: typeof item === 'string' ? '' : (item.hora || ''),
+                        descripcion: typeof item === 'string' ? '' : (item.descripcion || ''),
+                        recurrente: false,
+                        semanas: 1
+                    });
+                });
+            }
+        });
+        return lista;
+    } catch (e) {
+        return [];
+    }
+}
+
+function guardarEventosIglesiaAdmin(eventos) {
+    localStorage.setItem('eventosIglesia', JSON.stringify(eventos));
+    window.dispatchEvent(new Event('datosIglesiaActualizados'));
+}
+
+function generarHTMLCalendarioIglesia() {
+    const eventos = cargarEventosIglesiaAdmin().sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+    let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">';
+    html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;">📅 Calendario General de la Iglesia</h3>';
+    html += '<button onclick="cerrarCalendarioIglesiaAdmin()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver al Panel</button></div>';
+    html += '<div style="max-width:800px;margin:0 auto;padding:1rem;">';
+    
+    // Formulario
+    html += '<div style="background:white;border-radius:1.5rem;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 15px rgba(0,0,0,0.05);">';
+    html += '<h4 style="color:#1a3a4a;margin-bottom:1rem;" id="formCalendarioIglesiaTitulo"><i class="fas fa-plus-circle"></i> Agregar Evento a la Iglesia</h4>';
+    html += '<input type="text" id="eventoIglesiaTitulo" placeholder="Título del evento (ej: Culto Especial de Gratitud)" style="width:100%;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;margin-bottom:0.8rem;font-family:Inter,sans-serif;">';
+    html += '<div style="display:flex;gap:0.8rem;flex-wrap:wrap;margin-bottom:0.8rem;">';
+    html += '<input type="date" id="eventoIglesiaFecha" style="flex:1;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;font-family:Inter,sans-serif;">';
+    html += '<input type="time" id="eventoIglesiaHora" style="flex:1;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;font-family:Inter,sans-serif;">';
+    html += '</div>';
+    html += '<textarea id="eventoIglesiaDescripcion" placeholder="Descripción opcional..." rows="2" style="width:100%;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;margin-bottom:0.8rem;font-family:Inter,sans-serif;"></textarea>';
+    
+    // Recurrencia
+    html += '<div class="recurrencia-opcion" style="margin-bottom:0.5rem;">';
+    html += '<label style="font-weight:600;color:#1a3a4a;cursor:pointer;"><input type="checkbox" id="eventoIglesiaRecurrente" onchange="toggleCampoRecurrenciaIglesia()"> 📅 Repetir semanalmente</label>';
+    html += '</div>';
+    html += '<div class="campo-recurrencia" id="campoRecurrenciaIglesia" style="display:none;margin-bottom:1rem;padding:0.8rem;background:#faf8f5;border-radius:0.8rem;border:1px solid #e8e3d8;">';
+    html += '<label style="font-weight:600;color:#1a3a4a;margin-right:0.5rem;">Semanas a repetir:</label>';
+    html += '<input type="number" id="eventoIglesiaSemanas" min="1" max="52" value="4" style="width:80px;padding:0.4rem 0.6rem;border-radius:0.5rem;border:1px solid #cbd5e1;">';
+    html += '</div>';
+    
+    html += '<button onclick="agregarEventoIglesiaAdmin()" id="btnGuardarEventoIglesia" style="margin-top:0.5rem;width:100%;padding:0.8rem;background:linear-gradient(135deg,#d4a038 0%,#c9a53b 100%);color:#1a3a4a;border:none;border-radius:2rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;"><i class="fas fa-plus"></i> Agregar Evento</button>';
+    html += '</div>';
+
+    // Lista de eventos
+    html += '<div>';
+    html += '<h4 style="color:#1a3a4a;margin-bottom:0.8rem;"><i class="fas fa-list-ul"></i> Eventos Registrados (' + eventos.length + ')</h4>';
+    if (eventos.length === 0) {
+        html += '<p style="text-align:center;color:#5a6474;padding:1.5rem;background:white;border-radius:1rem;">No hay eventos programados en el calendario general.</p>';
+    } else {
+        eventos.forEach(ev => {
+            html += '<div class="evento-item" style="background:white;border-radius:1rem;padding:1rem;margin-bottom:0.8rem;box-shadow:0 2px 8px rgba(0,0,0,0.04);display:flex;justify-content:space-between;align-items:center;">';
+            html += '<div class="evento-info"><div class="evento-titulo" style="font-weight:700;color:#1a3a4a;">' + ev.titulo + (ev.recurrente ? ' <span style="font-size:0.75rem;background:#fef3c7;color:#b45309;padding:0.15rem 0.5rem;border-radius:0.8rem;">🔄 Semanal</span>' : '') + '</div>';
+            html += '<div class="evento-fecha" style="font-size:0.85rem;color:#5a6474;"><i class="far fa-calendar-alt"></i> ' + ev.fecha + (ev.hora ? ' a las ' + ev.hora : '') + (ev.descripcion ? ' · ' + ev.descripcion : '') + '</div></div>';
+            html += '<div style="display:flex;gap:0.4rem;">';
+            html += '<button class="btn-editar-evento" onclick="abrirEditarEventoIglesia(' + ev.id + ')" title="Editar" style="background:#e0f2fe;color:#0369a1;border:none;padding:0.4rem 0.7rem;border-radius:0.5rem;cursor:pointer;font-weight:600;">✏️</button>';
+            html += '<button class="btn-eliminar-miembro" onclick="eliminarEventoIglesiaAdmin(' + ev.id + ')" title="Quitar" style="background:#fee2e2;color:#991b1b;border:none;padding:0.4rem 0.7rem;border-radius:0.5rem;cursor:pointer;font-weight:600;">🗑️</button>';
+            html += '</div>';
+            html += '</div>';
+        });
+    }
+    html += '</div></div>';
+    return html;
+}
+
+function toggleCampoRecurrenciaIglesia() {
+    const checkbox = document.getElementById('eventoIglesiaRecurrente');
+    const campo = document.getElementById('campoRecurrenciaIglesia');
+    if (campo) {
+        campo.style.display = checkbox.checked ? 'block' : 'none';
+    }
+}
+
+function abrirEditarEventoIglesia(id) {
+    const eventos = cargarEventosIglesiaAdmin();
+    const evento = eventos.find(e => String(e.id) === String(id));
+    if (!evento) return;
+
+    document.getElementById('eventoIglesiaTitulo').value = evento.titulo;
+    document.getElementById('eventoIglesiaFecha').value = evento.fecha;
+    document.getElementById('eventoIglesiaHora').value = evento.hora || '';
+    document.getElementById('eventoIglesiaDescripcion').value = evento.descripcion || '';
+
+    eventoIglesiaPendienteEditarId = id;
+
+    document.getElementById('formCalendarioIglesiaTitulo').innerHTML = '<i class="fas fa-edit"></i> Editar Evento';
+    document.getElementById('btnGuardarEventoIglesia').innerHTML = '<i class="fas fa-save"></i> Guardar Cambios';
+
+    const checkbox = document.getElementById('eventoIglesiaRecurrente');
+    if (checkbox) checkbox.checked = false;
+    toggleCampoRecurrenciaIglesia();
+}
+
+function agregarEventoIglesiaAdmin() {
+    const titulo = document.getElementById('eventoIglesiaTitulo').value.trim();
+    const fecha = document.getElementById('eventoIglesiaFecha').value;
+    const hora = document.getElementById('eventoIglesiaHora').value;
+    const descripcion = document.getElementById('eventoIglesiaDescripcion').value.trim();
+
+    if (!titulo || !fecha) {
+        mostrarAlertaAdmin('Por favor completa el título y la fecha del evento.');
+        return;
+    }
+
+    const esRecurrente = document.getElementById('eventoIglesiaRecurrente').checked;
+    const semanas = esRecurrente ? parseInt(document.getElementById('eventoIglesiaSemanas').value) || 1 : 1;
+
+    let eventos = cargarEventosIglesiaAdmin();
+
+    if (eventoIglesiaPendienteEditarId !== null) {
+        const idx = eventos.findIndex(e => String(e.id) === String(eventoIglesiaPendienteEditarId));
+        if (idx !== -1) {
+            eventos.splice(idx, 1);
+        }
+    }
+
+    if (esRecurrente) {
+        const serieId = 'serie_' + Date.now();
+        const fechaBase = new Date(fecha + 'T00:00:00');
+        for (let i = 0; i < semanas; i++) {
+            const fechaNueva = new Date(fechaBase);
+            fechaNueva.setDate(fechaNueva.getDate() + (i * 7));
+            const fechaStr = fechaNueva.toISOString().split('T')[0];
+            eventos.push({
+                id: Date.now() + i,
+                titulo: titulo,
+                fecha: fechaStr,
+                hora: hora,
+                descripcion: descripcion,
+                recurrente: true,
+                semanas: semanas,
+                serieId: serieId
+            });
+        }
+    } else {
+        eventos.push({
+            id: eventoIglesiaPendienteEditarId !== null ? eventoIglesiaPendienteEditarId : Date.now(),
+            titulo: titulo,
+            fecha: fecha,
+            hora: hora,
+            descripcion: descripcion,
+            recurrente: false,
+            semanas: 1
+        });
+    }
+
+    guardarEventosIglesiaAdmin(eventos);
+
+    eventoIglesiaPendienteEditarId = null;
+    document.getElementById('formCalendarioIglesiaTitulo').innerHTML = '<i class="fas fa-plus-circle"></i> Agregar Evento a la Iglesia';
+    document.getElementById('btnGuardarEventoIglesia').innerHTML = '<i class="fas fa-plus"></i> Agregar Evento';
+    document.getElementById('eventoIglesiaTitulo').value = '';
+    document.getElementById('eventoIglesiaFecha').value = '';
+    document.getElementById('eventoIglesiaHora').value = '';
+    document.getElementById('eventoIglesiaDescripcion').value = '';
+    const checkbox = document.getElementById('eventoIglesiaRecurrente');
+    if (checkbox) checkbox.checked = false;
+    toggleCampoRecurrenciaIglesia();
+
+    const seccion = document.getElementById('seccionCalendarioIglesia');
+    if (seccion) {
+        seccion.innerHTML = generarHTMLCalendarioIglesia();
+    }
+}
+
+function eliminarEventoIglesiaAdmin(id) {
+    const eventos = cargarEventosIglesiaAdmin();
+    const ev = eventos.find(e => String(e.id) === String(id));
+    if (!ev) return;
+
+    const esSerie = ev.serieId ? true : false;
+    const mensaje = esSerie ? 
+        `¿Estás seguro de que deseas eliminar "${ev.titulo}"? Esta es una serie recurrente y se eliminarán todas sus repeticiones.` : 
+        `¿Estás seguro de que deseas eliminar el evento "${ev.titulo}"?`;
+
+    mostrarConfirmAdmin(mensaje, 'Eliminar evento', function () {
+        let nuevosEventos = [];
+        if (ev.serieId) {
+            nuevosEventos = cargarEventosIglesiaAdmin().filter(e => e.serieId !== ev.serieId);
+        } else {
+            nuevosEventos = cargarEventosIglesiaAdmin().filter(e => String(e.id) !== String(id));
+        }
+
+        guardarEventosIglesiaAdmin(nuevosEventos);
+
+        const seccion = document.getElementById('seccionCalendarioIglesia');
+        if (seccion) {
+            seccion.innerHTML = generarHTMLCalendarioIglesia();
+        }
+
+        const toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#c62828;color:white;padding:1rem 2rem;border-radius:2rem;font-weight:600;z-index:99999;font-family:Inter,sans-serif;box-shadow:0 8px 30px rgba(198,40,40,0.4);';
+        toast.innerHTML = '<i class="fas fa-trash"></i> Evento eliminado correctamente';
+        document.body.appendChild(toast);
+        setTimeout(function () {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.5s ease';
+            setTimeout(function () { toast.remove(); }, 500);
+        }, 2000);
+    });
+}
+
+// Exportar a window
+window.abrirCalendarioIglesiaAdmin = abrirCalendarioIglesiaAdmin;
+window.cerrarCalendarioIglesiaAdmin = cerrarCalendarioIglesiaAdmin;
+window.guardarEventosIglesiaAdmin = guardarEventosIglesiaAdmin;
+window.agregarEventoIglesiaAdmin = agregarEventoIglesiaAdmin;
+window.abrirEditarEventoIglesia = abrirEditarEventoIglesia;
+window.eliminarEventoIglesiaAdmin = eliminarEventoIglesiaAdmin;
+window.toggleCampoRecurrenciaIglesia = toggleCampoRecurrenciaIglesia;
+window.bloquearScrollAdmin = bloquearScrollAdmin;
+window.desbloquearScrollAdmin = desbloquearScrollAdmin;
+
+

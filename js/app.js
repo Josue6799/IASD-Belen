@@ -735,6 +735,119 @@ const GRUPOS_PEQUEÑOS = {
     }
 };
 
+function obtenerMesAnnoActual() {
+    const hoy = new Date();
+    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+    return `${hoy.getFullYear()}-${mm}`;
+}
+
+function cargarPredicadoresFechasPublico() {
+    try {
+        return JSON.parse(localStorage.getItem('cronograma_predicadores_fechas')) || {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function calcularFechasDelMesPublico(ano, mesIndex, diaSemanaTarget) {
+    const fechas = [];
+    const numDias = new Date(ano, mesIndex + 1, 0).getDate();
+    for (let d = 1; d <= numDias; d++) {
+        const fecha = new Date(ano, mesIndex, d);
+        if (fecha.getDay() === diaSemanaTarget) {
+            const mm = String(mesIndex + 1).padStart(2, '0');
+            const dd = String(d).padStart(2, '0');
+            fechas.push(`${ano}-${mm}-${dd}`);
+        }
+    }
+    return fechas;
+}
+
+function generarHTMLTablaPredicadoresPublico(actividadNombre, mesAnno, diaSemanaTarget, targetContainerId) {
+    if (!mesAnno) mesAnno = obtenerMesAnnoActual();
+    const parts = mesAnno.split('-');
+    const ano = parseInt(parts[0], 10);
+    const mesIndex = parseInt(parts[1], 10) - 1;
+
+    const nombresMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const mesNombre = nombresMeses[mesIndex] || '';
+
+    const data = cargarPredicadoresFechasPublico();
+    const actData = data[actividadNombre] || {};
+
+    const fechas = calcularFechasDelMesPublico(ano, mesIndex, diaSemanaTarget);
+
+    let html = `
+    <div class="cronograma-publico-card" style="background: white; border-radius: 1.2rem; padding: 1.2rem; margin-top: 1rem; border: 1px solid rgba(201,157,59,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.04);">
+        <div class="cronograma-publico-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem; border-bottom: 2px solid var(--cream-dark); padding-bottom: 0.8rem; margin-bottom: 0.8rem;">
+            <div class="titulo-actividad" style="display: flex; align-items: center; gap: 0.6rem; font-weight: 700; color: var(--deep-blue); font-size: 1rem;">
+                <i class="fas fa-calendar-alt" style="color: var(--golden);"></i>
+                <span>Cronograma de Predicadores / Encargados</span>
+            </div>
+            <div class="selector-mes-wrapper" style="display: flex; align-items: center; gap: 0.5rem;">
+                <label style="font-size: 0.85rem; font-weight: 600; color: var(--muted-text);">Mes:</label>
+                <input type="month" value="${mesAnno}" onchange="cambiarMesPublico('${actividadNombre}', this.value, '${targetContainerId}', ${diaSemanaTarget})" style="padding: 0.35rem 0.7rem; border: 1px solid #cbd5e1; border-radius: 0.6rem; font-family: Inter, sans-serif; font-size: 0.85rem; outline: none; cursor: pointer; color: var(--deep-blue); font-weight: 600;">
+            </div>
+        </div>
+
+        <div class="mes-subtitulo" style="font-weight: 700; color: var(--golden); font-size: 0.9rem; margin-bottom: 0.8rem; text-align: left;">
+            📆 ${mesNombre} ${ano}
+        </div>
+
+        <div class="tabla-responsive" style="overflow-x: auto;">
+            <table class="tabla-cronograma" style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+                <thead>
+                    <tr style="background: var(--cream); color: var(--deep-blue);">
+                        <th style="padding: 0.6rem 0.8rem; border-radius: 0.6rem 0 0 0.6rem; font-weight: 700;">Fecha</th>
+                        <th style="padding: 0.6rem 0.8rem; border-radius: 0 0.6rem 0.6rem 0; font-weight: 700;">Predicador / Encargado</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    if (fechas.length === 0) {
+        html += `<tr><td colspan="2" style="padding: 0.8rem; text-align: center; color: var(--muted-text);">No hay fechas programadas para este mes.</td></tr>`;
+    } else {
+        fechas.forEach(fechaStr => {
+            const [fAno, fMes, fDia] = fechaStr.split('-');
+            const fechaFormateada = `${fDia}/${fMes}/${fAno}`;
+            const predicador = actData[fechaStr];
+
+            html += `
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 0.6rem 0.8rem; font-weight: 600; color: var(--dark-text); white-space: nowrap;">📅 ${fechaFormateada}</td>
+                <td style="padding: 0.6rem 0.8rem;">
+                    ${predicador ? `<span style="background: #e0f2fe; color: #0369a1; font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 1rem; display: inline-block; font-size: 0.85rem;">👤 ${predicador}</span>` : `<span style="background: #f1f5f9; color: #64748b; font-weight: 600; padding: 0.3rem 0.8rem; border-radius: 1rem; display: inline-block; font-size: 0.85rem; font-style: italic;">No asignado</span>`}
+                </td>
+            </tr>
+            `;
+        });
+    }
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    </div>
+    `;
+
+    return html;
+}
+
+function cambiarMesPublico(actividadNombre, nuevoMesAnno, targetContainerId, diaSemanaTarget) {
+    const el = document.getElementById(targetContainerId);
+    if (el) {
+        el.innerHTML = generarHTMLTablaPredicadoresPublico(actividadNombre, nuevoMesAnno, diaSemanaTarget, targetContainerId);
+    }
+}
+
+function cerrarGrupoCard() {
+    const container = document.getElementById('grupoCardContainer');
+    if (container) {
+        container.classList.remove('active');
+    }
+}
+
 function mostrarGrupo(grupoId) {
     const grupo = GRUPOS_PEQUEÑOS[grupoId];
     if (!grupo) {
@@ -756,8 +869,15 @@ function mostrarGrupo(grupoId) {
         }
     }
 
+    const mesAnnoActual = obtenerMesAnnoActual();
+
+    const votoTexto = grupo.voto || 'Por amor a Jesús, me comprometo a participar activamente en mi Grupo Pequeño, amando y compartiendo el evangelio.';
+    const lemaTexto = grupo.lema || 'Unidos para amar, servir y salvar.';
+    const himnoTexto = grupo.himno || 'En los pasos de Jesús (Himno 528)';
+
     container.innerHTML = `
         <div class="grupo-card">
+            <button class="grupo-card-close" onclick="cerrarGrupoCard()" title="Cerrar">&times;</button>
             <div class="titulo-grupo">
                 <i class="fas ${grupo.icono}"></i>
                 ${grupo.nombre}
@@ -774,9 +894,26 @@ function mostrarGrupo(grupoId) {
                 <i class="fas fa-map-pin"></i>
                 <span><strong>Ubicación:</strong> ${grupo.direccion}</span>
             </div>
+            <div class="info-line">
+                <i class="fas fa-scroll"></i>
+                <span><strong>Voto:</strong> ${votoTexto}</span>
+            </div>
+            <div class="info-line">
+                <i class="fas fa-flag"></i>
+                <span><strong>Lema:</strong> ${lemaTexto}</span>
+            </div>
+            <div class="info-line">
+                <i class="fas fa-music"></i>
+                <span><strong>Himno:</strong> ${himnoTexto}</span>
+            </div>
             <div class="versiculo">
                 <i class="fas fa-bible" style="margin-right: 0.5rem; opacity: 0.6;"></i>
                 ${grupo.versiculo}
+            </div>
+
+            <!-- SECCIÓN CRONOGRAMA DE PREDICADORES POR FECHA -->
+            <div id="cronogramaGrupoContainer_${grupoId}">
+                ${generarHTMLTablaPredicadoresPublico(grupo.nombre, mesAnnoActual, 2, `cronogramaGrupoContainer_${grupoId}`)}
             </div>
         </div>
     `;
@@ -1104,10 +1241,522 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// ===== VISTAS PÚBLICAS DEL CRONOGRAMA DE LA IGLESIA =====
+
+const ACTIVIDADES_MAPA = {
+    'canto': { nombre: 'Canto', diaSemana: 6, diaNombre: 'Sábados', icono: 'fa-music', categoria: 'Culto' },
+    'escuela-sabatica': { nombre: 'Escuela Sabática', diaSemana: 6, diaNombre: 'Sábados', icono: 'fa-book-open', categoria: 'Culto' },
+    'minuto-misionero': { nombre: 'Minuto Misionero', diaSemana: 6, diaNombre: 'Sábados', icono: 'fa-globe-americas', categoria: 'Culto' },
+    'culto': { nombre: 'Predica', diaSemana: 6, diaNombre: 'Sábados', icono: 'fa-bible', categoria: 'Culto' },
+    'sociedad-jovenes': { nombre: 'Sociedad de Jóvenes', diaSemana: 6, diaNombre: 'Sábados (tarde)', icono: 'fa-users', categoria: 'Sociedad de Jóvenes' },
+    'lunes-oracion': { nombre: 'Lunes de Oración', diaSemana: 1, diaNombre: 'Lunes', icono: 'fa-hands-praying', categoria: 'Reuniones de Oración' },
+    'miercoles-testimonio': { nombre: 'Miércoles de Testimonio', diaSemana: 3, diaNombre: 'Miércoles', icono: 'fa-comment-dots', categoria: 'Reuniones de Oración' }
+};
+
+function renderizarActividadPublica(pageId, mesAnno) {
+    const pageEl = document.getElementById(pageId);
+    if (!pageEl) return;
+
+    if (!mesAnno) mesAnno = obtenerMesAnnoActual();
+
+    const info = ACTIVIDADES_MAPA[pageId] || { nombre: pageId, diaSemana: 6, diaNombre: 'Sábados', icono: 'fa-calendar', categoria: 'Cronograma' };
+
+    pageEl.innerHTML = `
+        <button class="back-link" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <div class="service-box" style="max-width: 900px; margin: 0 auto;">
+            <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem; border-bottom:2px solid var(--cream-dark); padding-bottom:1rem;">
+                <div style="width:50px; height:50px; background:linear-gradient(135deg, var(--deep-blue) 0%, var(--deep-blue-light) 100%); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--golden); font-size:1.5rem;">
+                    <i class="fas ${info.icono}"></i>
+                </div>
+                <div>
+                    <h2 style="margin:0; text-align:left; color:var(--deep-blue);">${info.nombre}</h2>
+                    <span style="color:var(--muted-text); font-size:0.9rem;">Categoría: ${info.categoria} • ${info.diaNombre}</span>
+                </div>
+            </div>
+
+            <div id="containerActividadPublica_${pageId}">
+                ${generarHTMLTablaPredicadoresPublico(info.nombre, mesAnno, info.diaSemana, `containerActividadPublica_${pageId}`)}
+            </div>
+        </div>
+    `;
+}
+
+function renderizarCronogramaPublico(mesAnno) {
+    const pageEl = document.getElementById('cronograma');
+    if (!pageEl) return;
+
+    if (!mesAnno) mesAnno = obtenerMesAnnoActual();
+
+    const parts = mesAnno.split('-');
+    const ano = parseInt(parts[0], 10);
+    const mesIndex = parseInt(parts[1], 10) - 1;
+
+    const nombresMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const mesNombre = nombresMeses[mesIndex] || '';
+
+    const categorias = [
+        {
+            titulo: 'Culto Divino',
+            icono: 'fa-pray',
+            actividades: [
+                { nombre: 'Canto', diaSemana: 6 },
+                { nombre: 'Escuela Sabática', diaSemana: 6 },
+                { nombre: 'Minuto Misionero', diaSemana: 6 },
+                { nombre: 'Predica', diaSemana: 6 }
+            ]
+        },
+        {
+            titulo: 'Sociedad de Jóvenes',
+            icono: 'fa-users',
+            actividades: [
+                { nombre: 'Sociedad de Jóvenes', diaSemana: 6 }
+            ]
+        },
+        {
+            titulo: 'Reuniones de Oración',
+            icono: 'fa-hands-praying',
+            actividades: [
+                { nombre: 'Lunes de Oración', diaSemana: 1 },
+                { nombre: 'Miércoles de Testimonio', diaSemana: 3 }
+            ]
+        },
+        {
+            titulo: 'Grupos Pequeños',
+            icono: 'fa-home',
+            actividades: [
+                { nombre: 'Unidos en Verdad', diaSemana: 2 },
+                { nombre: 'Mansión Gloriosa', diaSemana: 2 },
+                { nombre: 'Mansión Gloriosa Kid', diaSemana: 2 },
+                { nombre: 'Aposento Alto', diaSemana: 2 },
+                { nombre: 'Jehová Jireh', diaSemana: 2 },
+                { nombre: 'Maranatha 1', diaSemana: 2 },
+                { nombre: 'Maranatha 2', diaSemana: 2 },
+                { nombre: 'Ah de Venir', diaSemana: 2 }
+            ]
+        }
+    ];
+
+    let html = `
+        <button class="back-link" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <div class="service-box" style="max-width:1100px; margin:0 auto; padding:2rem;">
+            <div style="text-align:center; margin-bottom:2rem;">
+                <h2 style="color:var(--deep-blue); font-size:2rem; font-family:'Montserrat',sans-serif; margin-bottom:0.5rem;">
+                    <i class="fas fa-calendar-alt" style="color:var(--golden);"></i> Cronograma de Actividades y Predicadores
+                </h2>
+                <p style="color:var(--muted-text); font-size:1rem;">Consulta las fechas y responsables asignados para cada servicio de la iglesia.</p>
+            </div>
+
+            <div style="background:var(--cream); padding:1.2rem 1.8rem; border-radius:1.2rem; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:2rem; border:1px solid rgba(201,157,59,0.2);">
+                <div style="display:flex; align-items:center; gap:0.8rem;">
+                    <label style="font-weight:700; color:var(--deep-blue); font-size:0.95rem;">📆 Seleccionar Mes:</label>
+                    <input type="month" value="${mesAnno}" onchange="renderizarCronogramaPublico(this.value)" style="padding:0.5rem 0.9rem; border:1px solid #cbd5e1; border-radius:0.6rem; font-family:Inter,sans-serif; font-size:0.95rem; font-weight:600; color:var(--deep-blue); outline:none; cursor:pointer;">
+                </div>
+                <span style="font-weight:700; color:var(--deep-blue); background:white; padding:0.5rem 1.2rem; border-radius:1rem; border:1px solid rgba(11,43,79,0.1); font-size:1rem;">
+                    📅 ${mesNombre} ${ano}
+                </span>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:1.8rem;">
+    `;
+
+    categorias.forEach((cat, cIdx) => {
+        html += `
+        <div style="background:white; border-radius:1.2rem; padding:1.5rem; border:1px solid #e2e8f0; box-shadow:0 4px 15px rgba(0,0,0,0.03);">
+            <div style="display:flex; align-items:center; gap:0.7rem; border-bottom:2px solid var(--golden); padding-bottom:0.7rem; margin-bottom:1.2rem;">
+                <i class="fas ${cat.icono}" style="color:var(--golden); font-size:1.3rem;"></i>
+                <h3 style="margin:0; font-size:1.2rem; color:var(--deep-blue); font-weight:700;">${cat.titulo}</h3>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:1.2rem;">
+        `;
+
+        cat.actividades.forEach((act, aIdx) => {
+            const containerId = `cPublic_${cIdx}_${aIdx}`;
+            html += `
+            <div style="background:#fafbfc; border:1px solid #e2e8f0; border-radius:0.8rem; padding:0.8rem;">
+                <h4 style="margin:0 0 0.5rem 0; font-size:1rem; color:var(--deep-blue); font-weight:700; text-align:left;">${act.nombre}</h4>
+                <div id="${containerId}">
+                    ${generarHTMLTablaPredicadoresPublico(act.nombre, mesAnno, act.diaSemana, containerId)}
+                </div>
+            </div>
+            `;
+        });
+
+        html += `
+            </div>
+        </div>
+        `;
+    });
+
+    html += `
+            </div>
+        </div>
+    `;
+
+    pageEl.innerHTML = html;
+}
+
+window.addEventListener('datosCronogramaActualizados', () => {
+    const cronoPage = document.getElementById('cronograma');
+    if (cronoPage && cronoPage.classList.contains('active')) {
+        const inputMonth = cronoPage.querySelector('input[type="month"]');
+        const currentMonth = inputMonth ? inputMonth.value : obtenerMesAnnoActual();
+        renderizarCronogramaPublico(currentMonth);
+    }
+});
+
 // Exportar a window
 window.abrirModalDesbloqueoCandado = abrirModalDesbloqueoCandado;
 window.cerrarModalDesbloqueoCandado = cerrarModalDesbloqueoCandado;
 window.verificarPasswordCandado = verificarPasswordCandado;
 window.aplicarEstadoBloqueoCandado = aplicarEstadoBloqueoCandado;
+window.mostrarGrupo = mostrarGrupo;
+window.cerrarGrupoCard = cerrarGrupoCard;
+window.renderizarCronogramaPublico = renderizarCronogramaPublico;
+window.renderizarActividadPublica = renderizarActividadPublica;
+window.cambiarMesPublico = cambiarMesPublico;
 
-console.log('✅ app.js (Iglesia) cargado correctamente');
+/* ========================================
+   SISTEMA DE TRANSMISIONES "EN VIVO"
+   ======================================== */
+
+const CATEGORIAS_TRANSMISIONES = [
+    { nombre: 'Sábado (Culto)', icono: '🎥', color: '#1a3a4a' },
+    { nombre: 'Sociedad de Jóvenes', icono: '🙌', color: '#2c5f7c' },
+    { nombre: 'Lunes de Oración', icono: '🙏', color: '#d4a038' },
+    { nombre: 'Miércoles de Testimonio', icono: '✝️', color: '#1a3a4a' },
+    { nombre: 'Campaña', icono: '📢', color: '#c53030' }
+];
+
+const TRANSMISIONES_INICIALES = [
+    {
+        id: 1723650000001,
+        categoria: "Sábado (Culto)",
+        titulo: "Culto Divino - Dios es Nuestra Fortaleza",
+        fecha: "2026-08-08",
+        plataforma: "youtube",
+        videoId: "dQw4w9WgXcQ",
+        descripcion: "Transmisión en vivo del Culto Divino y Escuela Sabática.",
+        destacado: true,
+        enVivo: true,
+        fechaCreacion: "2026-08-08T10:00:00.000Z"
+    },
+    {
+        id: 1723650000002,
+        categoria: "Sociedad de Jóvenes",
+        titulo: "Sociedad de Jóvenes - Firmes en la Fe",
+        fecha: "2026-08-01",
+        plataforma: "youtube",
+        videoId: "dQw4w9WgXcQ",
+        descripcion: "Programa especial para jóvenes con testimonios y alabanzas.",
+        destacado: true,
+        enVivo: false,
+        fechaCreacion: "2026-08-01T16:00:00.000Z"
+    },
+    {
+        id: 1723650000003,
+        categoria: "Lunes de Oración",
+        titulo: "Lunes de Oración - Clamando con Esperanza",
+        fecha: "2026-08-03",
+        plataforma: "facebook",
+        videoId: "https://www.facebook.com/facebook/videos/10153231379946729/",
+        descripcion: "Noche de intercesión y peticiones de oración.",
+        destacado: true,
+        enVivo: false,
+        fechaCreacion: "2026-08-03T19:00:00.000Z"
+    },
+    {
+        id: 1723650000004,
+        categoria: "Miércoles de Testimonio",
+        titulo: "Miércoles de Testimonio - Bendiciones de Dios",
+        fecha: "2026-08-05",
+        plataforma: "youtube",
+        videoId: "dQw4w9WgXcQ",
+        descripcion: "Reunión congregacional para dar gloria a Dios por sus maravillas.",
+        destacado: true,
+        enVivo: false,
+        fechaCreacion: "2026-08-05T19:00:00.000Z"
+    },
+    {
+        id: 1723650000005,
+        categoria: "Campaña",
+        titulo: "Campaña Evangelística - Mensaje del Tercer Ángel",
+        fecha: "2026-07-25",
+        plataforma: "youtube",
+        videoId: "dQw4w9WgXcQ",
+        descripcion: "Gran noche de predicación y evangelismo.",
+        destacado: true,
+        enVivo: false,
+        fechaCreacion: "2026-07-25T19:30:00.000Z"
+    }
+];
+
+let videoActivoEnVivoId = null;
+
+function obtenerTransmisiones() {
+    const data = localStorage.getItem('transmisiones');
+    if (!data) {
+        localStorage.setItem('transmisiones', JSON.stringify(TRANSMISIONES_INICIALES));
+        return TRANSMISIONES_INICIALES;
+    }
+    try {
+        const parsed = JSON.parse(data);
+        return Array.isArray(parsed) ? parsed : TRANSMISIONES_INICIALES;
+    } catch (e) {
+        return TRANSMISIONES_INICIALES;
+    }
+}
+
+function guardarTransmisiones(lista) {
+    localStorage.setItem('transmisiones', JSON.stringify(lista));
+    actualizarBotonFlotanteEnVivo();
+}
+
+function obtenerYouTubeId(urlOrId) {
+    if (!urlOrId) return '';
+    urlOrId = urlOrId.trim();
+    if (/^[a-zA-Z0-9_-]{11}$/.test(urlOrId)) {
+        return urlOrId;
+    }
+    const match = urlOrId.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+    return match ? match[1] : urlOrId;
+}
+
+function obtenerFacebookEmbedUrl(urlOrId) {
+    if (!urlOrId) return '';
+    urlOrId = urlOrId.trim();
+    if (urlOrId.startsWith('http://') || urlOrId.startsWith('https://')) {
+        return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(urlOrId)}&show_text=0&width=560`;
+    }
+    return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent('https://www.facebook.com/watch/?v=' + urlOrId)}&show_text=0&width=560`;
+}
+
+function obtenerThumbnailVideo(t) {
+    if (t.plataforma === 'youtube') {
+        const id = obtenerYouTubeId(t.videoId);
+        return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+    }
+    return 'img/Logo adventista.png';
+}
+
+function abrirEnVivo() {
+    const modal = document.getElementById('modalEnVivo');
+    if (!modal) return;
+    document.body.style.overflow = 'hidden';
+    modal.style.display = 'flex';
+    renderizarVistaCategoriasEnVivo();
+    actualizarBotonFlotanteEnVivo();
+}
+
+function cerrarEnVivo(e) {
+    if (e && e.target && e.target !== document.getElementById('modalEnVivo') && !e.target.classList.contains('envivo-close-btn')) {
+        // Evitar cierre accidental si no fue en el overlay o botón de cerrar
+    }
+    const modal = document.getElementById('modalEnVivo');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
+function renderizarVistaCategoriasEnVivo() {
+    const body = document.getElementById('envivoBodyContenido');
+    const titulo = document.getElementById('envivoTituloModal');
+    if (!body || !titulo) return;
+
+    titulo.innerHTML = `<i class="fas fa-broadcast-tower" style="color:#c9a53b;"></i> Transmisiones En Vivo`;
+
+    const transmisiones = obtenerTransmisiones();
+
+    let html = `<div class="envivo-grid-categorias">`;
+
+    CATEGORIAS_TRANSMISIONES.forEach(cat => {
+        const videosCat = transmisiones.filter(t => t.categoria === cat.nombre);
+        const hayLive = videosCat.some(t => t.enVivo);
+
+        html += `
+        <div class="envivo-card-cat" onclick="abrirCategoriaEnVivo('${cat.nombre}')">
+            <div class="envivo-cat-icon" style="background: linear-gradient(135deg, ${cat.color} 0%, #2c5f7c 100%);">
+                ${cat.icono}
+            </div>
+            <div class="envivo-cat-titulo">${cat.nombre}</div>
+            <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap; justify-content:center;">
+                <span class="envivo-cat-badge"><i class="fas fa-film"></i> ${videosCat.length} video${videosCat.length !== 1 ? 's' : ''}</span>
+                ${hayLive ? '<span class="badge-live-pulse">🔴 EN VIVO</span>' : ''}
+            </div>
+        </div>
+        `;
+    });
+
+    html += `</div>`;
+    body.innerHTML = html;
+}
+
+function abrirCategoriaEnVivo(categoriaNombre) {
+    const body = document.getElementById('envivoBodyContenido');
+    const titulo = document.getElementById('envivoTituloModal');
+    if (!body || !titulo) return;
+
+    const catObj = CATEGORIAS_TRANSMISIONES.find(c => c.nombre === categoriaNombre) || { icono: '🎥', nombre: categoriaNombre };
+
+    titulo.innerHTML = `
+    <div style="display:flex; align-items:center; gap:0.8rem;">
+        <button onclick="renderizarVistaCategoriasEnVivo()" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:0.4rem 0.8rem; border-radius:1rem; font-size:0.85rem; cursor:pointer; font-weight:600; font-family:Inter,sans-serif;">
+            <i class="fas fa-arrow-left"></i> Categorías
+        </button>
+        <span>${catObj.icono} ${categoriaNombre}</span>
+    </div>
+    `;
+
+    const transmisiones = obtenerTransmisiones().filter(t => t.categoria === categoriaNombre);
+
+    if (transmisiones.length === 0) {
+        body.innerHTML = `
+        <div style="text-align:center; padding:3rem 1rem;">
+            <i class="fas fa-video-slash" style="font-size:3rem; color:#cbd5e1; margin-bottom:1rem;"></i>
+            <h3 style="color:#1a3a4a; margin-bottom:0.5rem;">No hay transmisiones disponibles</h3>
+            <p style="color:#64748b;">Aún no se han agregado transmisiones en la categoría <strong>${categoriaNombre}</strong>.</p>
+            <button onclick="renderizarVistaCategoriasEnVivo()" class="btn-ver-video" style="max-width:200px; margin:1.5rem auto 0;">
+                <i class="fas fa-arrow-left"></i> Volver a Categorías
+            </button>
+        </div>
+        `;
+        return;
+    }
+
+    // Ordenar por fecha (más reciente primero) y priorizar destacado / enVivo
+    transmisiones.sort((a, b) => {
+        if (a.enVivo && !b.enVivo) return -1;
+        if (!a.enVivo && b.enVivo) return 1;
+        if (a.destacado && !b.destacado) return -1;
+        if (!a.destacado && b.destacado) return 1;
+        return new Date(b.fecha) - new Date(a.fecha);
+    });
+
+    const videoDestacado = transmisiones.find(t => t.id === videoActivoEnVivoId) || transmisiones[0];
+    videoActivoEnVivoId = videoDestacado.id;
+
+    let iframeSrc = '';
+    if (videoDestacado.plataforma === 'youtube') {
+        const ytId = obtenerYouTubeId(videoDestacado.videoId);
+        iframeSrc = `https://www.youtube.com/embed/${ytId}?autoplay=1`;
+    } else {
+        iframeSrc = obtenerFacebookEmbedUrl(videoDestacado.videoId);
+    }
+
+    let html = `
+    <!-- REPRODUCTOR PRINCIPAL -->
+    <div style="margin-bottom: 2rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem; flex-wrap:wrap; gap:0.5rem;">
+            <h3 style="margin:0; color:#1a3a4a; font-size:1.2rem; font-weight:700;">
+                ${videoDestacado.titulo}
+            </h3>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+                <span class="envivo-plat-badge envivo-plat-${videoDestacado.plataforma}" style="position:static;">
+                    <i class="fab fa-${videoDestacado.plataforma}"></i> ${videoDestacado.plataforma}
+                </span>
+                ${videoDestacado.enVivo ? '<span class="badge-live-pulse">🔴 EN VIVO</span>' : ''}
+            </div>
+        </div>
+        <p style="margin:0 0 1rem; color:#5a6474; font-size:0.88rem;">
+            <i class="far fa-calendar-alt"></i> ${videoDestacado.fecha} ${videoDestacado.descripcion ? '· ' + videoDestacado.descripcion : ''}
+        </p>
+
+        <div class="envivo-player-container">
+            <iframe src="${iframeSrc}" loading="lazy" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        </div>
+    </div>
+    `;
+
+    // LISTA DE VIDEOS ANTERIORES
+    if (transmisiones.length > 1) {
+        html += `
+        <div>
+            <h4 style="color:#1a3a4a; font-size:1.05rem; font-weight:700; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.4rem;">
+                <i class="fas fa-list-ul"></i> Transmisiones Anteriores (${transmisiones.length - 1})
+            </h4>
+            <div class="envivo-lista-videos">
+        `;
+
+        transmisiones.forEach(t => {
+            if (t.id === videoDestacado.id) return; // omitir el reproduciéndose actualmente
+
+            const thumbUrl = obtenerThumbnailVideo(t);
+
+            html += `
+            <div class="envivo-video-item">
+                <div class="envivo-thumb-wrapper">
+                    <img src="${thumbUrl}" alt="${t.titulo}" class="envivo-thumb-img" onerror="this.src='img/Logo adventista.png'">
+                    <span class="envivo-plat-badge envivo-plat-${t.plataforma}">
+                        <i class="fab fa-${t.plataforma}"></i> ${t.plataforma}
+                    </span>
+                    ${t.enVivo ? '<span class="badge-live-pulse" style="position:absolute; bottom:0.5rem; right:0.5rem; font-size:0.65rem; padding:0.2rem 0.5rem;">🔴 EN VIVO</span>' : ''}
+                </div>
+                <div class="envivo-video-info">
+                    <div>
+                        <div class="envivo-video-title">${t.titulo}</div>
+                        <div class="envivo-video-fecha"><i class="far fa-calendar-alt"></i> ${t.fecha}</div>
+                    </div>
+                    <button onclick="conmutarVideo(${t.id}, '${categoriaNombre}')" class="btn-ver-video">
+                        <i class="fas fa-play"></i> Ver Transmisión
+                    </button>
+                </div>
+            </div>
+            `;
+        });
+
+        html += `
+            </div>
+        </div>
+        `;
+    }
+
+    body.innerHTML = html;
+}
+
+function conmutarVideo(id, categoriaNombre) {
+    videoActivoEnVivoId = id;
+    abrirCategoriaEnVivo(categoriaNombre);
+}
+
+function actualizarBotonFlotanteEnVivo() {
+    const btn = document.getElementById('btnFlotanteEnVivo');
+    const textoEl = document.getElementById('textoFlotanteEnVivo');
+    const iconoEl = document.getElementById('iconoFlotanteEnVivo');
+    if (!btn) return;
+
+    const transmisiones = typeof obtenerTransmisiones === 'function' ? obtenerTransmisiones() : [];
+    const hayLive = Array.isArray(transmisiones) && transmisiones.some(t => t.enVivo);
+
+    if (hayLive) {
+        btn.className = 'btn-flotante-envivo envivo-activo';
+        if (textoEl) textoEl.textContent = 'En Vivo';
+        if (iconoEl) {
+            iconoEl.className = 'fas fa-circle';
+            iconoEl.style.color = '#ffffff';
+        }
+    } else {
+        btn.className = 'btn-flotante-envivo envivo-inactivo';
+        if (textoEl) textoEl.textContent = 'En Vivo';
+        if (iconoEl) {
+            iconoEl.className = 'fas fa-video';
+            iconoEl.style.color = '#c9a53b';
+        }
+    }
+}
+
+// Inicializar estado del botón flotante al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    actualizarBotonFlotanteEnVivo();
+});
+
+// Exportar a window
+window.abrirEnVivo = abrirEnVivo;
+window.cerrarEnVivo = cerrarEnVivo;
+window.renderizarVistaCategoriasEnVivo = renderizarVistaCategoriasEnVivo;
+window.abrirCategoriaEnVivo = abrirCategoriaEnVivo;
+window.conmutarVideo = conmutarVideo;
+window.actualizarBotonFlotanteEnVivo = actualizarBotonFlotanteEnVivo;
+window.obtenerTransmisiones = obtenerTransmisiones;
+window.guardarTransmisiones = guardarTransmisiones;
+
+console.log('✅ app.js (Iglesia & En Vivo) cargado correctamente');

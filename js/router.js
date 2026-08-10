@@ -16,6 +16,7 @@ const PAGINAS = {
     visitantes: { titulo: '¿Quiénes son los adventistas del 7° día?', nivel: 1 },
     historia: { titulo: 'Historia de la IASD', nivel: 1 },
     estructura: { titulo: 'Estructura Organizacional', nivel: 1 },
+    cronograma: { titulo: 'Cronograma de la Iglesia', nivel: 1 },
 
     // Secciones de clubes (públicas pero con contenido restringido)
     clubes: { titulo: 'Clubes de la Iglesia', nivel: 1 },
@@ -28,6 +29,7 @@ const PAGINAS = {
     culto: { titulo: 'Culto Divino', nivel: 2 },
     canto: { titulo: 'Canto y Alabanza', nivel: 2 },
     'escuela-sabatica': { titulo: 'Escuela Sabática', nivel: 2 },
+    'minuto-misionero': { titulo: 'Minuto Misionero', nivel: 2 },
     'sociedad-jovenes': { titulo: 'Sociedad de Jóvenes', nivel: 2 },
     'lunes-oracion': { titulo: 'Lunes de Oración', nivel: 2 },
     'miercoles-testimonio': { titulo: 'Miércoles de Testimonio', nivel: 2 }
@@ -77,6 +79,13 @@ function showPage(pageId) {
         } else if (['aventureros', 'conquistadores', 'guias'].includes(pageId)) {
             CalendarManager.render(pageId);
         }
+    }
+
+    // 8. Renderizar cronograma público / actividades
+    if (pageId === 'cronograma' && typeof window.renderizarCronogramaPublico === 'function') {
+        window.renderizarCronogramaPublico();
+    } else if (['culto', 'canto', 'escuela-sabatica', 'minuto-misionero', 'sociedad-jovenes', 'lunes-oracion', 'miercoles-testimonio'].includes(pageId) && typeof window.renderizarActividadPublica === 'function') {
+        window.renderizarActividadPublica(pageId);
     }
 
     console.log(`📄 Página mostrada: ${pageId} - ${titulo}`);
