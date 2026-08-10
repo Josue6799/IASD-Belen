@@ -3486,7 +3486,7 @@
         </div>
     </div>
     <!-- ===== MODAL AGREGAR / EDITAR ANUNCIO ===== -->
-    <div id="modalAgregarAnuncio" class="modal-anuncio-overlay" onclick="cerrarModalAgregarAnuncio(event)">
+    <div id="modalAgregarAnuncio" class="modal-anuncio-overlay" style="display: none;" onclick="cerrarModalAgregarAnuncio(event)">
         <div class="modal-anuncio-card" onclick="event.stopPropagation()">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
                 <h3 id="modalAnuncioTitulo" style="margin:0; text-align:left; color:#1a3a4a; font-size:1.3rem;"><i class="fas fa-bullhorn"></i> Publicar Nuevo Anuncio</h3>
@@ -3556,7 +3556,7 @@
     </div>
 
     <!-- ===== MODAL VISTA PREVIA DE ANUNCIO ===== -->
-    <div id="modalVistaPrevia" class="modal-vista-previa" onclick="cerrarVistaPrevia(event)">
+    <div id="modalVistaPrevia" class="modal-vista-previa" style="display: none;" onclick="cerrarVistaPrevia(event)">
         <div class="vista-previa-card" onclick="event.stopPropagation()" style="position:relative; max-width:650px; width:92%; max-height:85vh; overflow-y:auto; padding:2rem; background:white; border-radius:1.8rem;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.6rem;">
                 <h4 style="margin:0; color:#1a3a4a; font-size:1.1rem;"><i class="fas fa-eye"></i> Vista Previa del Anuncio</h4>
@@ -3569,7 +3569,7 @@
     </div>
 
     <!-- ===== MODAL QUITAR / EDITAR ANUNCIOS Y EVENTOS ===== -->
-    <div id="modalQuitarAnuncio" class="modal-quitar-overlay" onclick="cerrarModalQuitarAnuncio(event)">
+    <div id="modalQuitarAnuncio" class="modal-quitar-overlay" style="display: none;" onclick="cerrarModalQuitarAnuncio(event)">
         <div class="modal-quitar-card" onclick="event.stopPropagation()" style="max-width:800px; width:92%;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
                 <h3 style="margin:0; text-align:left; color:#1a3a4a; font-size:1.2rem;"><i class="fas fa-bullhorn" style="color: #d4a038;"></i> Gestión de Anuncios y Eventos</h3>

@@ -4408,12 +4408,54 @@
     .modal-club-overlay,
     .modal-quitar-overlay,
     .envivo-modal-overlay,
-    .modal-vista-previa {
+    .modal-vista-previa,
+    .modal-confirm-overlay,
+    .modal-bd-overlay,
+    .modal-generico-overlay,
+    .modal-biblioteca-overlay,
+    .modal-anuncio-overlay {
         padding: 0.8rem !important;
         box-sizing: border-box !important;
-        display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+    }
+
+    /* Solo forzar flex cuando el modal esté activo u abierto */
+    .modal-overlay.active,
+    .modal-backdrop.active,
+    .modal-club-overlay.active,
+    .modal-quitar-overlay.active,
+    .envivo-modal-overlay.active,
+    .modal-vista-previa.active,
+    .modal-confirm-overlay.active,
+    .modal-bd-overlay.active,
+    .modal-generico-overlay.active,
+    .modal-biblioteca-overlay.active,
+    .modal-anuncio-overlay.active,
+    .modal-overlay.open,
+    .modal-backdrop.open,
+    .modal-club-overlay.open,
+    .modal-quitar-overlay.open,
+    .envivo-modal-overlay.open,
+    .modal-vista-previa.open,
+    .modal-confirm-overlay.open,
+    .modal-bd-overlay.open,
+    .modal-generico-overlay.open,
+    .modal-biblioteca-overlay.open,
+    .modal-anuncio-overlay.open,
+    .modal-overlay[style*="display: flex"],
+    .modal-backdrop[style*="display: flex"],
+    .modal-club-overlay[style*="display: flex"],
+    .modal-quitar-overlay[style*="display: flex"],
+    .envivo-modal-overlay[style*="display: flex"],
+    .modal-vista-previa[style*="display: flex"],
+    .modal-overlay[style*="display: block"],
+    .modal-backdrop[style*="display: block"],
+    .modal-club-overlay[style*="display: block"],
+    .modal-quitar-overlay[style*="display: block"],
+    .envivo-modal-overlay[style*="display: block"],
+    .modal-vista-previa[style*="display: block"] {
+        display: flex !important;
     }
 
     .modal-card,
