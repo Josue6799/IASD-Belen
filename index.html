@@ -78,67 +78,47 @@
 
                 <!-- ========== CRONOGRAMA CON GRUPOS PEQUEÑOS ========== -->
                 <div class="dropdown">
-                    <button class="nav-btn"><i class="fas fa-clock"></i> Cronograma <i class="fas fa-chevron-down"
-                            style="font-size:0.6rem;"></i></button>
-                    <ul class="dropdown-menu" style="min-width: 220px;">
+                    <button class="nav-btn"><i class="fas fa-clock"></i> Cronograma <i class="fas fa-chevron-down nav-chevron"></i></button>
+                    <ul class="dropdown-menu">
                         <!-- Submenú Culto -->
-                        <li style="position: relative;">
-                            <a style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                        <li class="has-submenu">
+                            <a class="submenu-toggle">
                                 <span><i class="fas fa-pray"></i> Culto</span>
-                                <i class="fas fa-chevron-right" style="font-size:0.6rem; color:var(--golden);"></i>
+                                <i class="fas fa-chevron-right sub-chevron"></i>
                             </a>
-                            <ul
-                                style="position: absolute; left: 100%; top: 0; background: var(--pure-white); min-width: 200px; border-radius: 1.2rem; padding: 0.5rem 0; box-shadow: var(--shadow-lg); border: 1px solid rgba(201,157,59,0.12); list-style: none; z-index: 100;">
+                            <ul class="submenu-list">
                                 <li><a onclick="showPage('culto')"><i class="fas fa-bible"></i> Culto Divino / Predica</a></li>
                                 <li><a onclick="showPage('canto')"><i class="fas fa-music"></i> Canto</a></li>
-                                <li><a onclick="showPage('escuela-sabatica')"><i class="fas fa-book-open"></i> Escuela
-                                        Sabática</a></li>
-                                <li><a onclick="showPage('minuto-misionero')"><i class="fas fa-globe-americas"></i> Minuto
-                                        Misionero</a></li>
+                                <li><a onclick="showPage('escuela-sabatica')"><i class="fas fa-book-open"></i> Escuela Sabática</a></li>
+                                <li><a onclick="showPage('minuto-misionero')"><i class="fas fa-globe-americas"></i> Minuto Misionero</a></li>
                             </ul>
                         </li>
-                        <li><a onclick="showPage('sociedad-jovenes')"><i class="fas fa-users"></i> Sociedad de
-                                Jóvenes</a></li>
-                        <li><a onclick="showPage('lunes-oracion')"><i class="fas fa-hands-praying"></i> Lunes de
-                                Oración</a></li>
-                        <li><a onclick="showPage('miercoles-testimonio')"><i class="fas fa-comment-dots"></i> Miér. de
-                                Testimonio</a></li>
+                        <li><a onclick="showPage('sociedad-jovenes')"><i class="fas fa-users"></i> Sociedad de Jóvenes</a></li>
+                        <li><a onclick="showPage('lunes-oracion')"><i class="fas fa-hands-praying"></i> Lunes de Oración</a></li>
+                        <li><a onclick="showPage('miercoles-testimonio')"><i class="fas fa-comment-dots"></i> Miér. de Testimonio</a></li>
 
-                        <!-- ========== NUEVO: GRUPOS PEQUEÑOS CON SUBMENÚ ========== -->
-                        <li style="position: relative;" class="grupos-pequenos-item">
-                            <a
-                                style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                        <!-- Submenú Grupos Pequeños -->
+                        <li class="has-submenu grupos-pequenos-item">
+                            <a class="submenu-toggle">
                                 <span><i class="fas fa-users"></i> Grupos pequeños</span>
-                                <i class="fas fa-chevron-right" style="font-size:0.6rem; color:var(--golden);"></i>
+                                <i class="fas fa-chevron-right sub-chevron"></i>
                             </a>
-                            <!-- Submenú de Grupos Pequeños (8 opciones) -->
-                            <ul class="submenu-grupos"
-                                style="position: absolute; left: 100%; top: 0; background: var(--pure-white); min-width: 220px; border-radius: 1.2rem; padding: 0.5rem 0; box-shadow: var(--shadow-lg); border: 1px solid rgba(201,157,59,0.12); border-left: 3px solid var(--golden); list-style: none; z-index: 200; opacity: 0; visibility: hidden; transform: translateX(8px) scale(0.96); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
-                                <li><a onclick="mostrarGrupo('unidos_en_verdad')"><i class="fas fa-home"></i> Unidos en
-                                        Verdad</a></li>
-                                <li><a onclick="mostrarGrupo('mansion_gloriosa')"><i class="fas fa-home"></i> Mansión
-                                        Gloriosa</a></li>
-                                <li><a onclick="mostrarGrupo('mansion_gloriosa_kid')"><i class="fas fa-child"></i>
-                                        Mansión Gloriosa Kid</a></li>
-                                <li><a onclick="mostrarGrupo('aposento_alto')"><i class="fas fa-arrow-up"></i> Aposento
-                                        Alto</a></li>
-                                <li><a onclick="mostrarGrupo('jehova_jireh')"><i class="fas fa-cross"></i> Jehová
-                                        Jireh</a></li>
-                                <li><a onclick="mostrarGrupo('maranatha_1')"><i class="fas fa-star"></i> Maranatha 1</a>
-                                </li>
-                                <li><a onclick="mostrarGrupo('maranatha_2')"><i class="fas fa-star"></i> Maranatha 2</a>
-                                </li>
-                                <li><a onclick="mostrarGrupo('ah_de_venir')"><i class="fas fa-clock"></i> Ah de
-                                        Venir</a></li>
+                            <ul class="submenu-list">
+                                <li><a onclick="mostrarGrupo('unidos_en_verdad')"><i class="fas fa-home"></i> Unidos en Verdad</a></li>
+                                <li><a onclick="mostrarGrupo('mansion_gloriosa')"><i class="fas fa-home"></i> Mansión Gloriosa</a></li>
+                                <li><a onclick="mostrarGrupo('mansion_gloriosa_kid')"><i class="fas fa-child"></i> Mansión Gloriosa Kid</a></li>
+                                <li><a onclick="mostrarGrupo('aposento_alto')"><i class="fas fa-arrow-up"></i> Aposento Alto</a></li>
+                                <li><a onclick="mostrarGrupo('jehova_jireh')"><i class="fas fa-cross"></i> Jehová Jireh</a></li>
+                                <li><a onclick="mostrarGrupo('maranatha_1')"><i class="fas fa-star"></i> Maranatha 1</a></li>
+                                <li><a onclick="mostrarGrupo('maranatha_2')"><i class="fas fa-star"></i> Maranatha 2</a></li>
+                                <li><a onclick="mostrarGrupo('ah_de_venir')"><i class="fas fa-clock"></i> Ah de Venir</a></li>
                             </ul>
                         </li>
-                        <!-- ========== FIN GRUPOS PEQUEÑOS ========== -->
 
                         <li>
-                            <hr style="border: 0; border-top: 1px solid var(--cream-dark); margin: 0.3rem 0.5rem;">
+                            <hr class="dropdown-divider">
                         </li>
-                        <li><a onclick="showPage('conquistadores')"><i class="fas fa-hiking"></i> Conquistadores</a>
-                        </li>
+                        <li><a onclick="showPage('conquistadores')"><i class="fas fa-hiking"></i> Conquistadores</a></li>
                         <li><a onclick="showPage('aventureros')"><i class="fas fa-seedling"></i> Aventureros</a></li>
                         <li><a onclick="showPage('guias')"><i class="fas fa-compass"></i> Guías Mayores</a></li>
                     </ul>

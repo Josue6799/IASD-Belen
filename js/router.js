@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Escuchar clic en enlaces con submenús anidados (ej. Grupos pequeños, Culto) en móviles
-    const nestedSubmenuLinks = document.querySelectorAll('.dropdown-menu li > a');
+    const nestedSubmenuLinks = document.querySelectorAll('.dropdown-menu li > .submenu-toggle, .dropdown-menu li.has-submenu > a');
     nestedSubmenuLinks.forEach(link => {
         link.addEventListener('click', function (e) {
             const parentLi = this.parentElement;
