@@ -2145,6 +2145,7 @@
 
 /* ==================== 1. CALENDARIO GENERAL Y DE CLUBES ==================== */
 @media (max-width: 768px) {
+
     /* Encabezado y Navegación del Calendario */
     .calendar-header,
     /* Ajustes de Calendario en Móvil */
@@ -2234,6 +2235,7 @@
 }
 
 @media (max-width: 480px) {
+
     .calendario-wrapper,
     .calendario-club {
         padding: 1rem 0.4rem !important;
@@ -2258,6 +2260,7 @@
 
 /* ==================== 2. CLUBES (VISTA PÚBLICA) ==================== */
 @media (max-width: 768px) {
+
     /* Grid Vista General de Clubes */
     .clubes-grid,
     #clubes div[style*="grid-template-columns"] {
@@ -2293,6 +2296,7 @@
 
 /* ==================== 3. CREENCIAS Y DOCTRINAS ==================== */
 @media (max-width: 768px) {
+
     /* Buscador de Creencias */
     .search-creencias-box {
         margin-bottom: 1.5rem !important;
@@ -2301,7 +2305,8 @@
 
     .search-creencias-box input {
         min-height: 44px !important;
-        font-size: 16px !important; /* Previene auto-zoom en iOS Safari */
+        font-size: 16px !important;
+        /* Previene auto-zoom en iOS Safari */
     }
 
     /* Tarjetas de Creencias y Doctrinas */
@@ -2330,6 +2335,7 @@
 
 /* ==================== 4. PÁGINAS DE CONTENIDO (VISITANTES, HISTORIA, ESTRUCTURA) ==================== */
 @media (max-width: 768px) {
+
     /* Visitantes / ¿Quiénes somos? */
     #visitantes div[style*="grid-template-columns"] {
         grid-template-columns: 1fr !important;

@@ -118,10 +118,16 @@
     position: relative;
 }
 
+/* ✅ Código corregido (para desktop) */
 .dropdown-menu {
     position: absolute;
-    top: calc(100% + 6px);
+    top: 100%;
+    /* Se coloca debajo del elemento padre */
     left: 0;
+    /* Alineado a la izquierda */
+    right: auto;
+    /* Asegura que no se vaya a la derecha */
+
     background: var(--pure-white);
     min-width: 210px;
     border-radius: 1.2rem;
@@ -136,8 +142,8 @@
     z-index: 100;
 }
 
-.dropdown:hover > .dropdown-menu,
-.dropdown.open > .dropdown-menu {
+.dropdown:hover>.dropdown-menu,
+.dropdown.open>.dropdown-menu {
     opacity: 1;
     visibility: visible;
     transform: translateY(0) scale(1);
@@ -170,6 +176,7 @@
 .dropdown-menu li .submenu-toggle:hover {
     background: var(--cream-dark);
     color: var(--golden);
+
 }
 
 .dropdown-menu li a i,
@@ -208,8 +215,8 @@
     transition: var(--transition);
 }
 
-.has-submenu:hover > .submenu-list,
-.has-submenu.open > .submenu-list {
+.has-submenu:hover>.submenu-list,
+.has-submenu.open>.submenu-list {
     opacity: 1 !important;
     visibility: visible !important;
     transform: translateX(0) scale(1) !important;
@@ -500,18 +507,18 @@
         transition: all 0.3s ease;
     }
 
-    .dropdown.open > .nav-btn {
+    .dropdown.open>.nav-btn {
         background: rgba(201, 157, 59, 0.12) !important;
         color: var(--golden) !important;
         font-weight: 700;
     }
 
-    .dropdown > .nav-btn .nav-chevron {
+    .dropdown>.nav-btn .nav-chevron {
         transition: transform 0.3s ease;
         font-size: 0.75rem;
     }
 
-    .dropdown.open > .nav-btn .nav-chevron {
+    .dropdown.open>.nav-btn .nav-chevron {
         transform: rotate(180deg);
         color: var(--golden);
     }
@@ -538,7 +545,7 @@
         transform: none !important;
     }
 
-    .dropdown.open > .dropdown-menu {
+    .dropdown.open>.dropdown-menu {
         display: block !important;
     }
 
@@ -559,7 +566,7 @@
         text-decoration: none;
     }
 
-    .has-submenu.open > .submenu-toggle {
+    .has-submenu.open>.submenu-toggle {
         color: var(--golden) !important;
         font-weight: 700;
     }
@@ -571,7 +578,7 @@
         font-size: 0.75rem;
     }
 
-    .has-submenu.open > .submenu-toggle .sub-chevron {
+    .has-submenu.open>.submenu-toggle .sub-chevron {
         transform: rotate(90deg);
     }
 
@@ -592,7 +599,7 @@
         margin-top: 0.2rem !important;
     }
 
-    .has-submenu.open > .submenu-list {
+    .has-submenu.open>.submenu-list {
         display: block !important;
     }
 
@@ -722,6 +729,7 @@
 }
 
 @media (max-width: 480px) {
+
     /* --- PANTALLAS MÓVILES PEQUEÑAS (< 480px) --- */
     .container {
         padding: 0 0.8rem;
@@ -774,7 +782,7 @@
         max-height: 210px !important;
     }
 
-    .hero-image > div > div:first-child {
+    .hero-image>div>div:first-child {
         width: 230px !important;
         height: 230px !important;
     }
@@ -873,26 +881,30 @@
    ======================================== */
 
 @media (max-width: 768px) {
-
-    /* Ajuste para dropdown en móvil */
     .dropdown-menu {
         position: static;
-        opacity: 1 !important;
-        visibility: visible !important;
-        transform: none !important;
-        box-shadow: none;
-        border: none;
-        padding-left: 0.8rem;
+        /* O relative, para que no flote */
+        left: 0;
+        right: auto;
+        width: 100%;
+        padding-left: 1rem;
         display: none;
-        background: rgba(245, 239, 224, 0.4);
-        min-width: 100% !important;
-        transition: none;
-        border-left: 3px solid var(--golden);
-        border-radius: 0 0 0.8rem 0.8rem;
-        margin-top: 0.2rem;
+        /* Se muestra con JS al hacer clic */
     }
 
-    .dropdown.open > .dropdown-menu {
+    .dropdown.open .dropdown-menu {
+        display: block;
+        /* Se muestra al abrir */
+    }
+
+    .dropdown-menu li a {
+        padding-left: 1.5rem;
+        /* Asegura que los textos estén alineados a la izquierda */
+        text-align: left;
+    }
+
+
+    .dropdown.open>.dropdown-menu {
         display: block !important;
     }
 
@@ -910,7 +922,7 @@
     }
 
     /* Submenú en móvil */
-    .dropdown-menu li > ul {
+    .dropdown-menu li>ul {
         position: static !important;
         opacity: 1 !important;
         visibility: visible !important;
@@ -925,7 +937,7 @@
         margin-top: 0.3rem;
     }
 
-    .dropdown-menu li.open > ul {
+    .dropdown-menu li.open>ul {
         display: block !important;
     }
 
