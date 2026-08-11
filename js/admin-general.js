@@ -1838,9 +1838,9 @@ function abrirCronograma() {
     if (!seccion) {
         seccion = document.createElement('div');
         seccion.id = 'seccionCronograma';
-        seccion.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9997;overflow-y:auto;font-family:Inter,sans-serif;';
         document.body.appendChild(seccion);
     }
+    seccion.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9997;overflow-y:auto;font-family:Inter,sans-serif;';
 
     // Inicializar mes por defecto al actual si no está seteado
     if (!mesAnnoAdminCronograma) {
@@ -1949,7 +1949,7 @@ function generarHTMLCronograma(mesAnno) {
     const dataGuardada = cargarPredicadoresFechas();
 
     let html = `
-    <div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1.2rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.25);">
+    <div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1.2rem 2rem;display:flex;justify-content:space-between;align-items:center;position:-webkit-sticky;position:sticky;top:0;z-index:1000;box-shadow:0 4px 20px rgba(0,0,0,0.25);">
         <div style="display:flex;align-items:center;gap:0.8rem;">
             <i class="fas fa-calendar-alt" style="color:#c9a53b;font-size:1.6rem;"></i>
             <div>
@@ -3542,15 +3542,28 @@ function guardarTransmisionForm(e) {
     const categoria = document.getElementById('transCategoria').value;
     const titulo = document.getElementById('transTitulo').value.trim();
     const fecha = document.getElementById('transFecha').value;
-    const plataforma = document.getElementById('transPlataforma').value;
-    const videoId = document.getElementById('transVideoId').value.trim();
+    let plataforma = document.getElementById('transPlataforma').value;
+    let videoIdRaw = document.getElementById('transVideoId').value.trim();
     const descripcion = document.getElementById('transDescripcion').value.trim();
     const destacado = document.getElementById('transDestacado').checked;
     const enVivo = document.getElementById('transEnVivo').checked;
 
-    if (!titulo || !fecha || !videoId) {
+    if (!titulo || !fecha || !videoIdRaw) {
         alert('⚠️ Por favor complete todos los campos obligatorios (*)');
         return;
+    }
+
+    // Auto-detectar plataforma si la URL indica claramente YouTube o Facebook
+    if (videoIdRaw.includes('facebook.com') || videoIdRaw.includes('fb.watch')) {
+        plataforma = 'facebook';
+    } else if (videoIdRaw.includes('youtube.com') || videoIdRaw.includes('youtu.be')) {
+        plataforma = 'youtube';
+    }
+
+    // Procesar ID si es YouTube
+    let videoId = videoIdRaw;
+    if (plataforma === 'youtube' && typeof window.obtenerYouTubeId === 'function') {
+        videoId = window.obtenerYouTubeId(videoIdRaw);
     }
 
     let transmisiones = typeof obtenerTransmisiones === 'function' ? obtenerTransmisiones() : [];

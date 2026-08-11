@@ -357,17 +357,47 @@ body {
 }
 
 @media (max-width: 480px) {
+    .container {
+        padding: 0.8rem 0.5rem;
+    }
+
+    .biblioteca-header h1 {
+        font-size: 1.45rem;
+    }
+
     .formulario-section {
         padding: 1.2rem 0.95rem;
     }
 
+    .tabla-wrapper {
+        padding: 0.4rem;
+        border-radius: 1rem;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .tabla-wrapper table {
-        font-size: 0.78rem;
-        min-width: 520px;
+        font-size: 0.75rem;
+        min-width: 480px;
+        width: 100%;
     }
 
     .tabla-wrapper th,
     .tabla-wrapper td {
-        padding: 0.5rem 0.55rem;
+        padding: 0.45rem 0.5rem;
+        word-break: normal;
+    }
+
+    .tabla-wrapper th:nth-child(1),
+    .tabla-wrapper td:nth-child(1),
+    .tabla-wrapper th:nth-child(3),
+    .tabla-wrapper td:nth-child(3),
+    .tabla-wrapper th:nth-child(6),
+    .tabla-wrapper td:nth-child(6),
+    .tabla-wrapper th:nth-child(7),
+    .tabla-wrapper td:nth-child(7) {
+        white-space: nowrap;
     }
 }

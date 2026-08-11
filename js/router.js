@@ -116,6 +116,8 @@ document.addEventListener('DOMContentLoaded', function () {
     dropdownBtns.forEach(btn => {
         btn.addEventListener('click', function (e) {
             if (window.innerWidth <= 768) {
+                e.preventDefault();
+                e.stopPropagation();
                 const parentDropdown = this.closest('.dropdown');
                 if (parentDropdown) {
                     const isAlreadyOpen = parentDropdown.classList.contains('open');
@@ -136,8 +138,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const parentLi = this.parentElement;
             const subList = parentLi.querySelector('ul');
             if (window.innerWidth <= 768 && subList) {
+                e.preventDefault();
                 e.stopPropagation();
                 const isSubOpen = parentLi.classList.contains('open');
+                // Cerrar otros submenús hermanos
+                if (parentLi.parentElement) {
+                    parentLi.parentElement.querySelectorAll('li').forEach(li => {
+                        if (li !== parentLi) li.classList.remove('open');
+                    });
+                }
                 parentLi.classList.toggle('open', !isSubOpen);
             }
         });

@@ -78,24 +78,25 @@
 
                 <!-- ========== CRONOGRAMA CON GRUPOS PEQUEÑOS ========== -->
                 <div class="dropdown">
-                    <button class="nav-btn" onclick="showPage('cronograma')"><i class="fas fa-clock"></i> Cronograma <i class="fas fa-chevron-down"
+                    <button class="nav-btn"><i class="fas fa-clock"></i> Cronograma <i class="fas fa-chevron-down"
                             style="font-size:0.6rem;"></i></button>
                     <ul class="dropdown-menu" style="min-width: 220px;">
+                        <li><a onclick="showPage('cronograma')"><i class="fas fa-calendar-week"></i> Ver Cronograma General</a></li>
+                        <li><hr style="border: 0; border-top: 1px solid var(--cream-dark); margin: 0.3rem 0.5rem;"></li>
                         <!-- Submenú Culto -->
                         <li style="position: relative;">
-                            <a onclick="showPage('culto')"
-                                style="display: flex; justify-content: space-between; align-items: center;">
+                            <a style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
                                 <span><i class="fas fa-pray"></i> Culto</span>
                                 <i class="fas fa-chevron-right" style="font-size:0.6rem; color:var(--golden);"></i>
                             </a>
                             <ul
                                 style="position: absolute; left: 100%; top: 0; background: var(--pure-white); min-width: 200px; border-radius: 1.2rem; padding: 0.5rem 0; box-shadow: var(--shadow-lg); border: 1px solid rgba(201,157,59,0.12); list-style: none; z-index: 100;">
+                                <li><a onclick="showPage('culto')"><i class="fas fa-bible"></i> Culto Divino / Predica</a></li>
                                 <li><a onclick="showPage('canto')"><i class="fas fa-music"></i> Canto</a></li>
                                 <li><a onclick="showPage('escuela-sabatica')"><i class="fas fa-book-open"></i> Escuela
                                         Sabática</a></li>
                                 <li><a onclick="showPage('minuto-misionero')"><i class="fas fa-globe-americas"></i> Minuto
                                         Misionero</a></li>
-                                <li><a onclick="showPage('culto')"><i class="fas fa-bible"></i> Predica</a></li>
                             </ul>
                         </li>
                         <li><a onclick="showPage('sociedad-jovenes')"><i class="fas fa-users"></i> Sociedad de

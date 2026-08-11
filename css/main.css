@@ -772,49 +772,58 @@
         transform: none !important;
         box-shadow: none;
         border: none;
-        padding-left: 1.2rem;
+        padding-left: 0.8rem;
         display: none;
-        background: transparent;
-        min-width: 100%;
+        background: rgba(245, 239, 224, 0.4);
+        min-width: 100% !important;
         transition: none;
+        border-left: 3px solid var(--golden);
+        border-radius: 0 0 0.8rem 0.8rem;
+        margin-top: 0.2rem;
     }
 
-    .dropdown:hover .dropdown-menu,
-    .dropdown.open .dropdown-menu {
-        display: block;
+    .dropdown.open > .dropdown-menu {
+        display: block !important;
     }
 
     .dropdown-menu li a {
-        padding: 0.5rem 1rem;
-        font-size: 0.85rem;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
     }
 
     .dropdown-menu li a:hover {
-        padding-left: 1.5rem;
-        background: rgba(201, 157, 59, 0.05);
+        padding-left: 1.2rem;
+        background: rgba(201, 157, 59, 0.08);
     }
 
     /* Submenú en móvil */
-    .dropdown-menu li>ul {
-        position: static;
+    .dropdown-menu li > ul {
+        position: static !important;
         opacity: 1 !important;
         visibility: visible !important;
         transform: none !important;
-        box-shadow: none;
-        border: none;
-        padding-left: 0.5rem;
-        display: none;
-        background: transparent;
+        box-shadow: none !important;
+        border: none !important;
+        border-left: 2px solid var(--golden) !important;
+        padding-left: 0.6rem !important;
+        display: none !important;
+        background: transparent !important;
+        min-width: 100% !important;
+        margin-top: 0.3rem;
     }
 
-    .dropdown-menu li:hover>ul {
-        display: block;
+    .dropdown-menu li.open > ul {
+        display: block !important;
     }
 
     /* Ajuste para el botón del dropdown */
     .dropdown .nav-btn {
         width: 100%;
         justify-content: flex-start;
+        min-height: 44px;
     }
 
     .dropdown .nav-btn i.fa-chevron-down {

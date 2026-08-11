@@ -1520,8 +1520,15 @@ function obtenerYouTubeId(urlOrId) {
     if (/^[a-zA-Z0-9_-]{11}$/.test(urlOrId)) {
         return urlOrId;
     }
-    const match = urlOrId.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-    return match ? match[1] : urlOrId;
+    const match = urlOrId.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|live\/|shorts\/))([\w-]{11})/i);
+    if (match && match[1]) {
+        return match[1];
+    }
+    const vMatch = urlOrId.match(/[?&]v=([\w-]{11})/i);
+    if (vMatch && vMatch[1]) {
+        return vMatch[1];
+    }
+    return urlOrId;
 }
 
 function obtenerFacebookEmbedUrl(urlOrId) {
@@ -1761,5 +1768,7 @@ window.conmutarVideo = conmutarVideo;
 window.actualizarBotonFlotanteEnVivo = actualizarBotonFlotanteEnVivo;
 window.obtenerTransmisiones = obtenerTransmisiones;
 window.guardarTransmisiones = guardarTransmisiones;
+window.obtenerYouTubeId = obtenerYouTubeId;
+window.obtenerFacebookEmbedUrl = obtenerFacebookEmbedUrl;
 
 console.log('✅ app.js (Iglesia & En Vivo) cargado correctamente');

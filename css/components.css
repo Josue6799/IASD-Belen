@@ -1661,8 +1661,8 @@
         min-width: 100%;
     }
 
-    .dropdown:hover .dropdown-menu {
-        display: block;
+    .dropdown.open > .dropdown-menu {
+        display: block !important;
     }
 
     .dropdown-menu li a {
@@ -3949,7 +3949,8 @@
     }
     .btn-flotante-envivo {
         bottom: 1rem;
-        right: calc(1rem + 60px + 8px);
+        right: calc(1rem + 55px + 18px);
+        min-height: 44px;
     }
     .btn-flotante-envivo.envivo-inactivo {
         padding: 0.35rem 0.7rem;
