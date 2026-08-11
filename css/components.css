@@ -1652,43 +1652,7 @@
     margin-bottom: 0.8rem;
 }
 
-/* Animación para el dropdown en móviles */
-@media (max-width: 768px) {
-    .dropdown-menu {
-        position: static;
-        /* O relative, para que no flote */
-        left: 0;
-        right: auto;
-        width: 100%;
-        padding-left: 1rem;
-        display: none;
-        /* Se muestra con JS al hacer clic */
-    }
 
-    .dropdown.open .dropdown-menu {
-        display: block;
-        /* Se muestra al abrir */
-    }
-
-    .dropdown-menu li a {
-        padding-left: 1.5rem;
-        /* Asegura que los textos estén alineados a la izquierda */
-        text-align: left;
-    }
-
-
-    .dropdown.open>.dropdown-menu {
-        display: block !important;
-    }
-
-    .dropdown-menu li a {
-        padding: 0.5rem 1rem;
-    }
-
-    .dropdown-menu li a:hover {
-        padding-left: 1.5rem;
-    }
-}
 
 /* ========================================
    BOTÓN DE CERRAR MODAL MEJORADO
@@ -3750,8 +3714,8 @@
 .envivo-header h2 {
     margin: 0;
     font-size: 1.4rem;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-weight: 700;
     display: flex;
     align-items: center;
     gap: 0.6rem;

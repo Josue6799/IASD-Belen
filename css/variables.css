@@ -30,8 +30,10 @@
     --radius-card: 1.6rem;
     --radius-btn: 3rem;
 
-    /* Transiciones */
-    --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* Tipografía */
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: 'Montserrat', sans-serif;
 }
 
 /* Reset Global */
@@ -46,20 +48,43 @@ html {
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-body);
     background: var(--cream);
     color: var(--dark-text);
     line-height: 1.6;
+    letter-spacing: 0.02em;
+    font-size: 1.05rem;
     min-height: 100vh;
 }
 
 h1,
 h2,
-h3,
-h4 {
-    font-family: 'Montserrat', sans-serif;
+h3 {
+    font-family: var(--font-heading);
+    letter-spacing: 0.01em;
+}
+
+h1 {
+    font-size: clamp(2.6rem, 5vw, 3.6rem);
     font-weight: 700;
-    letter-spacing: -0.02em;
+    line-height: 1.25;
+}
+
+h2 {
+    font-size: clamp(1.9rem, 3.5vw, 2.4rem);
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+h3 {
+    font-size: clamp(1.35rem, 2.5vw, 1.7rem);
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+h4 {
+    font-family: var(--font-body);
+    font-weight: 700;
 }
 
 a {

@@ -265,7 +265,9 @@
 }
 
 .page-title {
-    font-size: 2.4rem;
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
+    font-weight: 700;
     color: var(--deep-blue);
     margin: 1.2rem 0 1.8rem;
     display: flex;
@@ -318,28 +320,29 @@
     padding: 0.35rem 1.4rem;
     border-radius: 2rem;
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     letter-spacing: 0.5px;
     margin-bottom: 1.2rem;
 }
 
 .hero-text h1 {
-    font-size: 3.8rem;
-    font-weight: 900;
-    line-height: 1.1;
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: clamp(2.8rem, 5vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.2;
 }
 
 .hero-text h1 .welcome {
     display: block;
-    font-size: 2.6rem;
+    font-size: clamp(2.2rem, 4vw, 2.8rem);
     color: var(--golden);
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 0.01em;
 }
 
 .hero-text h1 .church-name {
     display: block;
-    font-size: 2.4rem;
+    font-size: clamp(2.2rem, 4vw, 2.6rem);
     color: var(--deep-blue);
     font-weight: 800;
 }
@@ -877,79 +880,84 @@
 }
 
 /* ========================================
-   ESTILOS PARA EL DROPDOWN EN MÓVIL
+   ESTILOS Y CORRECCIÓN DEFINITIVA DEL MENÚ EN MÓVILES
    ======================================== */
 
 @media (max-width: 768px) {
-    .dropdown-menu {
-        position: static;
-        /* O relative, para que no flote */
-        left: 0;
-        right: auto;
-        width: 100%;
-        padding-left: 1rem;
-        display: none;
-        /* Se muestra con JS al hacer clic */
-    }
-
-    .dropdown.open .dropdown-menu {
-        display: block;
-        /* Se muestra al abrir */
-    }
-
-    .dropdown-menu li a {
-        padding-left: 1.5rem;
-        /* Asegura que los textos estén alineados a la izquierda */
-        text-align: left;
-    }
-
-
-    .dropdown.open>.dropdown-menu {
-        display: block !important;
-    }
-
-    .dropdown-menu li a {
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        padding: 0.6rem 1rem;
-        font-size: 0.9rem;
-    }
-
-    .dropdown-menu li a:hover {
-        padding-left: 1.2rem;
-        background: rgba(201, 157, 59, 0.08);
-    }
-
-    /* Submenú en móvil */
-    .dropdown-menu li>ul {
+    /* Forzar que todos los submenús (niveles 1 y 2) sean estáticos y apilados debajo */
+    .dropdown-menu,
+    .submenu-list,
+    .submenu-grupos,
+    .dropdown-menu li > ul {
         position: static !important;
+        left: 0 !important;
+        right: auto !important;
+        top: auto !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-left: 3px solid rgba(201, 157, 59, 0.4) !important;
+        border-radius: 0 0 1rem 1rem !important;
+        padding: 0.4rem 0 0.4rem 0.8rem !important;
+        margin-top: 0.2rem !important;
+        background: rgba(254, 252, 246, 0.9) !important;
+        display: none !important;
         opacity: 1 !important;
         visibility: visible !important;
         transform: none !important;
-        box-shadow: none !important;
-        border: none !important;
-        border-left: 2px solid var(--golden) !important;
-        padding-left: 0.6rem !important;
-        display: none !important;
-        background: transparent !important;
-        min-width: 100% !important;
-        margin-top: 0.3rem;
     }
 
-    .dropdown-menu li.open>ul {
+    /* Mostrar cuando el padre tiene la clase .open */
+    .dropdown.open > .dropdown-menu,
+    .dropdown.open .dropdown-menu,
+    .has-submenu.open > .submenu-list,
+    .has-submenu.open > .submenu-grupos,
+    .has-submenu.open .submenu-grupos,
+    .dropdown-menu li.open > ul {
         display: block !important;
     }
 
-    /* Ajuste para el botón del dropdown */
-    .dropdown .nav-btn {
-        width: 100%;
-        justify-content: flex-start;
-        min-height: 44px;
+    /* Asegurar que todos los enlaces e ítems de submenús estén alineados a la izquierda */
+    .dropdown-menu li a,
+    .submenu-list li a,
+    .submenu-grupos li a,
+    .dropdown-menu li .submenu-toggle,
+    .submenu-list li .submenu-toggle,
+    .submenu-grupos li .submenu-toggle {
+        justify-content: flex-start !important;
+        text-align: left !important;
+        padding-left: 1rem !important;
+        width: 100% !important;
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        box-sizing: border-box !important;
     }
 
-    .dropdown .nav-btn i.fa-chevron-down {
-        margin-left: auto;
+    /* Eliminar cualquier posible margen o padding desalineador en listas */
+    .dropdown-menu li,
+    .submenu-list li,
+    .submenu-grupos li {
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Los botones principales del menú también alineados a la izquierda */
+    .nav-btn {
+        justify-content: flex-start !important;
+        text-align: left !important;
+        gap: 0.6rem !important;
+        width: 100% !important;
+    }
+
+    /* El chevron (flecha) debe estar siempre a la derecha, con texto e iconos a la izquierda */
+    .nav-btn .nav-chevron,
+    .nav-btn i.fa-chevron-down,
+    .sub-chevron {
+        margin-left: auto !important;
     }
 }
 
