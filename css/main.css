@@ -379,6 +379,12 @@
     /* --- NAVBAR RESPONSIVE --- */
     .navbar {
         padding: 0.8rem 0;
+        position: relative;
+        z-index: 1000;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .logo-img {
@@ -391,6 +397,7 @@
 
     .logo {
         gap: 0.5rem;
+        z-index: 1001;
     }
 
     .mobile-menu-toggle {
@@ -406,6 +413,7 @@
         border: none;
         cursor: pointer;
         transition: all 0.3s ease;
+        z-index: 1001;
     }
 
     .mobile-menu-toggle:active {
@@ -414,26 +422,32 @@
 
     .nav-links {
         display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
         width: 100%;
         flex-direction: column;
         align-items: stretch;
         background: var(--pure-white);
         padding: 0.8rem;
         border-radius: 1.4rem;
-        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2);
         margin-top: 0.5rem;
-        border: 1px solid rgba(201, 157, 59, 0.15);
-        max-height: 82vh;
+        border: 1px solid rgba(201, 157, 59, 0.2);
+        max-height: 80vh;
         overflow-y: auto;
         opacity: 0;
         transform: translateY(-8px);
         transition: opacity 0.3s ease, transform 0.3s ease;
+        z-index: 9999;
     }
 
     .nav-links.open {
-        display: flex;
-        opacity: 1;
-        transform: translateY(0);
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateY(0) !important;
     }
 
     .nav-btn {
