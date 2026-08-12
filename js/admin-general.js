@@ -2368,7 +2368,9 @@ function importarDatosClub(event) {
 const STORAGE_LIBROS = 'libros_biblioteca';
 const STORAGE_PEDIDOS = 'libros_pedidos';
 let libroPendienteEditarId = null;
-let filtroPedidosTabActual = 'Pendientes'; // 'Pendientes' o 'Todos'
+let filtroPedidosTabActual = 'Pendientes'; // 'Pendientes', 'EnCurso', o 'Todos'
+let seccionVerPedidosActual = 'Libros'; // 'Libros' o 'Pedidos'
+let filtroTextoLibrosPedidos = '';
 
 function cargarLibros() {
     try {
@@ -2628,15 +2630,135 @@ function confirmarEliminarLibro(id) {
 
 // --- Ver Libros Pedidos ---
 function abrirModalVerPedidos() {
+    seccionVerPedidosActual = 'Libros';
     filtroPedidosTabActual = 'Pendientes';
+    filtroTextoLibrosPedidos = '';
+    const inputBuscador = document.getElementById('buscadorLibrosPedidos');
+    if (inputBuscador) inputBuscador.value = '';
+
+    actualizarTabsSeccionVerPedidos();
     actualizarBotonesTabPedidos();
     document.getElementById('modalVerPedidos').classList.add('active');
-    renderizarPedidos();
+    renderizarSeccionVerPedidos();
 }
 
 function cerrarModalVerPedidos(event) {
     if (event && event.target !== document.getElementById('modalVerPedidos')) return;
     document.getElementById('modalVerPedidos').classList.remove('active');
+}
+
+function cambiarSeccionVerPedidos(seccion) {
+    seccionVerPedidosActual = seccion;
+    actualizarTabsSeccionVerPedidos();
+    renderizarSeccionVerPedidos();
+}
+
+function actualizarTabsSeccionVerPedidos() {
+    const btnLibros = document.getElementById('btnTabSeccionLibros');
+    const btnPedidos = document.getElementById('btnTabSeccionPedidos');
+    const secLibros = document.getElementById('seccionVerLibros');
+    const secPedidos = document.getElementById('seccionVerPedidos');
+
+    const estActivo = 'padding:0.5rem 1.4rem; border-radius:1.5rem; border:none; background:#1a3a4a; color:white; font-weight:700; cursor:pointer; font-size:0.88rem; font-family:Inter,sans-serif; min-height:44px; display:inline-flex; align-items:center; gap:0.4rem;';
+    const estInactivo = 'padding:0.5rem 1.4rem; border-radius:1.5rem; border:1px solid #1a3a4a; background:white; color:#1a3a4a; font-weight:700; cursor:pointer; font-size:0.88rem; font-family:Inter,sans-serif; min-height:44px; display:inline-flex; align-items:center; gap:0.4rem;';
+
+    if (btnLibros) btnLibros.style.cssText = (seccionVerPedidosActual === 'Libros') ? estActivo : estInactivo;
+    if (btnPedidos) btnPedidos.style.cssText = (seccionVerPedidosActual === 'Pedidos') ? estActivo : estInactivo;
+
+    if (secLibros) secLibros.style.display = (seccionVerPedidosActual === 'Libros') ? 'block' : 'none';
+    if (secPedidos) secPedidos.style.display = (seccionVerPedidosActual === 'Pedidos') ? 'block' : 'none';
+}
+
+function renderizarSeccionVerPedidos() {
+    if (seccionVerPedidosActual === 'Libros') {
+        renderizarLibrosPedidos();
+    } else {
+        renderizarPedidos();
+    }
+}
+
+function filtrarLibrosPedidosAdmin() {
+    const inputBuscador = document.getElementById('buscadorLibrosPedidos');
+    filtroTextoLibrosPedidos = inputBuscador ? inputBuscador.value.trim().toLowerCase() : '';
+    renderizarLibrosPedidos();
+}
+
+function renderizarLibrosPedidos() {
+    const libros = cargarLibros();
+    const contenedor = document.getElementById('listaLibrosAdminEstados');
+    if (!contenedor) return;
+
+    let librosFiltrados = libros;
+    if (filtroTextoLibrosPedidos) {
+        librosFiltrados = libros.filter(l => 
+            (l.titulo && l.titulo.toLowerCase().includes(filtroTextoLibrosPedidos)) ||
+            (l.autor && l.autor.toLowerCase().includes(filtroTextoLibrosPedidos)) ||
+            (l.categoria && l.categoria.toLowerCase().includes(filtroTextoLibrosPedidos)) ||
+            (l.id && String(l.id).toLowerCase().includes(filtroTextoLibrosPedidos))
+        );
+    }
+
+    if (librosFiltrados.length === 0) {
+        const msj = filtroTextoLibrosPedidos
+            ? 'No se encontraron libros que coincidan con la búsqueda.'
+            : 'No hay libros registrados en la biblioteca.';
+        contenedor.innerHTML = `<p style="text-align:center; color:#5a6474; padding:2rem 1rem;">${msj}</p>`;
+        return;
+    }
+
+    let html = '<div style="overflow-x:auto;"><table class="tabla-libros" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:680px;">';
+    html += '<thead><tr style="background:#1a3a4a; color:white; text-align:left;">';
+    html += '<th style="padding:0.7rem;">ID / Título del Libro</th>';
+    html += '<th style="padding:0.7rem;">Autor</th>';
+    html += '<th style="padding:0.7rem;">Categoría</th>';
+    html += '<th style="padding:0.7rem;">Estado Actual</th>';
+    html += '<th style="padding:0.7rem; text-align:center;">Cambiar Estado</th>';
+    html += '</tr></thead><tbody>';
+
+    librosFiltrados.forEach((l, index) => {
+        const bgRow = index % 2 === 0 ? '#ffffff' : '#f9f8f5';
+        const estado = l.estado || 'Disponible';
+
+        let estadoBadge = '<span style="background:#e8f5e9; color:#2e7d32; padding:0.25rem 0.7rem; border-radius:1rem; font-weight:700; font-size:0.78rem; display:inline-flex; align-items:center; gap:0.3rem;"><i class="fas fa-check-circle"></i> Disponible</span>';
+        if (estado === 'En curso') {
+            estadoBadge = '<span style="background:#fff3e0; color:#e65100; padding:0.25rem 0.7rem; border-radius:1rem; font-weight:700; font-size:0.78rem; display:inline-flex; align-items:center; gap:0.3rem;"><i class="fas fa-hourglass-half"></i> En curso</span>';
+        } else if (estado === 'Prestado') {
+            estadoBadge = '<span style="background:#ffebee; color:#c62828; padding:0.25rem 0.7rem; border-radius:1rem; font-weight:700; font-size:0.78rem; display:inline-flex; align-items:center; gap:0.3rem;"><i class="fas fa-user-clock"></i> Prestado</span>';
+        } else if (estado === 'Dañado') {
+            estadoBadge = '<span style="background:#f5f5f5; color:#757575; padding:0.25rem 0.7rem; border-radius:1rem; font-weight:700; font-size:0.78rem; display:inline-flex; align-items:center; gap:0.3rem;"><i class="fas fa-exclamation-triangle"></i> Dañado</span>';
+        }
+
+        html += `<tr style="background:${bgRow}; border-bottom:1px solid #eee;">
+            <td style="padding:0.7rem; font-weight:600; color:#1a3a4a;">
+                <div><span style="font-size:0.75rem; color:#d4a038; font-weight:700;">[ID: ${l.id}]</span> ${l.titulo || 'Sin título'}</div>
+            </td>
+            <td style="padding:0.7rem; color:#5a6474;">${l.autor || '-'}</td>
+            <td style="padding:0.7rem; color:#5a6474;">${l.categoria || l.cat || 'General'}</td>
+            <td style="padding:0.7rem;">${estadoBadge}</td>
+            <td style="padding:0.7rem; text-align:center;">
+                <select onchange="cambiarEstadoLibroDirecto('${l.id}', this.value)" style="padding:0.4rem 0.6rem; border-radius:0.8rem; border:1px solid #1a3a4a; font-weight:600; font-size:0.8rem; min-height:44px; cursor:pointer; background:white; color:#1a3a4a; outline:none;">
+                    <option value="Disponible" ${estado === 'Disponible' ? 'selected' : ''}>🟢 Disponible</option>
+                    <option value="En curso" ${estado === 'En curso' ? 'selected' : ''}>🟠 En curso</option>
+                    <option value="Prestado" ${estado === 'Prestado' ? 'selected' : ''}>🔴 Prestado</option>
+                    <option value="Dañado" ${estado === 'Dañado' ? 'selected' : ''}>⚪ Dañado</option>
+                </select>
+            </td>
+        </tr>`;
+    });
+
+    html += '</tbody></table></div>';
+    contenedor.innerHTML = html;
+}
+
+function cambiarEstadoLibroDirecto(id, nuevoEstado) {
+    let libros = cargarLibros();
+    const idx = libros.findIndex(l => String(l.id) === String(id));
+    if (idx !== -1) {
+        libros[idx].estado = nuevoEstado;
+        guardarLibros(libros);
+        mostrarToastBiblio(`<i class="fas fa-sync-alt"></i> Estado del libro cambiado a "${nuevoEstado}"`);
+        renderizarSeccionVerPedidos();
+    }
 }
 
 function filtrarPedidosTab(tab) {
@@ -2647,24 +2769,15 @@ function filtrarPedidosTab(tab) {
 
 function actualizarBotonesTabPedidos() {
     const btnPend = document.getElementById('btnFiltroPedidosPendientes');
+    const btnEnCurso = document.getElementById('btnFiltroPedidosEnCurso');
     const btnTodos = document.getElementById('btnFiltroPedidosTodos');
-    if (btnPend && btnTodos) {
-        if (filtroPedidosTabActual === 'Pendientes') {
-            btnPend.style.background = '#1a3a4a';
-            btnPend.style.color = 'white';
-            btnPend.style.border = 'none';
-            btnTodos.style.background = 'white';
-            btnTodos.style.color = '#1a3a4a';
-            btnTodos.style.border = '1px solid #1a3a4a';
-        } else {
-            btnTodos.style.background = '#1a3a4a';
-            btnTodos.style.color = 'white';
-            btnTodos.style.border = 'none';
-            btnPend.style.background = 'white';
-            btnPend.style.color = '#1a3a4a';
-            btnPend.style.border = '1px solid #1a3a4a';
-        }
-    }
+
+    const estActivo = 'padding:0.4rem 1rem; border-radius:1.5rem; border:none; background:#1a3a4a; color:white; font-weight:600; cursor:pointer; font-size:0.82rem; font-family:Inter,sans-serif; min-height:44px; display:inline-flex; align-items:center; justify-content:center;';
+    const estInactivo = 'padding:0.4rem 1rem; border-radius:1.5rem; border:1px solid #1a3a4a; background:white; color:#1a3a4a; font-weight:600; cursor:pointer; font-size:0.82rem; font-family:Inter,sans-serif; min-height:44px; display:inline-flex; align-items:center; justify-content:center;';
+
+    if (btnPend) btnPend.style.cssText = (filtroPedidosTabActual === 'Pendientes') ? estActivo : estInactivo;
+    if (btnEnCurso) btnEnCurso.style.cssText = (filtroPedidosTabActual === 'EnCurso') ? estActivo : estInactivo;
+    if (btnTodos) btnTodos.style.cssText = (filtroPedidosTabActual === 'Todos') ? estActivo : estInactivo;
 }
 
 function renderizarPedidos() {
@@ -2672,6 +2785,11 @@ function renderizarPedidos() {
     const libros = cargarLibros();
     const contenedor = document.getElementById('listaPedidosLibros');
     if (!contenedor) return;
+
+    if (filtroPedidosTabActual === 'EnCurso') {
+        renderizarPedidosEnCurso(contenedor);
+        return;
+    }
 
     let pedidos = todosPedidos;
     if (filtroPedidosTabActual === 'Pendientes') {
@@ -2738,13 +2856,106 @@ function renderizarPedidos() {
     contenedor.innerHTML = html;
 }
 
+function renderizarPedidosEnCurso(contenedor) {
+    const libros = cargarLibros();
+    const todosPedidos = cargarPedidos();
+
+    const librosEnCurso = libros.filter(l => l.estado === 'En curso');
+
+    if (librosEnCurso.length === 0) {
+        contenedor.innerHTML = `<p style="text-align:center; color:#5a6474; padding:2rem 1rem;">No hay libros actualmente en curso en la biblioteca.</p>`;
+        return;
+    }
+
+    let html = '<div style="overflow-x:auto;"><table class="tabla-libros" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:720px;">';
+    html += '<thead><tr style="background:#1a3a4a; color:white; text-align:left;">';
+    html += '<th style="padding:0.7rem;">Título del Libro</th>';
+    html += '<th style="padding:0.7rem;">Solicitante / Contacto</th>';
+    html += '<th style="padding:0.7rem;">Fecha Solicitud</th>';
+    html += '<th style="padding:0.7rem;">Fecha Devolución (+14 días)</th>';
+    html += '<th style="padding:0.7rem; text-align:center;">Acciones</th>';
+    html += '</tr></thead><tbody>';
+
+    librosEnCurso.forEach((l, index) => {
+        const bgRow = index % 2 === 0 ? '#ffffff' : '#f9f8f5';
+        
+        const pedidoAsociado = todosPedidos.slice().reverse().find(p => 
+            p.estado !== 'Cancelado' &&
+            ((p.libroId && String(p.libroId) === String(l.id)) || 
+             (l.titulo && p.tituloLibro && l.titulo.toLowerCase().trim() === p.tituloLibro.toLowerCase().trim()))
+        );
+
+        let solicitanteHtml = '<span style="color:#757575; font-style:italic;">Sin solicitante registrado</span>';
+        let fechaSolTexto = 'Sin fecha';
+        let fechaDevTexto = 'No aplica';
+
+        if (pedidoAsociado) {
+            const tel = pedidoAsociado.telefono ? ` 📱 ${pedidoAsociado.telefono}` : '';
+            const email = pedidoAsociado.email ? ` ✉️ ${pedidoAsociado.email}` : '';
+            solicitanteHtml = `<strong style="color:#1a3a4a;">${pedidoAsociado.solicitante || 'Anónimo'}</strong><div style="font-size:0.75rem; color:#5a6474;">${tel}${email}</div>`;
+
+            if (pedidoAsociado.fecha) {
+                const fechaObj = new Date(pedidoAsociado.fecha);
+                if (!isNaN(fechaObj.getTime())) {
+                    fechaSolTexto = fechaObj.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    const fechaDevObj = new Date(fechaObj.getTime() + 14 * 24 * 60 * 60 * 1000);
+                    fechaDevTexto = fechaDevObj.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                }
+            }
+        }
+
+        html += `<tr style="background:${bgRow}; border-bottom:1px solid #eee;">
+            <td style="padding:0.7rem; font-weight:600; color:#1a3a4a;">
+                <div><span style="font-size:0.75rem; color:#d4a038; font-weight:700;">[ID: ${l.id}]</span> ${l.titulo || 'Sin título'}</div>
+                <div style="font-size:0.75rem; color:#5a6474; font-weight:normal;">Autor: ${l.autor || '-'}</div>
+            </td>
+            <td style="padding:0.7rem;">${solicitanteHtml}</td>
+            <td style="padding:0.7rem; color:#1a3a4a; white-space:nowrap; font-weight:600;">
+                <i class="fas fa-calendar-alt" style="color:#1a3a4a; font-size:0.8rem;"></i> ${fechaSolTexto}
+            </td>
+            <td style="padding:0.7rem; color:#e65100; white-space:nowrap; font-weight:700;">
+                <i class="fas fa-clock" style="color:#e65100; font-size:0.8rem;"></i> ${fechaDevTexto}
+            </td>
+            <td style="padding:0.7rem; text-align:center; white-space:nowrap;">
+                <button type="button" onclick="completarEnCurso('${l.id}', '${pedidoAsociado ? pedidoAsociado.id : ''}')" style="background:#2e7d32; color:white; border:none; padding:0.45rem 0.9rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; min-height:44px; display:inline-flex; align-items:center; gap:0.4rem;">
+                    <i class="fas fa-check-circle"></i> Marcar Disponible
+                </button>
+            </td>
+        </tr>`;
+    });
+
+    html += '</tbody></table></div>';
+    contenedor.innerHTML = html;
+}
+
+function completarEnCurso(libroId, pedidoId) {
+    let libros = cargarLibros();
+    const idx = libros.findIndex(l => String(l.id) === String(libroId));
+    if (idx !== -1) {
+        libros[idx].estado = 'Disponible';
+        guardarLibros(libros);
+    }
+
+    if (pedidoId) {
+        let pedidos = cargarPedidos();
+        const pIdx = pedidos.findIndex(p => String(p.id) === String(pedidoId));
+        if (pIdx !== -1) {
+            pedidos[pIdx].estado = 'Entregado';
+            guardarPedidos(pedidos);
+        }
+    }
+
+    mostrarToastBiblio('<i class="fas fa-check-circle"></i> Libro devuelto y marcado como Disponible');
+    renderizarSeccionVerPedidos();
+}
+
 function marcarEntregadoPedido(id) {
     let pedidos = cargarPedidos();
     const pedido = pedidos.find(p => String(p.id) === String(id));
     if (pedido) {
         pedido.estado = 'Entregado';
         guardarPedidos(pedidos);
-        renderizarPedidos();
+        renderizarSeccionVerPedidos();
         mostrarToastBiblio('<i class="fas fa-check-circle"></i> Pedido marcado como entregado');
     }
 }
@@ -2755,7 +2966,7 @@ function cancelarPedido(id) {
     if (pedido) {
         pedido.estado = 'Cancelado';
         guardarPedidos(pedidos);
-        renderizarPedidos();
+        renderizarSeccionVerPedidos();
         mostrarToastBiblio('<i class="fas fa-ban"></i> Pedido cancelado', '#757575');
     }
 }
@@ -2768,7 +2979,7 @@ window.addEventListener('datosBibliotecaActualizados', function () {
     }
     const modalPedidos = document.getElementById('modalVerPedidos');
     if (modalPedidos && modalPedidos.classList.contains('active')) {
-        renderizarPedidos();
+        renderizarSeccionVerPedidos();
     }
 });
 
@@ -2780,7 +2991,7 @@ window.addEventListener('storage', function (e) {
         }
         const modalPedidos = document.getElementById('modalVerPedidos');
         if (modalPedidos && modalPedidos.classList.contains('active')) {
-            renderizarPedidos();
+            renderizarSeccionVerPedidos();
         }
     }
 });
@@ -3333,6 +3544,13 @@ window.cerrarModalEliminarLibro = cerrarModalEliminarLibro;
 window.confirmarEliminarLibro = confirmarEliminarLibro;
 window.abrirModalVerPedidos = abrirModalVerPedidos;
 window.cerrarModalVerPedidos = cerrarModalVerPedidos;
+window.cambiarSeccionVerPedidos = cambiarSeccionVerPedidos;
+window.filtrarLibrosPedidosAdmin = filtrarLibrosPedidosAdmin;
+window.cambiarEstadoLibroDirecto = cambiarEstadoLibroDirecto;
+window.renderizarLibrosPedidos = renderizarLibrosPedidos;
+window.renderizarSeccionVerPedidos = renderizarSeccionVerPedidos;
+window.renderizarPedidosEnCurso = renderizarPedidosEnCurso;
+window.completarEnCurso = completarEnCurso;
 window.marcarEntregadoPedido = marcarEntregadoPedido;
 window.cancelarPedido = cancelarPedido;
 window.filtrarPedidosTab = filtrarPedidosTab;

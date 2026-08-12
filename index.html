@@ -3562,19 +3562,47 @@
         </div>
     </div>
 
-    <!-- ===== MODAL VER LIBROS PEDIDOS ===== -->
+    <!-- ===== MODAL VER LIBROS Y PEDIDOS ===== -->
     <div id="modalVerPedidos" class="modal-biblioteca-overlay" onclick="cerrarModalVerPedidos(event)">
-        <div class="modal-biblioteca-card" onclick="event.stopPropagation()" style="max-width:880px;">
+        <div class="modal-biblioteca-card" onclick="event.stopPropagation()" style="max-width:920px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
-                <h3 style="margin:0; text-align:left; color:#1a3a4a; font-size:1.2rem;"><i class="fas fa-book-open"></i> Solicitudes de Préstamo de Libros</h3>
+                <h3 style="margin:0; text-align:left; color:#1a3a4a; font-size:1.2rem;">
+                    <i class="fas fa-book-open"></i> Gestión de Libros y Pedidos
+                </h3>
                 <button type="button" onclick="cerrarModalVerPedidos()" style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;" title="Cerrar">&times;</button>
             </div>
-            <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
-                <button id="btnFiltroPedidosPendientes" onclick="filtrarPedidosTab('Pendientes')" style="padding:0.4rem 1.2rem; border-radius:1.5rem; border:none; background:#1a3a4a; color:white; font-weight:600; cursor:pointer; font-size:0.85rem; font-family:Inter,sans-serif;">Pendientes</button>
-                <button id="btnFiltroPedidosTodos" onclick="filtrarPedidosTab('Todos')" style="padding:0.4rem 1.2rem; border-radius:1.5rem; border:1px solid #1a3a4a; background:white; color:#1a3a4a; font-weight:600; cursor:pointer; font-size:0.85rem; font-family:Inter,sans-serif;">Todos los pedidos</button>
+
+            <!-- Pestañas Principales: Catálogo de Libros vs Solicitudes de Préstamo -->
+            <div style="display:flex; gap:0.5rem; margin-bottom:1rem; border-bottom:1px solid #e0e0e0; padding-bottom:0.6rem; flex-wrap:wrap;">
+                <button id="btnTabSeccionLibros" onclick="cambiarSeccionVerPedidos('Libros')" style="padding:0.5rem 1.4rem; border-radius:1.5rem; border:none; background:#1a3a4a; color:white; font-weight:700; cursor:pointer; font-size:0.88rem; font-family:Inter,sans-serif; min-height:44px; display:inline-flex; align-items:center; gap:0.4rem;">
+                    <i class="fas fa-book"></i> Catálogo y Estados
+                </button>
+                <button id="btnTabSeccionPedidos" onclick="cambiarSeccionVerPedidos('Pedidos')" style="padding:0.5rem 1.4rem; border-radius:1.5rem; border:1px solid #1a3a4a; background:white; color:#1a3a4a; font-weight:700; cursor:pointer; font-size:0.88rem; font-family:Inter,sans-serif; min-height:44px; display:inline-flex; align-items:center; gap:0.4rem;">
+                    <i class="fas fa-list-alt"></i> Solicitudes de Préstamo
+                </button>
             </div>
-            <div id="listaPedidosLibros" style="overflow-x:auto; max-height:60vh;">
-                <!-- Se llena dinámicamente con JS -->
+
+            <!-- SECCIÓN 1: CATÁLOGO Y ESTADOS DE LIBROS -->
+            <div id="seccionVerLibros">
+                <div class="buscador-biblioteca" style="margin-bottom:1rem;">
+                    <i class="fas fa-search icono-buscar"></i>
+                    <input type="text" id="buscadorLibrosPedidos" placeholder="Buscar libro por título, autor o ID..." oninput="filtrarLibrosPedidosAdmin()">
+                </div>
+                <div id="listaLibrosAdminEstados" style="overflow-x:auto; max-height:55vh;">
+                    <!-- Se llena dinámicamente con JS -->
+                </div>
+            </div>
+
+            <!-- SECCIÓN 2: SOLICITUDES DE PRÉSTAMO DE LIBROS -->
+            <div id="seccionVerPedidos" style="display:none;">
+                <div style="display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap; align-items:center;">
+                    <button id="btnFiltroPedidosPendientes" onclick="filtrarPedidosTab('Pendientes')" style="padding:0.4rem 1rem; border-radius:1.5rem; border:none; background:#1a3a4a; color:white; font-weight:600; cursor:pointer; font-size:0.82rem; font-family:Inter,sans-serif; min-height:44px; display:inline-flex; align-items:center; justify-content:center;">Pendientes</button>
+                    <button id="btnFiltroPedidosEnCurso" onclick="filtrarPedidosTab('EnCurso')" style="padding:0.4rem 1rem; border-radius:1.5rem; border:1px solid #1a3a4a; background:white; color:#1a3a4a; font-weight:600; cursor:pointer; font-size:0.82rem; font-family:Inter,sans-serif; min-height:44px; display:inline-flex; align-items:center; justify-content:center;">En curso</button>
+                    <button id="btnFiltroPedidosTodos" onclick="filtrarPedidosTab('Todos')" style="padding:0.4rem 1rem; border-radius:1.5rem; border:1px solid #1a3a4a; background:white; color:#1a3a4a; font-weight:600; cursor:pointer; font-size:0.82rem; font-family:Inter,sans-serif; min-height:44px; display:inline-flex; align-items:center; justify-content:center;">Todos los pedidos</button>
+                </div>
+                <div id="listaPedidosLibros" style="overflow-x:auto; max-height:55vh;">
+                    <!-- Se llena dinámicamente con JS -->
+                </div>
             </div>
         </div>
     </div>
