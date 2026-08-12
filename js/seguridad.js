@@ -35,8 +35,11 @@ const CONTRASENAS_ADMIN = {
   'anuncios': 'anuncios2026!',
 
   // LMS
-  'lms_examenes': 'lmsAdmin2026!',
-  'lms_resultados': 'lmsNotas2026!'
+  'lms_crear_examen': 'lmsAdmin2026!',
+  'lms_editar_examenes': 'lmsAdmin2026!',
+  'lms_resultados': 'lmsNotas2026!',
+  'lms_plan_estudios': 'lmsAyuda2026!',
+  'lms_gestion_pins': 'pinadmin2026!'
 };
 
 const NOMBRES_SECCIONES_ADMIN = {
@@ -58,8 +61,11 @@ const NOMBRES_SECCIONES_ADMIN = {
   'biblioteca_admin': 'Biblioteca (Administración)',
   'pedidos_biblioteca': 'Ver Pedidos de Biblioteca',
   'anuncios': 'Anuncios',
-  'lms_examenes': 'LMS – Crear/Editar Exámenes',
-  'lms_resultados': 'LMS – Gestionar Resultados'
+  'lms_crear_examen': 'LMS – Crear Nuevo Examen',
+  'lms_editar_examenes': 'LMS – Editar / Eliminar Exámenes',
+  'lms_resultados': 'LMS – Gestionar Resultados',
+  'lms_plan_estudios': 'LMS – Plan de Estudios y Ayudas',
+  'lms_gestion_pins': 'LMS – Gestión de PINs de Alumnos'
 };
 
 let _callbackModalSeguridad = null;
@@ -182,7 +188,7 @@ function crearModalSeguridadElemento() {
   modal.id = 'modalSeguridadAdmin';
   modal.className = 'modal-seguridad-overlay';
   modal.style.display = 'none';
-  modal.onclick = function(e) {
+  modal.onclick = function (e) {
     if (e.target === modal) {
       cerrarModalContrasena();
     }
@@ -225,7 +231,7 @@ function crearModalSeguridadElemento() {
   setTimeout(() => {
     const inputPass = document.getElementById('inputSeguridadPassword');
     if (inputPass) {
-      inputPass.addEventListener('keydown', function(e) {
+      inputPass.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
           e.preventDefault();
           procesarVerificacionContrasena();
@@ -238,7 +244,7 @@ function crearModalSeguridadElemento() {
 }
 
 // Evento global Escape para cerrar modal de seguridad
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') {
     const modal = document.getElementById('modalSeguridadAdmin');
     if (modal && modal.style.display !== 'none' && modal.style.display !== '') {
@@ -275,7 +281,10 @@ window.cerrarModalContrasena = cerrarModalContrasena;
  * 🟡 Biblioteca (Admin)           = "bibliotecaAdmin2026!"   (Media)
  * 🟡 Ver Pedidos de Biblioteca    = "pedidosBiblioteca2026!" (Media)
  * 🟢 Anuncios                     = "anuncios2026!"          (Baja)
- * 🟡 LMS Crear/Editar Exámenes    = "lmsAdmin2026!"          (Media)
+ * 🟡 LMS Crear Nuevo Examen       = "lmsAdmin2026!"          (Media)
+ * 🟡 LMS Editar Exámenes          = "lmsAdmin2026!"          (Media)
  * 🟡 LMS Gestionar Resultados     = "lmsNotas2026!"          (Media)
+ * 🟡 LMS Plan de Estudios y Ayuda = "lmsAyuda2026!"          (Media)
+ * 🔴 LMS Gestión de PINs Alumnos  = "pinadmin2026!"          (Muy Alta / Especial)
  * ============================================================
  */

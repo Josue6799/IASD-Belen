@@ -305,7 +305,85 @@ document.addEventListener('keydown', function (e) {
     }
 });
 
-// ===== IDENTIDAD DEL ALUMNO =====
+// ===== IDENTIDAD Y PINS DE ALUMNOS LMS =====
+function obtenerListaAlumnosIdentidades() {
+    try {
+        const data = localStorage.getItem('lms_alumnos_identidades');
+        return data ? JSON.parse(data) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function guardarListaAlumnosIdentidades(lista) {
+    try {
+        localStorage.setItem('lms_alumnos_identidades', JSON.stringify(lista));
+    } catch (e) { }
+}
+
+function generarPinUnicoLMS() {
+    const lista = obtenerListaAlumnosIdentidades();
+    const pinsExistentes = new Set(lista.map(a => String(a.pin)));
+    let pin;
+    let contador = 0;
+    do {
+        pin = String(Math.floor(1000 + Math.random() * 9000));
+        contador++;
+        if (contador > 9000) break; // salvaguarda
+    } while (pinsExistentes.has(pin));
+    return pin;
+}
+
+function obtenerOGenerarPinAlumno(nombre, documento, grupo = 'Clase Belén') {
+    let lista = obtenerListaAlumnosIdentidades();
+    const docClean = String(documento).trim();
+    const nomClean = String(nombre).trim();
+
+    let alumno = lista.find(a => String(a.documento).trim().toLowerCase() === docClean.toLowerCase());
+
+    let esNuevoPin = false;
+    if (!alumno) {
+        const nuevoPin = generarPinUnicoLMS();
+        alumno = {
+            id: Date.now(),
+            nombre: nomClean,
+            documento: docClean,
+            grupo: grupo,
+            pin: nuevoPin,
+            fechaRegistro: new Date().toISOString()
+        };
+        lista.push(alumno);
+        guardarListaAlumnosIdentidades(lista);
+        esNuevoPin = true;
+    } else {
+        if (!alumno.pin) {
+            alumno.pin = generarPinUnicoLMS();
+            guardarListaAlumnosIdentidades(lista);
+            esNuevoPin = true;
+        }
+        if (nomClean && nomClean !== alumno.nombre) {
+            alumno.nombre = nomClean;
+            guardarListaAlumnosIdentidades(lista);
+        }
+    }
+
+    guardarIdentidadAlumno(alumno.nombre, alumno.documento, alumno.grupo, alumno.pin);
+
+    if (esNuevoPin && typeof window.agregarNotificacionPersonalLMS === 'function') {
+        window.agregarNotificacionPersonalLMS(
+            alumno.documento,
+            '¡Tu PIN de acceso ha sido creado!',
+            `Hola ${alumno.nombre}, tu PIN de 4 dígitos para acceder a tus resultados es: ${alumno.pin}. Guárdalo en un lugar seguro.`
+        );
+    }
+
+    try {
+        window.dispatchEvent(new CustomEvent('pinGenerado'));
+    } catch (e) { }
+
+    return { alumno, esNuevoPin };
+}
+
 function obtenerIdentidadAlumno() {
     try {
         const data = localStorage.getItem('alumnoIdentidad');
@@ -315,8 +393,11 @@ function obtenerIdentidadAlumno() {
     }
 }
 
-function guardarIdentidadAlumno(nombre, documento, grupo = 'Clase Belén') {
-    const identidad = { nombre, documento, whatsapp: documento, grupo };
+function guardarIdentidadAlumno(nombre, documento, grupo = 'Clase Belén', pin = '') {
+    let lista = obtenerListaAlumnosIdentidades();
+    let alum = lista.find(a => String(a.documento).trim().toLowerCase() === String(documento).trim().toLowerCase());
+    const pinFinal = pin || (alum ? alum.pin : '');
+    const identidad = { nombre, documento, whatsapp: documento, grupo, pin: pinFinal };
     localStorage.setItem('alumnoIdentidad', JSON.stringify(identidad));
     return identidad;
 }
@@ -841,7 +922,24 @@ function renderizarPrincipal() {
         `;
     });
 
-    container.innerHTML = cursosHTML;
+    const bannerPinHTML = `
+        <div style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); color: white; padding: 1.2rem; border-radius: 1.2rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 15px rgba(26,58,74,0.15);">
+            <div style="display: flex; align-items: center; gap: 0.9rem;">
+                <div style="font-size: 1.8rem; background: rgba(255,255,255,0.12); width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--golden);">🔑</div>
+                <div>
+                    <h4 style="margin: 0; color: white; font-family: 'Inter', sans-serif; font-size: 1.05rem;">Tu PIN de Acceso a Resultados</h4>
+                    <p style="margin: 0.2rem 0 0 0; font-size: 0.82rem; opacity: 0.9; font-family: 'Inter', sans-serif;">
+                        ${identidad && identidad.pin ? `Tu PIN actual es: <strong style="color:var(--golden); font-size:0.95rem; font-family:monospace;">${identidad.pin}</strong> (Consúltalo en notificaciones).` : 'Genera tu PIN de 4 dígitos para consultar la revisión de tus exámenes.'}
+                    </p>
+                </div>
+            </div>
+            <button onclick="abrirModalGenerarPinLMS()" class="btn btn-golden" style="padding: 0.6rem 1.4rem; border-radius: 2rem; border: none; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.85rem; min-height: 44px; display: inline-flex; align-items: center; gap: 0.4rem; background: var(--golden); color: var(--deep-blue);">
+                <i class="fas fa-key"></i> Obtener / Generar mi PIN
+            </button>
+        </div>
+    `;
+
+    container.innerHTML = bannerPinHTML + cursosHTML;
 }
 
 // ===== PESTAÑA CURSOS =====
@@ -1075,33 +1173,57 @@ function iniciarFlujoIdentidad() {
             z-index: 100050; backdrop-filter: blur(5px);
         `;
         modal.innerHTML = `
-            <div class="modal-card" style="background: white; border-radius: 1.5rem; padding: 2rem; max-width: 420px; width: 90%; box-shadow: 0 25px 60px rgba(0,0,0,0.3); border: 2px solid var(--golden);">
-                <h3 style="color: #1a3a4a; margin-top: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-id-card" style="color:#c9a53b;"></i> Identificación del Alumno</h3>
-                <div style="margin-bottom: 0.8rem; text-align: left;">
-                    <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; font-family: 'Inter', sans-serif;">Nombre Completo *</label>
-                    <input type="text" id="inputNombreAlumno" placeholder="Ej: Juan Pérez" style="width: 100%; padding: 0.7rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.9rem; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; padding: 2rem; max-width: 440px; width: 95%; box-shadow: 0 25px 60px rgba(0,0,0,0.3); border: 2px solid var(--golden);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.6rem;">
+                    <h3 style="color: #1a3a4a; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-user-lock" style="color:#c9a53b;"></i> Identificación del Alumno</h3>
+                    <button type="button" onclick="cancelarIdentidad()" style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; line-height:1;">&times;</button>
                 </div>
-                <div style="margin-bottom: 0.8rem; text-align: left;">
-                    <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; font-family: 'Inter', sans-serif;">Documento de Identidad *</label>
-                    <input type="text" id="inputDocumentoAlumno" placeholder="Ej: 1098765432" style="width: 100%; padding: 0.7rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.9rem; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                <p style="font-size:0.85rem; color:#5a6474; margin-bottom:1rem; font-family:'Inter',sans-serif;">
+                    Ingresa tu PIN de 4 dígitos y tu nombre completo tal como lo registraste para comenzar el examen.
+                </p>
+
+                <div id="errorIdentidadRendir" style="display:none; background:#ffebee; color:#c62828; padding:0.75rem; border-radius:0.8rem; border:1px solid #ffcdd2; font-size:0.84rem; font-family:'Inter',sans-serif; margin-bottom:1rem; text-align:left;"></div>
+
+                <div style="margin-bottom: 0.9rem; text-align: left;">
+                    <label style="font-weight: 700; font-size: 0.85rem; color: #1a3a4a; font-family: 'Inter', sans-serif;">🔑 PIN de 4 dígitos *</label>
+                    <input type="text" id="inputPinAlumnoRendir" maxlength="4" placeholder="Ej: 4829" 
+                        onkeyup="if(event.key==='Enter') verificarIdentidadYRendir()"
+                        style="width: 100%; padding: 0.75rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 1.1rem; font-weight: 800; letter-spacing: 3px; text-align: center; box-sizing: border-box; font-family: 'Inter', sans-serif; min-height: 44px;">
                 </div>
+                
                 <div style="margin-bottom: 1.2rem; text-align: left;">
-                    <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; font-family: 'Inter', sans-serif;">Grupo / Clase de Estudio</label>
-                    <input type="text" id="inputGrupoAlumno" placeholder="Ej: Clase Sabática Belén" style="width: 100%; padding: 0.7rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.9rem; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                    <label style="font-weight: 700; font-size: 0.85rem; color: #1a3a4a; font-family: 'Inter', sans-serif;">👤 Nombre Completo *</label>
+                    <input type="text" id="inputNombreAlumnoRendir" placeholder="Ej: Juan Pérez" 
+                        onkeyup="if(event.key==='Enter') verificarIdentidadYRendir()"
+                        style="width: 100%; padding: 0.75rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.95rem; box-sizing: border-box; font-family: 'Inter', sans-serif; min-height: 44px;">
                 </div>
-                <div style="display: flex; gap: 0.8rem;">
-                    <button onclick="verificarIdentidadYRendir()" class="btn btn-golden" style="flex:1; border:none; padding:0.75rem; border-radius:2rem; font-weight:700; background: var(--golden); color: var(--deep-blue); cursor: pointer; font-family: 'Inter', sans-serif;">Comenzar Examen</button>
-                    <button onclick="cancelarIdentidad()" class="btn btn-outline" style="flex:1; padding:0.75rem; border-radius:2rem; background: transparent; border: 2px solid var(--deep-blue); color: var(--deep-blue); cursor: pointer; font-weight: 700; font-family: 'Inter', sans-serif;">Cancelar</button>
+
+                <div style="display: flex; gap: 0.8rem; margin-bottom: 1rem;">
+                    <button onclick="verificarIdentidadYRendir()" class="btn btn-golden" style="flex:1; border:none; padding:0.75rem; border-radius:2rem; font-weight:700; background: var(--golden); color: var(--deep-blue); cursor: pointer; font-family: 'Inter', sans-serif; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                        <i class="fas fa-check-circle"></i> Verificar y Rendir
+                    </button>
+                    <button onclick="cancelarIdentidad()" class="btn btn-outline" style="flex:1; padding:0.75rem; border-radius:2rem; background: transparent; border: 2px solid var(--deep-blue); color: var(--deep-blue); cursor: pointer; font-weight: 700; font-family: 'Inter', sans-serif; min-height: 44px;">
+                        Cancelar
+                    </button>
+                </div>
+
+                <div style="text-align: center; font-size: 0.82rem; font-family: 'Inter', sans-serif; color: #5a6474; border-top: 1px dashed #e8e3d8; padding-top: 0.8rem;">
+                    ¿No tienes un PIN asignado? 
+                    <a href="javascript:void(0)" onclick="redirigirGenerarPinDesdeIdentidad()" style="color: var(--deep-blue); font-weight: 700; text-decoration: underline;">
+                        Genera tu PIN aquí
+                    </a>
                 </div>
             </div>
         `;
         document.body.appendChild(modal);
     }
 
+    const errDiv = document.getElementById('errorIdentidadRendir');
+    if (errDiv) errDiv.style.display = 'none';
+
     if (identidadExistente) {
-        document.getElementById('inputNombreAlumno').value = identidadExistente.nombre || '';
-        document.getElementById('inputDocumentoAlumno').value = identidadExistente.documento || identidadExistente.whatsapp || '';
-        document.getElementById('inputGrupoAlumno').value = identidadExistente.grupo || 'Clase Belén';
+        document.getElementById('inputPinAlumnoRendir').value = identidadExistente.pin || '';
+        document.getElementById('inputNombreAlumnoRendir').value = identidadExistente.nombre || '';
     }
 
     mostrarElementoModal(modal);
@@ -1114,17 +1236,63 @@ function cancelarIdentidad() {
     examenActualParaRendir = null;
 }
 
-function verificarIdentidadYRendir() {
-    const nombre = document.getElementById('inputNombreAlumno').value.trim();
-    const documento = document.getElementById('inputDocumentoAlumno').value.trim();
-    const grupo = document.getElementById('inputGrupoAlumno').value.trim() || 'Clase Belén';
+function redirigirGenerarPinDesdeIdentidad() {
+    cancelarIdentidad();
+    abrirModalGenerarPinLMS();
+}
 
-    if (!nombre || !documento) {
-        mostrarModalGenerico('Campos incompletos', 'Ingresa tu nombre y documento de identidad.');
+function verificarIdentidadYRendir() {
+    const pinInput = document.getElementById('inputPinAlumnoRendir');
+    const nombreInput = document.getElementById('inputNombreAlumnoRendir');
+    const errorDiv = document.getElementById('errorIdentidadRendir');
+
+    const pin = pinInput ? pinInput.value.trim() : '';
+    const nombre = nombreInput ? nombreInput.value.trim() : '';
+
+    if (errorDiv) errorDiv.style.display = 'none';
+
+    if (!pin || !nombre) {
+        if (errorDiv) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = '⚠️ Ingresa tanto tu <strong>PIN de 4 dígitos</strong> como tu <strong>Nombre Completo</strong>.';
+        }
         return;
     }
 
-    guardarIdentidadAlumno(nombre, documento, grupo);
+    const listaAlumnos = obtenerListaAlumnosIdentidades();
+    const alumnoEncontrado = listaAlumnos.find(a => String(a.pin).trim() === pin);
+
+    if (!alumnoEncontrado) {
+        if (errorDiv) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = '⚠️ PIN no válido. Genera un PIN desde la pestaña Principal o verifica que lo hayas ingresado correctamente. <br><br><a href="javascript:void(0)" onclick="redirigirGenerarPinDesdeIdentidad()" style="color:#c62828; font-weight:700; text-decoration:underline;">Generar mi PIN de acceso</a>';
+        }
+        if (pinInput) {
+            pinInput.value = '';
+            pinInput.focus();
+        }
+        return;
+    }
+
+    const nomClean = nombre.toLowerCase().replace(/\s+/g, ' ').trim();
+    const alumNomClean = String(alumnoEncontrado.nombre).toLowerCase().replace(/\s+/g, ' ').trim();
+
+    if (nomClean !== alumNomClean) {
+        if (errorDiv) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = '⚠️ El nombre no coincide con el PIN ingresado. Verifica tus datos.';
+        }
+        if (pinInput) {
+            pinInput.value = '';
+            pinInput.focus();
+        }
+        if (nombreInput) {
+            nombreInput.value = '';
+        }
+        return;
+    }
+
+    guardarIdentidadAlumno(alumnoEncontrado.nombre, alumnoEncontrado.documento, alumnoEncontrado.grupo, alumnoEncontrado.pin);
 
     const modal = document.getElementById('modalIdentidadAlumno');
     if (modal) ocultarElementoModal(modal);
@@ -1429,7 +1597,7 @@ function cerrarModalRetroalimentacion() {
     desbloquearScroll('modalRetroalimentacion');
 }
 
-// ===== PESTAÑA REVISIÓN Y RESULTADOS =====
+// ===== PESTAÑA REVISIÓN Y RESULTADOS CON PIN =====
 function renderizarRevision() {
     const container = document.getElementById('contenidoResultados');
     if (!container) return;
@@ -1437,55 +1605,51 @@ function renderizarRevision() {
     const identidad = obtenerIdentidadAlumno();
     cargarExamenesRealizados();
 
-    const docGuardado = identidad ? (identidad.documento || identidad.whatsapp || '') : '';
-
-    let miHistorial = EXAMENES_REALIZADOS;
-    if (docGuardado) {
-        miHistorial = miHistorial.filter(ex =>
-            (ex.alumnoDocumento && ex.alumnoDocumento.toLowerCase() === docGuardado.toLowerCase()) ||
-            (ex.alumnoNombre && ex.alumnoNombre.toLowerCase().includes(docGuardado.toLowerCase()))
-        );
-    }
-
-    const califs = miHistorial.map(e => e.calificacion).filter(c => typeof c === 'number' && !isNaN(c));
-    const promGeneral = califs.length > 0 ? (califs.reduce((a, b) => a + b, 0) / califs.length).toFixed(1) : '0.0';
-    const aprobados = califs.filter(c => c >= 4.0).length;
-    const reprobados = califs.filter(c => c < 4.0).length;
+    const pinGuardado = identidad ? (identidad.pin || '') : '';
 
     container.innerHTML = `
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div id="statsRevisionContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
             <div style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); color: white; padding: 1.2rem; border-radius: 1.2rem; text-align: center;">
                 <span style="font-size: 0.8rem; opacity: 0.9; display: block; font-family: 'Inter', sans-serif;">PROMEDIO GENERAL</span>
-                <span style="font-size: 2.2rem; font-weight: 800; color: var(--golden); font-family: 'Inter', sans-serif;">${promGeneral}</span>
+                <span id="statPromedioGeneral" style="font-size: 2.2rem; font-weight: 800; color: var(--golden); font-family: 'Inter', sans-serif;">0.0</span>
             </div>
             <div style="background: #e8f5e9; color: #2e7d32; padding: 1.2rem; border-radius: 1.2rem; text-align: center; border: 1px solid #c8e6c9;">
                 <span style="font-size: 0.8rem; display: block; font-family: 'Inter', sans-serif;">APROBADOS</span>
-                <span style="font-size: 2.2rem; font-weight: 800; font-family: 'Inter', sans-serif;">${aprobados}</span>
+                <span id="statAprobados" style="font-size: 2.2rem; font-weight: 800; font-family: 'Inter', sans-serif;">0</span>
             </div>
             <div style="background: #ffebee; color: #c62828; padding: 1.2rem; border-radius: 1.2rem; text-align: center; border: 1px solid #ffcdd2;">
                 <span style="font-size: 0.8rem; display: block; font-family: 'Inter', sans-serif;">REPROBADOS</span>
-                <span style="font-size: 2.2rem; font-weight: 800; font-family: 'Inter', sans-serif;">${reprobados}</span>
+                <span id="statReprobados" style="font-size: 2.2rem; font-weight: 800; font-family: 'Inter', sans-serif;">0</span>
             </div>
         </div>
 
-        <div style="margin-bottom: 1.2rem; background: var(--cream); padding: 1.2rem; border-radius: 1rem; border-left: 4px solid var(--golden);">
-            <div style="display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center;">
-                <div style="flex: 2; min-width: 220px;">
+        <div style="margin-bottom: 1.2rem; background: var(--cream); padding: 1.4rem; border-radius: 1rem; border-left: 4px solid var(--golden); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+            <h4 style="margin: 0 0 0.8rem 0; color: var(--deep-blue); font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-lock" style="color: var(--golden);"></i> Consulta de Resultados por PIN de 4 Dígitos
+            </h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: flex-end;">
+                <div style="flex: 2; min-width: 200px;">
                     <label style="font-weight: 700; color: var(--deep-blue); font-size: 0.85rem; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">
-                        🔍 Buscar por Documento o Nombre:
+                        🔑 Ingresa tu PIN de 4 dígitos *
                     </label>
-                    <input type="text" id="inputSearchRevision" placeholder="Ingresa documento..." 
-                        value="${docGuardado}"
-                        style="width: 100%; padding: 0.6rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; background: white; box-sizing: border-box;">
+                    <input type="text" id="inputPinRevision" maxlength="4" placeholder="Ej: 4829" 
+                        value="${pinGuardado}"
+                        onkeyup="if(event.key==='Enter') buscarResultadosPorPin()"
+                        style="width: 100%; padding: 0.7rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 800; letter-spacing: 3px; text-align: center; background: white; box-sizing: border-box; min-height: 44px;">
                 </div>
-                <div style="flex: 1; min-width: 180px;">
+                <div style="flex: 1; min-width: 170px;">
                     <label style="font-weight: 700; color: var(--deep-blue); font-size: 0.85rem; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">
                         📚 Curso:
                     </label>
-                    <select id="selectCursoRevision" style="width: 100%; padding: 0.6rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; background: white;">
+                    <select id="selectCursoRevision" onchange="buscarResultadosPorPin()" style="width: 100%; padding: 0.7rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.88rem; background: white; min-height: 44px;">
                         <option value="todos">Todos los cursos</option>
-                        ${Object.keys(CURSOS_DATA).map(c => `<option value="${c}" ${cursoSeleccionadoRevision === c ? 'selected' : ''}>${c}</option>`).join('')}
+                        ${Object.keys(CURSOS_DATA).map(c => `<option value="${c}">${c}</option>`).join('')}
                     </select>
+                </div>
+                <div>
+                    <button onclick="buscarResultadosPorPin()" class="btn btn-golden" style="padding: 0.7rem 1.4rem; border-radius: 0.8rem; border: none; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.88rem; min-height: 44px; background: var(--golden); color: var(--deep-blue); display: inline-flex; align-items: center; gap: 0.4rem;">
+                        <i class="fas fa-search"></i> Consultar Resultados
+                    </button>
                 </div>
             </div>
         </div>
@@ -1493,73 +1657,126 @@ function renderizarRevision() {
         <div id="tablaRevisionContainer" style="overflow-x: auto;"></div>
     `;
 
-    const searchInput = document.getElementById('inputSearchRevision');
-    const courseSelect = document.getElementById('selectCursoRevision');
-
-    const updateTable = () => {
-        const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
-        const cursoFiltro = courseSelect ? courseSelect.value : 'todos';
-
-        let filtrados = EXAMENES_REALIZADOS;
-        if (query) {
-            filtrados = filtrados.filter(ex =>
-                (ex.alumnoDocumento && ex.alumnoDocumento.toLowerCase().includes(query)) ||
-                (ex.alumnoNombre && ex.alumnoNombre.toLowerCase().includes(query))
-            );
-        }
-        if (cursoFiltro && cursoFiltro !== 'todos') {
-            filtrados = filtrados.filter(ex => ex.curso === cursoFiltro);
-        }
-
-        const tableContainer = document.getElementById('tablaRevisionContainer');
-        if (!tableContainer) return;
-
-        if (filtrados.length === 0) {
-            tableContainer.innerHTML = `<p style="text-align: center; color: var(--muted-text); padding: 2rem; font-style: italic; font-family: 'Inter', sans-serif;">No se encontraron registros de exámenes rendidos con los criterios especificados.</p>`;
-            return;
-        }
-
-        tableContainer.innerHTML = `
-            <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: 'Inter', sans-serif; font-size: 0.88rem;">
-                <thead>
-                    <tr style="background: var(--deep-blue); color: white;">
-                        <th style="padding: 0.8rem 1rem; border-radius: 0.6rem 0 0 0.6rem;">Alumno</th>
-                        <th style="padding: 0.8rem 1rem;">Curso</th>
-                        <th style="padding: 0.8rem 1rem;">Examen</th>
-                        <th style="padding: 0.8rem 1rem;">Fecha</th>
-                        <th style="padding: 0.8rem 1rem;">Calificación</th>
-                        <th style="padding: 0.8rem 1rem; border-radius: 0 0.6rem 0.6rem 0;">Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${filtrados.map((ex, idx) => `
-                        <tr style="border-bottom: 1px solid #e8e3d8; ${idx % 2 === 0 ? 'background: #fafaf9;' : 'background: white;'}">
-                            <td style="padding: 0.8rem 1rem; font-weight: 600; color: #1a3a4a;">
-                                ${ex.alumnoNombre}
-                                ${ex.alumnoDocumento ? `<br><small style="color: #888; font-weight: 400;">Doc: ${ex.alumnoDocumento}</small>` : ''}
-                            </td>
-                            <td style="padding: 0.8rem 1rem;">${ex.curso}</td>
-                            <td style="padding: 0.8rem 1rem;">${ex.titulo}</td>
-                            <td style="padding: 0.8rem 1rem;">${ex.fecha}</td>
-                            <td style="padding: 0.8rem 1rem; font-weight: 700; color: ${ex.calificacion >= 4 ? '#2e7d32' : ex.calificacion !== null ? '#c62828' : '#f57c00'};">
-                                ${ex.calificacion !== null && ex.calificacion !== undefined ? (typeof ex.calificacion === 'number' ? ex.calificacion.toFixed(1) : ex.calificacion) : 'Pendiente'}
-                            </td>
-                            <td style="padding: 0.8rem 1rem;">
-                                <span style="padding: 0.25rem 0.7rem; border-radius: 1rem; font-size: 0.78rem; font-weight: 700; background: ${ex.calificacion >= 4 ? '#e8f5e9' : ex.calificacion !== null ? '#ffebee' : '#fff3e0'}; color: ${ex.calificacion >= 4 ? '#2e7d32' : ex.calificacion !== null ? '#c62828' : '#e65100'};">
-                                    ${ex.nota || (ex.calificacion >= 4 ? 'Aprobado' : 'Pendiente')}
-                                </span>
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
-    };
-
-    if (searchInput) searchInput.addEventListener('input', updateTable);
-    if (courseSelect) courseSelect.addEventListener('change', updateTable);
-    updateTable();
+    buscarResultadosPorPin();
 }
+
+function buscarResultadosPorPin() {
+    const pinInput = document.getElementById('inputPinRevision');
+    const cursoSelect = document.getElementById('selectCursoRevision');
+    const tableContainer = document.getElementById('tablaRevisionContainer');
+    if (!tableContainer) return;
+
+    const pinVal = pinInput ? pinInput.value.trim() : '';
+    const cursoFiltro = cursoSelect ? cursoSelect.value : 'todos';
+
+    if (!pinVal) {
+        tableContainer.innerHTML = `
+            <div style="text-align: center; color: var(--muted-text); padding: 2.5rem 1rem; font-family: 'Inter', sans-serif; background: #fafaf9; border-radius: 1rem; border: 2px dashed #e8e3d8;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔑</div>
+                <h4 style="margin: 0 0 0.3rem 0; color: #1a3a4a;">Ingresa tu PIN de 4 dígitos</h4>
+                <p style="margin: 0; font-size: 0.85rem;">Si aún no tienes un PIN, puedes obtenerlo fácilmente en la pestaña <strong>Principal</strong> haciendo clic en "Obtener / Generar mi PIN".</p>
+            </div>
+        `;
+        actualizarStatsRevision([]);
+        return;
+    }
+
+    const listaAlumnos = obtenerListaAlumnosIdentidades();
+    const alumnoEncontrado = listaAlumnos.find(a => String(a.pin) === String(pinVal));
+
+    if (!alumnoEncontrado) {
+        tableContainer.innerHTML = `
+            <div style="text-align: center; color: #c62828; padding: 2rem 1rem; font-family: 'Inter', sans-serif; background: #ffebee; border-radius: 1rem; border: 1px solid #ffcdd2;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⚠️</div>
+                <h4 style="margin: 0 0 0.4rem 0;">PIN no válido</h4>
+                <p style="margin: 0; font-size: 0.88rem;">Verifica que tu PIN de 4 dígitos sea correcto o genera uno nuevo desde la pestaña <strong>Principal</strong>.</p>
+            </div>
+        `;
+        actualizarStatsRevision([]);
+        return;
+    }
+
+    cargarExamenesRealizados();
+
+    let filtrados = EXAMENES_REALIZADOS.filter(ex =>
+        (ex.alumnoDocumento && String(ex.alumnoDocumento).trim().toLowerCase() === String(alumnoEncontrado.documento).trim().toLowerCase()) ||
+        (ex.alumnoNombre && ex.alumnoNombre.toLowerCase().includes(alumnoEncontrado.nombre.toLowerCase()))
+    );
+
+    if (cursoFiltro && cursoFiltro !== 'todos') {
+        filtrados = filtrados.filter(ex => ex.curso === cursoFiltro);
+    }
+
+    actualizarStatsRevision(filtrados);
+
+    if (filtrados.length === 0) {
+        tableContainer.innerHTML = `
+            <div style="text-align: center; color: var(--muted-text); padding: 2.5rem 1rem; font-family: 'Inter', sans-serif;">
+                <p style="margin: 0; font-style: italic;">Hola <strong>${alumnoEncontrado.nombre}</strong> (PIN: <strong>${alumnoEncontrado.pin}</strong>). Aún no se han registrado exámenes evaluados para tu usuario en el curso seleccionado.</p>
+            </div>
+        `;
+        return;
+    }
+
+    tableContainer.innerHTML = `
+        <div style="margin-bottom: 0.8rem; font-size: 0.88rem; color: #1a3a4a; font-family: 'Inter', sans-serif;">
+            👤 Resultados para: <strong>${alumnoEncontrado.nombre}</strong> (Doc: <strong>${alumnoEncontrado.documento}</strong>) | PIN: <strong style="color:var(--golden); background:#1a3a4a; padding:0.1rem 0.5rem; border-radius:0.5rem;">${alumnoEncontrado.pin}</strong>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: 'Inter', sans-serif; font-size: 0.88rem;">
+            <thead>
+                <tr style="background: var(--deep-blue); color: white;">
+                    <th style="padding: 0.8rem 1rem; border-radius: 0.6rem 0 0 0.6rem;">Alumno</th>
+                    <th style="padding: 0.8rem 1rem;">Curso</th>
+                    <th style="padding: 0.8rem 1rem;">Examen</th>
+                    <th style="padding: 0.8rem 1rem;">Fecha</th>
+                    <th style="padding: 0.8rem 1rem;">Calificación</th>
+                    <th style="padding: 0.8rem 1rem; border-radius: 0 0.6rem 0.6rem 0;">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${filtrados.map((ex, idx) => `
+                    <tr style="border-bottom: 1px solid #e8e3d8; ${idx % 2 === 0 ? 'background: #fafaf9;' : 'background: white;'}">
+                        <td style="padding: 0.8rem 1rem; font-weight: 600; color: #1a3a4a;">
+                            ${ex.alumnoNombre}
+                            ${ex.alumnoDocumento ? `<br><small style="color: #888; font-weight: 400;">Doc: ${ex.alumnoDocumento}</small>` : ''}
+                        </td>
+                        <td style="padding: 0.8rem 1rem;">${ex.curso}</td>
+                        <td style="padding: 0.8rem 1rem;">${ex.titulo}</td>
+                        <td style="padding: 0.8rem 1rem;">${ex.fecha}</td>
+                        <td style="padding: 0.8rem 1rem; font-weight: 700; color: ${ex.calificacion >= 4 ? '#2e7d32' : ex.calificacion !== null ? '#c62828' : '#f57c00'};">
+                            ${ex.calificacion !== null && ex.calificacion !== undefined ? (typeof ex.calificacion === 'number' ? ex.calificacion.toFixed(1) : ex.calificacion) : 'Pendiente'}
+                        </td>
+                        <td style="padding: 0.8rem 1rem;">
+                            <span style="padding: 0.25rem 0.7rem; border-radius: 1rem; font-size: 0.78rem; font-weight: 700; background: ${ex.calificacion >= 4 ? '#e8f5e9' : ex.calificacion !== null ? '#ffebee' : '#fff3e0'}; color: ${ex.calificacion >= 4 ? '#2e7d32' : ex.calificacion !== null ? '#c62828' : '#e65100'};">
+                                ${ex.nota || (ex.calificacion >= 4 ? 'Aprobado' : 'Pendiente')}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function actualizarStatsRevision(historial) {
+    const califs = (historial || []).map(e => e.calificacion).filter(c => typeof c === 'number' && !isNaN(c));
+    const promGeneral = califs.length > 0 ? (califs.reduce((a, b) => a + b, 0) / califs.length).toFixed(1) : '0.0';
+    const aprobados = califs.filter(c => c >= 4.0).length;
+    const reprobados = califs.filter(c => c < 4.0).length;
+
+    const elProm = document.getElementById('statPromedioGeneral');
+    const elAprob = document.getElementById('statAprobados');
+    const elReprob = document.getElementById('statReprobados');
+
+    if (elProm) elProm.innerText = promGeneral;
+    if (elAprob) elAprob.innerText = aprobados;
+    if (elReprob) elReprob.innerText = reprobados;
+}
+
+if (searchInput) searchInput.addEventListener('input', updateTable);
+if (courseSelect) courseSelect.addEventListener('change', updateTable);
+updateTable();
+
 
 // ===== PESTAÑA LOGROS =====
 function renderizarLogros() {
@@ -1652,11 +1869,28 @@ function renderizarGrupo() {
     `;
 }
 
-// ===== NOTIFICACIONES INTERNAS Y BADGES =====
+// ===== NOTIFICACIONES INTERNAS Y PERSONALES =====
 function agregarNotificacionInterna(titulo, cuerpo) {
     let notifs = [];
     try { notifs = JSON.parse(localStorage.getItem('notificacionesLMS')) || []; } catch (e) { }
-    notifs.unshift({ id: Date.now(), titulo, cuerpo, fecha: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }), leido: false });
+    const fechaHora = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    notifs.unshift({ id: Date.now(), documento: null, titulo, cuerpo, fecha: fechaHora, leido: false });
+    localStorage.setItem('notificacionesLMS', JSON.stringify(notifs));
+    actualizarBadgesNotificaciones();
+}
+
+function agregarNotificacionPersonalLMS(documento, titulo, cuerpo) {
+    let notifs = [];
+    try { notifs = JSON.parse(localStorage.getItem('notificacionesLMS')) || []; } catch (e) { }
+    const fechaHora = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    notifs.unshift({
+        id: Date.now(),
+        documento: documento ? String(documento).trim().toLowerCase() : null,
+        titulo,
+        cuerpo,
+        fecha: fechaHora,
+        leido: false
+    });
     localStorage.setItem('notificacionesLMS', JSON.stringify(notifs));
     actualizarBadgesNotificaciones();
 }
@@ -1664,7 +1898,15 @@ function agregarNotificacionInterna(titulo, cuerpo) {
 function actualizarBadgesNotificaciones() {
     let notifs = [];
     try { notifs = JSON.parse(localStorage.getItem('notificacionesLMS')) || []; } catch (e) { }
-    const noLeidas = notifs.filter(n => !n.leido).length;
+    const identidad = obtenerIdentidadAlumno();
+    const docClean = identidad && identidad.documento ? String(identidad.documento).trim().toLowerCase() : '';
+
+    const noLeidas = notifs.filter(n => {
+        if (n.leido) return false;
+        if (!n.documento) return true;
+        return docClean && n.documento === docClean;
+    }).length;
+
     const badge = document.getElementById('badgeNotificacionesCount');
     if (badge) {
         if (noLeidas > 0) {
@@ -1681,7 +1923,14 @@ function abrirModalNotificacionesLMS() {
     let notifs = [];
     try { notifs = JSON.parse(localStorage.getItem('notificacionesLMS')) || []; } catch (e) { }
 
-    notifs.forEach(n => n.leido = true);
+    const identidad = obtenerIdentidadAlumno();
+    const docClean = identidad && identidad.documento ? String(identidad.documento).trim().toLowerCase() : '';
+
+    notifs.forEach(n => {
+        if (!n.documento || (docClean && n.documento === docClean)) {
+            n.leido = true;
+        }
+    });
     localStorage.setItem('notificacionesLMS', JSON.stringify(notifs));
     actualizarBadgesNotificaciones();
 
@@ -1696,7 +1945,7 @@ function abrirModalNotificacionesLMS() {
             z-index: 100050; backdrop-filter: blur(5px);
         `;
         modal.innerHTML = `
-            <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 520px; width: 95%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
                 <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.2rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
                     <h3 style="color: #c9a53b; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-bell"></i> Notificaciones del LMS</h3>
                     <button onclick="cerrarModalNotificacionesLMS()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
@@ -1707,10 +1956,17 @@ function abrirModalNotificacionesLMS() {
         document.body.appendChild(modal);
     }
 
-    const itemsHTML = notifs.map(n => `
-        <div style="background: #fafaf9; padding: 0.9rem; border-radius: 0.8rem; margin-bottom: 0.6rem; border-left: 3px solid var(--golden); font-family: 'Inter', sans-serif;">
+    let notifsVisibles = notifs.filter(n => {
+        if (!n.documento) return true; // notificaciones generales
+        return docClean && n.documento === docClean; // notificaciones personales
+    });
+
+    const itemsHTML = notifsVisibles.map(n => `
+        <div style="background: ${n.documento ? '#fffdf5' : '#fafaf9'}; padding: 0.9rem; border-radius: 0.8rem; margin-bottom: 0.6rem; border-left: 4px solid ${n.documento ? 'var(--golden)' : 'var(--deep-blue)'}; font-family: 'Inter', sans-serif; box-shadow: 0 1px 4px rgba(0,0,0,0.03);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
-                <strong style="color: var(--deep-blue); font-size: 0.9rem;">${n.titulo}</strong>
+                <strong style="color: var(--deep-blue); font-size: 0.9rem;">
+                    ${n.documento ? '🔒 ' : ''}${n.titulo}
+                </strong>
                 <small style="color: #888; font-size: 0.75rem;">${n.fecha}</small>
             </div>
             <p style="margin: 0; font-size: 0.84rem; color: #555;">${n.cuerpo}</p>
@@ -1886,7 +2142,7 @@ function verificarPasswordAdmin() {
         const errorDiv = document.getElementById('errorPasswordAdmin');
         if (errorDiv) {
             errorDiv.style.display = 'block';
-            errorDiv.innerHTML = '❌ Contraseña incorrecta (recuerda: admin2026)';
+            errorDiv.innerHTML = '❌ Contraseña incorrecta';
         }
         if (pwdInput) {
             pwdInput.value = '';
@@ -1936,7 +2192,7 @@ function mostrarPanelAdmin() {
         </div>
 
         <div id="adminCardContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-bottom: 2rem;">
-            <div class="admin-card" onclick="abrirModalCrearExamen()" style="
+            <div class="admin-card" onclick="verificarAccesoSeccion('lms_crear_examen', abrirModalCrearExamen)" style="
                 background: var(--pure-white);
                 padding: 1.8rem;
                 border-radius: 1.5rem;
@@ -1954,7 +2210,25 @@ function mostrarPanelAdmin() {
                 <p style="color: var(--muted-text); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">Preguntas dinámicas o bancos aleatorios</p>
             </div>
 
-            <div class="admin-card" onclick="abrirModalEditarExamenes()" style="
+            <div class="admin-card" onclick="verificarAccesoSeccion('lms_gestion_pins', abrirGestionPinsLMS)" style="
+                background: var(--pure-white);
+                padding: 1.8rem;
+                border-radius: 1.5rem;
+                border: 2px solid var(--golden);
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.8rem;
+                text-align: center;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <div style="font-size: 2.5rem;">🔐</div>
+                <h4 style="color: var(--deep-blue); margin: 0; font-family: 'Inter', sans-serif;">Gestión de PINs</h4>
+                <p style="color: var(--muted-text); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">Administra y regenera PINs de alumnos</p>
+            </div>
+
+            <div class="admin-card" onclick="verificarAccesoSeccion('lms_editar_examenes', abrirModalEditarExamenes)" style="
                 background: var(--pure-white);
                 padding: 1.8rem;
                 border-radius: 1.5rem;
@@ -1972,7 +2246,7 @@ function mostrarPanelAdmin() {
                 <p style="color: var(--muted-text); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">Modifica o elimina exámenes existentes</p>
             </div>
 
-            <div class="admin-card" onclick="abrirModalGestionarResultados()" style="
+            <div class="admin-card" onclick="verificarAccesoSeccion('lms_resultados', abrirModalGestionarResultados)" style="
                 background: var(--pure-white);
                 padding: 1.8rem;
                 border-radius: 1.5rem;
@@ -1990,7 +2264,7 @@ function mostrarPanelAdmin() {
                 <p style="color: var(--muted-text); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">Califica entregas y revisa exámenes</p>
             </div>
 
-            <div class="admin-card" onclick="abrirModalGestionarPlanEstudios()" style="
+            <div class="admin-card" onclick="verificarAccesoSeccion('lms_plan_estudios', abrirModalGestionarPlanEstudios)" style="
                 background: var(--pure-white);
                 padding: 1.8rem;
                 border-radius: 1.5rem;
@@ -2822,6 +3096,372 @@ window.finalizarExamen = finalizarExamen;
 window.procesarEntregaExamen = procesarEntregaExamen;
 window.mostrarModalRetroalimentacion = mostrarModalRetroalimentacion;
 window.cerrarModalRetroalimentacion = cerrarModalRetroalimentacion;
+// ===== MODAL GENERAR PIN ALUMNO =====
+function abrirModalGenerarPinLMS() {
+    bloquearScroll('modalGenerarPinLMS');
+    const identidadExistente = obtenerIdentidadAlumno();
+
+    let modal = document.getElementById('modalGenerarPinLMS');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalGenerarPinLMS';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; padding: 2rem; max-width: 440px; width: 95%; box-shadow: 0 25px 60px rgba(0,0,0,0.3); border: 2px solid var(--golden);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.6rem;">
+                    <h3 style="color: #1a3a4a; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-key" style="color:#c9a53b;"></i> Obtener / Generar PIN de Acceso</h3>
+                    <button type="button" onclick="cerrarModalGenerarPinLMS()" style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; line-height:1;">&times;</button>
+                </div>
+                <p style="font-size:0.85rem; color:#5a6474; margin-bottom:1.2rem; font-family:'Inter',sans-serif;">
+                    Ingresa tu nombre y documento. Si ya tienes un PIN asignado, el sistema te lo recordará. Si eres nuevo, se creará un PIN único de 4 dígitos.
+                </p>
+                <div style="margin-bottom: 0.9rem; text-align: left;">
+                    <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; font-family: 'Inter', sans-serif;">Nombre Completo *</label>
+                    <input type="text" id="inputNombreGenerarPin" placeholder="Ej: Juan Pérez" style="width: 100%; padding: 0.75rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.9rem; box-sizing: border-box; font-family: 'Inter', sans-serif; min-height:44px;">
+                </div>
+                <div style="margin-bottom: 1.2rem; text-align: left;">
+                    <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; font-family: 'Inter', sans-serif;">Documento de Identidad *</label>
+                    <input type="text" id="inputDocGenerarPin" placeholder="Ej: 1098765432" style="width: 100%; padding: 0.75rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.9rem; box-sizing: border-box; font-family: 'Inter', sans-serif; min-height:44px;">
+                </div>
+                <div style="display: flex; gap: 0.8rem;">
+                    <button onclick="procesarGenerarPinLMS()" class="btn btn-golden" style="flex:1; border:none; padding:0.75rem; border-radius:2rem; font-weight:700; background: var(--golden); color: var(--deep-blue); cursor: pointer; font-family: 'Inter', sans-serif; min-height:44px;">
+                        <i class="fas fa-check-circle"></i> Procesar PIN
+                    </button>
+                    <button onclick="cerrarModalGenerarPinLMS()" class="btn btn-outline" style="flex:1; padding:0.75rem; border-radius:2rem; background: transparent; border: 2px solid var(--deep-blue); color: var(--deep-blue); cursor: pointer; font-weight: 700; font-family: 'Inter', sans-serif; min-height:44px;">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    if (identidadExistente) {
+        document.getElementById('inputNombreGenerarPin').value = identidadExistente.nombre || '';
+        document.getElementById('inputDocGenerarPin').value = identidadExistente.documento || '';
+    }
+
+    mostrarElementoModal(modal);
+}
+
+function cerrarModalGenerarPinLMS() {
+    const modal = document.getElementById('modalGenerarPinLMS');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalGenerarPinLMS');
+}
+
+function procesarGenerarPinLMS() {
+    const nombre = document.getElementById('inputNombreGenerarPin').value.trim();
+    const documento = document.getElementById('inputDocGenerarPin').value.trim();
+
+    if (!nombre || !documento) {
+        mostrarModalGenerico('Campos Incompletos', 'Ingresa tu nombre y documento de identidad.');
+        return;
+    }
+
+    const { alumno, esNuevoPin } = obtenerOGenerarPinAlumno(nombre, documento);
+    cerrarModalGenerarPinLMS();
+
+    if (esNuevoPin) {
+        mostrarModalGenerico(
+            '🔑 ¡Tu PIN de Acceso ha sido creado!',
+            `Hola <strong>${alumno.nombre}</strong>, tu PIN único de 4 dígitos para acceder a tus resultados es:<br><br>
+            <div style="font-size: 2.2rem; font-weight: 900; color: #1a3a4a; background: #fff3e0; padding: 0.8rem; border-radius: 1rem; text-align: center; border: 2px solid #c9a53b; letter-spacing: 4px; font-family: monospace;">${alumno.pin}</div><br>
+            Guárdalo en un lugar seguro. También puedes consultarlo en cualquier momento en tus <strong>Notificaciones</strong>.`
+        );
+    } else {
+        mostrarModalGenerico(
+            '🔑 Consulta de PIN Existente',
+            `Hola <strong>${alumno.nombre}</strong>, ya tienes un PIN asignado previamente:<br><br>
+            <div style="font-size: 2.2rem; font-weight: 900; color: #1a3a4a; background: #e8f5e9; padding: 0.8rem; border-radius: 1rem; text-align: center; border: 2px solid #2e7d32; letter-spacing: 4px; font-family: monospace;">${alumno.pin}</div><br>
+            Puedes usar este PIN en la pestaña <strong>Revisión</strong> para consultar tus calificaciones o ver tus <strong>Notificaciones</strong>.`
+        );
+    }
+
+    renderizarPrincipal();
+}
+
+// ===== GESTIÓN DE PINS DE ALUMNOS (ADMIN LMS) =====
+let sesionGestionPinsLMSActiva = false;
+
+function abrirSolicitudGestionPinsLMS() {
+    if (sesionGestionPinsLMSActiva) {
+        abrirGestionPinsLMS();
+    } else {
+        abrirModalPasswordGestionPinsLMS();
+    }
+}
+
+function abrirModalPasswordGestionPinsLMS() {
+    bloquearScroll('modalPasswordGestionPinsLMS');
+    let modal = document.getElementById('modalPasswordGestionPinsLMS');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalPasswordGestionPinsLMS';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; padding: 2rem; max-width: 420px; width: 95%; box-shadow: 0 25px 60px rgba(0,0,0,0.4); border: 2px solid var(--golden);">
+                <h3 style="color: #1a3a4a; margin-top: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-key" style="color: var(--golden);"></i> Contraseña de Gestión de PINs</h3>
+                <p style="font-size: 0.85rem; color: #5a6474; margin-bottom: 1.2rem; font-family: 'Inter', sans-serif;">
+                    Ingresa la contraseña especial de administración de PINs para continuar.
+                </p>
+                <div style="margin-bottom: 1rem;">
+                    <input type="password" id="inputPasswordGestionPins" placeholder="Contraseña de PINs" 
+                        onkeyup="if(event.key==='Enter') verificarPasswordGestionPinsLMS()"
+                        style="width: 100%; padding: 0.75rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.95rem; box-sizing: border-box; font-family: 'Inter', sans-serif; min-height:44px;">
+                    <div id="errorPasswordGestionPins" style="color: #c62828; font-size: 0.8rem; margin-top: 0.4rem; display: none; font-family: 'Inter', sans-serif;"></div>
+                </div>
+                <div style="display: flex; gap: 0.8rem;">
+                    <button onclick="verificarPasswordGestionPinsLMS()" class="btn btn-golden" style="flex:1; border:none; padding:0.75rem; border-radius:2rem; font-weight:700; background: var(--golden); color: var(--deep-blue); cursor: pointer; font-family: 'Inter', sans-serif; min-height:44px;">Acceder</button>
+                    <button onclick="cerrarModalPasswordGestionPinsLMS()" class="btn btn-outline" style="flex:1; padding:0.75rem; border-radius:2rem; background: transparent; border: 2px solid var(--deep-blue); color: var(--deep-blue); cursor: pointer; font-weight: 700; font-family: 'Inter', sans-serif; min-height:44px;">Cancelar</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    const inputPwd = document.getElementById('inputPasswordGestionPins');
+    if (inputPwd) inputPwd.value = '';
+    const errDiv = document.getElementById('errorPasswordGestionPins');
+    if (errDiv) errDiv.style.display = 'none';
+
+    mostrarElementoModal(modal);
+    setTimeout(() => { if (inputPwd) inputPwd.focus(); }, 200);
+}
+
+function cerrarModalPasswordGestionPinsLMS() {
+    const modal = document.getElementById('modalPasswordGestionPinsLMS');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalPasswordGestionPinsLMS');
+}
+
+function verificarPasswordGestionPinsLMS() {
+    const inputPwd = document.getElementById('inputPasswordGestionPins');
+    const pwd = inputPwd ? inputPwd.value.trim() : '';
+
+    if (pwd === 'pinadmin2026!') {
+        cerrarModalPasswordGestionPinsLMS();
+        sesionGestionPinsLMSActiva = true;
+        abrirGestionPinsLMS();
+        mostrarToast('🔓 Acceso a Gestión de PINs Autorizado', 'success');
+    } else {
+        const errDiv = document.getElementById('errorPasswordGestionPins');
+        if (errDiv) {
+            errDiv.style.display = 'block';
+            errDiv.innerText = '❌ Contraseña incorrecta (requiere: pinadmin2026!)';
+        }
+        if (inputPwd) {
+            inputPwd.value = '';
+            inputPwd.focus();
+        }
+    }
+}
+
+function abrirGestionPinsLMS() {
+    bloquearScroll('modalGestionPinsLMS');
+    let modal = document.getElementById('modalGestionPinsLMS');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalGestionPinsLMS';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 850px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.2rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: #c9a53b; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-users-cog"></i> Administración de PINs e Identidades</h3>
+                    <button onclick="cerrarGestionPinsLMS()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                </div>
+                <div class="modal-body" style="padding: 1.8rem;">
+                    <div style="display: flex; gap: 0.8rem; margin-bottom: 1.2rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <input type="text" id="inputBuscarPinsAdmin" oninput="renderizarTablaPinsAdmin()" placeholder="🔍 Buscar por nombre o documento..." 
+                                style="width: 100%; padding: 0.7rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box; min-height: 44px;">
+                        </div>
+                        <div style="font-size: 0.85rem; color: #5a6474; font-family: 'Inter', sans-serif;">
+                            Clave Admin de PINs: <strong style="color:#1a3a4a;">pinadmin2026!</strong>
+                        </div>
+                    </div>
+                    <div id="tablaPinsAdminContainer" style="overflow-x: auto;"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    renderizarTablaPinsAdmin();
+    mostrarElementoModal(modal);
+}
+
+function cerrarGestionPinsLMS() {
+    const modal = document.getElementById('modalGestionPinsLMS');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalGestionPinsLMS');
+}
+
+function renderizarTablaPinsAdmin() {
+    const container = document.getElementById('tablaPinsAdminContainer');
+    if (!container) return;
+
+    const queryInput = document.getElementById('inputBuscarPinsAdmin');
+    const query = queryInput ? queryInput.value.trim().toLowerCase() : '';
+
+    let lista = obtenerListaAlumnosIdentidades();
+
+    if (query) {
+        lista = lista.filter(a =>
+            (a.nombre && a.nombre.toLowerCase().includes(query)) ||
+            (a.documento && a.documento.toLowerCase().includes(query))
+        );
+    }
+
+    if (lista.length === 0) {
+        const msj = query ? 'No se encontraron alumnos con los términos ingresados.' : 'No hay identidades o PINs de alumnos registrados aún.';
+        container.innerHTML = `<p style="text-align:center; color:#5a6474; padding:2rem 1rem; font-family:'Inter',sans-serif;">${msj}</p>`;
+        return;
+    }
+
+    let html = `
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: 'Inter', sans-serif; font-size: 0.88rem; min-width: 650px;">
+            <thead>
+                <tr style="background: var(--deep-blue); color: white;">
+                    <th style="padding: 0.8rem 1rem; border-radius: 0.6rem 0 0 0.6rem;">Alumno / Grupo</th>
+                    <th style="padding: 0.8rem 1rem;">Documento</th>
+                    <th style="padding: 0.8rem 1rem;">PIN Actual</th>
+                    <th style="padding: 0.8rem 1rem; text-align: center; border-radius: 0 0.6rem 0.6rem 0;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    lista.forEach((a, idx) => {
+        const bgRow = idx % 2 === 0 ? '#ffffff' : '#fafaf9';
+        html += `
+            <tr style="background: ${bgRow}; border-bottom: 1px solid #e8e3d8;">
+                <td style="padding: 0.8rem 1rem; font-weight: 600; color: #1a3a4a;">
+                    ${a.nombre}
+                    <div style="font-size: 0.75rem; color: #757575; font-weight: 400;">🏫 ${a.grupo || 'Clase Belén'}</div>
+                </td>
+                <td style="padding: 0.8rem 1rem; font-weight: 600; color: #5a6474;">${a.documento}</td>
+                <td style="padding: 0.8rem 1rem;">
+                    <span style="background: #1a3a4a; color: var(--golden); padding: 0.3rem 0.8rem; border-radius: 1rem; font-weight: 900; font-size: 0.95rem; font-family: monospace; letter-spacing: 2px;">
+                        ${a.pin || 'Sin PIN'}
+                    </span>
+                </td>
+                <td style="padding: 0.8rem 1rem; text-align: center; white-space: nowrap;">
+                    <button onclick="regenerarPinAlumnoAdmin('${a.documento}')" style="background: #e65100; color: white; border: none; padding: 0.45rem 0.85rem; border-radius: 1.5rem; font-weight: 600; cursor: pointer; font-size: 0.8rem; margin-right: 0.4rem; min-height: 44px; display: inline-flex; align-items: center; gap: 0.3rem;">
+                        <i class="fas fa-sync-alt"></i> Regenerar PIN
+                    </button>
+                    <button onclick="eliminarPinAlumnoAdmin('${a.documento}')" style="background: #c62828; color: white; border: none; padding: 0.45rem 0.75rem; border-radius: 1.5rem; font-weight: 600; cursor: pointer; font-size: 0.8rem; min-height: 44px; display: inline-flex; align-items: center; gap: 0.3rem;">
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+function regenerarPinAlumnoAdmin(documento) {
+    let lista = obtenerListaAlumnosIdentidades();
+    const idx = lista.findIndex(a => String(a.documento).trim().toLowerCase() === String(documento).trim().toLowerCase());
+
+    if (idx !== -1) {
+        const nuevoPin = generarPinUnicoLMS();
+        lista[idx].pin = nuevoPin;
+        guardarListaAlumnosIdentidades(lista);
+
+        const identidadActiva = obtenerIdentidadAlumno();
+        if (identidadActiva && String(identidadActiva.documento).trim().toLowerCase() === String(documento).trim().toLowerCase()) {
+            guardarIdentidadAlumno(identidadActiva.nombre, identidadActiva.documento, identidadActiva.grupo, nuevoPin);
+        }
+
+        agregarNotificacionPersonalLMS(
+            documento,
+            '🔄 Tu PIN de acceso ha sido actualizado',
+            `Hola ${lista[idx].nombre}, tu nuevo PIN de 4 dígitos generado por el administrador es: ${nuevoPin}.`
+        );
+
+        mostrarToast(`🔄 Nuevo PIN generado para ${lista[idx].nombre}: ${nuevoPin}`, 'success');
+        renderizarTablaPinsAdmin();
+    }
+}
+
+function eliminarPinAlumnoAdmin(documento) {
+    let lista = obtenerListaAlumnosIdentidades();
+    const idx = lista.findIndex(a => String(a.documento).trim().toLowerCase() === String(documento).trim().toLowerCase());
+
+    if (idx === -1) return;
+    const alumno = lista[idx];
+
+    mostrarModalGenerico(
+        '🗑️ Eliminar PIN de Alumno',
+        `¿Deseas eliminar el PIN del alumno <strong>${alumno.nombre}</strong> (Doc: ${alumno.documento})? El campo PIN quedará vacío y el alumno podrá generar uno nuevo en su próxima identificación.`,
+        [
+            {
+                texto: '<i class="fas fa-trash"></i> Sí, eliminar PIN',
+                callback: () => {
+                    lista[idx].pin = '';
+                    guardarListaAlumnosIdentidades(lista);
+
+                    const identidadActiva = obtenerIdentidadAlumno();
+                    if (identidadActiva && String(identidadActiva.documento).trim().toLowerCase() === String(documento).trim().toLowerCase()) {
+                        guardarIdentidadAlumno(identidadActiva.nombre, identidadActiva.documento, identidadActiva.grupo, '');
+                    }
+
+                    mostrarToast('🗑️ PIN de alumno eliminado correctamente', 'warning');
+                    renderizarTablaPinsAdmin();
+                    try { window.dispatchEvent(new CustomEvent('pinGenerado')); } catch (e) { }
+                }
+            },
+            {
+                texto: 'Cancelar',
+                callback: () => { }
+            }
+        ]
+    );
+}
+
+window.addEventListener('pinGenerado', function () {
+    const modalPins = document.getElementById('modalGestionPinsLMS');
+    if (modalPins && (modalPins.classList.contains('active') || modalPins.style.display === 'flex' || modalPins.style.display === 'block')) {
+        renderizarTablaPinsAdmin();
+    }
+});
+
+// Exportaciones a window
+window.obtenerListaAlumnosIdentidades = obtenerListaAlumnosIdentidades;
+window.obtenerOGenerarPinAlumno = obtenerOGenerarPinAlumno;
+window.abrirModalGenerarPinLMS = abrirModalGenerarPinLMS;
+window.cerrarModalGenerarPinLMS = cerrarModalGenerarPinLMS;
+window.procesarGenerarPinLMS = procesarGenerarPinLMS;
+window.buscarResultadosPorPin = buscarResultadosPorPin;
+window.abrirSolicitudGestionPinsLMS = abrirSolicitudGestionPinsLMS;
+window.abrirModalPasswordGestionPinsLMS = abrirModalPasswordGestionPinsLMS;
+window.cerrarModalPasswordGestionPinsLMS = cerrarModalPasswordGestionPinsLMS;
+window.verificarPasswordGestionPinsLMS = verificarPasswordGestionPinsLMS;
+window.abrirGestionPinsLMS = abrirGestionPinsLMS;
+window.cerrarGestionPinsLMS = cerrarGestionPinsLMS;
+window.renderizarTablaPinsAdmin = renderizarTablaPinsAdmin;
+window.regenerarPinAlumnoAdmin = regenerarPinAlumnoAdmin;
+window.eliminarPinAlumnoAdmin = eliminarPinAlumnoAdmin;
+window.agregarNotificacionPersonalLMS = agregarNotificacionPersonalLMS;
+
 window.mostrarModalBienvenida = mostrarModalBienvenida;
 window.cerrarModalBienvenida = cerrarModalBienvenida;
 window.mostrarModalGenerico = mostrarModalGenerico;
