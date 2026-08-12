@@ -500,40 +500,44 @@ function ejecutarAccionAdmin(accion, texto, event) {
     event.stopPropagation();
     switch (accion) {
         case 'cronogramaIglesia':
-            abrirCronograma();
+            verificarAccesoSeccion('cronograma', abrirCronograma);
             break;
         case 'encuestasIglesia':
-            abrirEncuestas();
+            verificarAccesoSeccion('encuestas', abrirEncuestas);
             break;
         case 'calendarioIglesia':
-            abrirCalendarioIglesiaAdmin();
+            verificarAccesoSeccion('calendario_iglesia', abrirCalendarioIglesiaAdmin);
             break;
         case 'gestionarTransmisiones':
-            abrirModalGestionarTransmisiones();
+            verificarAccesoSeccion('transmisiones', abrirModalGestionarTransmisiones);
             break;
         case 'baseDatosIglesia':
-            alert('Función de Base de datos en construcción');
+            verificarAccesoSeccion('bd_iglesia', function () {
+                mostrarAlertaAdmin('Función de Base de datos en construcción');
+            });
             break;
         case 'verInteresados':
-            abrirVerInteresados();
+            verificarAccesoSeccion('interesados', abrirVerInteresados);
             break;
         case 'agregarLibro':
-            abrirModalAgregarLibro();
+            verificarAccesoSeccion('biblioteca_admin', abrirModalAgregarLibro);
             break;
         case 'eliminarLibro':
-            abrirModalEliminarLibro();
+            verificarAccesoSeccion('biblioteca_admin', abrirModalEliminarLibro);
             break;
         case 'verLibrosPedidos':
-            abrirModalVerPedidos();
+            verificarAccesoSeccion('pedidos_biblioteca', abrirModalVerPedidos);
             break;
         case 'agregarEvento':
-            abrirModalAgregarAnuncio();
+            verificarAccesoSeccion('anuncios', abrirModalAgregarAnuncio);
             break;
         case 'quitarEvento':
-            abrirModalQuitarAnuncio(); // ✅ AHORA LLAMA A LA FUNCIÓN REAL
+            verificarAccesoSeccion('anuncios', abrirModalQuitarAnuncio);
             break;
         case 'editarAnuncios':
-            mostrarAlertaAdmin('Función de Editar anuncios en construcción');
+            verificarAccesoSeccion('anuncios', function () {
+                mostrarAlertaAdmin('Función de Editar anuncios en construcción');
+            });
             break;
         default:
             alert(`Función: ${texto}`);
@@ -802,25 +806,31 @@ function abrirCalendarioClub() {
         return;
     }
 
-    storageKeyCalendarioClub = CLUBES_STORAGE_CALENDARIO[clubActual] || 'eventos_aventureros';
+    let claveSeccion = 'calendario_aventureros';
+    if (clubActual === 'Conquistadores') claveSeccion = 'calendario_conquistadores';
+    else if (clubActual === 'Guías Mayores') claveSeccion = 'calendario_guias_mayores';
 
-    cerrarModalClub();
+    verificarAccesoSeccion(claveSeccion, function () {
+        storageKeyCalendarioClub = CLUBES_STORAGE_CALENDARIO[clubActual] || 'eventos_aventureros';
 
-    const panel = document.getElementById('panelAdminGeneral');
-    if (!panel) return;
+        cerrarModalClub();
 
-    let seccion = document.getElementById('seccionCalendarioClub');
-    if (!seccion) {
-        seccion = document.createElement('div');
-        seccion.id = 'seccionCalendarioClub';
-        seccion.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9999;overflow-y:auto;font-family:Inter,sans-serif;';
-        document.body.appendChild(seccion);
-    }
+        const panel = document.getElementById('panelAdminGeneral');
+        if (!panel) return;
 
-    const eventos = cargarEventosClub();
-    seccion.innerHTML = generarHTMLCalendarioClub(clubActual);
-    seccion.style.display = 'block';
-    panel.style.display = 'none';
+        let seccion = document.getElementById('seccionCalendarioClub');
+        if (!seccion) {
+            seccion = document.createElement('div');
+            seccion.id = 'seccionCalendarioClub';
+            seccion.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9999;overflow-y:auto;font-family:Inter,sans-serif;';
+            document.body.appendChild(seccion);
+        }
+
+        const eventos = cargarEventosClub();
+        seccion.innerHTML = generarHTMLCalendarioClub(clubActual);
+        seccion.style.display = 'block';
+        panel.style.display = 'none';
+    });
 }
 
 function cerrarCalendarioClub() {
@@ -1057,31 +1067,38 @@ function abrirCuotasClub() {
         console.error('❌ No se encontró el club activo.');
         return;
     }
-    cerrarModalClub();
 
-    const panel = document.getElementById('panelAdminGeneral');
-    if (!panel) return;
+    let claveSeccion = 'cuotas_aventureros';
+    if (clubActual === 'Conquistadores') claveSeccion = 'cuotas_conquistadores';
+    else if (clubActual === 'Guías Mayores') claveSeccion = 'cuotas_guias_mayores';
 
-    storageKeyActual = CLUBES_STORAGE[clubActual] || 'cuotas_aventureros';
-    console.log('✅ Club:', clubActual, '→ Storage key:', storageKeyActual);
+    verificarAccesoSeccion(claveSeccion, function () {
+        cerrarModalClub();
 
-    let seccionCuotas = document.getElementById('seccionCuotasClub');
-    if (!seccionCuotas) {
-        seccionCuotas = document.createElement('div');
-        seccionCuotas.id = 'seccionCuotasClub';
-        seccionCuotas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9999;overflow-y:auto;font-family:Inter,sans-serif;';
-        document.body.appendChild(seccionCuotas);
-    }
+        const panel = document.getElementById('panelAdminGeneral');
+        if (!panel) return;
 
-    const miembros = cargarCuotas(storageKeyActual);
-    seccionCuotas.innerHTML = generarHTMLCuotas(clubActual, miembros, storageKeyActual);
-    seccionCuotas.style.display = 'block';
-    panel.style.display = 'none';
+        storageKeyActual = CLUBES_STORAGE[clubActual] || 'cuotas_aventureros';
+        console.log('✅ Club:', clubActual, '→ Storage key:', storageKeyActual);
 
-    setTimeout(function () {
-        vincularEventosCuotas(storageKeyActual);
-        actualizarTotalesCuotas(storageKeyActual);
-    }, 100);
+        let seccionCuotas = document.getElementById('seccionCuotasClub');
+        if (!seccionCuotas) {
+            seccionCuotas = document.createElement('div');
+            seccionCuotas.id = 'seccionCuotasClub';
+            seccionCuotas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9999;overflow-y:auto;font-family:Inter,sans-serif;';
+            document.body.appendChild(seccionCuotas);
+        }
+
+        const miembros = cargarCuotas(storageKeyActual);
+        seccionCuotas.innerHTML = generarHTMLCuotas(clubActual, miembros, storageKeyActual);
+        seccionCuotas.style.display = 'block';
+        panel.style.display = 'none';
+
+        setTimeout(function () {
+            vincularEventosCuotas(storageKeyActual);
+            actualizarTotalesCuotas(storageKeyActual);
+        }, 100);
+    });
 }
 function cerrarSeccionCuotas() {
     const seccionCuotas = document.getElementById('seccionCuotasClub');
@@ -1447,29 +1464,36 @@ function abrirBaseDatosClub() {
         console.error('❌ No se encontró el club activo.');
         return;
     }
-    cerrarModalClub();
 
-    const panel = document.getElementById('panelAdminGeneral');
-    if (!panel) return;
+    let claveSeccion = 'bd_aventureros';
+    if (clubActual === 'Conquistadores') claveSeccion = 'bd_conquistadores';
+    else if (clubActual === 'Guías Mayores') claveSeccion = 'bd_guias_mayores';
 
-    const storageKey = CLUBES_STORAGE_BD[clubActual] || 'bd_aventureros';
+    verificarAccesoSeccion(claveSeccion, function () {
+        cerrarModalClub();
 
-    let seccionBD = document.getElementById('seccionBaseDatosClub');
-    if (!seccionBD) {
-        seccionBD = document.createElement('div');
-        seccionBD.id = 'seccionBaseDatosClub';
-        seccionBD.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9999;overflow-y:auto;font-family:Inter,sans-serif;';
-        document.body.appendChild(seccionBD);
-    }
+        const panel = document.getElementById('panelAdminGeneral');
+        if (!panel) return;
 
-    const miembros = cargarMiembrosBD(storageKey);
-    seccionBD.innerHTML = generarHTMLBaseDatos(clubActual, miembros, storageKey);
-    seccionBD.style.display = 'block';
-    panel.style.display = 'none';
+        const storageKey = CLUBES_STORAGE_BD[clubActual] || 'bd_aventureros';
 
-    setTimeout(function () {
-        vincularEventosBD(storageKey);
-    }, 100);
+        let seccionBD = document.getElementById('seccionBaseDatosClub');
+        if (!seccionBD) {
+            seccionBD = document.createElement('div');
+            seccionBD.id = 'seccionBaseDatosClub';
+            seccionBD.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#faf8f5;z-index:9999;overflow-y:auto;font-family:Inter,sans-serif;';
+            document.body.appendChild(seccionBD);
+        }
+
+        const miembros = cargarMiembrosBD(storageKey);
+        seccionBD.innerHTML = generarHTMLBaseDatos(clubActual, miembros, storageKey);
+        seccionBD.style.display = 'block';
+        panel.style.display = 'none';
+
+        setTimeout(function () {
+            vincularEventosBD(storageKey);
+        }, 100);
+    });
 }
 
 function cerrarSeccionBD() {

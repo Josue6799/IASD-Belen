@@ -2189,45 +2189,47 @@ function eliminarAyudaPlan(curso, idx) {
 
 // ===== EDITAR Y ELIMINAR EXÁMENES =====
 function abrirModalEditarExamenes() {
-    bloquearScroll('modalEditarExamenes');
-    let modal = document.getElementById('modalEditarExamenes');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'modalEditarExamenes';
-        modal.className = 'modal-overlay';
-        modal.style.cssText = `
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
-            z-index: 100050; backdrop-filter: blur(5px);
-        `;
-        modal.innerHTML = `
-            <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 600px; width: 95%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
-                <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.3rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
-                    <h3 style="color: #c9a53b; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-edit"></i> Editar o Eliminar Exámenes</h3>
-                    <button onclick="cerrarModalEditarExamenes()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
-                </div>
-                <div class="modal-body" style="padding: 1.8rem;">
-                    <div style="margin-bottom: 1rem;">
-                        <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">Seleccionar Curso</label>
-                        <select id="selectCursoEditar" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.95rem; background: white;">
-                            <option value="">-- Selecciona un curso --</option>
-                            ${Object.keys(CURSOS_DATA).map(c => `<option value="${c}">${c}</option>`).join('')}
-                        </select>
+    verificarAccesoSeccion('lms_examenes', function () {
+        bloquearScroll('modalEditarExamenes');
+        let modal = document.getElementById('modalEditarExamenes');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'modalEditarExamenes';
+            modal.className = 'modal-overlay';
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+                z-index: 100050; backdrop-filter: blur(5px);
+            `;
+            modal.innerHTML = `
+                <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 600px; width: 95%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
+                    <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.3rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="color: #c9a53b; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-edit"></i> Editar o Eliminar Exámenes</h3>
+                        <button onclick="cerrarModalEditarExamenes()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
                     </div>
-                    <div id="listaExamenesEditar"></div>
+                    <div class="modal-body" style="padding: 1.8rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">Seleccionar Curso</label>
+                            <select id="selectCursoEditar" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.95rem; background: white;">
+                                <option value="">-- Selecciona un curso --</option>
+                                ${Object.keys(CURSOS_DATA).map(c => `<option value="${c}">${c}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div id="listaExamenesEditar"></div>
+                    </div>
                 </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
+            `;
+            document.body.appendChild(modal);
 
-        modal.querySelector('#selectCursoEditar').addEventListener('change', function () {
-            cargarExamenesParaEditar(this.value);
-        });
-    }
+            modal.querySelector('#selectCursoEditar').addEventListener('change', function () {
+                cargarExamenesParaEditar(this.value);
+            });
+        }
 
-    document.getElementById('selectCursoEditar').value = '';
-    document.getElementById('listaExamenesEditar').innerHTML = '';
-    mostrarElementoModal(modal);
+        document.getElementById('selectCursoEditar').value = '';
+        document.getElementById('listaExamenesEditar').innerHTML = '';
+        mostrarElementoModal(modal);
+    });
 }
 
 function cerrarModalEditarExamenes() {
@@ -2301,8 +2303,10 @@ function eliminarExamenDirecto(examId) {
 
 // ===== CREAR / EDITAR EXÁMENES =====
 function abrirModalCrearExamen() {
-    editandoExamenIndex = -1;
-    abrirModalCrearExamenForm(null);
+    verificarAccesoSeccion('lms_examenes', function () {
+        editandoExamenIndex = -1;
+        abrirModalCrearExamenForm(null);
+    });
 }
 
 function abrirModalCrearExamenForm(examenObj) {
@@ -2573,45 +2577,47 @@ function guardarExamenCompletoAdmin() {
 
 // ===== GESTIONAR RESULTADOS DE ALUMNOS =====
 function abrirModalGestionarResultados() {
-    bloquearScroll('modalGestionarResultados');
-    let modal = document.getElementById('modalGestionarResultados');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'modalGestionarResultados';
-        modal.className = 'modal-overlay';
-        modal.style.cssText = `
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
-            z-index: 100050; backdrop-filter: blur(5px);
-        `;
-        modal.innerHTML = `
-            <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 680px; width: 95%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
-                <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.3rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
-                    <h3 style="color: #c9a53b; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-chart-line"></i> Gestionar Resultados de Alumnos</h3>
-                    <button onclick="cerrarModalGestionarResultados()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
-                </div>
-                <div class="modal-body" style="padding: 1.8rem;">
-                    <div style="margin-bottom: 1rem;">
-                        <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">Seleccionar Curso</label>
-                        <select id="selectCursoResultadosAdmin" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.95rem; background: white;">
-                            <option value="todos">Todos los Cursos</option>
-                            ${Object.keys(CURSOS_DATA).map(c => `<option value="${c}">${c}</option>`).join('')}
-                        </select>
+    verificarAccesoSeccion('lms_resultados', function () {
+        bloquearScroll('modalGestionarResultados');
+        let modal = document.getElementById('modalGestionarResultados');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'modalGestionarResultados';
+            modal.className = 'modal-overlay';
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+                z-index: 100050; backdrop-filter: blur(5px);
+            `;
+            modal.innerHTML = `
+                <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 680px; width: 95%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
+                    <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.3rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="color: #c9a53b; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-chart-line"></i> Gestionar Resultados de Alumnos</h3>
+                        <button onclick="cerrarModalGestionarResultados()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
                     </div>
-                    <div id="listaEntregasResultadosAdmin"></div>
+                    <div class="modal-body" style="padding: 1.8rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">Seleccionar Curso</label>
+                            <select id="selectCursoResultadosAdmin" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.95rem; background: white;">
+                                <option value="todos">Todos los Cursos</option>
+                                ${Object.keys(CURSOS_DATA).map(c => `<option value="${c}">${c}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div id="listaEntregasResultadosAdmin"></div>
+                    </div>
                 </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
+            `;
+            document.body.appendChild(modal);
 
-        modal.querySelector('#selectCursoResultadosAdmin').addEventListener('change', function () {
-            cargarEntregasResultadosAdmin(this.value);
-        });
-    }
+            modal.querySelector('#selectCursoResultadosAdmin').addEventListener('change', function () {
+                cargarEntregasResultadosAdmin(this.value);
+            });
+        }
 
-    document.getElementById('selectCursoResultadosAdmin').value = 'todos';
-    cargarEntregasResultadosAdmin('todos');
-    mostrarElementoModal(modal);
+        document.getElementById('selectCursoResultadosAdmin').value = 'todos';
+        cargarEntregasResultadosAdmin('todos');
+        mostrarElementoModal(modal);
+    });
 }
 
 function cerrarModalGestionarResultados() {

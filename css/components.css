@@ -4575,3 +4575,205 @@
 .dropdown {
     position: relative;
 }
+
+/* ========================================
+   MODAL DE SEGURIDAD POR SECCIÓN (ADMIN)
+   ======================================== */
+.modal-seguridad-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.modal-seguridad-card {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    max-width: 420px;
+    width: 90%;
+    padding: 2rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(201, 165, 59, 0.25);
+    position: relative;
+    text-align: center;
+    box-sizing: border-box;
+    animation: fadeScaleInSeguridad 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes fadeScaleInSeguridad {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes shakeSeguridad {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+
+.modal-seguridad-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.2rem;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #5a6474;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+
+.modal-seguridad-close:hover {
+    color: #c62828;
+}
+
+.modal-seguridad-icono {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.2rem;
+    box-shadow: 0 8px 24px rgba(26, 58, 74, 0.3);
+}
+
+.modal-seguridad-icono i {
+    color: #c9a53b;
+    font-size: 1.8rem;
+}
+
+.modal-seguridad-titulo {
+    color: #1a3a4a;
+    font-family: 'Montserrat', 'Inter', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
+
+.modal-seguridad-subtitulo {
+    color: #5a6474;
+    font-size: 0.9rem;
+    margin: 0 0 1.5rem 0;
+    line-height: 1.5;
+    font-family: 'Inter', sans-serif;
+}
+
+.modal-seguridad-input-wrapper {
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.modal-seguridad-input-wrapper .icono-candado-input {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #c9a53b;
+    font-size: 0.9rem;
+}
+
+.modal-seguridad-input-wrapper input {
+    width: 100%;
+    padding: 0.85rem 1rem 0.85rem 2.6rem;
+    border: 2px solid #e8e3d8;
+    border-radius: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+    background: #faf8f5;
+}
+
+.modal-seguridad-input-wrapper input:focus {
+    border-color: #c9a53b;
+    background: #ffffff;
+}
+
+.modal-seguridad-error {
+    color: #dc2626;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: none;
+    margin-bottom: 1rem;
+    background: rgba(220, 38, 38, 0.08);
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.6rem;
+    border-left: 3px solid #dc2626;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+}
+
+.modal-seguridad-botones {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+.btn-seguridad-desbloquear {
+    flex: 1;
+    background: linear-gradient(135deg, #d4a038 0%, #c9a53b 100%);
+    color: #1a3a4a;
+    padding: 0.85rem 1rem;
+    border: none;
+    border-radius: 2rem;
+    font-family: 'Montserrat', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(201, 165, 59, 0.35);
+    transition: all 0.3s ease;
+}
+
+.btn-seguridad-desbloquear:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(201, 165, 59, 0.45);
+}
+
+.btn-seguridad-cancelar {
+    flex: 1;
+    background: transparent;
+    border: 2px solid #c9a53b;
+    color: #c9a53b;
+    padding: 0.85rem 1rem;
+    border-radius: 2rem;
+    font-family: 'Montserrat', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-seguridad-cancelar:hover {
+    background: rgba(201, 165, 59, 0.1);
+}
+
+@media (max-width: 480px) {
+    .modal-seguridad-card {
+        padding: 1.5rem 1.2rem;
+        border-radius: 1.2rem;
+    }
+    .modal-seguridad-botones {
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+}
