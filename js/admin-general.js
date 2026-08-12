@@ -552,6 +552,10 @@ function verificarVisibilidadBotonAdmin() {
     const dashboardLMS = document.getElementById('dashboardEvaluacion');
     const panelAdmin = document.getElementById('panelAdminGeneral');
 
+    if (typeof actualizarBotonFlotanteEnVivo === 'function') {
+        actualizarBotonFlotanteEnVivo();
+    }
+
     if (!btnAdmin) return;
 
     // Si el dashboard del LMS está visible o el panel de admin está abierto, ocultar botón
@@ -3639,6 +3643,7 @@ function guardarTransmisionForm(e) {
         guardarTransmisiones(transmisiones);
     } else {
         localStorage.setItem('transmisiones', JSON.stringify(transmisiones));
+        window.dispatchEvent(new CustomEvent('transmisionesActualizadas'));
     }
 
     renderizarAdminTransmisiones();

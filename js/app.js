@@ -1512,6 +1512,7 @@ function obtenerTransmisiones() {
 function guardarTransmisiones(lista) {
     localStorage.setItem('transmisiones', JSON.stringify(lista));
     actualizarBotonFlotanteEnVivo();
+    window.dispatchEvent(new CustomEvent('transmisionesActualizadas'));
 }
 
 function obtenerYouTubeId(urlOrId) {
@@ -1728,36 +1729,68 @@ function conmutarVideo(id, categoriaNombre) {
     abrirCategoriaEnVivo(categoriaNombre);
 }
 
-function actualizarBotonFlotanteEnVivo() {
-    const btn = document.getElementById('btnFlotanteEnVivo');
-    const textoEl = document.getElementById('textoFlotanteEnVivo');
-    const iconoEl = document.getElementById('iconoFlotanteEnVivo');
+function actualizarVisibilidadBtnEnVivo() {
+    const btn = document.getElementById('btnEnVivo') || document.getElementById('btnFlotanteEnVivo');
     if (!btn) return;
 
-    const transmisiones = typeof obtenerTransmisiones === 'function' ? obtenerTransmisiones() : [];
-    const hayLive = Array.isArray(transmisiones) && transmisiones.some(t => t.enVivo);
+    let transmisiones = [];
+    try {
+        if (typeof obtenerTransmisiones === 'function') {
+            transmisiones = obtenerTransmisiones();
+        } else {
+            transmisiones = JSON.parse(localStorage.getItem('transmisiones') || '[]');
+        }
+    } catch (e) {
+        transmisiones = [];
+    }
 
-    if (hayLive) {
-        btn.className = 'btn-flotante-envivo envivo-activo';
-        if (textoEl) textoEl.textContent = 'En Vivo';
-        if (iconoEl) {
-            iconoEl.className = 'fas fa-circle';
-            iconoEl.style.color = '#ffffff';
-        }
+    const hayLive = Array.isArray(transmisiones) && transmisiones.some(t => t && (t.enVivo === true || t.enVivo === 'true'));
+
+    const dashboardLMS = document.getElementById('dashboardEvaluacion');
+    const panelAdmin = document.getElementById('panelAdminGeneral');
+
+    const lmsAbierto = dashboardLMS && (dashboardLMS.style.display === 'block' || window.getComputedStyle(dashboardLMS).display === 'block');
+    const adminAbierto = panelAdmin && (panelAdmin.style.display === 'block' || window.getComputedStyle(panelAdmin).display === 'block');
+
+    if (hayLive && !lmsAbierto && !adminAbierto) {
+        btn.style.display = 'flex';
     } else {
-        btn.className = 'btn-flotante-envivo envivo-inactivo';
-        if (textoEl) textoEl.textContent = 'En Vivo';
-        if (iconoEl) {
-            iconoEl.className = 'fas fa-video';
-            iconoEl.style.color = '#c9a53b';
-        }
+        btn.style.display = 'none';
     }
 }
 
-// Inicializar estado del botón flotante al cargar
+function actualizarBotonFlotanteEnVivo() {
+    actualizarVisibilidadBtnEnVivo();
+}
+
+function verificarVisibilidadBtnEnVivo() {
+    actualizarVisibilidadBtnEnVivo();
+}
+
+// Inicializar estado y escuchadores del botón flotante
 document.addEventListener('DOMContentLoaded', () => {
-    actualizarBotonFlotanteEnVivo();
+    actualizarVisibilidadBtnEnVivo();
+
+    const dashboardLMS = document.getElementById('dashboardEvaluacion');
+    if (dashboardLMS) {
+        const observerLMS = new MutationObserver(actualizarVisibilidadBtnEnVivo);
+        observerLMS.observe(dashboardLMS, { attributes: true, attributeFilter: ['style'] });
+    }
+
+    const panelAdmin = document.getElementById('panelAdminGeneral');
+    if (panelAdmin) {
+        const observerAdmin = new MutationObserver(actualizarVisibilidadBtnEnVivo);
+        observerAdmin.observe(panelAdmin, { attributes: true, attributeFilter: ['style'] });
+    }
 });
+
+window.addEventListener('transmisionesActualizadas', actualizarVisibilidadBtnEnVivo);
+window.addEventListener('storage', function (e) {
+    if (e.key === 'transmisiones') {
+        actualizarVisibilidadBtnEnVivo();
+    }
+});
+setInterval(actualizarVisibilidadBtnEnVivo, 3000);
 
 // Exportar a window
 window.abrirEnVivo = abrirEnVivo;
@@ -1765,10 +1798,44 @@ window.cerrarEnVivo = cerrarEnVivo;
 window.renderizarVistaCategoriasEnVivo = renderizarVistaCategoriasEnVivo;
 window.abrirCategoriaEnVivo = abrirCategoriaEnVivo;
 window.conmutarVideo = conmutarVideo;
+window.actualizarVisibilidadBtnEnVivo = actualizarVisibilidadBtnEnVivo;
 window.actualizarBotonFlotanteEnVivo = actualizarBotonFlotanteEnVivo;
+window.verificarVisibilidadBtnEnVivo = verificarVisibilidadBtnEnVivo;
 window.obtenerTransmisiones = obtenerTransmisiones;
 window.guardarTransmisiones = guardarTransmisiones;
 window.obtenerYouTubeId = obtenerYouTubeId;
 window.obtenerFacebookEmbedUrl = obtenerFacebookEmbedUrl;
 
-console.log('✅ app.js (Iglesia & En Vivo) cargado correctamente');
+/* ========================================
+   SCROLL REVEAL Y ANIMACIONES EN UNIFORMES
+   ======================================== */
+function inicializarAnimacionesUniformes() {
+    const cards = document.querySelectorAll('.uniforme-card');
+    if (!cards.length) return;
+
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('reveal-visible');
+                    }, (index % 3) * 120);
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        cards.forEach(card => {
+            if (!card.classList.contains('reveal-visible')) {
+                observer.observe(card);
+            }
+        });
+    } else {
+        cards.forEach(card => card.classList.add('reveal-visible'));
+    }
+}
+
+document.addEventListener('DOMContentLoaded', inicializarAnimacionesUniformes);
+window.inicializarAnimacionesUniformes = inicializarAnimacionesUniformes;
+
+console.log('✅ app.js (Iglesia & En Vivo & Animaciones) cargado correctamente');

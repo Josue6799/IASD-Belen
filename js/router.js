@@ -87,6 +87,11 @@ function showPage(pageId) {
         window.renderizarActividadPublica(pageId);
     }
 
+    // 9. Activar animaciones de uniformes al navegar a clubes
+    if (['aventureros', 'conquistadores', 'guias'].includes(pageId) && typeof window.inicializarAnimacionesUniformes === 'function') {
+        setTimeout(window.inicializarAnimacionesUniformes, 60);
+    }
+
     console.log(`📄 Página mostrada: ${pageId} - ${titulo}`);
 }
 
