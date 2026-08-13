@@ -1773,9 +1773,8 @@ function actualizarStatsRevision(historial) {
     if (elReprob) elReprob.innerText = reprobados;
 }
 
-if (searchInput) searchInput.addEventListener('input', updateTable);
-if (courseSelect) courseSelect.addEventListener('change', updateTable);
-updateTable();
+
+
 
 
 // ===== PESTAÑA LOGROS =====

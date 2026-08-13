@@ -945,25 +945,14 @@ function cerrarMenus() {
 }
 
 function toggleSubmenuGrupos(event) {
-    event.stopPropagation();
-    const parent = event.currentTarget.closest('.grupos-pequenos-item');
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    const parent = document.querySelector('.grupos-pequenos-item');
     if (parent) {
         parent.classList.toggle('open');
     }
-}
-
-const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-
-if (isTouchDevice) {
-    document.addEventListener('DOMContentLoaded', function () {
-        const gruposItem = document.querySelector('.grupos-pequenos-item');
-        if (gruposItem) {
-            const link = gruposItem.querySelector('a');
-            if (link) {
-                link.addEventListener('click', toggleSubmenuGrupos);
-            }
-        }
-    });
 }
 
 document.addEventListener('click', function (event) {
