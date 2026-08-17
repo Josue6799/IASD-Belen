@@ -1,0 +1,293 @@
+/* ========================================
+   ANIMACIONES PROFESIONALES Y MICRO-INTERACCIONES
+   Iglesia IASD Belén · CSS3 Puro
+   ======================================== */
+
+/* ==================== 1. KEYFRAMES GLOBALES ==================== */
+
+/* Levitación suave para el Hero y elementos destacados */
+@keyframes floatHero {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-10px) rotate(0.5deg);
+    }
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+}
+
+/* Revelado desde abajo */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(28px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Pulsación sutil dorada para insignias y botones en vivo */
+@keyframes pulseGolden {
+    0% {
+        box-shadow: 0 0 0 0 rgba(201, 157, 59, 0.45);
+    }
+    70% {
+        box-shadow: 0 0 0 14px rgba(201, 157, 59, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(201, 157, 59, 0);
+    }
+}
+
+/* Destello dorado al desbloquear logro LMS */
+@keyframes achievementGlow {
+    0% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(201, 157, 59, 0.8);
+    }
+    50% {
+        transform: scale(1.08);
+        box-shadow: 0 0 30px 10px rgba(201, 157, 59, 0.6);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(201, 157, 59, 0);
+    }
+}
+
+/* Efecto Ripple (Onda) para botones */
+@keyframes rippleAnimation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Entrada de modal con escala */
+@keyframes modalScaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.92) translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Salida de modal */
+@keyframes modalScaleOut {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.94) translateY(10px);
+    }
+}
+
+/* Crecimiento de barras de encuesta */
+@keyframes barGrowAnimation {
+    from {
+        width: 0%;
+    }
+}
+
+/* ==================== 2. NAVBAR ESTÁTICO (NO FLOTANTE) ==================== */
+.navbar {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    z-index: 100 !important;
+}
+
+/* ==================== 3. HERO ANIMATIONS ==================== */
+.hero-image img,
+.hero-image svg,
+.hero-image div > div:first-child {
+    animation: floatHero 5s ease-in-out infinite;
+    will-change: transform;
+}
+
+.hero-text .badge {
+    animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hero-text h1 {
+    animation: fadeUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+}
+
+.hero-text p {
+    animation: fadeUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+}
+
+.hero-text .hero-buttons {
+    animation: fadeUp 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+}
+
+/* ==================== 4. REVELADO AL SCROLL (INTERSECTION OBSERVER) ==================== */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal.reveal-active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Escalonamiento automático para listas de tarjetas */
+.reveal-stagger > *:nth-child(1) { transition-delay: 0.05s; }
+.reveal-stagger > *:nth-child(2) { transition-delay: 0.12s; }
+.reveal-stagger > *:nth-child(3) { transition-delay: 0.19s; }
+.reveal-stagger > *:nth-child(4) { transition-delay: 0.26s; }
+.reveal-stagger > *:nth-child(5) { transition-delay: 0.33s; }
+.reveal-stagger > *:nth-child(6) { transition-delay: 0.40s; }
+
+/* ==================== 5. TARJETAS INTERACTIVAS ==================== */
+.card,
+.club-card,
+.doctrina-card,
+.creencia-card,
+.anuncio-card,
+.diezmo-card,
+.historia-card,
+.modal-card {
+    transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                border-color 0.35s ease;
+    will-change: transform, box-shadow;
+}
+
+.card:hover,
+.club-card:hover,
+.doctrina-card:hover,
+.creencia-card:hover,
+.anuncio-card:hover,
+.diezmo-card:hover {
+    transform: translateY(-7px) scale(1.012);
+    box-shadow: 0 18px 40px rgba(11, 43, 79, 0.12), 0 0 0 2px rgba(201, 157, 59, 0.35) !important;
+}
+
+/* Zoom suave en imágenes dentro de tarjetas */
+.card img,
+.club-card img,
+.anuncio-card img,
+.creencia-card img {
+    transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.card:hover img,
+.club-card:hover img,
+.anuncio-card:hover img,
+.creencia-card:hover img {
+    transform: scale(1.05);
+}
+
+/* ==================== 6. BOTONES CON RIPPLE & PRESIONADO ==================== */
+.btn,
+.nav-btn,
+.btn-primary,
+.btn-ver-candado,
+.btn-publicar-anuncio,
+.btn-flotante-envivo,
+button {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 0.25s ease,
+                background-color 0.25s ease,
+                color 0.25s ease;
+}
+
+/* Estado de presionado */
+.btn:active,
+.nav-btn:active,
+.btn-primary:active,
+button:active {
+    transform: scale(0.96) !important;
+}
+
+/* Onda de agua (Ripple) */
+.ripple-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+    transform: scale(0);
+    animation: rippleAnimation 0.65s linear;
+    pointer-events: none;
+}
+
+/* ==================== 7. MODALES Y DIÁLOGOS ==================== */
+.modal-overlay,
+.envivo-modal-overlay,
+.modal-anuncio-overlay,
+.modal-biblioteca-overlay,
+.modal-quitar-overlay,
+.modal-confirm-overlay {
+    transition: opacity 0.3s ease, backdrop-filter 0.3s ease;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.modal-card,
+.envivo-modal-card,
+.modal-anuncio-card,
+.modal-biblioteca-card,
+.modal-quitar-card,
+.modal-confirm-card {
+    animation: modalScaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: transform, opacity;
+}
+
+.modal-closing .modal-card,
+.modal-closing .envivo-modal-card,
+.modal-closing .modal-anuncio-card,
+.modal-closing .modal-biblioteca-card {
+    animation: modalScaleOut 0.25s ease forwards;
+}
+
+/* ==================== 8. ENCUESTAS Y RESULTADOS ==================== */
+.opcion-barra {
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.encuesta-opcion-card {
+    transition: transform 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.encuesta-opcion-card:hover {
+    transform: translateX(6px);
+    border-color: var(--golden) !important;
+}
+
+/* ==================== 9. TABLAS Y RESULTADOS ==================== */
+.tabla-wrapper tr,
+.tabla-cronograma tr,
+.tabla-quitar-wrapper tr {
+    transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.tabla-wrapper tbody tr:hover,
+.tabla-cronograma tbody tr:hover {
+    background-color: rgba(201, 157, 59, 0.08) !important;
+}
+
+/* ==================== 10. ACCESIBILIDAD (PREFERS-REDUCED-MOTION) ==================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

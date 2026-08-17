@@ -1,0 +1,420 @@
+/* ========================================
+   ESTILOS DE BIBLIOTECA VIRTUAL - IASD BELÉN
+   ======================================== */
+
+:root {
+    --deep-blue: #1e344e;
+    --deep-blue-light: #2a4a6a;
+    --golden: #d4a038;
+    --golden-light: #f0d68a;
+    --cream: #fcfaf5;
+    --cream-dark: #f0ebe0;
+    --pure-white: #ffffff;
+    --dark-text: #1e293b;
+    --muted-text: #64748b;
+    --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 8px 35px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 16px 50px rgba(0, 0, 0, 0.12);
+    --golden-glow: rgba(212, 160, 56, 0.25);
+    --radius-btn: 30px;
+    --radius-card: 20px;
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--cream);
+    color: var(--dark-text);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+    cursor: pointer;
+    transition: var(--transition);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    border: none;
+    background: transparent;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    color: var(--golden);
+    background: rgba(201, 157, 59, 0.1);
+}
+
+/* ENCABEZADO */
+.biblioteca-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.biblioteca-header h1 {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 800;
+    color: var(--deep-blue);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+}
+
+.biblioteca-header h1 i {
+    color: var(--golden);
+}
+
+.biblioteca-header .linea-dorada {
+    width: 70px;
+    height: 4px;
+    background: var(--golden);
+    margin: 0.6rem auto 1.2rem;
+    border-radius: 4px;
+}
+
+.biblioteca-header p {
+    color: var(--muted-text);
+    font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+    max-width: 620px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* BUSCADOR */
+.buscador-container {
+    margin: 0 auto 2rem auto;
+    position: relative;
+    max-width: 550px;
+    width: 100%;
+}
+
+.buscador-container .search-icon {
+    position: absolute;
+    left: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--golden);
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+
+#buscadorBibliotecaPublica {
+    width: 100%;
+    padding: 0.9rem 1rem 0.9rem 3rem;
+    border: 2px solid #e2dcd0;
+    border-radius: 2rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: var(--transition);
+    background: var(--pure-white);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+    color: var(--dark-text);
+}
+
+#buscadorBibliotecaPublica:focus {
+    border-color: var(--golden);
+    box-shadow: 0 6px 22px rgba(212, 160, 56, 0.2);
+}
+
+/* TABLA CONTENEDOR */
+.tabla-wrapper {
+    background: var(--pure-white);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 3rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    animation: fadeInUp 0.6s ease 0.15s forwards;
+    opacity: 1;
+    border: 1px solid rgba(201, 157, 59, 0.15);
+}
+
+.tabla-wrapper table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    min-width: 700px;
+}
+
+.tabla-wrapper thead {
+    background: var(--deep-blue);
+    color: white;
+}
+
+.tabla-wrapper th {
+    padding: 0.9rem 1.1rem;
+    text-align: left;
+    font-weight: 700;
+    white-space: nowrap;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.3px;
+    font-size: 0.85rem;
+}
+
+.tabla-wrapper td {
+    padding: 0.8rem 1.1rem;
+    border-bottom: 1px solid #f1ece4;
+    color: var(--dark-text);
+    vertical-align: middle;
+}
+
+.tabla-wrapper tbody tr:nth-child(even) {
+    background: #faf8f5;
+}
+
+.tabla-wrapper tbody tr {
+    transition: background 0.2s ease;
+}
+
+.tabla-wrapper tbody tr:hover {
+    background: rgba(30, 52, 78, 0.05);
+}
+
+.estado-disponible {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #2e7d32;
+    margin-right: 6px;
+}
+
+.estado-en-curso {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #f57c00;
+    margin-right: 6px;
+}
+
+/* FORMULARIO */
+.formulario-section {
+    background: linear-gradient(145deg, #1a3a4a 0%, #102633 100%);
+    border-radius: 1.8rem;
+    padding: 2.8rem 2.2rem;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.18);
+    margin-top: 2rem;
+    animation: fadeInUp 0.6s ease 0.3s forwards;
+    opacity: 1;
+    color: white;
+}
+
+.formulario-section h2 {
+    color: white;
+    font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    font-family: var(--font-heading, 'Playfair Display', serif);
+}
+
+.formulario-section h2 i {
+    color: var(--golden);
+}
+
+.formulario-section .subtitulo {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.98rem;
+    margin-bottom: 2rem;
+}
+
+.formulario-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+}
+
+.formulario-grid .full-width {
+    grid-column: 1 / -1;
+}
+
+.formulario-grid label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.formulario-grid input,
+.formulario-grid textarea {
+    width: 100%;
+    padding: 0.8rem 1.1rem;
+    border-radius: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: var(--transition);
+}
+
+.formulario-grid input::placeholder,
+.formulario-grid textarea::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.formulario-grid input:focus,
+.formulario-grid textarea:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--golden);
+    box-shadow: 0 0 0 3px rgba(212, 160, 56, 0.3);
+}
+
+.btn-enviar {
+    grid-column: 1 / -1;
+    background: var(--golden);
+    color: var(--deep-blue);
+    border: none;
+    padding: 0.9rem 2.5rem;
+    border-radius: 2rem;
+    font-weight: 800;
+    font-size: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 0.8rem;
+    width: 100%;
+    max-width: 300px;
+}
+
+.btn-enviar:hover {
+    background: #e5b347;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(212, 160, 56, 0.4);
+}
+
+/* ANIMACIONES KEYFRAMES */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* RESPONSIVE MÓVIL */
+@media (max-width: 992px) {
+    .formulario-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .formulario-grid .full-width {
+        grid-column: 1;
+    }
+
+    .btn-enviar {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem 0.8rem;
+    }
+
+    .back-link {
+        min-height: 44px;
+        font-size: 0.9rem;
+    }
+
+    .biblioteca-header h1 {
+        font-size: 1.6rem;
+    }
+
+    #buscadorBibliotecaPublica {
+        min-height: 48px;
+        font-size: 16px !important;
+        /* Previene auto-zoom en iOS Safari */
+    }
+
+    .tabla-wrapper {
+        padding: 0.8rem 0.6rem;
+        border-radius: 1.2rem;
+    }
+
+    .tabla-wrapper table {
+        min-width: 580px;
+        font-size: 0.82rem;
+    }
+
+    .tabla-wrapper th,
+    .tabla-wrapper td {
+        padding: 0.65rem 0.75rem;
+    }
+
+    .formulario-section {
+        padding: 1.8rem 1.2rem;
+        border-radius: 1.4rem;
+    }
+
+    .formulario-grid input,
+    .formulario-grid textarea {
+        min-height: 46px;
+        font-size: 16px !important;
+    }
+
+    .btn-enviar {
+        min-height: 48px;
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0.8rem 0.6rem;
+    }
+
+    .biblioteca-header h1 {
+        font-size: 1.4rem;
+    }
+
+    .tabla-wrapper {
+        padding: 0.5rem 0.4rem;
+        border-radius: 1.2rem;
+    }
+
+    .tabla-wrapper table {
+        font-size: 0.78rem;
+        min-width: 500px;
+    }
+
+    .tabla-wrapper th,
+    .tabla-wrapper td {
+        padding: 0.55rem 0.6rem;
+    }
+}
