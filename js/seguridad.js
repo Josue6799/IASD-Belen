@@ -199,8 +199,8 @@ function crearModalSeguridadElemento() {
   };
 
   modal.innerHTML = `
-    <div class="modal-seguridad-card" onclick="event.stopPropagation()">
-      <button type="button" class="modal-seguridad-close" onclick="cerrarModalContrasena()" title="Cerrar">&times;</button>
+    <div class="modal-seguridad-card" data-csp-click="event.stopPropagation()">
+      <button type="button" class="modal-seguridad-close" data-csp-click="cerrarModalContrasena()" title="Cerrar">&times;</button>
       <div class="modal-seguridad-icono">
         <i class="fas fa-lock"></i>
       </div>
@@ -219,10 +219,10 @@ function crearModalSeguridadElemento() {
       </div>
 
       <div class="modal-seguridad-botones">
-        <button type="button" id="btnSeguridadDesbloquear" class="btn-seguridad-desbloquear" onclick="procesarVerificacionContrasena()">
+        <button type="button" id="btnSeguridadDesbloquear" class="btn-seguridad-desbloquear" data-csp-click="procesarVerificacionContrasena()">
           <i class="fas fa-unlock"></i> Desbloquear
         </button>
-        <button type="button" id="btnSeguridadCancelar" class="btn-seguridad-cancelar" onclick="cerrarModalContrasena()">
+        <button type="button" id="btnSeguridadCancelar" class="btn-seguridad-cancelar" data-csp-click="cerrarModalContrasena()">
           Cancelar
         </button>
       </div>

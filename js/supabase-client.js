@@ -1,75 +1,219 @@
 /**
  * Configuración del cliente Supabase y Helper de Sincronización (Offline-First)
- * IASD Belén
+ * IASD Belén · Iglesia Adventista del Séptimo Día
  */
 
-const SUPABASE_URL = 'https://ojfpzlvayjfzzqtqydgy.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qZnB6bHZheWpmenpxdHF5ZGd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NDIzOTYsImV4cCI6MjEwMDIxODM5Nn0.iLCgGBZPP0Zv0cU3xpbNq1rdb9C4AbBKyXV8Mr665NE';
+// Credenciales por defecto (pueden ser modificadas dinámicamente desde el Panel de Base de Datos)
+const DEFAULT_SUPABASE_URL = 'https://ojfpzlvayjfzzqtqydgy.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qZnB6bHZheWpmenpxdHF5ZGd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NDIzOTYsImV4cCI6MjEwMDIxODM5Nn0.iLCgGBZPP0Zv0cU3xpbNq1rdb9C4AbBKyXV8Mr665NE';
 
-// Inicializar cliente si la librería global supabase existe
-let supabaseClient = null;
-
-if (typeof supabase !== 'undefined' && supabase.createClient) {
-  supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  console.log('✅ Cliente Supabase inicializado correctamente.');
-  
-  // Refrescar caché de esquema para las tablas principales
-  try {
-    const tablas = [
-      'examenes', 'pedidos_libros', 'interesados', 'anuncios', 'cronograma_predicadores', 
-      'galeria_fotos', 'transmisiones', 'inscripciones_cursos', 'libros', 'encuestas', 'votos_encuestas',
-      'bd_aventureros', 'bd_conquistadores', 'bd_guias_mayores',
-      'cuotas_aventureros', 'cuotas_conquistadores', 'cuotas_guias_mayores',
-      'eventos_aventureros', 'eventos_conquistadores', 'eventos_guias_mayores',
-      'eventos_iglesia', 'miembros_clubes', 'cuotas_clubes', 'logros_alumnos', 'plan_estudios'
-    ];
-    tablas.forEach(t => {
-      supabaseClient.from(t).select('*').limit(0).catch(() => {});
-    });
-    console.log('🔄 Caché de esquema de Supabase refrescado.');
-  } catch (e) {}
-
-  // Suscripción Realtime a Supabase para sincronización instantánea entre dispositivos
-  try {
-    const channel = supabaseClient.channel('realtime-db-changes');
-    const tablasSync = [
-      'interesados', 'pedidos_libros', 'encuestas', 'votos_encuestas',
-      'alumnos_identidades', 'respuestas_examenes', 'inscripciones_cursos',
-      'anuncios', 'transmisiones', 'galeria_fotos', 'cronograma_predicadores',
-      'libros', 'eventos_iglesia', 'eventos_clubes', 'miembros_clubes',
-      'cuotas_clubes', 'bd_aventureros', 'bd_conquistadores', 'bd_guias_mayores',
-      'cuotas_aventureros', 'cuotas_conquistadores', 'cuotas_guias_mayores',
-      'eventos_aventureros', 'eventos_conquistadores', 'eventos_guias_mayores'
-    ];
-
-    tablasSync.forEach(tabla => {
-      channel.on('postgres_changes', { event: '*', schema: 'public', table: tabla }, () => {
-        const keyMap = window.KEY_TO_TABLE || {};
-        const key = Object.keys(keyMap).find(k => keyMap[k] === tabla) || tabla;
-        if (window.SupabaseSync) {
-          window.SupabaseSync.get(key, tabla, []);
-        }
-      });
-    });
-
-    channel.subscribe((status) => {
-      if (status === 'SUBSCRIBED') {
-        console.log('📡 Supabase Realtime activo para sincronización entre dispositivos.');
-      }
-    });
-  } catch (e) {
-    console.warn('⚠️ No se pudo activar Supabase Realtime:', e);
-  }
-} else {
-  console.warn('⚠️ La librería Supabase SDK no está cargada aún. Asegúrate de incluir el CDN o script local en el HTML.');
+// Obtener credenciales activas (prioridad: localStorage > constantes por defecto)
+function getActiveCredentials() {
+  const customUrl = localStorage.getItem('supabase_custom_url');
+  const customKey = localStorage.getItem('supabase_custom_anon_key');
+  return {
+    url: (customUrl && customUrl.trim()) ? customUrl.trim() : DEFAULT_SUPABASE_URL,
+    anonKey: (customKey && customKey.trim()) ? customKey.trim() : DEFAULT_SUPABASE_ANON_KEY,
+    isCustom: Boolean(customUrl || customKey)
+  };
 }
 
-window.supabaseClient = supabaseClient;
-window.SUPABASE_URL = SUPABASE_URL;
-window.SUPABASE_ANON_KEY = SUPABASE_ANON_KEY;
+let currentCreds = getActiveCredentials();
+let SUPABASE_URL = currentCreds.url;
+let SUPABASE_ANON_KEY = currentCreds.anonKey;
+
+// Helper para convertir cualquier formato de fecha a ISO compatible con PostgreSQL
+function formatDateForDb(val) {
+  if (!val) return new Date().toISOString();
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (/^\d{4}-\d{2}-\d{2}/.test(trimmed)) return trimmed;
+  }
+  if (typeof val === 'number') {
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+  }
+  if (val instanceof Date) {
+    return isNaN(val.getTime()) ? new Date().toISOString() : val.toISOString();
+  }
+  const parsed = Date.parse(val);
+  if (!isNaN(parsed)) {
+    return new Date(parsed).toISOString();
+  }
+  try {
+    const str = String(val).replace(/a\.\s*m\./i, 'AM').replace(/p\.\s*m\./i, 'PM');
+    const match = str.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+    if (match) {
+      let day = parseInt(match[1], 10);
+      let month = parseInt(match[2], 10);
+      let year = parseInt(match[3], 10);
+      if (year < 100) year += 2000;
+      if (day <= 31 && month <= 12) {
+        const d = new Date(year, month - 1, day);
+        if (!isNaN(d.getTime())) return d.toISOString();
+      }
+    }
+  } catch (e) {}
+
+  return new Date().toISOString();
+}
+
+// Variable global del cliente Supabase
+let supabaseClient = null;
+let connectionStatus = {
+  ok: false,
+  checked: false,
+  message: 'Iniciando conexión...',
+  code: 'INIT'
+};
+
+// Función para inicializar o reiniciar el cliente Supabase
+function initSupabase(url, key) {
+  const targetUrl = url || SUPABASE_URL;
+  const targetKey = key || SUPABASE_ANON_KEY;
+
+  SUPABASE_URL = targetUrl;
+  SUPABASE_ANON_KEY = targetKey;
+
+  const supabaseLib = window.supabase || (typeof supabase !== 'undefined' ? supabase : null);
+
+  if (supabaseLib && typeof supabaseLib.createClient === 'function') {
+    try {
+      supabaseClient = supabaseLib.createClient(targetUrl, targetKey);
+      window.supabaseClient = supabaseClient;
+      window.SUPABASE_URL = targetUrl;
+      window.SUPABASE_ANON_KEY = targetKey;
+      console.log('✅ Cliente Supabase instanciado con URL:', targetUrl);
+      
+      // Probar conexión de forma no bloqueante
+      testSupabaseConnection().then(status => {
+        window.dispatchEvent(new CustomEvent('supabase_connection_status', { detail: status }));
+      });
+      return true;
+    } catch (e) {
+      console.warn('⚠️ Error al crear cliente Supabase:', e);
+      connectionStatus = { ok: false, checked: true, message: `Error de inicialización: ${e.message}`, code: 'CLIENT_ERROR' };
+      return false;
+    }
+  } else {
+    console.warn('⚠️ La librería Supabase SDK no está disponible todavía en el ámbito global.');
+    connectionStatus = { ok: false, checked: true, message: 'Librería Supabase SDK no cargada', code: 'NO_SDK' };
+    return false;
+  }
+}
+
+// Test de conexión exhaustivo y con diagnóstico detallado
+async function testSupabaseConnection() {
+  if (!window.supabaseClient) {
+    const creds = getActiveCredentials();
+    initSupabase(creds.url, creds.anonKey);
+    if (!window.supabaseClient) {
+      connectionStatus = {
+        ok: false,
+        checked: true,
+        message: 'No se ha podido inicializar el cliente Supabase. Modo Local Activo.',
+        code: 'NO_CLIENT'
+      };
+      return connectionStatus;
+    }
+  }
+
+  try {
+    const { data, error, status } = await window.supabaseClient
+      .from('anuncios')
+      .select('id')
+      .limit(1);
+
+    if (error) {
+      let friendlyMsg = error.message;
+      let code = error.code || String(status || 'ERROR');
+
+      if (status === 401 || error.message.includes('API key') || error.message.includes('JWT') || error.message.includes('Invalid API key')) {
+        friendlyMsg = 'Clave API (Anon Key) no válida o expirada en el proyecto Supabase.';
+        code = '401_UNAUTHORIZED';
+      } else if (status === 404 || error.message.includes('relation') || error.message.includes('does not exist')) {
+        friendlyMsg = 'Conexión exitosa, pero algunas tablas aún no existen en Supabase. Ejecuta el script supabase_setup.sql.';
+        code = 'TABLES_MISSING';
+        connectionStatus = { ok: true, checked: true, message: friendlyMsg, code, data };
+        return connectionStatus;
+      } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        friendlyMsg = 'No se pudo contactar al servidor de Supabase (proyecto pausado o sin conexión a internet).';
+        code = 'NETWORK_ERROR';
+      }
+
+      connectionStatus = {
+        ok: false,
+        checked: true,
+        message: friendlyMsg,
+        code: code,
+        rawError: error
+      };
+      return connectionStatus;
+    }
+
+    connectionStatus = {
+      ok: true,
+      checked: true,
+      message: 'Conexión activa y verificada con la base de datos Supabase en la nube.',
+      code: 'CONNECTED',
+      data: data
+    };
+    return connectionStatus;
+  } catch (err) {
+    connectionStatus = {
+      ok: false,
+      checked: true,
+      message: `Error de red: ${err.message || 'Sin respuesta del servidor Supabase'}. Modo local activo.`,
+      code: 'FETCH_ERROR',
+      rawError: err
+    };
+    return connectionStatus;
+  }
+}
+
+// Inicialización automática
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => initSupabase());
+  } else {
+    initSupabase();
+  }
+}
+
+// Funciones globales de configuración expuestas para la interfaz y administración
+window.initSupabase = initSupabase;
+window.testSupabaseConnection = testSupabaseConnection;
+window.getSupabaseConnectionStatus = () => connectionStatus;
+window.getActiveSupabaseCredentials = getActiveCredentials;
+
+window.setSupabaseCredentials = async function(url, key) {
+  if (!url || !url.startsWith('http')) {
+    return { ok: false, message: 'La URL debe ser válida (ej: https://tuid.supabase.co)' };
+  }
+  if (!key || key.length < 20) {
+    return { ok: false, message: 'La clave Anon Key parece inválida o demasiado corta.' };
+  }
+
+  localStorage.setItem('supabase_custom_url', url.trim());
+  localStorage.setItem('supabase_custom_anon_key', key.trim());
+
+  initSupabase(url.trim(), key.trim());
+  const testRes = await testSupabaseConnection();
+  window.dispatchEvent(new CustomEvent('supabase_config_changed', { detail: testRes }));
+  return testRes;
+};
+
+window.resetSupabaseCredentials = async function() {
+  localStorage.removeItem('supabase_custom_url');
+  localStorage.removeItem('supabase_custom_anon_key');
+  initSupabase(DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_ANON_KEY);
+  const testRes = await testSupabaseConnection();
+  window.dispatchEvent(new CustomEvent('supabase_config_changed', { detail: testRes }));
+  return testRes;
+};
 
 /**
- * Mapeo de claves primarias compuestas o específicas por tabla
+ * Mapeo de claves primarias por tabla
  */
 const TABLE_MATCH_COLS = {
   inscripciones_cursos: 'alumno_documento,id_curso',
@@ -82,8 +226,25 @@ const TABLE_MATCH_COLS = {
   anuncios: 'id',
   interesados: 'id',
   examenes: 'id',
-  respuestas_examenes: 'id'
+  respuestas_examenes: 'id',
+  encuestas: 'id',
+  galeria_fotos: 'id',
+  transmisiones: 'id',
+  eventos_iglesia: 'id',
+  bd_aventureros: 'id',
+  bd_conquistadores: 'id',
+  bd_guias_mayores: 'id',
+  cuotas_aventureros: 'id',
+  cuotas_conquistadores: 'id',
+  cuotas_guias_mayores: 'id',
+  eventos_aventureros: 'id',
+  eventos_conquistadores: 'id',
+  eventos_guias_mayores: 'id',
+  miembros_clubes: 'id',
+  cuotas_clubes: 'id',
+  eventos_clubes: 'id'
 };
+window.TABLE_MATCH_COLS = TABLE_MATCH_COLS;
 
 const clubMemberTransformer = {
   toDb(item) {
@@ -157,6 +318,7 @@ const clubEventTransformer = {
     if (!data) return data;
     const mapRow = r => ({
       ...r,
+      nombre: r.nombre || r.titulo || '',
       titulo: r.titulo || r.nombre || '',
       date: r.date || r.fecha || ''
     });
@@ -164,46 +326,124 @@ const clubEventTransformer = {
   }
 };
 
-/**
- * Transformadores de Esquema para Mapeos de Nombre de Columna
- */
 const TABLE_TRANSFORMERS = {
   bd_aventureros: clubMemberTransformer,
   bd_conquistadores: clubMemberTransformer,
   bd_guias_mayores: clubMemberTransformer,
-  miembros_clubes: clubMemberTransformer,
-
   cuotas_aventureros: clubCuotasTransformer,
   cuotas_conquistadores: clubCuotasTransformer,
   cuotas_guias_mayores: clubCuotasTransformer,
-  cuotas_clubes: clubCuotasTransformer,
-
   eventos_aventureros: clubEventTransformer,
   eventos_conquistadores: clubEventTransformer,
   eventos_guias_mayores: clubEventTransformer,
-  eventos_clubes: clubEventTransformer,
-  eventos_iglesia: clubEventTransformer,
 
-  alumnos_identidades: {
+  eventos_iglesia: {
     toDb(item) {
-      if (!item) return null;
-      const fechaVal = item.fechaRegistro || item.fecharegistro || item.fecha_registro || new Date().toISOString();
+      if (!item) return item;
       return {
-        documento: item.documento != null ? String(item.documento).trim() : '',
-        nombre: item.nombre || '',
-        whatsapp: item.whatsapp || item.telefono || item.documento || '',
-        grupo: item.grupo || 'General',
-        pin: item.pin != null ? String(item.pin) : '',
-        fechaRegistro: fechaVal,
-        fecharegistro: fechaVal
+        id: item.id != null ? String(item.id) : undefined,
+        titulo: item.titulo || '',
+        descripcion: item.descripcion || '',
+        fecha: formatDateForDb(item.fecha),
+        hora: item.hora || '09:00',
+        tipo: item.tipo || 'General',
+        lugar: item.lugar || 'Templo Principal'
+      };
+    },
+    fromDb(data) {
+      return data;
+    }
+  },
+
+  cronograma_predicadores: {
+    toDb(item) {
+      if (!item) return item;
+      return {
+        id: item.id != null ? String(item.id) : `${item.actividad || 'culto'}_${item.fecha || ''}`,
+        fecha: item.fecha || '',
+        predicador: item.predicador || item.nombre || '',
+        culto_tipo: item.culto_tipo || item.actividad || 'Culto',
+        actividad: item.actividad || item.culto_tipo || 'Culto',
+        tema: item.tema || '',
+        curso: item.curso || '',
+        recurrente: Boolean(item.recurrente),
+        semanas: Number(item.semanas || 1)
+      };
+    },
+    fromDb(data) {
+      return data;
+    }
+  },
+
+  pedidos_libros: {
+    toDb(item) {
+      if (!item) return item;
+      return {
+        id: item.id != null ? String(item.id) : undefined,
+        libro_id: String(item.libro_id || item.libroId || item.libroid || '0'),
+        solicitante: item.solicitante || item.nombre || item.solicitante_nombre || '',
+        telefono: item.telefono || item.whatsapp || item.contacto || item.solicitante_contacto || '',
+        email: item.email || item.correo || '',
+        fecha: formatDateForDb(item.fecha),
+        estado: item.estado || 'Pendiente',
+        titulo_libro: item.titulo_libro || item.tituloLibro || item.libro_titulo || item.titulolibro || item.libro || ''
       };
     },
     fromDb(data) {
       if (!data) return data;
       const mapRow = r => ({
         ...r,
-        fechaRegistro: r.fechaRegistro || r.fecharegistro || r.fecha_registro || new Date().toISOString(),
-        fecharegistro: r.fecharegistro || r.fechaRegistro || r.fecha_registro || new Date().toISOString()
+        id: r.id != null ? String(r.id) : String(Date.now()),
+        libroId: r.libro_id ?? r.libroid ?? r.libroId ?? 0,
+        solicitante: r.solicitante || r.solicitante_nombre || r.nombre || '',
+        telefono: r.telefono || r.solicitante_contacto || r.contacto || r.whatsapp || '',
+        email: r.email || '',
+        fecha: r.fecha || r.fecha_solicitud || r.fecha_pedido || '',
+        estado: r.estado || 'Pendiente',
+        tituloLibro: r.titulo_libro || r.libro_titulo || r.titulolibro || r.tituloLibro || ''
+      });
+      return Array.isArray(data) ? data.map(mapRow) : mapRow(data);
+    }
+  },
+
+  libros: {
+    toDb(item) {
+      if (!item) return item;
+      const numInv = (item.numero_inventario != null && String(item.numero_inventario).trim() !== '')
+        ? String(item.numero_inventario)
+        : ((item.numeroInventario != null && String(item.numeroInventario).trim() !== '')
+          ? String(item.numeroInventario)
+          : String(item.id || '1'));
+
+      return {
+        id: item.id != null ? String(item.id) : undefined,
+        titulo: item.titulo || 'Sin título',
+        autor: item.autor || 'Autor Desconocido',
+        categoria: item.categoria || item.cat || 'General',
+        cant: Number(item.cant || item.cantidad || 1),
+        estado: item.estado || 'Disponible',
+        ubicacion: item.ubicacion || item.ubi || 'Biblioteca',
+        numero_inventario: numInv,
+        portada_url: item.portada_url || item.portada || '',
+        disponible: item.estado ? (item.estado === 'Disponible') : true
+      };
+    },
+    fromDb(data) {
+      if (!data) return data;
+      const mapRow = r => ({
+        ...r,
+        id: r.id,
+        titulo: r.titulo || '',
+        autor: r.autor || '',
+        cat: r.categoria || r.cat || 'General',
+        categoria: r.categoria || r.cat || 'General',
+        cant: r.cant || r.cantidad || 1,
+        cantidad: r.cant || r.cantidad || 1,
+        estado: r.estado || (r.disponible === false ? 'Prestado' : 'Disponible'),
+        ubi: r.ubicacion || r.ubi || 'Biblioteca',
+        ubicacion: r.ubicacion || r.ubi || 'Biblioteca',
+        numero_inventario: r.numero_inventario || r.numeroInventario || String(r.id || ''),
+        portada_url: r.portada_url || r.portada || ''
       });
       return Array.isArray(data) ? data.map(mapRow) : mapRow(data);
     }
@@ -211,159 +451,18 @@ const TABLE_TRANSFORMERS = {
 
   encuestas: {
     toDb(item) {
-      if (!item) return null;
-      const preg = item.pregunta || item.titulo || '';
+      if (!item) return item;
       return {
         id: item.id != null ? String(item.id) : undefined,
-        pregunta: preg,
-        titulo: preg,
+        pregunta: item.pregunta || item.titulo || '',
+        titulo: item.titulo || item.pregunta || '',
         opciones: item.opciones || [],
         votos: item.votos || [],
         activa: item.activa !== false
       };
     },
     fromDb(data) {
-      if (!data) return data;
-      const mapRow = r => ({
-        ...r,
-        pregunta: r.pregunta || r.titulo || '',
-        titulo: r.titulo || r.pregunta || ''
-      });
-      return Array.isArray(data) ? data.map(mapRow) : mapRow(data);
-    }
-  },
-
-  inscripciones_cursos: {
-    toDb(item) {
-      if (!item) return null;
-      let doc = 'anonimo';
-      try {
-        const raw = localStorage.getItem('alumnoIdentidad');
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed && parsed.documento) doc = String(parsed.documento).trim();
-        }
-      } catch (e) {}
-
-      const cursoNombre = typeof item === 'string' ? item : (item.id_curso || item.curso || item.nombre);
-      if (!cursoNombre) return null;
-
-      return {
-        alumno_documento: typeof item === 'object' && item.alumno_documento ? String(item.alumno_documento).trim() : doc,
-        id_curso: String(cursoNombre),
-        progreso: typeof item === 'object' && item.progreso != null ? item.progreso : 0,
-        estado: typeof item === 'object' && item.estado ? item.estado : 'en_proceso'
-      };
-    },
-    fromDb(rows) {
-      if (!Array.isArray(rows)) return rows;
-      return rows.map(r => typeof r === 'string' ? r : (r.id_curso || r.curso)).filter(Boolean);
-    }
-  },
-
-  libros: {
-    toDb(item) {
-      if (!item) return null;
-      const estadoVal = item.estado || (item.disponible === false ? 'Prestado' : 'Disponible');
-      const payload = {
-        id: item.id != null ? String(item.id) : undefined,
-        titulo: item.titulo || '',
-        autor: item.autor || 'Desconocido',
-        categoria: item.categoria || 'General',
-        disponible: item.disponible !== false && estadoVal !== 'Prestado' && estadoVal !== 'En curso',
-        estado: estadoVal,
-        portada_url: item.portada_url || item.portada || '',
-        portada: item.portada_url || item.portada || '',
-        descripcion: item.descripcion || '',
-        numero_inventario: item.numero_inventario || item.numeroInventario || ''
-      };
-      return payload;
-    },
-    fromDb(data) {
-      if (!data) return data;
-      const mapRow = r => ({
-        ...r,
-        estado: r.estado || (r.disponible === false ? 'Prestado' : 'Disponible'),
-        portada: r.portada || r.portada_url || '',
-        portada_url: r.portada_url || r.portada || '',
-        numeroInventario: r.numeroInventario || r.numero_inventario || '',
-        numero_inventario: r.numero_inventario || r.numeroInventario || ''
-      });
-      return Array.isArray(data) ? data.map(mapRow) : mapRow(data);
-    }
-  },
-
-  pedidos_libros: {
-    toDb(item) {
-      if (!item) return item;
-      const libroId = item.libro_id != null ? String(item.libro_id) : (item.libroId != null ? String(item.libroId) : null);
-      const libroTit = item.libro_titulo || item.titulo_libro || item.tituloLibro || item.libro || '';
-      const solNom = item.solicitante_nombre || item.solicitante || item.nombre || '';
-      const solCont = item.solicitante_contacto || item.contacto || item.whatsapp || item.telefono || '';
-      const fechaVal = item.fecha_solicitud || item.fecha_pedido || item.fecha || new Date().toISOString();
-
-      return {
-        id: item.id != null ? String(item.id) : undefined,
-        libro_id: libroId,
-        libro_titulo: libroTit,
-        titulo_libro: libroTit,
-        solicitante_nombre: solNom,
-        solicitante: solNom,
-        solicitante_contacto: solCont,
-        contacto: solCont,
-        email: item.email || item.correo || '',
-        estado: item.estado || 'Pendiente',
-        fecha_solicitud: fechaVal,
-        fecha_pedido: fechaVal
-      };
-    },
-    fromDb(data) {
-      if (!data) return data;
-      const mapRow = r => ({
-        ...r,
-        libroId: r.libroId || r.libro_id || null,
-        libro_id: r.libro_id || r.libroId || null,
-        libro_titulo: r.libro_titulo || r.titulo_libro || r.libro || '',
-        solicitante: r.solicitante || r.solicitante_nombre || '',
-        solicitante_nombre: r.solicitante_nombre || r.solicitante || '',
-        contacto: r.contacto || r.solicitante_contacto || '',
-        solicitante_contacto: r.solicitante_contacto || r.contacto || '',
-        email: r.email || ''
-      });
-      return Array.isArray(data) ? data.map(mapRow) : mapRow(data);
-    }
-  },
-
-  interesados: {
-    toDb(item) {
-      if (!item) return item;
-      const fechaVal = item.fecha_contacto || item.fecha || new Date().toISOString();
-      return {
-        id: item.id != null ? String(item.id) : undefined,
-        nombre: item.nombre || '',
-        telefono: item.telefono || item.whatsapp || item.celular || '',
-        whatsapp: item.whatsapp || item.telefono || item.celular || '',
-        direccion: item.direccion || '',
-        email: item.email || '',
-        estudio_interes: item.estudio_interes || item.estudio || item.interes || 'Estudio Bíblico',
-        estado: item.estado || 'nuevo',
-        contactado: item.contactado === true,
-        fecha: fechaVal,
-        fecha_contacto: fechaVal,
-        notas: item.notas || ''
-      };
-    },
-    fromDb(data) {
-      if (!data) return data;
-      const mapRow = r => ({
-        ...r,
-        whatsapp: r.whatsapp || r.telefono || '',
-        telefono: r.telefono || r.whatsapp || '',
-        fecha_contacto: r.fecha_contacto || r.fecha || '',
-        fecha: r.fecha || r.fecha_contacto || '',
-        contactado: r.contactado === true
-      });
-      return Array.isArray(data) ? data.map(mapRow) : mapRow(data);
+      return data;
     }
   },
 
@@ -373,76 +472,11 @@ const TABLE_TRANSFORMERS = {
       return {
         id: item.id != null ? String(item.id) : undefined,
         titulo: item.titulo || '',
-        contenido: item.contenido || item.descripcion || '',
-        categoria: item.categoria || 'General',
-        ubicacion: item.ubicacion || item.lugar || '',
-        fecha_inicio: item.fecha_inicio || item.fechaInicio || item.fecha || null,
-        hora_inicio: item.hora_inicio || item.horaInicio || item.hora || null,
-        fecha_fin: item.fecha_fin || item.fechaFin || null,
-        hora_fin: item.hora_fin || item.horaFin || null,
-        imagen: item.imagen || item.imagen_url || '',
-        imagen_url: item.imagen_url || item.imagen || '',
-        activo: item.activo !== false
-      };
-    },
-    fromDb(data) {
-      if (!data) return data;
-      const mapRow = r => ({
-        ...r,
-        fechaInicio: r.fechaInicio || r.fecha_inicio || '',
-        fecha_inicio: r.fecha_inicio || r.fechaInicio || '',
-        horaInicio: r.horaInicio || r.hora_inicio || '',
-        hora_inicio: r.hora_inicio || r.horaInicio || '',
-        fechaFin: r.fechaFin || r.fecha_fin || '',
-        fecha_fin: r.fecha_fin || r.fechaFin || '',
-        horaFin: r.horaFin || r.hora_fin || '',
-        hora_fin: r.hora_fin || r.horaFin || '',
-        imagen_url: r.imagen_url || r.imagen || '',
-        imagen: r.imagen || r.imagen_url || ''
-      });
-      return Array.isArray(data) ? data.map(mapRow) : mapRow(data);
-    }
-  },
-
-  cronograma_predicadores: {
-    toDb(item) {
-      if (!item) return item;
-      return {
-        id: item.id != null ? String(item.id) : undefined,
-        fecha: item.fecha || new Date().toISOString().split('T')[0],
-        predicador: item.predicador || item.nombre || '',
-        culto_tipo: item.culto_tipo || item.culto || item.actividad || 'Sábado Mañana',
-        actividad: item.actividad || item.culto_tipo || item.culto || 'Sábado Mañana',
-        tema: item.tema || '',
-        curso: item.curso || '',
-        recurrente: item.recurrente === true,
-        semanas: item.semanas ? Number(item.semanas) : 1
-      };
-    },
-    fromDb(data) {
-      if (!data) return data;
-      const mapRow = r => ({
-        ...r,
-        actividad: r.actividad || r.culto_tipo || '',
-        culto_tipo: r.culto_tipo || r.actividad || '',
-        recurrente: r.recurrente === true,
-        semanas: r.semanas ? Number(r.semanas) : 1
-      });
-      return Array.isArray(data) ? data.map(mapRow) : mapRow(data);
-    }
-  },
-
-  galeria_fotos: {
-    toDb(item) {
-      if (!item) return item;
-      return {
-        id: item.id != null ? String(item.id) : undefined,
-        titulo: item.titulo || '',
         descripcion: item.descripcion || '',
         imagen: item.imagen || item.url || '',
         url: item.url || item.imagen || '',
         categoria: item.categoria || 'General',
-        fecha: item.fecha || new Date().toLocaleDateString('es-ES'),
+        fecha: formatDateForDb(item.fecha),
         creadopor: item.creadopor || item.creadoPor || 'admin'
       };
     },
@@ -468,7 +502,7 @@ const TABLE_TRANSFORMERS = {
         tipo: item.tipo || 'YouTube',
         activo: item.activo !== false,
         activa: item.activa !== false,
-        fecha: item.fecha || new Date().toISOString()
+        fecha: formatDateForDb(item.fecha)
       };
     },
     fromDb(data) {
@@ -504,7 +538,7 @@ const TABLE_TRANSFORMERS = {
         ...r,
         cantidadPreguntas: r.cantidadpreguntas ?? r.cantidad_preguntas ?? r.cantidadPreguntas ?? (r.preguntas ? r.preguntas.length : 0),
         cantidadpreguntas: r.cantidadpreguntas ?? r.cantidad_preguntas ?? r.cantidadPreguntas ?? (r.preguntas ? r.preguntas.length : 0),
-        cantidad_preguntas: r.cantidad_preguntas ?? r.cantidadpreguntas ?? r.cantidadPreguntas ?? (r.preguntas ? r.preguntas.length : 0)
+        cantidad_preguntas: r.cantidad_preguntas ?? r.cantidad_preguntas ?? r.cantidadPreguntas ?? (r.preguntas ? r.preguntas.length : 0)
       });
       return Array.isArray(data) ? data.map(mapRow) : mapRow(data);
     }
@@ -522,7 +556,7 @@ const TABLE_TRANSFORMERS = {
         respuestas: item.respuestas || {},
         intento: Number(item.intento || 1),
         estado: item.estado || 'aprobado',
-        fecha_rendido: item.fecha_rendido || item.fecha || new Date().toISOString()
+        fecha_rendido: formatDateForDb(item.fecha_rendido || item.fecha)
       };
     },
     fromDb(data) {
@@ -535,8 +569,347 @@ const TABLE_TRANSFORMERS = {
       });
       return Array.isArray(data) ? data.map(mapRow) : mapRow(data);
     }
+  },
+
+  inscripciones_cursos: {
+    table: 'inscripciones_cursos',
+    toDb(item) {
+      if (!item) return null;
+      let cursoId = '';
+      let doc = '';
+      let progreso = 0;
+      let estado = 'en_proceso';
+      let fechaInscripcion = new Date().toISOString();
+
+      if (typeof item === 'string') {
+        cursoId = item.trim();
+        try {
+          const rawId = localStorage.getItem('alumnoIdentidad');
+          if (rawId) {
+            const parsed = JSON.parse(rawId);
+            if (parsed && parsed.documento) doc = String(parsed.documento).trim();
+          }
+        } catch (e) {}
+      } else if (typeof item === 'object' && item !== null) {
+        cursoId = String(item.id_curso || item.curso_id || item.curso || item.nombre || '').trim();
+        doc = String(item.alumno_documento || item.documento || item.doc || '').trim();
+        if (!doc) {
+          try {
+            const rawId = localStorage.getItem('alumnoIdentidad');
+            if (rawId) {
+              const parsed = JSON.parse(rawId);
+              if (parsed && parsed.documento) doc = String(parsed.documento).trim();
+            }
+          } catch (e) {}
+        }
+        progreso = Number(item.progreso || 0);
+        estado = String(item.estado || 'en_proceso');
+        fechaInscripcion = item.fecha_inscripcion || item.fecha || new Date().toISOString();
+      }
+
+      if (!cursoId) return null;
+      if (!doc) doc = 'alumno_local';
+
+      return {
+        alumno_documento: doc,
+        id_curso: cursoId,
+        curso_id: cursoId,
+        progreso: isNaN(progreso) ? 0 : progreso,
+        estado: estado,
+        fecha_inscripcion: fechaInscripcion
+      };
+    },
+    fromDb(data) {
+      if (!data) return data;
+      const mapRow = r => {
+        if (!r) return r;
+        if (typeof r === 'string') return r;
+        return r.id_curso || r.curso_id || r.curso || r;
+      };
+      return Array.isArray(data) ? data.map(mapRow) : mapRow(data);
+    },
+    transform(data) {
+      if (!data) return null;
+      return {
+        alumno_documento: data.alumno_documento || 'alumno_local',
+        curso_id: data.curso_id || data.id_curso || 'curso',
+        fecha_inscripcion: data.fecha_inscripcion || new Date().toISOString()
+      };
+    },
+    untransform(row) {
+      if (!row) return null;
+      return {
+        alumno_documento: row.alumno_documento,
+        curso_id: row.curso_id || row.id_curso,
+        fecha_inscripcion: row.fecha_inscripcion
+      };
+    }
+  },
+
+  alumnos_identidades: {
+    toDb(item) {
+      if (!item) return null;
+      const doc = item.documento ? String(item.documento).trim() : '';
+      if (!doc) return null;
+      return {
+        documento: doc,
+        nombre: item.nombre || '',
+        whatsapp: item.whatsapp || doc,
+        grupo: item.grupo || 'General',
+        pin: item.pin ? String(item.pin) : ''
+      };
+    },
+    fromDb(data) {
+      return data;
+    }
+  },
+
+  interesados: {
+    toDb(item) {
+      if (!item) return null;
+      return {
+        id: item.id != null ? String(item.id) : undefined,
+        nombre: item.nombre || '',
+        telefono: item.telefono || item.celular || item.whatsapp || '',
+        whatsapp: item.whatsapp || item.telefono || item.celular || '',
+        direccion: item.direccion || '',
+        email: item.email || item.correo || '',
+        estudio_interes: item.estudio_interes || item.estudio || item.interes || 'Estudio Bíblico',
+        estado: item.estado || 'nuevo',
+        contactado: Boolean(item.contactado),
+        fecha: formatDateForDb(item.fecha),
+        notas: item.notas || ''
+      };
+    },
+    fromDb(data) {
+      if (!data) return data;
+      const mapRow = r => ({
+        ...r,
+        id: r.id != null ? String(r.id) : String(Date.now()),
+        nombre: r.nombre || '',
+        whatsapp: r.whatsapp || r.telefono || '',
+        telefono: r.telefono || r.whatsapp || '',
+        email: r.email || '',
+        contactado: Boolean(r.contactado),
+        fecha: r.fecha || r.fecha_contacto || ''
+      });
+      return Array.isArray(data) ? data.map(mapRow) : mapRow(data);
+    }
+  },
+
+  votos_encuestas: {
+    toDb(item) {
+      if (!item) return null;
+      return {
+        id: item.id != null ? String(item.id) : undefined,
+        encuesta_id: String(item.encuesta_id || item.encuestaId || ''),
+        usuario_identificador: String(item.usuario_identificador || item.usuario || ''),
+        opcion_index: Number(item.opcion_index ?? item.opcionIndex ?? 0),
+        fecha: formatDateForDb(item.fecha)
+      };
+    },
+    fromDb(data) {
+      return data;
+    }
   }
 };
+
+const _tableIgnoredCols = {};
+const _tableKnownCols = {};
+
+function _filterPayloadForTable(table, payload) {
+  if (!payload) return payload;
+  const ignored = _tableIgnoredCols[table];
+  const known = _tableKnownCols[table];
+  if (!ignored && !known) return payload;
+
+  const items = Array.isArray(payload) ? payload : [payload];
+  const cleaned = items.map(item => {
+    if (typeof item === 'object' && item !== null) {
+      const clone = { ...item };
+      if (ignored) {
+        ignored.forEach(col => { delete clone[col]; });
+      }
+      if (known && known.size > 0) {
+        Object.keys(clone).forEach(k => {
+          if (!known.has(k)) delete clone[k];
+        });
+      }
+      return clone;
+    }
+    return item;
+  });
+  return Array.isArray(payload) ? cleaned : cleaned[0];
+}
+
+function _safeInsertToSupabase(table, payload, retriesLeft = 4) {
+  if (!payload || (Array.isArray(payload) && payload.length === 0) || retriesLeft <= 0 || !window.supabaseClient) return;
+
+  const rawData = Array.isArray(payload) ? payload : [payload];
+  const dataToInsert = _filterPayloadForTable(table, rawData);
+
+  Promise.resolve(window.supabaseClient.from(table).insert(dataToInsert))
+    .then(({ error } = {}) => {
+      if (error) {
+        const matchCol = error.message && (
+          error.message.match(/Could not find the '([^']+)' column of/i) ||
+          error.message.match(/column "([^"]+)" of relation/i) ||
+          error.message.match(/column "([^"]+)" does not exist/i) ||
+          error.message.match(/column ([a-zA-Z0-9_]+) does not exist/i)
+        );
+        if (matchCol && matchCol[1]) {
+          const missingCol = matchCol[1];
+          if (!_tableIgnoredCols[table]) _tableIgnoredCols[table] = new Set();
+          _tableIgnoredCols[table].add(missingCol);
+          const cleanedPayload = dataToInsert.map(item => {
+            if (typeof item === 'object' && item !== null) {
+              const clone = { ...item };
+              delete clone[missingCol];
+              return clone;
+            }
+            return item;
+          });
+          return _safeInsertToSupabase(table, cleanedPayload, retriesLeft - 1);
+        }
+        const matchNotNull = error.message && error.message.match(/null value in column "([^"]+)"/i);
+        if (matchNotNull && matchNotNull[1]) {
+          const col = matchNotNull[1];
+          const cleanedPayload = dataToInsert.map(item => {
+            if (typeof item === 'object' && item !== null) {
+              const clone = { ...item };
+              if (clone[col] === null || clone[col] === undefined || clone[col] === '') {
+                if (col === 'numero_inventario' || col === 'numeroInventario') {
+                  clone[col] = String(clone.id || '1');
+                } else if (col === 'cant' || col === 'cantidad' || col === 'orden') {
+                  clone[col] = 1;
+                } else if (col === 'activo' || col === 'activa' || col === 'disponible') {
+                  clone[col] = true;
+                } else {
+                  clone[col] = String(clone.id || '-');
+                }
+              }
+              return clone;
+            }
+            return item;
+          });
+          return _safeInsertToSupabase(table, cleanedPayload, retriesLeft - 1);
+        }
+        if (error.message && error.message.includes('invalid input syntax for type integer')) {
+          const cleanedPayload = dataToInsert.map(item => {
+            if (typeof item === 'object' && item !== null) {
+              const clone = {};
+              for (const [k, v] of Object.entries(item)) {
+                if (v === '') {
+                  clone[k] = null;
+                } else if (k === 'id' && typeof v === 'string' && !isNaN(v) && v.trim() !== '') {
+                  clone[k] = Number(v);
+                } else {
+                  clone[k] = v;
+                }
+              }
+              return clone;
+            }
+            return item;
+          });
+          return _safeInsertToSupabase(table, cleanedPayload, retriesLeft - 1);
+        }
+        if (error.code !== '401_UNAUTHORIZED') {
+          console.warn(`[SupabaseSync] Nota al insertar en ${table}:`, error.message);
+        }
+      }
+    })
+    .catch(() => {});
+}
+
+/**
+ * Helper para reintentar inserciones/upserts omitiendo columnas que falten en el esquema
+ */
+function _safeUpsertToSupabase(table, payload, matchCol, retriesLeft = 4) {
+  if (!payload || payload.length === 0 || retriesLeft <= 0 || !window.supabaseClient) return;
+
+  const rawData = Array.isArray(payload) ? payload : [payload];
+  const filteredPayload = _filterPayloadForTable(table, rawData);
+  const options = matchCol && !matchCol.includes(',') ? { onConflict: matchCol } : undefined;
+
+  Promise.resolve(window.supabaseClient.from(table).upsert(filteredPayload, options))
+    .then(({ error } = {}) => {
+      if (error) {
+        const matchCol = error.message && (
+          error.message.match(/Could not find the '([^']+)' column of/i) ||
+          error.message.match(/column "([^"]+)" of relation/i) ||
+          error.message.match(/column "([^"]+)" does not exist/i) ||
+          error.message.match(/column ([a-zA-Z0-9_]+) does not exist/i)
+        );
+        if (matchCol && matchCol[1]) {
+          const missingCol = matchCol[1];
+          if (!_tableIgnoredCols[table]) _tableIgnoredCols[table] = new Set();
+          _tableIgnoredCols[table].add(missingCol);
+          const cleanedPayload = filteredPayload.map(item => {
+            if (typeof item === 'object' && item !== null) {
+              const clone = { ...item };
+              delete clone[missingCol];
+              return clone;
+            }
+            return item;
+          });
+          return _safeUpsertToSupabase(table, cleanedPayload, matchCol, retriesLeft - 1);
+        }
+        if (error.message && (
+          error.message.includes('unique or exclusion constraint') ||
+          error.message.includes('ON CONFLICT')
+        )) {
+          // Fallback a delete + insert si la tabla no tiene restricción UNIQUE en 'id'
+          return _safeInsertToSupabase(table, filteredPayload, retriesLeft - 1);
+        }
+        const matchNotNull = error.message && error.message.match(/null value in column "([^"]+)"/i);
+        if (matchNotNull && matchNotNull[1]) {
+          const col = matchNotNull[1];
+          const cleanedPayload = filteredPayload.map(item => {
+            if (typeof item === 'object' && item !== null) {
+              const clone = { ...item };
+              if (clone[col] === null || clone[col] === undefined || clone[col] === '') {
+                if (col === 'numero_inventario' || col === 'numeroInventario') {
+                  clone[col] = String(clone.id || '1');
+                } else if (col === 'cant' || col === 'cantidad' || col === 'orden') {
+                  clone[col] = 1;
+                } else if (col === 'activo' || col === 'activa' || col === 'disponible') {
+                  clone[col] = true;
+                } else {
+                  clone[col] = String(clone.id || '-');
+                }
+              }
+              return clone;
+            }
+            return item;
+          });
+          return _safeUpsertToSupabase(table, cleanedPayload, matchCol, retriesLeft - 1);
+        }
+        if (error.message && error.message.includes('invalid input syntax for type integer')) {
+          const cleanedPayload = filteredPayload.map(item => {
+            if (typeof item === 'object' && item !== null) {
+              const clone = {};
+              for (const [k, v] of Object.entries(item)) {
+                if (v === '') {
+                  clone[k] = null;
+                } else if (k === 'id' && typeof v === 'string' && !isNaN(v) && v.trim() !== '') {
+                  clone[k] = Number(v);
+                } else {
+                  clone[k] = v;
+                }
+              }
+              return clone;
+            }
+            return item;
+          });
+          return _safeUpsertToSupabase(table, cleanedPayload, matchCol, retriesLeft - 1);
+        }
+        if (error.code !== '401_UNAUTHORIZED') {
+          console.warn(`[SupabaseSync] Nota en ${table}:`, error.message);
+        }
+      }
+    })
+    .catch(() => {});
+}
 
 /**
  * Motor de Sincronización Transparente (Offline-First)
@@ -549,15 +922,20 @@ const SupabaseSync = {
       if (raw) localData = JSON.parse(raw);
     } catch (e) {}
 
-    if (window.supabaseClient) {
+    if (window.supabaseClient && connectionStatus.ok !== false) {
       window.supabaseClient.from(table).select('*').then(({ data, error }) => {
         if (!error && data) {
+          if (Array.isArray(data) && data.length > 0 && data[0] && typeof data[0] === 'object') {
+            _tableKnownCols[table] = new Set(Object.keys(data[0]));
+          }
           const customTransform = transformFromDb || (TABLE_TRANSFORMERS[table] ? TABLE_TRANSFORMERS[table].fromDb : null);
           const formatted = customTransform ? customTransform(data) : data;
           localStorage.setItem(key, JSON.stringify(formatted));
           window.dispatchEvent(new CustomEvent(`supabase_synced_${key}`, { detail: formatted }));
         }
-      }).catch(err => console.warn(`[SupabaseSync] Error leyendo ${table}:`, err));
+      }).catch(() => {
+        // Modo offline silencioso
+      });
     }
 
     return localData;
@@ -568,28 +946,77 @@ const SupabaseSync = {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (e) {}
 
-    if (!window.supabaseClient) return;
+    if (!window.supabaseClient || connectionStatus.ok === false) return;
 
     try {
       const matchCol = matchColOverride || TABLE_MATCH_COLS[table] || 'id';
       const transformer = transformToDb || (TABLE_TRANSFORMERS[table] ? TABLE_TRANSFORMERS[table].toDb : null);
-      let payload = Array.isArray(value) ? value : [value];
-      
-      if (transformer) {
-        payload = payload.map(item => transformer(item)).filter(Boolean);
-      }
-      
-      if (!payload || payload.length === 0) return;
 
-      window.supabaseClient.from(table).upsert(payload, { onConflict: matchCol })
-        .then(({ error }) => {
-          if (error) console.error(`[SupabaseSync] Error al guardar en ${table}:`, error);
-          else console.log(`[SupabaseSync] ✅ Sincronizado ${table}`);
-        })
-        .catch(err => console.warn(`[SupabaseSync] Error de red en ${table}:`, err));
+      let rawItems = [];
+      if (table === 'cronograma_predicadores' && typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        for (const [act, fechasObj] of Object.entries(value)) {
+          if (fechasObj && typeof fechasObj === 'object') {
+            for (const [f, val] of Object.entries(fechasObj)) {
+              if (val) {
+                const pred = typeof val === 'object' ? (val.predicador || val.nombre || '') : String(val);
+                const temaVal = typeof val === 'object' ? (val.tema || '') : '';
+                rawItems.push({
+                  id: `${act.replace(/\s+/g, '_')}_${f}`,
+                  actividad: act,
+                  culto_tipo: act,
+                  fecha: f,
+                  predicador: pred,
+                  tema: temaVal
+                });
+              }
+            }
+          }
+        }
+      } else if (Array.isArray(value)) {
+        rawItems = value;
+      } else if (typeof value === 'object' && value !== null) {
+        rawItems = Object.values(value);
+      } else if (value != null) {
+        rawItems = [value];
+      }
+
+      let payload = rawItems;
+      if (transformer) {
+        payload = rawItems.map(item => transformer(item)).filter(Boolean);
+      }
+
+      if (payload && payload.length > 0) {
+        _safeUpsertToSupabase(table, payload, matchCol);
+      }
+
+      this._syncDeletions(table, matchCol, payload || []);
     } catch (e) {
-      console.error(`[SupabaseSync] Excepción al guardar en ${table}:`, e);
+      console.warn(`[SupabaseSync] Error local en ${table}:`, e);
     }
+  },
+
+  _syncDeletions(table, matchCol, currentPayload) {
+    if (!window.supabaseClient || !matchCol || matchCol.includes(',') || connectionStatus.ok === false) return;
+
+    const currentIds = new Set(
+      (currentPayload || [])
+        .map(item => item && item[matchCol] != null ? String(item[matchCol]) : null)
+        .filter(Boolean)
+    );
+
+    Promise.resolve(window.supabaseClient.from(table).select(matchCol))
+      .then(({ data, error } = {}) => {
+        if (!error && Array.isArray(data)) {
+          const deletedIds = data
+            .map(row => row && row[matchCol] != null ? String(row[matchCol]) : null)
+            .filter(id => id && !currentIds.has(id));
+
+          if (deletedIds.length > 0) {
+            Promise.resolve(window.supabaseClient.from(table).delete().in(matchCol, deletedIds)).catch(() => {});
+          }
+        }
+      })
+      .catch(() => {});
   },
 
   insert(key, table, row, transformRow) {
@@ -604,20 +1031,16 @@ const SupabaseSync = {
       try { localStorage.setItem(key, JSON.stringify(localList)); } catch (e) {}
     }
 
-    if (!window.supabaseClient) return;
+    if (!window.supabaseClient || connectionStatus.ok === false) return;
 
     const transformer = transformRow || (TABLE_TRANSFORMERS[table] ? TABLE_TRANSFORMERS[table].toDb : null);
     const payload = transformer ? transformer(row) : row;
     
-    window.supabaseClient.from(table).insert([payload])
-      .then(({ error }) => {
-        if (error) console.error(`[SupabaseSync] Error al insertar en ${table}:`, error);
-        else console.log(`[SupabaseSync] ✅ Insertado en ${table}`);
-      })
-      .catch(err => console.warn(`[SupabaseSync] Error de red insertando en ${table}:`, err));
+    _safeInsertToSupabase(table, payload);
   },
 
   delete(key, table, colName, value) {
+    const col = colName || TABLE_MATCH_COLS[table] || 'id';
     let localList = [];
     try {
       const raw = localStorage.getItem(key);
@@ -625,19 +1048,62 @@ const SupabaseSync = {
     } catch (e) {}
 
     if (Array.isArray(localList)) {
-      localList = localList.filter(item => item && item[colName] !== value);
+      localList = localList.filter(item => item && String(item[col]) !== String(value));
+      try { localStorage.setItem(key, JSON.stringify(localList)); } catch (e) {}
+    } else if (typeof localList === 'object' && localList !== null) {
+      delete localList[value];
       try { localStorage.setItem(key, JSON.stringify(localList)); } catch (e) {}
     }
 
-    if (!window.supabaseClient) return;
+    if (!window.supabaseClient || connectionStatus.ok === false) return;
 
-    window.supabaseClient.from(table).delete().eq(colName, value)
-      .then(({ error }) => {
-        if (error) console.error(`[SupabaseSync] Error eliminando en ${table}:`, error);
-        else console.log(`[SupabaseSync] ✅ Eliminado de ${table}`);
-      })
-      .catch(err => console.warn(`[SupabaseSync] Error de red eliminando en ${table}:`, err));
+    try {
+      const query = window.supabaseClient.from(table).delete().eq(col, value);
+      Promise.resolve(query).catch(function(err) {
+        console.warn(`[SupabaseSync] Error al eliminar en ${table}:`, err);
+      });
+    } catch (e) {
+      console.warn(`[SupabaseSync] Error al preparar eliminación en ${table}:`, e);
+    }
   }
 };
 
 window.SupabaseSync = SupabaseSync;
+
+// Función integral para sincronizar todas las tablas locales a Supabase en 1 clic
+window.sincronizarTodoASupabase = async function(onProgress) {
+  if (!window.supabaseClient) {
+    return { ok: false, message: 'Supabase no está conectado.' };
+  }
+
+  const keysToSync = Object.entries(window.KEY_TO_TABLE || {});
+  let exitosos = 0;
+  let total = keysToSync.length;
+  let errores = [];
+
+  for (let i = 0; i < total; i++) {
+    const [key, table] = keysToSync[i];
+    if (onProgress) onProgress(i + 1, total, table);
+
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const val = JSON.parse(raw);
+        if (val) {
+          SupabaseSync.set(key, table, val);
+          exitosos++;
+        }
+      }
+    } catch (e) {
+      errores.push(`${table}: ${e.message}`);
+    }
+  }
+
+  return {
+    ok: errores.length === 0,
+    exitosos,
+    total,
+    errores,
+    message: `Sincronización finalizada: ${exitosos} tablas enviadas a Supabase.`
+  };
+};

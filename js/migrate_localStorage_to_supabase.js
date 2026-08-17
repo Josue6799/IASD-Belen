@@ -154,6 +154,27 @@ async function migrarLocalStorageASupabase() {
     else report.push(`✅ ${interesados.length} Interesados migrados`);
   }
 
+  // 8. Inscripciones Cursos LMS
+  const misCursos = helperParse('misCursos') || [];
+  if (misCursos.length > 0) {
+    let alumnoDoc = 'alumno_local';
+    const rawId = helperParse('alumnoIdentidad');
+    if (rawId && rawId.documento) alumnoDoc = String(rawId.documento).trim();
+
+    const inscripcionesPayload = misCursos.map(c => ({
+      alumno_documento: alumnoDoc,
+      id_curso: typeof c === 'string' ? c : (c.id_curso || c.curso || 'curso'),
+      progreso: typeof c === 'object' && c.progreso ? Number(c.progreso) : 0,
+      estado: typeof c === 'object' && c.estado ? c.estado : 'en_proceso'
+    }));
+
+    const { error } = await client
+      .from('inscripciones_cursos')
+      .upsert(inscripcionesPayload, { onConflict: 'alumno_documento,id_curso' });
+    if (error) console.error('❌ Error migrando inscripciones cursos:', error);
+    else report.push(`✅ ${inscripcionesPayload.length} Inscripciones de cursos migradas`);
+  }
+
   console.log('🎉 Migración completada:', report);
   alert('Migración a Supabase completada:\n\n' + (report.join('\n') || 'No se encontraron datos previos en localStorage para migrar.'));
 }

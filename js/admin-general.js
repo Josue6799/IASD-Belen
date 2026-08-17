@@ -210,6 +210,18 @@ const TARJETAS_ADMIN = [
             { texto: '🗑️ Quitar eventos', accion: 'quitarEvento' },
             { texto: '✏️ Editar anuncios', accion: 'editarAnuncios' },
         ]
+    },
+    {
+        id: 'basedatos_cloud',
+        icono: '🗄️',
+        titulo: 'Base de Datos (Supabase)',
+        descripcion: 'Configurar credenciales, probar conexión y sincronizar tablas',
+        color: '#2e7d32',
+        subopciones: [
+            { texto: '🔌 Configurar credenciales y probar conexión', accion: 'configurarSupabase' },
+            { texto: '🔄 Sincronizar datos locales con Supabase', accion: 'sincronizarSupabase' },
+            { texto: '📊 Estado de tablas en la nube', accion: 'estadoSupabase' }
+        ]
     }
 ];
 
@@ -310,7 +322,7 @@ function renderizarTarjetasAdmin() {
     if (!container) return;
 
     container.innerHTML = TARJETAS_ADMIN.map(tarjeta => `
-    <div id="tarjeta-${tarjeta.id}" class="tarjeta-admin" onclick="toggleSubmenuAdmin('${tarjeta.id}', event)">
+    <div id="tarjeta-${tarjeta.id}" class="tarjeta-admin" data-csp-click="toggleSubmenuAdmin('${tarjeta.id}', event)">
         <div style="
             width: 80px;
             height: 80px;
@@ -403,42 +415,42 @@ function toggleSubmenuAdmin(tarjetaId, event) {
     if (tarjetaId === 'iglesia') {
         html += `
         <div class="admin-menu-moderno">
-            <div class="admin-menu-item" onclick="ejecutarAccionAdmin('cronogramaIglesia', '📅 Cronograma', event)">
+            <div class="admin-menu-item" data-csp-click="ejecutarAccionAdmin('cronogramaIglesia', '📅 Cronograma', event)">
                 <div class="item-icono" style="background: var(--deep-blue);">
                     <i class="fas fa-calendar-alt" style="color: white; font-size: 1.2rem;"></i>
                 </div>
                 <span class="item-texto">Cronograma</span>
                 <i class="fas fa-chevron-right item-flecha"></i>
             </div>
-            <div class="admin-menu-item" onclick="ejecutarAccionAdmin('encuestasIglesia', '📋 Encuestas', event)">
+            <div class="admin-menu-item" data-csp-click="ejecutarAccionAdmin('encuestasIglesia', '📋 Encuestas', event)">
                 <div class="item-icono" style="background: linear-gradient(135deg, #d4a038 0%, #c9a53b 100%);">
                     <i class="fas fa-clipboard-list" style="color: white; font-size: 1.2rem;"></i>
                 </div>
                 <span class="item-texto">Encuestas</span>
                 <i class="fas fa-chevron-right item-flecha"></i>
             </div>
-            <div class="admin-menu-item" onclick="ejecutarAccionAdmin('calendarioIglesia', '📅 Calendario', event)">
+            <div class="admin-menu-item" data-csp-click="ejecutarAccionAdmin('calendarioIglesia', '📅 Calendario', event)">
                 <div class="item-icono" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%);">
                     <i class="fas fa-calendar-week" style="color: white; font-size: 1.2rem;"></i>
                 </div>
                 <span class="item-texto">Calendario</span>
                 <i class="fas fa-chevron-right item-flecha"></i>
             </div>
-            <div class="admin-menu-item" onclick="ejecutarAccionAdmin('gestionarTransmisiones', '📹 Gestionar Transmisiones', event)">
+            <div class="admin-menu-item" data-csp-click="ejecutarAccionAdmin('gestionarTransmisiones', '📹 Gestionar Transmisiones', event)">
                 <div class="item-icono" style="background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);">
                     <i class="fas fa-video" style="color: white; font-size: 1.2rem;"></i>
                 </div>
                 <span class="item-texto">Gestionar Transmisiones</span>
                 <i class="fas fa-chevron-right item-flecha"></i>
             </div>
-            <div class="admin-menu-item" onclick="ejecutarAccionAdmin('baseDatosIglesia', '🗄️ Base de datos', event)">
+            <div class="admin-menu-item" data-csp-click="ejecutarAccionAdmin('baseDatosIglesia', '🗄️ Base de datos', event)">
                 <div class="item-icono" style="background: var(--deep-blue);">
                     <i class="fas fa-database" style="color: white; font-size: 1.2rem;"></i>
                 </div>
                 <span class="item-texto">Base de datos</span>
                 <i class="fas fa-chevron-right item-flecha"></i>
             </div>
-            <div class="admin-menu-item" onclick="ejecutarAccionAdmin('verInteresados', '👥 Ver interesados', event)">
+            <div class="admin-menu-item" data-csp-click="ejecutarAccionAdmin('verInteresados', '👥 Ver interesados', event)">
                 <div class="item-icono" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%);">
                     <i class="fas fa-users" style="color: white; font-size: 1.2rem;"></i>
                 </div>
@@ -451,12 +463,12 @@ function toggleSubmenuAdmin(tarjetaId, event) {
         // === PARA CLUBES, BIBLIOTECA, ANUNCIOS (MANTENER EL BUCLE) ===
         tarjeta.subopciones.forEach(op => {
             if (op.esCategoria && op.clubNombre) {
-                html += `<div class="categoria-club" onclick="abrirModalClub('${op.clubNombre}', event)" style="margin-bottom: 0.8rem; border-bottom: 1px solid rgba(201,165,59,0.2); padding-bottom: 0.8rem;">
+                html += `<div class="categoria-club" data-csp-click="abrirModalClub('${op.clubNombre}', event)" style="margin-bottom: 0.8rem; border-bottom: 1px solid rgba(201,165,59,0.2); padding-bottom: 0.8rem;">
                     <span>${op.texto}</span>
                     <i class="fas fa-chevron-right" style="font-size:0.7rem; color:#c9a53b;"></i>
                 </div>`;
             } else {
-                html += `<div class="submenu-opcion" onclick="ejecutarAccionAdmin('${op.accion}', '${op.texto}', event)">
+                html += `<div class="submenu-opcion" data-csp-click="ejecutarAccionAdmin('${op.accion}', '${op.texto}', event)">
                     <i class="fas fa-circle" style="font-size:0.4rem;color:#c9a53b;flex-shrink:0;"></i>
                     ${op.texto}
                 </div>`;
@@ -512,9 +524,7 @@ function ejecutarAccionAdmin(accion, texto, event) {
             verificarAccesoSeccion('transmisiones', abrirModalGestionarTransmisiones);
             break;
         case 'baseDatosIglesia':
-            verificarAccesoSeccion('bd_iglesia', function () {
-                mostrarAlertaAdmin('Función de Base de datos en construcción');
-            });
+            verificarAccesoSeccion('bd_iglesia', abrirModalBaseDatos);
             break;
         case 'verInteresados':
             verificarAccesoSeccion('interesados', abrirVerInteresados);
@@ -538,6 +548,11 @@ function ejecutarAccionAdmin(accion, texto, event) {
             verificarAccesoSeccion('anuncios', function () {
                 mostrarAlertaAdmin('Función de Editar anuncios en construcción');
             });
+            break;
+        case 'configurarSupabase':
+        case 'sincronizarSupabase':
+        case 'estadoSupabase':
+            verificarAccesoSeccion('bd_iglesia', abrirModalBaseDatos);
             break;
         default:
             alert(`Función: ${texto}`);
@@ -857,7 +872,7 @@ function generarHTMLCalendarioClub(clubNombre) {
     const eventos = cargarEventosClub().sort((a, b) => a.fecha.localeCompare(b.fecha));
     let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">';
     html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;">📅 Calendario - ' + clubNombre + '</h3>';
-    html += '<button onclick="cerrarCalendarioClub()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver al Panel</button></div>';
+    html += '<button data-csp-click="cerrarCalendarioClub()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver al Panel</button></div>';
     html += '<div style="max-width:800px;margin:0 auto;padding:1rem;">';
     // formulario
     html += '<div style="background:white;border-radius:1.5rem;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 15px rgba(0,0,0,0.05);">';
@@ -869,13 +884,13 @@ function generarHTMLCalendarioClub(clubNombre) {
     html += '</div>';
     // Recurrencia
     html += '<div class="recurrencia-opcion">';
-    html += '<label><input type="checkbox" id="eventoClubRecurrente" onchange="toggleCampoRecurrencia()"> 📅 Repetir semanalmente</label>';
+    html += '<label><input type="checkbox" id="eventoClubRecurrente" data-csp-change="toggleCampoRecurrencia()"> 📅 Repetir semanalmente</label>';
     html += '</div>';
     html += '<div class="campo-recurrencia" id="campoRecurrencia">';
     html += '<label style="font-weight:600;color:#1a3a4a;">Semanas a repetir:</label>';
     html += '<input type="number" id="eventoClubSemanas" min="1" max="52" value="4">';
     html += '</div>';
-    html += '<button onclick="agregarEventoClubAdmin()" id="btnGuardarEventoClub" style="margin-top:0.8rem;width:100%;padding:0.8rem;background:linear-gradient(135deg,#d4a038 0%,#c9a53b 100%);color:#1a3a4a;border:none;border-radius:2rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;"><i class="fas fa-plus"></i> Agregar Evento</button>';
+    html += '<button data-csp-click="agregarEventoClubAdmin()" id="btnGuardarEventoClub" style="margin-top:0.8rem;width:100%;padding:0.8rem;background:linear-gradient(135deg,#d4a038 0%,#c9a53b 100%);color:#1a3a4a;border:none;border-radius:2rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;"><i class="fas fa-plus"></i> Agregar Evento</button>';
     html += '</div>';
     // lista
     html += '<div>';
@@ -887,8 +902,8 @@ function generarHTMLCalendarioClub(clubNombre) {
             html += '<div class="evento-info"><div class="evento-titulo">' + ev.titulo + '</div>';
             html += '<div class="evento-fecha">' + ev.fecha + ' a las ' + ev.hora + '</div></div>';
             html += '<div>';
-            html += '<button class="btn-editar-evento" onclick="abrirEditarEventoClub(' + ev.id + ')" title="Editar">✏️</button>';
-            html += '<button class="btn-eliminar-miembro" onclick="eliminarEventoClubAdmin(' + ev.id + ')" title="Quitar">🗑️</button>';
+            html += '<button class="btn-editar-evento" data-csp-click="abrirEditarEventoClub(' + ev.id + ')" title="Editar">✏️</button>';
+            html += '<button class="btn-eliminar-miembro" data-csp-click="eliminarEventoClubAdmin(' + ev.id + ')" title="Quitar">🗑️</button>';
             html += '</div>';
             html += '</div>';
         });
@@ -1035,10 +1050,26 @@ const CLUBES_STORAGE = {
     'Guías Mayores': 'cuotas_guias_mayores'
 };
 
+function obtenerNombreClubPorStorage(storageKey) {
+    if (storageKey === 'cuotas_conquistadores' || storageKey === 'bd_conquistadores' || storageKey === 'eventos_conquistadores') {
+        return 'Conquistadores';
+    }
+    if (storageKey === 'cuotas_guias_mayores' || storageKey === 'bd_guias_mayores' || storageKey === 'eventos_guias_mayores') {
+        return 'Guías Mayores';
+    }
+    return 'Aventureros';
+}
+
+function obtenerStorageKeyCuotasPorClub(clubNombre) {
+    if (clubNombre === 'Conquistadores') return 'cuotas_conquistadores';
+    if (clubNombre === 'Guías Mayores' || clubNombre === 'Guias Mayores') return 'cuotas_guias_mayores';
+    return 'cuotas_aventureros';
+}
+
 // Variable para almacenar la clave actual
 let storageKeyActual = '';
 
-// ===== FUNCIONES DEL MODAL DE CLUBES (SIN CAMBIOS) =====
+// ===== FUNCIONES DEL MODAL DE CLUBES =====
 
 function abrirModalClub(clubNombre, event) {
     if (event) event.stopPropagation();
@@ -1054,35 +1085,34 @@ function abrirModalClub(clubNombre, event) {
 }
 
 function cerrarModalClub(event) {
-    if (event && event.target !== document.getElementById('modalClubOpciones')) return;
+    if (event && event.target !== document.getElementById('modalClubOpciones') && event.target !== event.currentTarget) return;
     const modal = document.getElementById('modalClubOpciones');
     if (!modal) return;
     modal.classList.remove('active');
     document.body.style.overflow = '';
-    clubSeleccionadoActual = '';
 }
 
-// ===== FUNCIÓN PRINCIPAL DE CUOTAS (MEJORADA) =====
+// ===== FUNCIÓN PRINCIPAL DE CUOTAS =====
 function abrirCuotasClub() {
     const modal = document.getElementById('modalClubOpciones');
-    const clubActual = modal ? modal.dataset.club : clubSeleccionadoActual;
-    if (!clubActual) {
-        console.error('❌ No se encontró el club activo.');
-        return;
-    }
+    const clubActual = (modal && modal.dataset.club) ? modal.dataset.club : (clubSeleccionadoActual || 'Aventureros');
+    clubSeleccionadoActual = clubActual;
 
     let claveSeccion = 'cuotas_aventureros';
     if (clubActual === 'Conquistadores') claveSeccion = 'cuotas_conquistadores';
-    else if (clubActual === 'Guías Mayores') claveSeccion = 'cuotas_guias_mayores';
+    else if (clubActual === 'Guías Mayores' || clubActual === 'Guias Mayores') claveSeccion = 'cuotas_guias_mayores';
 
     verificarAccesoSeccion(claveSeccion, function () {
-        cerrarModalClub();
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
 
         const panel = document.getElementById('panelAdminGeneral');
         if (!panel) return;
 
-        storageKeyActual = CLUBES_STORAGE[clubActual] || 'cuotas_aventureros';
-        console.log('✅ Club:', clubActual, '→ Storage key:', storageKeyActual);
+        storageKeyActual = obtenerStorageKeyCuotasPorClub(clubActual);
+        console.log('✅ Abriendo Cuotas Club:', clubActual, '→ Storage key:', storageKeyActual);
 
         let seccionCuotas = document.getElementById('seccionCuotasClub');
         if (!seccionCuotas) {
@@ -1100,9 +1130,10 @@ function abrirCuotasClub() {
         setTimeout(function () {
             vincularEventosCuotas(storageKeyActual);
             actualizarTotalesCuotas(storageKeyActual);
-        }, 100);
+        }, 80);
     });
 }
+
 function cerrarSeccionCuotas() {
     const seccionCuotas = document.getElementById('seccionCuotasClub');
     const panel = document.getElementById('panelAdminGeneral');
@@ -1111,14 +1142,21 @@ function cerrarSeccionCuotas() {
     storageKeyActual = '';
 }
 
-// ===== FUNCIONES AUXILIARES DE CUOTAS (MODIFICADAS) =====
+// ===== FUNCIONES AUXILIARES DE CUOTAS =====
 
 function cargarCuotas(storageKey) {
-    return StorageHelper.get(storageKey || 'cuotas_aventureros', []);
+    const key = storageKey || storageKeyActual || 'cuotas_aventureros';
+    const datos = StorageHelper.get(key, []);
+    return Array.isArray(datos) ? datos : [];
 }
 
 function guardarCuotas(storageKey, datos) {
-    StorageHelper.set(storageKey || 'cuotas_aventureros', datos);
+    const key = storageKey || storageKeyActual || 'cuotas_aventureros';
+    const lista = Array.isArray(datos) ? datos : [];
+    StorageHelper.set(key, lista);
+    if (window.SupabaseSync) {
+        window.SupabaseSync.set(key, key, lista);
+    }
 }
 
 function generarMesesCuotas() {
@@ -1156,175 +1194,316 @@ function generarMesesCuotas() {
 
 function generarHTMLCuotas(clubNombre, miembros, storageKey) {
     const meses = generarMesesCuotas();
+    const lista = Array.isArray(miembros) ? miembros : [];
 
     // Encabezado (barra superior)
-    let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">';
-    html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;">💰 Cuotas - ' + clubNombre + '</h3>';
+    let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20;box-shadow:0 4px 15px rgba(0,0,0,0.15);">';
+    html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;display:flex;align-items:center;gap:0.5rem;"><i class="fas fa-coins"></i> Cuotas - ' + clubNombre + '</h3>';
     html += '<div style="display:flex;align-items:center;gap:0.8rem;">';
-    html += '<button class="btn-descargar-excel" onclick="descargarExcelCuotas()" title="Descargar Excel">📥 Descargar Excel</button>';
-    html += '<button onclick="cerrarSeccionCuotas()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver al Panel</button>';
+    html += '<button class="btn-descargar-excel" data-csp-click="descargarExcelCuotas()" title="Descargar Excel" style="background:#2e7d32;color:white;border:none;padding:0.5rem 1.2rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;font-size:0.85rem;display:inline-flex;align-items:center;gap:0.4rem;"><i class="fas fa-file-excel"></i> Descargar Excel</button>';
+    html += '<button data-csp-click="cerrarSeccionCuotas()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.4rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;font-size:0.85rem;display:inline-flex;align-items:center;gap:0.4rem;"><i class="fas fa-arrow-left"></i> Volver al Panel</button>';
     html += '</div>';
     html += '</div>';
 
-    html += '<div style="max-width:100%;margin:0 auto;padding:1rem;">';
+    html += '<div style="max-width:100%;margin:0 auto;padding:1.2rem;">';
 
     // Tarjetas de resumen
     html += '<div class="cuotas-resumen-grid">';
-    html += '<div class="cuotas-resumen-card"><div class="resumen-icono">👥</div><div class="resumen-titulo">Total de Miembros</div><div class="resumen-valor" id="cuotasTotalMiembros">' + miembros.length + '</div></div>';
+    html += '<div class="cuotas-resumen-card"><div class="resumen-icono">👥</div><div class="resumen-titulo">Total de Miembros</div><div class="resumen-valor" id="cuotasTotalMiembros">' + lista.length + '</div></div>';
     html += '<div class="cuotas-resumen-card"><div class="resumen-icono">💰</div><div class="resumen-titulo">Total Recaudado</div><div class="resumen-valor" id="cuotasTotalGeneral">$0</div></div>';
     html += '</div>';
 
     // Formulario agregar miembro
-    html += '<div class="cuotas-form-agregar"><input type="text" id="cuotasInputNombre" placeholder="Nombre completo del miembro..."><button id="cuotasBtnAgregar"><i class="fas fa-plus"></i> Agregar Miembro</button></div>';
+    html += '<div class="cuotas-form-agregar" style="display:flex;gap:0.8rem;margin-bottom:1.2rem;background:white;padding:1rem;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);align-items:center;">';
+    html += '<input type="text" id="cuotasInputNombre" placeholder="Nombre completo del nuevo miembro..." style="flex:1;padding:0.65rem 1rem;border:1px solid #d1d5db;border-radius:8px;font-size:0.95rem;outline:none;">';
+    html += '<button id="cuotasBtnAgregar" data-csp-click="agregarMiembroCuotas()" style="background:#0b2b4f;color:white;border:none;padding:0.65rem 1.5rem;border-radius:8px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:0.5rem;white-space:nowrap;"><i class="fas fa-plus"></i> Agregar Miembro</button>';
+    html += '</div>';
 
     // Tabla
-    html += '<div class="cuotas-tabla-wrapper"><table class="cuotas-tabla">';
+    html += '<div class="cuotas-tabla-wrapper" style="overflow-x:auto;background:white;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:1.5rem;"><table class="cuotas-tabla">';
     html += '<thead><tr>';
-    html += '<th class="col-nombres" rowspan="2">N°</th>';
-    html += '<th class="col-nombres" rowspan="2">NOMBRES</th>';
+    html += '<th class="col-nombres" rowspan="2" style="position:sticky;left:0;z-index:5;background:#1a3a4a;color:white;">N°</th>';
+    html += '<th class="col-nombres" rowspan="2" style="position:sticky;left:40px;z-index:5;background:#1a3a4a;color:white;min-width:180px;">NOMBRES</th>';
     meses.forEach(function (mes) {
-        html += '<th class="col-mes" colspan="' + (mes.domingos.length + 1) + '">' + mes.nombre + ' ' + mes.anio + '</th>';
+        html += '<th class="col-mes" colspan="' + (mes.domingos.length + 1) + '" style="text-align:center;background:#244a5e;color:#c9a53b;">' + mes.nombre + ' ' + mes.anio + '</th>';
     });
-    html += '<th class="col-total" rowspan="2">TOTAL<br>GENERAL</th>';
-    html += '<th class="col-acciones" rowspan="2"></th>';
+    html += '<th class="col-total" rowspan="2" style="background:#1a3a4a;color:#c9a53b;">TOTAL<br>GENERAL</th>';
+    html += '<th class="col-acciones" rowspan="2" style="background:#1a3a4a;color:white;">ACCIONES</th>';
     html += '</tr><tr>';
     meses.forEach(function (mes) {
         mes.domingos.forEach(function (d) {
-            html += '<th>' + d.fechaTexto + '</th>';
+            html += '<th style="font-size:0.75rem;padding:0.4rem 0.3rem;">' + d.fechaTexto + '</th>';
         });
-        html += '<th class="col-total">TOTAL</th>';
+        html += '<th class="col-total" style="font-size:0.75rem;font-weight:700;">TOTAL</th>';
     });
     html += '</tr></thead><tbody>';
 
-    miembros.forEach(function (miembro, idx) {
-        html += '<tr data-miembro-id="' + miembro.id + '">';
-        html += '<td class="col-nombres">' + (idx + 1) + '</td>';
-        html += '<td class="col-nombres">' + miembro.nombre + '</td>';
-        meses.forEach(function (mes) {
-            mes.domingos.forEach(function (d) {
-                const valor = (miembro.pagos && miembro.pagos[mes.clave] && miembro.pagos[mes.clave][d.numero]) ? miembro.pagos[mes.clave][d.numero] : '';
-                html += '<td><input type="number" class="cuotas-input" data-miembro="' + miembro.id + '" data-mes="' + mes.clave + '" data-domingo="' + d.numero + '" value="' + valor + '" placeholder="0" min="0"></td>';
+    if (lista.length === 0) {
+        html += '<tr><td colspan="100" style="text-align:center;padding:3rem 1rem;color:#6b7280;font-style:italic;">No hay miembros registrados en este club. Agrega el primer miembro arriba.</td></tr>';
+    } else {
+        lista.forEach(function (miembro, idx) {
+            const mId = String(miembro.id);
+            html += '<tr data-miembro-id="' + mId + '">';
+            html += '<td class="col-nombres" style="position:sticky;left:0;background:#f9fafb;font-weight:600;text-align:center;">' + (idx + 1) + '</td>';
+            html += '<td class="col-nombres" style="position:sticky;left:40px;background:#f9fafb;font-weight:600;">' + (miembro.nombre || 'Sin nombre') + '</td>';
+            meses.forEach(function (mes) {
+                mes.domingos.forEach(function (d) {
+                    const valor = (miembro.pagos && miembro.pagos[mes.clave] && miembro.pagos[mes.clave][d.numero] !== undefined) ? miembro.pagos[mes.clave][d.numero] : '';
+                    html += '<td style="padding:2px;"><input type="number" class="cuotas-input" data-miembro="' + mId + '" data-mes="' + mes.clave + '" data-domingo="' + d.numero + '" value="' + valor + '" placeholder="0" min="0" style="width:100%;min-width:55px;padding:4px;border:1px solid #e5e7eb;border-radius:4px;text-align:right;font-size:0.85rem;"></td>';
+                });
+                html += '<td class="col-total-miembro cuotas-total-mes" data-miembro="' + mId + '" data-mes="' + mes.clave + '" style="font-weight:700;color:#0b2b4f;text-align:right;padding:4px 8px;font-size:0.85rem;">$0</td>';
             });
-            html += '<td class="col-total-miembro cuotas-total-mes" data-miembro="' + miembro.id + '" data-mes="' + mes.clave + '">$0</td>';
+            html += '<td class="col-total-miembro cuotas-total-general" data-miembro="' + mId + '" style="font-weight:800;color:#2e7d32;text-align:right;padding:4px 8px;font-size:0.9rem;background:#f0fdf4;">$0</td>';
+            html += '<td class="col-acciones" style="text-align:center;padding:4px;"><button class="btn-eliminar-miembro" data-csp-click="eliminarMiembroCuotas(\'' + mId + '\')" title="Eliminar miembro" style="background:#fee2e2;color:#b91c1c;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:0.85rem;transition:all 0.2s;"><i class="fas fa-trash"></i></button></td>';
+            html += '</tr>';
         });
-        html += '<td class="col-total-miembro cuotas-total-general" data-miembro="' + miembro.id + '">$0</td>';
-        html += '<td class="col-acciones"><button class="btn-eliminar-miembro" onclick="eliminarMiembroCuotas(\'' + miembro.id + '\')" title="Eliminar miembro">🗑️</button></td>';
-        html += '</tr>';
-    });
+    }
     html += '</tbody></table></div>';
 
     // Totales anuales
-    html += '<div class="cuotas-totales-anuales" id="cuotasTotalesAnuales">';
-    html += '<div class="cuotas-anual-item"><span class="anual-label">Total recaudado 2026:</span> <span class="anual-valor" id="totalAnual2026">$0</span></div>';
-    html += '<div class="cuotas-anual-item"><span class="anual-label">Total recaudado 2027:</span> <span class="anual-valor" id="totalAnual2027">$0</span></div>';
+    html += '<div class="cuotas-totales-anuales" id="cuotasTotalesAnuales" style="display:flex;gap:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap;">';
+    html += '<div class="cuotas-anual-item" style="background:white;padding:1rem 1.5rem;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.05);flex:1;min-width:220px;"><span class="anual-label" style="font-size:0.9rem;color:#4b5563;font-weight:600;">Total recaudado 2026:</span> <span class="anual-valor" id="totalAnual2026" style="font-size:1.15rem;font-weight:800;color:#0b2b4f;margin-left:0.5rem;">$0</span></div>';
+    html += '<div class="cuotas-anual-item" style="background:white;padding:1rem 1.5rem;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.05);flex:1;min-width:220px;"><span class="anual-label" style="font-size:0.9rem;color:#4b5563;font-weight:600;">Total recaudado 2027:</span> <span class="anual-valor" id="totalAnual2027" style="font-size:1.15rem;font-weight:800;color:#0b2b4f;margin-left:0.5rem;">$0</span></div>';
     html += '</div>';
 
     // Botón guardar y cerrar
-    html += '<button class="btn-guardar-cuotas" onclick="guardarYCerrarCuotas()"><i class="fas fa-save"></i> Guardar y Cerrar</button>';
+    html += '<div style="display:flex;justify-content:flex-end;gap:1rem;">';
+    html += '<button class="btn-guardar-cuotas" data-csp-click="guardarYCerrarCuotas()" style="background:#2e7d32;color:white;border:none;padding:0.75rem 2rem;border-radius:8px;cursor:pointer;font-weight:700;font-size:1rem;display:inline-flex;align-items:center;gap:0.5rem;box-shadow:0 4px 12px rgba(46,125,50,0.3);"><i class="fas fa-save"></i> Guardar y Cerrar</button>';
+    html += '</div>';
+
     html += '</div>';
 
     return html;
 }
 
 function vincularEventosCuotas(storageKey) {
+    const key = storageKey || storageKeyActual;
     const btnAgregar = document.getElementById('cuotasBtnAgregar');
     const inputNombre = document.getElementById('cuotasInputNombre');
-    if (btnAgregar && inputNombre) {
-        btnAgregar.onclick = function () { agregarMiembroCuotas(); };
-        inputNombre.onkeydown = function (e) { if (e.key === 'Enter') agregarMiembroCuotas(); };
+    if (btnAgregar) {
+        btnAgregar.onclick = function (e) {
+            if (e) e.preventDefault();
+            agregarMiembroCuotas();
+        };
+    }
+    if (inputNombre) {
+        inputNombre.onkeydown = function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                agregarMiembroCuotas();
+            }
+        };
     }
     document.querySelectorAll('.cuotas-input').forEach(function (input) {
-        input.addEventListener('input', function () { actualizarTotalesCuotas(storageKey); });
+        input.addEventListener('input', function () {
+            actualizarTotalesCuotas(key);
+            guardarDatosActuales();
+        });
+        input.addEventListener('change', function () {
+            guardarDatosActuales();
+        });
     });
 }
 
 function guardarDatosActuales() {
-    if (!storageKeyActual) return;
-    const miembros = cargarCuotas(storageKeyActual);
+    const key = storageKeyActual || obtenerStorageKeyCuotasPorClub(clubSeleccionadoActual);
+    if (!key) return;
+
+    const miembros = cargarCuotas(key);
+    let hayCambios = false;
+
     miembros.forEach(function (miembro) {
         if (!miembro.pagos) miembro.pagos = {};
-        document.querySelectorAll('.cuotas-input[data-miembro="' + miembro.id + '"]').forEach(function (input) {
+        const mId = String(miembro.id);
+        document.querySelectorAll('.cuotas-input[data-miembro="' + mId + '"]').forEach(function (input) {
             const mesClave = input.getAttribute('data-mes');
-            const domingo = parseInt(input.getAttribute('data-domingo'));
-            if (!miembro.pagos[mesClave]) miembro.pagos[mesClave] = {};
-            miembro.pagos[mesClave][domingo] = parseFloat(input.value) || 0;
+            const domingo = parseInt(input.getAttribute('data-domingo'), 10);
+            if (!mesClave || isNaN(domingo)) return;
+
+            const rawVal = parseFloat(input.value);
+            if (!isNaN(rawVal) && rawVal > 0) {
+                if (!miembro.pagos[mesClave]) miembro.pagos[mesClave] = {};
+                if (miembro.pagos[mesClave][domingo] !== rawVal) {
+                    miembro.pagos[mesClave][domingo] = rawVal;
+                    hayCambios = true;
+                }
+            } else {
+                if (miembro.pagos[mesClave] && miembro.pagos[mesClave][domingo] !== undefined) {
+                    delete miembro.pagos[mesClave][domingo];
+                    hayCambios = true;
+                }
+            }
         });
     });
-    guardarCuotas(storageKeyActual, miembros);
+
+    if (hayCambios) {
+        guardarCuotas(key, miembros);
+    }
 }
 
 function agregarMiembroCuotas() {
-    if (!storageKeyActual) return;
+    const key = storageKeyActual || obtenerStorageKeyCuotasPorClub(clubSeleccionadoActual);
+    if (!key) return;
+
     const inputNombre = document.getElementById('cuotasInputNombre');
     if (!inputNombre) return;
     const nombre = inputNombre.value.trim();
-    if (!nombre) { alert('Por favor ingresa un nombre.'); return; }
+    if (!nombre) {
+        mostrarToastExitoClub('⚠️ Por favor ingresa el nombre del miembro');
+        return;
+    }
 
-    // ⭐ GUARDAR DATOS ACTUALES ANTES DE AGREGAR
+    // 1. Guardar datos actuales para preservar cualquier número ingresado en la tabla
     guardarDatosActuales();
 
-    const miembros = cargarCuotas(storageKeyActual);
-    miembros.push({ id: Date.now(), nombre: nombre, pagos: {} });
-    guardarCuotas(storageKeyActual, miembros);
+    // 2. Obtener lista actual de cuotas
+    const miembros = cargarCuotas(key);
+    const nuevoId = String(Date.now());
+    const nuevoMiembro = {
+        id: nuevoId,
+        nombre: nombre,
+        pagos: {}
+    };
+
+    miembros.push(nuevoMiembro);
+    guardarCuotas(key, miembros);
+
+    // 3. Conectar automáticamente con BD del club si corresponde
+    const bdKeyMap = {
+        'cuotas_aventureros': 'bd_aventureros',
+        'cuotas_conquistadores': 'bd_conquistadores',
+        'cuotas_guias_mayores': 'bd_guias_mayores'
+    };
+    const bdKey = bdKeyMap[key];
+    if (bdKey) {
+        const miembrosBD = cargarMiembrosBD(bdKey);
+        if (!miembrosBD.some(m => String(m.id) === nuevoId || (m.nombre && m.nombre.trim().toLowerCase() === nombre.toLowerCase()))) {
+            miembrosBD.push({
+                id: nuevoId,
+                nombre: nombre,
+                cc: '',
+                tipoSangre: '',
+                fechaNacimiento: '',
+                cartillas: '',
+                especialidades: ''
+            });
+            guardarMiembrosBD(bdKey, miembrosBD);
+        }
+    }
+
     inputNombre.value = '';
+
+    // 4. Re-renderizar sección
+    const clubNombre = clubSeleccionadoActual || obtenerNombreClubPorStorage(key);
     const seccionCuotas = document.getElementById('seccionCuotasClub');
-    seccionCuotas.innerHTML = generarHTMLCuotas(clubSeleccionadoActual, miembros, storageKeyActual);
-    setTimeout(function () {
-        vincularEventosCuotas(storageKeyActual);
-        actualizarTotalesCuotas(storageKeyActual);
-    }, 100);
+    if (seccionCuotas) {
+        seccionCuotas.innerHTML = generarHTMLCuotas(clubNombre, miembros, key);
+        setTimeout(function () {
+            vincularEventosCuotas(key);
+            actualizarTotalesCuotas(key);
+            const nuevoInput = document.getElementById('cuotasInputNombre');
+            if (nuevoInput) nuevoInput.focus();
+        }, 50);
+    }
+
+    mostrarToastExitoClub('✅ Miembro "' + nombre + '" agregado a ' + clubNombre);
 }
 
 function eliminarMiembroCuotas(miembroId) {
-    miembroPendienteEliminar = miembroId;
+    if (!miembroId) return;
+    miembroPendienteEliminar = String(miembroId);
+    storageKeyPendienteEliminar = storageKeyActual || obtenerStorageKeyCuotasPorClub(clubSeleccionadoActual);
+
+    const key = storageKeyPendienteEliminar;
+    const miembros = cargarCuotas(key);
+    const miembro = miembros.find(m => String(m.id) === String(miembroId));
+    const nombreMiembro = miembro ? miembro.nombre : 'este miembro';
+
     const modal = document.getElementById('modalConfirmarEliminar');
     if (modal) {
+        const msg = modal.querySelector('.modal-confirm-mensaje');
+        if (msg) {
+            msg.innerHTML = `¿Estás seguro de que deseas eliminar a <strong>${nombreMiembro}</strong> del sistema de cuotas? Se borrarán sus pagos registrados.`;
+        }
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
 }
 
 function confirmarEliminarMiembro() {
-    if (miembroPendienteEliminar === null || !storageKeyActual) return;
+    const key = storageKeyPendienteEliminar || storageKeyActual || obtenerStorageKeyCuotasPorClub(clubSeleccionadoActual);
     const miembroId = miembroPendienteEliminar;
-    let miembros = cargarCuotas(storageKeyActual);
-    miembros = miembros.filter(function (m) { return m.id !== miembroId; });
-    guardarCuotas(storageKeyActual, miembros);
+    if (!miembroId || !key) {
+        cerrarModalConfirmarEliminar();
+        return;
+    }
+
+    // 1. Guardar datos actuales antes de filtrar
+    guardarDatosActuales();
+
+    // 2. Filtrar miembro de la lista de cuotas
+    let miembros = cargarCuotas(key);
+    const miembroAEliminar = miembros.find(m => String(m.id) === String(miembroId));
+    const nombreEliminado = miembroAEliminar ? miembroAEliminar.nombre : 'Miembro';
+
+    miembros = miembros.filter(function (m) {
+        return String(m.id) !== String(miembroId);
+    });
+    guardarCuotas(key, miembros);
+
+    // 3. Sincronizar eliminación en Supabase
+    if (window.SupabaseSync) {
+        window.SupabaseSync.delete(key, key, 'id', String(miembroId));
+    }
+    if (window.supabaseClient) {
+        Promise.resolve(window.supabaseClient.from(key).delete().eq('id', String(miembroId))).catch(() => {});
+        if (!isNaN(miembroId)) {
+            Promise.resolve(window.supabaseClient.from(key).delete().eq('id', Number(miembroId))).catch(() => {});
+        }
+    }
+
+    // 4. Re-renderizar sección
+    const clubNombre = clubSeleccionadoActual || obtenerNombreClubPorStorage(key);
     const seccionCuotas = document.getElementById('seccionCuotasClub');
-    seccionCuotas.innerHTML = generarHTMLCuotas(clubSeleccionadoActual, miembros, storageKeyActual);
-    setTimeout(function () {
-        vincularEventosCuotas(storageKeyActual);
-        actualizarTotalesCuotas(storageKeyActual);
-    }, 100);
+    if (seccionCuotas) {
+        seccionCuotas.innerHTML = generarHTMLCuotas(clubNombre, miembros, key);
+        setTimeout(function () {
+            vincularEventosCuotas(key);
+            actualizarTotalesCuotas(key);
+        }, 50);
+    }
+
     cerrarModalConfirmarEliminar();
-    const toast = document.createElement('div');
-    toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#c62828;color:white;padding:1rem 2rem;border-radius:2rem;font-weight:600;z-index:99999;font-family:Inter,sans-serif;box-shadow:0 8px 30px rgba(198,40,40,0.4);';
-    toast.innerHTML = '<i class="fas fa-trash"></i> Miembro eliminado correctamente';
-    document.body.appendChild(toast);
-    setTimeout(function () { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.5s ease'; setTimeout(function () { toast.remove(); }, 500); }, 2000);
+    mostrarToastExitoClub('🗑️ ' + nombreEliminado + ' eliminado de ' + clubNombre);
 }
 
 function cerrarModalConfirmarEliminar(event) {
-    if (event && event.target !== document.getElementById('modalConfirmarEliminar')) return;
+    if (event && event.target !== document.getElementById('modalConfirmarEliminar') && event.target !== event.currentTarget) return;
     const modal = document.getElementById('modalConfirmarEliminar');
-    if (modal) { modal.classList.remove('active'); document.body.style.overflow = ''; }
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
     miembroPendienteEliminar = null;
+    storageKeyPendienteEliminar = null;
 }
 
 function actualizarTotalesCuotas(storageKey) {
-    const miembros = cargarCuotas(storageKey);
+    const key = storageKey || storageKeyActual || obtenerStorageKeyCuotasPorClub(clubSeleccionadoActual);
+    const miembros = cargarCuotas(key);
     let totalGeneral = 0;
     let totalAnual2026 = 0;
     let totalAnual2027 = 0;
 
     miembros.forEach(function (miembro) {
+        const mId = String(miembro.id);
         let totalMiembro = 0;
-        document.querySelectorAll('.cuotas-total-mes[data-miembro="' + miembro.id + '"]').forEach(function (td) {
+        document.querySelectorAll('.cuotas-total-mes[data-miembro="' + mId + '"]').forEach(function (td) {
             const mesClave = td.getAttribute('data-mes');
             let totalMes = 0;
-            const anioMes = parseInt(mesClave.split('_')[0]);
+            const anioMes = parseInt(mesClave.split('_')[0], 10);
 
-            document.querySelectorAll('.cuotas-input[data-miembro="' + miembro.id + '"][data-mes="' + mesClave + '"]').forEach(function (input) {
+            document.querySelectorAll('.cuotas-input[data-miembro="' + mId + '"][data-mes="' + mesClave + '"]').forEach(function (input) {
                 totalMes += parseFloat(input.value) || 0;
             });
 
@@ -1336,7 +1515,7 @@ function actualizarTotalesCuotas(storageKey) {
             else if (anioMes === 2027) totalAnual2027 += totalMes;
         });
 
-        const tdGeneral = document.querySelector('.cuotas-total-general[data-miembro="' + miembro.id + '"]');
+        const tdGeneral = document.querySelector('.cuotas-total-general[data-miembro="' + mId + '"]');
         if (tdGeneral) tdGeneral.textContent = '$' + totalMiembro.toLocaleString('es-CO');
         totalGeneral += totalMiembro;
     });
@@ -1355,19 +1534,20 @@ function actualizarTotalesCuotas(storageKey) {
 }
 
 function descargarExcelCuotas() {
-    if (!storageKeyActual) {
+    const key = storageKeyActual || obtenerStorageKeyCuotasPorClub(clubSeleccionadoActual);
+    if (!key) {
         alert('No hay ningún club seleccionado.');
         return;
     }
 
-    const miembros = cargarCuotas(storageKeyActual);
+    const miembros = cargarCuotas(key);
     if (miembros.length === 0) {
-        alert('No hay miembros para exportar.');
+        alert('No hay miembros para exportar en este club.');
         return;
     }
 
     const meses = generarMesesCuotas();
-    const clubNombre = Object.keys(CLUBES_STORAGE).find(k => CLUBES_STORAGE[k] === storageKeyActual) || 'Club';
+    const clubNombre = clubSeleccionadoActual || obtenerNombreClubPorStorage(key);
 
     // Construir el CSV
     let csv = 'N°;Nombre';
@@ -1383,7 +1563,7 @@ function descargarExcelCuotas() {
     let totalAnio2027 = 0;
 
     miembros.forEach((miembro, idx) => {
-        let row = (idx + 1) + ';' + miembro.nombre;
+        let row = (idx + 1) + ';' + (miembro.nombre || 'Sin nombre');
         let totalMiembro = 0;
         meses.forEach(mes => {
             let totalMes = 0;
@@ -1419,24 +1599,11 @@ function descargarExcelCuotas() {
 }
 
 function guardarYCerrarCuotas() {
-    if (!storageKeyActual) return;
-    const miembros = cargarCuotas(storageKeyActual);
-    miembros.forEach(function (miembro) {
-        if (!miembro.pagos) miembro.pagos = {};
-        document.querySelectorAll('.cuotas-input[data-miembro="' + miembro.id + '"]').forEach(function (input) {
-            const mesClave = input.getAttribute('data-mes');
-            const domingo = parseInt(input.getAttribute('data-domingo'));
-            if (!miembro.pagos[mesClave]) miembro.pagos[mesClave] = {};
-            miembro.pagos[mesClave][domingo] = parseFloat(input.value) || 0;
-        });
-    });
-    guardarCuotas(storageKeyActual, miembros);
+    if (storageKeyActual) {
+        guardarDatosActuales();
+    }
     cerrarSeccionCuotas();
-    const toast = document.createElement('div');
-    toast.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#2e7d32;color:white;padding:1rem 2rem;border-radius:2rem;font-weight:600;z-index:99999;font-family:Inter,sans-serif;box-shadow:0 8px 30px rgba(46,125,50,0.4);';
-    toast.innerHTML = '<i class="fas fa-check-circle"></i> Datos guardados correctamente';
-    document.body.appendChild(toast);
-    setTimeout(function () { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.5s ease'; setTimeout(function () { toast.remove(); }, 500); }, 2000);
+    mostrarToastExitoClub('✅ Cuotas guardadas correctamente');
 }
 
 // ===== VARIABLES GLOBALES PARA BASE DE DATOS =====
@@ -1510,7 +1677,7 @@ function guardarMiembrosBD(storageKey, datos) {
 function generarHTMLBaseDatos(clubNombre, miembros, storageKey) {
     let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">';
     html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;">🗄️ Base de datos - ' + clubNombre + '</h3>';
-    html += '<button onclick="cerrarSeccionBD()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver al Panel</button>';
+    html += '<button data-csp-click="cerrarSeccionBD()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver al Panel</button>';
     html += '</div>';
 
     html += '<div style="max-width:100%;margin:0 auto;padding:1rem;">';
@@ -1523,11 +1690,11 @@ function generarHTMLBaseDatos(clubNombre, miembros, storageKey) {
     // Buscador
     html += '<div class="bd-buscador-wrapper">';
     html += '<span class="bd-icono-buscar">🔍</span>';
-    html += '<input type="text" id="bdInputBuscar" placeholder="Buscar por nombre..." oninput="filtrarMiembrosBD(\'' + storageKey + '\')">';
+    html += '<input type="text" id="bdInputBuscar" placeholder="Buscar por nombre..." data-csp-input="filtrarMiembrosBD(\'' + storageKey + '\')">';
     html += '</div>';
 
     // Botón agregar
-    html += '<button class="btn-agregar-miembro" onclick="abrirModalAgregarMiembroBD(\'' + storageKey + '\')"><i class="fas fa-plus"></i> Agregar miembro</button>';
+    html += '<button class="btn-agregar-miembro" data-csp-click="abrirModalAgregarMiembroBD(\'' + storageKey + '\')"><i class="fas fa-plus"></i> Agregar miembro</button>';
 
     // Tabla
     html += '<div class="bd-tabla-wrapper"><table class="bd-tabla"><thead><tr>';
@@ -1553,8 +1720,8 @@ function generarFilaMiembroBD(miembro, storageKey) {
         '<td>' + (miembro.cartillas || '-') + '</td>' +
         '<td>' + (miembro.especialidades || '-') + '</td>' +
         '<td>' +
-        '<button class="btn-editar-miembro" onclick="abrirModalEditarMiembroBD(\'' + miembro.id + '\',\'' + storageKey + '\')" title="Editar">✏️</button>' +
-        '<button class="btn-eliminar-miembro" onclick="solicitarEliminarMiembroBD(\'' + miembro.id + '\',\'' + storageKey + '\')" title="Eliminar">🗑️</button>' +
+        '<button class="btn-editar-miembro" data-csp-click="abrirModalEditarMiembroBD(\'' + miembro.id + '\',\'' + storageKey + '\')" title="Editar">✏️</button>' +
+        '<button class="btn-eliminar-miembro" data-csp-click="solicitarEliminarMiembroBD(\'' + miembro.id + '\',\'' + storageKey + '\')" title="Eliminar">🗑️</button>' +
         '</td>' +
         '</tr>';
 }
@@ -2006,7 +2173,7 @@ function generarHTMLCronograma(mesAnno) {
                 <span style="color:rgba(255,255,255,0.7);font-size:0.85rem;">Asignación detallada para el cronograma de la iglesia</span>
             </div>
         </div>
-        <button onclick="cerrarCronograma()" style="background:rgba(255,255,255,0.18);color:white;border:1px solid rgba(255,255,255,0.3);padding:0.6rem 1.4rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;font-size:0.9rem;transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.18)'">
+        <button data-csp-click="cerrarCronograma()" style="background:rgba(255,255,255,0.18);color:white;border:1px solid rgba(255,255,255,0.3);padding:0.6rem 1.4rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;font-size:0.9rem;transition:all 0.2s ease;" data-csp-mouseover="this.style.background='rgba(255,255,255,0.3)'" data-csp-mouseout="this.style.background='rgba(255,255,255,0.18)'">
             <i class="fas fa-arrow-left"></i> Volver al Panel
         </button>
     </div>
@@ -2018,13 +2185,13 @@ function generarHTMLCronograma(mesAnno) {
                 <label style="font-weight:700;color:#1a3a4a;font-size:0.95rem;margin-right:0.8rem;display:block;margin-bottom:0.4rem;">
                     <i class="fas fa-calendar-day" style="color:#c9a53b;"></i> Seleccionar Mes y Año:
                 </label>
-                <input type="month" value="${mesAnno}" onchange="cambiarMesCronogramaAdmin(this.value)" style="padding:0.6rem 1rem;border:2px solid #e2e8f0;border-radius:0.8rem;font-family:Inter,sans-serif;font-size:1rem;font-weight:600;color:#1a3a4a;outline:none;cursor:pointer;">
+                <input type="month" value="${mesAnno}" data-csp-change="cambiarMesCronogramaAdmin(this.value)" style="padding:0.6rem 1rem;border:2px solid #e2e8f0;border-radius:0.8rem;font-family:Inter,sans-serif;font-size:1rem;font-weight:600;color:#1a3a4a;outline:none;cursor:pointer;">
             </div>
             <div style="display:flex;align-items:center;gap:1rem;">
                 <span style="font-size:1.1rem;font-weight:700;color:#2c5f7c;background:#f0f7ff;padding:0.5rem 1.2rem;border-radius:1rem;border:1px solid rgba(44,95,124,0.15);">
                     📆 ${mesNombre} ${ano}
                 </span>
-                <button onclick="guardarTodoElMes()" style="background:linear-gradient(135deg,#2e7d32 0%,#388e3c 100%);color:white;border:none;padding:0.75rem 1.6rem;border-radius:2rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;box-shadow:0 4px 15px rgba(46,125,50,0.3);transition:all 0.2s ease;">
+                <button data-csp-click="guardarTodoElMes()" style="background:linear-gradient(135deg,#2e7d32 0%,#388e3c 100%);color:white;border:none;padding:0.75rem 1.6rem;border-radius:2rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;box-shadow:0 4px 15px rgba(46,125,50,0.3);transition:all 0.2s ease;">
                     <i class="fas fa-save"></i> Guardar Todo el Mes
                 </button>
             </div>
@@ -2087,9 +2254,9 @@ function generarHTMLCronograma(mesAnno) {
                                data-fecha="${fechaStr}" 
                                value="${valorActual}" 
                                placeholder="Predicador o encargado..." 
-                               onblur="guardarPredicadorFecha('${actNombre}', '${fechaStr}', this.value)" 
+                               data-csp-blur="guardarPredicadorFecha('${actNombre}', '${fechaStr}', this.value)" 
                                style="flex:1;padding:0.45rem 0.8rem;border:1px solid #cbd5e1;border-radius:0.6rem;font-family:Inter,sans-serif;font-size:0.85rem;outline:none;transition:border-color 0.2s ease;" 
-                               onfocus="this.style.borderColor='#c9a53b'">
+                               data-csp-focus="this.style.borderColor='#c9a53b'">
                     </div>
                     `;
                 });
@@ -2098,7 +2265,7 @@ function generarHTMLCronograma(mesAnno) {
             html += `
                     </div>
                 </div>
-                <button onclick="guardarActividadMes('${actNombre}')" style="width:100%;background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);color:white;border:none;padding:0.6rem;border-radius:0.8rem;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s ease;">
+                <button data-csp-click="guardarActividadMes('${actNombre}')" style="width:100%;background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);color:white;border:none;padding:0.6rem;border-radius:0.8rem;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s ease;">
                     <i class="fas fa-save"></i> Guardar ${actNombre}
                 </button>
             </div>
@@ -2158,14 +2325,14 @@ function generarHTMLEncuestas() {
     const encuestas = cargarEncuestas();
     let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">';
     html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;">📋 Encuestas</h3>';
-    html += '<button onclick="cerrarEncuestas()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver</button></div>';
+    html += '<button data-csp-click="cerrarEncuestas()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver</button></div>';
     html += '<div style="max-width:800px;margin:0 auto;padding:1rem;">';
     // formulario
     html += '<div style="background:white;border-radius:1.5rem;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 4px 15px rgba(0,0,0,0.05);">';
     html += '<h4 style="color:#1a3a4a;margin-bottom:1rem;"><i class="fas fa-plus-circle"></i> Agregar Encuesta</h4>';
     html += '<input type="text" id="encuestaPregunta" placeholder="Pregunta" style="width:100%;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;margin-bottom:0.8rem;font-family:Inter,sans-serif;">';
     html += '<input type="text" id="encuestaOpciones" placeholder="Opciones (separadas por comas)" style="width:100%;padding:0.7rem 1rem;border:2px solid #e8e3d8;border-radius:1rem;margin-bottom:0.8rem;font-family:Inter,sans-serif;">';
-    html += '<button onclick="agregarEncuesta()" style="width:100%;padding:0.8rem;background:linear-gradient(135deg,#d4a038 0%,#c9a53b 100%);color:#1a3a4a;border:none;border-radius:2rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;"><i class="fas fa-plus"></i> Agregar Encuesta</button>';
+    html += '<button data-csp-click="agregarEncuesta()" style="width:100%;padding:0.8rem;background:linear-gradient(135deg,#d4a038 0%,#c9a53b 100%);color:#1a3a4a;border:none;border-radius:2rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;"><i class="fas fa-plus"></i> Agregar Encuesta</button>';
     html += '</div>';
     // lista
     encuestas.forEach(enc => {
@@ -2176,7 +2343,7 @@ function generarHTMLEncuestas() {
             html += '<div class="opcion-badge">' + op + ' <span class="votos-count">' + (enc.votos[i] || 0) + '</span></div>';
         });
         html += '</div>';
-        html += '<button class="btn-eliminar-miembro" onclick="eliminarEncuesta(' + enc.id + ')" style="float:right;">🗑️</button>';
+        html += '<button class="btn-eliminar-miembro" data-csp-click="eliminarEncuesta(' + enc.id + ')" style="float:right;">🗑️</button>';
         html += '<div style="clear:both;"></div>';
         html += '</div>';
     });
@@ -2412,29 +2579,46 @@ function guardarPedidos(pedidos) {
 // --- Agregar / Editar Libro ---
 function abrirModalAgregarLibro() {
     libroPendienteEditarId = null;
+    const libros = cargarLibros();
+    
+    // Auto-calcular siguiente ID numérico sugerido
+    let nextId = 1;
+    if (Array.isArray(libros) && libros.length > 0) {
+        const numIds = libros.map(l => Number(l.id)).filter(n => !isNaN(n) && n > 0);
+        nextId = numIds.length > 0 ? (Math.max(...numIds) + 1) : (libros.length + 1);
+    }
+
     const inputId = document.getElementById('inputIdLibro');
     if (inputId) {
-        inputId.value = '';
+        inputId.value = nextId;
         inputId.disabled = false;
     }
-    document.getElementById('inputTituloLibro').value = '';
-    document.getElementById('inputCantidadLibro').value = '1';
-    document.getElementById('inputAutorLibro').value = '';
-    document.getElementById('inputCategoriaLibro').value = '';
-    document.getElementById('inputEstadoLibro').value = 'Disponible';
-    document.getElementById('inputUbicacionLibro').value = '';
+    const inpTitulo = document.getElementById('inputTituloLibro');
+    if (inpTitulo) inpTitulo.value = '';
+    const inpCant = document.getElementById('inputCantidadLibro');
+    if (inpCant) inpCant.value = '1';
+    const inpAutor = document.getElementById('inputAutorLibro');
+    if (inpAutor) inpAutor.value = '';
+    const inpCat = document.getElementById('inputCategoriaLibro');
+    if (inpCat) inpCat.value = '';
+    const inpEstado = document.getElementById('inputEstadoLibro');
+    if (inpEstado) inpEstado.value = 'Disponible';
+    const inpUbi = document.getElementById('inputUbicacionLibro');
+    if (inpUbi) inpUbi.value = '';
 
     const tituloEl = document.getElementById('modalBiblioTitulo');
     const btnEl = document.getElementById('btnGuardarLibro');
     if (tituloEl) tituloEl.innerHTML = '<i class="fas fa-plus-circle"></i> Agregar Libro';
     if (btnEl) btnEl.innerHTML = '<i class="fas fa-save"></i> Guardar Libro';
 
-    document.getElementById('modalAgregarLibro').classList.add('active');
+    const modal = document.getElementById('modalAgregarLibro');
+    if (modal) modal.classList.add('active');
 }
 
 function cerrarModalAgregarLibro(event) {
-    if (event && event.target !== document.getElementById('modalAgregarLibro')) return;
-    document.getElementById('modalAgregarLibro').classList.remove('active');
+    if (event && event.target && event.target !== document.getElementById('modalAgregarLibro')) return;
+    const modal = document.getElementById('modalAgregarLibro');
+    if (modal) modal.classList.remove('active');
     libroPendienteEditarId = null;
 }
 
@@ -2449,12 +2633,18 @@ function abrirModalEditarLibro(id) {
         inputId.disabled = true;
     }
 
-    document.getElementById('inputTituloLibro').value = libro.titulo || '';
-    document.getElementById('inputCantidadLibro').value = libro.cant || libro.cantidad || 1;
-    document.getElementById('inputAutorLibro').value = libro.autor || '';
-    document.getElementById('inputCategoriaLibro').value = libro.cat || libro.categoria || '';
-    document.getElementById('inputEstadoLibro').value = libro.estado || 'Disponible';
-    document.getElementById('inputUbicacionLibro').value = libro.ubi || libro.ubicacion || '';
+    const inpTitulo = document.getElementById('inputTituloLibro');
+    if (inpTitulo) inpTitulo.value = libro.titulo || '';
+    const inpCant = document.getElementById('inputCantidadLibro');
+    if (inpCant) inpCant.value = libro.cant || libro.cantidad || 1;
+    const inpAutor = document.getElementById('inputAutorLibro');
+    if (inpAutor) inpAutor.value = libro.autor || '';
+    const inpCat = document.getElementById('inputCategoriaLibro');
+    if (inpCat) inpCat.value = libro.cat || libro.categoria || '';
+    const inpEstado = document.getElementById('inputEstadoLibro');
+    if (inpEstado) inpEstado.value = libro.estado || 'Disponible';
+    const inpUbi = document.getElementById('inputUbicacionLibro');
+    if (inpUbi) inpUbi.value = libro.ubi || libro.ubicacion || '';
 
     libroPendienteEditarId = id;
 
@@ -2467,38 +2657,36 @@ function abrirModalEditarLibro(id) {
     const modalEliminar = document.getElementById('modalEliminarLibro');
     if (modalEliminar) modalEliminar.classList.remove('active');
 
-    document.getElementById('modalAgregarLibro').classList.add('active');
+    const modal = document.getElementById('modalAgregarLibro');
+    if (modal) modal.classList.add('active');
 }
 
 function guardarNuevoLibro() {
     const inputId = document.getElementById('inputIdLibro');
-    const idVal = inputId ? inputId.value.trim() : '';
-    const titulo = document.getElementById('inputTituloLibro').value.trim();
-    const cantidad = parseInt(document.getElementById('inputCantidadLibro').value) || 1;
-    const autor = document.getElementById('inputAutorLibro').value.trim();
-    const categoria = document.getElementById('inputCategoriaLibro').value.trim() || 'General';
-    const estado = document.getElementById('inputEstadoLibro').value;
-    const ubicacion = document.getElementById('inputUbicacionLibro').value.trim();
+    let idVal = inputId ? inputId.value.trim() : '';
+    const titulo = (document.getElementById('inputTituloLibro') ? document.getElementById('inputTituloLibro').value : '').trim();
+    const cantidad = parseInt(document.getElementById('inputCantidadLibro') ? document.getElementById('inputCantidadLibro').value : '1') || 1;
+    const autor = (document.getElementById('inputAutorLibro') ? document.getElementById('inputAutorLibro').value : '').trim();
+    const categoria = (document.getElementById('inputCategoriaLibro') ? document.getElementById('inputCategoriaLibro').value : '').trim() || 'General';
+    const estado = (document.getElementById('inputEstadoLibro') ? document.getElementById('inputEstadoLibro').value : '') || 'Disponible';
+    const ubicacion = (document.getElementById('inputUbicacionLibro') ? document.getElementById('inputUbicacionLibro').value : '').trim() || 'Biblioteca';
 
-    if (!idVal) {
-        mostrarAlertaAdmin('⚠️ El ID del libro es obligatorio.');
-        return;
-    }
-
-    if (!titulo || !autor) {
-        mostrarAlertaAdmin('⚠️ El título y el autor son campos obligatorios.');
+    if (!titulo) {
+        mostrarAlertaAdmin('⚠️ El título del libro es obligatorio.');
         return;
     }
 
     const libros = cargarLibros();
+    let idFinal;
 
     if (libroPendienteEditarId !== null) {
+        idFinal = libroPendienteEditarId;
         const idx = libros.findIndex(l => String(l.id) === String(libroPendienteEditarId));
         if (idx !== -1) {
             libros[idx].titulo = titulo;
             libros[idx].cantidad = cantidad;
             libros[idx].cant = cantidad;
-            libros[idx].autor = autor;
+            libros[idx].autor = autor || 'Autor Desconocido';
             libros[idx].categoria = categoria;
             libros[idx].cat = categoria;
             libros[idx].estado = estado;
@@ -2507,21 +2695,26 @@ function guardarNuevoLibro() {
         }
         libroPendienteEditarId = null;
     } else {
-        // Verificar que no exista otro libro con el mismo ID
-        const existe = libros.some(l => String(l.id).toLowerCase() === idVal.toLowerCase());
-        if (existe) {
-            mostrarAlertaAdmin('⚠️ Ya existe un libro con este ID. Por favor, ingresa un ID diferente.');
-            return;
+        if (!idVal) {
+            const numIds = libros.map(l => Number(l.id)).filter(n => !isNaN(n) && n > 0);
+            idVal = numIds.length > 0 ? (Math.max(...numIds) + 1) : (libros.length + 1);
         }
 
-        const idFinal = isNaN(idVal) ? idVal : Number(idVal);
+        // Si ya existe un libro con este ID, auto-asignar siguiente ID libre
+        const existe = libros.some(l => String(l.id).toLowerCase() === String(idVal).toLowerCase());
+        if (existe) {
+            const numIds = libros.map(l => Number(l.id)).filter(n => !isNaN(n) && n > 0);
+            idVal = numIds.length > 0 ? (Math.max(...numIds) + 1) : (Date.now());
+        }
+
+        idFinal = (!isNaN(idVal) && String(idVal).trim() !== '') ? Number(idVal) : idVal;
 
         libros.push({
             id: idFinal,
             titulo: titulo,
             cantidad: cantidad,
             cant: cantidad,
-            autor: autor,
+            autor: autor || 'Autor Desconocido',
             categoria: categoria,
             cat: categoria,
             estado: estado,
@@ -2531,11 +2724,18 @@ function guardarNuevoLibro() {
     }
 
     guardarLibros(libros);
+
     cerrarModalAgregarLibro();
     mostrarToastBiblio('<i class="fas fa-check-circle"></i> Libro guardado correctamente');
 
-    // Refrescar lista de gestión si está abierta
+    _librosFiltrados = cargarLibros();
     filtrarEliminarLibro();
+    if (typeof renderizarSeccionVerPedidos === 'function') {
+        renderizarSeccionVerPedidos();
+    }
+    if (typeof renderizarCatalogo === 'function') {
+        renderizarCatalogo();
+    }
 }
 
 // --- Toast de Biblioteca ---
@@ -2548,7 +2748,7 @@ function mostrarToastBiblio(mensaje, bg = '#2e7d32') {
         toast.style.opacity = '0';
         toast.style.transition = 'opacity 0.5s ease';
         setTimeout(function () { toast.remove(); }, 500);
-    }, 2000);
+    }, 2200);
 }
 
 // --- Gestor / Eliminar / Editar Libros ---
@@ -2558,13 +2758,31 @@ function abrirModalEliminarLibro() {
     _librosFiltrados = cargarLibros();
     const buscador = document.getElementById('buscadorEliminarLibro');
     if (buscador) buscador.value = '';
-    document.getElementById('modalEliminarLibro').classList.add('active');
+    const modal = document.getElementById('modalEliminarLibro');
+    if (modal) modal.classList.add('active');
     renderizarEliminarLibro(_librosFiltrados);
+
+    // Cargar datos frescos desde Supabase en segundo plano si está disponible
+    if (window.supabaseClient) {
+        window.supabaseClient.from('libros').select('*').then(({ data, error }) => {
+            if (!error && Array.isArray(data) && data.length > 0) {
+                const transformer = (window.TABLE_TRANSFORMERS && window.TABLE_TRANSFORMERS.libros) ? window.TABLE_TRANSFORMERS.libros.fromDb : null;
+                const items = transformer ? transformer(data) : data;
+                localStorage.setItem('libros_biblioteca', JSON.stringify(items));
+                _librosFiltrados = items;
+                const modalActivo = document.getElementById('modalEliminarLibro');
+                if (modalActivo && modalActivo.classList.contains('active')) {
+                    filtrarEliminarLibro();
+                }
+            }
+        }).catch(() => {});
+    }
 }
 
 function cerrarModalEliminarLibro(event) {
-    if (event && event.target !== document.getElementById('modalEliminarLibro')) return;
-    document.getElementById('modalEliminarLibro').classList.remove('active');
+    if (event && event.target && event.target !== document.getElementById('modalEliminarLibro')) return;
+    const modal = document.getElementById('modalEliminarLibro');
+    if (modal) modal.classList.remove('active');
 }
 
 function filtrarEliminarLibro() {
@@ -2572,9 +2790,10 @@ function filtrarEliminarLibro() {
     const termino = buscador ? buscador.value.trim().toLowerCase() : '';
     const libros = cargarLibros();
     _librosFiltrados = libros.filter(l =>
-        (l.titulo && l.titulo.toLowerCase().includes(termino)) ||
-        (l.autor && l.autor.toLowerCase().includes(termino)) ||
-        ((l.categoria || l.cat) && (l.categoria || l.cat).toLowerCase().includes(termino))
+        (l.titulo && String(l.titulo).toLowerCase().includes(termino)) ||
+        (l.autor && String(l.autor).toLowerCase().includes(termino)) ||
+        ((l.categoria || l.cat) && String(l.categoria || l.cat).toLowerCase().includes(termino)) ||
+        (l.id && String(l.id).toLowerCase().includes(termino))
     );
     renderizarEliminarLibro(_librosFiltrados);
 }
@@ -2583,39 +2802,39 @@ function renderizarEliminarLibro(libros) {
     const contenedor = document.getElementById('listaEliminarLibros');
     if (!contenedor) return;
 
-    if (libros.length === 0) {
+    if (!libros || libros.length === 0) {
         contenedor.innerHTML = '<p style="text-align:center; color:#5a6474; padding:2rem 1rem;">No se encontraron libros registrados.</p>';
         return;
     }
 
-    let html = '<div style="overflow-x:auto;"><table class="tabla-libros" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:600px;">';
+    let html = '<div class="tabla-contenedor-scroll" style="overflow-x:auto; -webkit-overflow-scrolling:touch; width:100%;"><table class="tabla-libros" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:680px;">';
     html += '<thead><tr style="background:#1a3a4a; color:white; text-align:left;">';
-    html += '<th style="padding:0.7rem;"># Inv.</th>';
-    html += '<th style="padding:0.7rem;">Título</th>';
-    html += '<th style="padding:0.7rem;">Autor</th>';
-    html += '<th style="padding:0.7rem; text-align:center;">Cant.</th>';
-    html += '<th style="padding:0.7rem;">Estado</th>';
-    html += '<th style="padding:0.7rem; text-align:center;">Acciones</th>';
+    html += '<th style="padding:0.75rem 0.6rem;"># ID</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Título</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Autor</th>';
+    html += '<th style="padding:0.75rem 0.6rem; text-align:center;">Cant.</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Estado</th>';
+    html += '<th style="padding:0.75rem 0.6rem; text-align:center;">Acciones</th>';
     html += '</tr></thead><tbody>';
 
     libros.forEach((lib, index) => {
         const bgRow = index % 2 === 0 ? '#ffffff' : '#f9f8f5';
-        const numInv = lib.numero_inventario ? `#${lib.numero_inventario}` : `#${index + 1}`;
+        const numInv = lib.numero_inventario ? `#${lib.numero_inventario}` : (lib.id ? `#${lib.id}` : `#${index + 1}`);
         const cant = lib.cant || lib.cantidad || 1;
         const estado = lib.estado || 'Disponible';
         const estadoBadgeClass = estado === 'Disponible'
-            ? 'background:#e8f5e9; color:#2e7d32; padding:0.2rem 0.6rem; border-radius:1rem; font-weight:600; font-size:0.75rem;'
-            : 'background:#fff3e0; color:#e65100; padding:0.2rem 0.6rem; border-radius:1rem; font-weight:600; font-size:0.75rem;';
+            ? 'background:#e8f5e9; color:#2e7d32; padding:0.25rem 0.65rem; border-radius:1rem; font-weight:600; font-size:0.75rem;'
+            : 'background:#fff3e0; color:#e65100; padding:0.25rem 0.65rem; border-radius:1rem; font-weight:600; font-size:0.75rem;';
 
         html += `<tr style="background:${bgRow}; border-bottom:1px solid #eee;">
-            <td style="padding:0.7rem; font-weight:600; color:#5a6474;">${numInv}</td>
-            <td style="padding:0.7rem; font-weight:600; color:#1a3a4a;">${lib.titulo}</td>
-            <td style="padding:0.7rem; color:#5a6474;">${lib.autor || '-'}</td>
-            <td style="padding:0.7rem; text-align:center; font-weight:600;">${cant}</td>
-            <td style="padding:0.7rem;"><span style="${estadoBadgeClass}">${estado}</span></td>
-            <td style="padding:0.7rem; text-align:center; white-space:nowrap;">
-                <button type="button" onclick="abrirModalEditarLibro('${lib.id}')" style="background:#f0a800; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;" title="Editar libro">✏️ Editar</button>
-                <button type="button" onclick="confirmarEliminarLibro('${lib.id}')" style="background:#c62828; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar libro">🗑️ Eliminar</button>
+            <td style="padding:0.7rem 0.6rem; font-weight:600; color:#5a6474;">${numInv}</td>
+            <td style="padding:0.7rem 0.6rem; font-weight:600; color:#1a3a4a;">${lib.titulo || 'Sin título'}</td>
+            <td style="padding:0.7rem 0.6rem; color:#5a6474;">${lib.autor || '-'}</td>
+            <td style="padding:0.7rem 0.6rem; text-align:center; font-weight:600;">${cant}</td>
+            <td style="padding:0.7rem 0.6rem;"><span style="${estadoBadgeClass}">${estado}</span></td>
+            <td style="padding:0.7rem 0.6rem; text-align:center; white-space:nowrap;">
+                <button type="button" data-csp-click="abrirModalEditarLibro('${lib.id}')" style="background:#f0a800; color:white; border:none; padding:0.4rem 0.8rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;" title="Editar libro">✏️ Editar</button>
+                <button type="button" data-csp-click="confirmarEliminarLibro('${lib.id}')" style="background:#c62828; color:white; border:none; padding:0.4rem 0.8rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar libro">🗑️ Eliminar</button>
             </td>
         </tr>`;
     });
@@ -2632,11 +2851,26 @@ function confirmarEliminarLibro(id) {
     mostrarConfirmAdmin(`¿Estás seguro de que deseas eliminar <strong>"${tituloLibro}"</strong> de la biblioteca?`, 'Eliminar libro', function () {
         let nuevosLibros = cargarLibros().filter(l => String(l.id) !== String(id));
         guardarLibros(nuevosLibros);
+        
+        // Sincronizar borrado con Supabase
         if (window.SupabaseSync) {
             window.SupabaseSync.delete('libros_biblioteca', 'libros', 'id', String(id));
         }
+        if (window.supabaseClient) {
+            Promise.resolve(window.supabaseClient.from('libros').delete().eq('id', String(id))).catch(() => {});
+            if (!isNaN(id)) {
+                Promise.resolve(window.supabaseClient.from('libros').delete().eq('id', Number(id))).catch(() => {});
+            }
+        }
+
         _librosFiltrados = nuevosLibros;
         filtrarEliminarLibro();
+        if (typeof renderizarSeccionVerPedidos === 'function') {
+            renderizarSeccionVerPedidos();
+        }
+        if (typeof renderizarCatalogo === 'function') {
+            renderizarCatalogo();
+        }
         mostrarToastBiblio('<i class="fas fa-trash"></i> Libro eliminado correctamente', '#c62828');
     });
 }
@@ -2651,13 +2885,43 @@ function abrirModalVerPedidos() {
 
     actualizarTabsSeccionVerPedidos();
     actualizarBotonesTabPedidos();
-    document.getElementById('modalVerPedidos').classList.add('active');
+    const modal = document.getElementById('modalVerPedidos');
+    if (modal) modal.classList.add('active');
     renderizarSeccionVerPedidos();
+
+    // Sincronizar datos frescos en segundo plano
+    if (window.supabaseClient) {
+        Promise.all([
+            window.supabaseClient.from('libros').select('*'),
+            window.supabaseClient.from('pedidos_libros').select('*')
+        ]).then(([resLibros, resPedidos]) => {
+            let actualizo = false;
+            if (resLibros && !resLibros.error && Array.isArray(resLibros.data) && resLibros.data.length > 0) {
+                const transformer = (window.TABLE_TRANSFORMERS && window.TABLE_TRANSFORMERS.libros) ? window.TABLE_TRANSFORMERS.libros.fromDb : null;
+                const items = transformer ? transformer(resLibros.data) : resLibros.data;
+                localStorage.setItem('libros_biblioteca', JSON.stringify(items));
+                actualizo = true;
+            }
+            if (resPedidos && !resPedidos.error && Array.isArray(resPedidos.data)) {
+                const transformer = (window.TABLE_TRANSFORMERS && window.TABLE_TRANSFORMERS.pedidos_libros) ? window.TABLE_TRANSFORMERS.pedidos_libros.fromDb : null;
+                const items = transformer ? transformer(resPedidos.data) : resPedidos.data;
+                localStorage.setItem('libros_pedidos', JSON.stringify(items));
+                actualizo = true;
+            }
+            if (actualizo) {
+                const modalActivo = document.getElementById('modalVerPedidos');
+                if (modalActivo && modalActivo.classList.contains('active')) {
+                    renderizarSeccionVerPedidos();
+                }
+            }
+        }).catch(() => {});
+    }
 }
 
 function cerrarModalVerPedidos(event) {
-    if (event && event.target !== document.getElementById('modalVerPedidos')) return;
-    document.getElementById('modalVerPedidos').classList.remove('active');
+    if (event && event.target && event.target !== document.getElementById('modalVerPedidos')) return;
+    const modal = document.getElementById('modalVerPedidos');
+    if (modal) modal.classList.remove('active');
 }
 
 function cambiarSeccionVerPedidos(seccion) {
@@ -2704,14 +2968,14 @@ function renderizarLibrosPedidos() {
     let librosFiltrados = libros;
     if (filtroTextoLibrosPedidos) {
         librosFiltrados = libros.filter(l => 
-            (l.titulo && l.titulo.toLowerCase().includes(filtroTextoLibrosPedidos)) ||
-            (l.autor && l.autor.toLowerCase().includes(filtroTextoLibrosPedidos)) ||
-            (l.categoria && l.categoria.toLowerCase().includes(filtroTextoLibrosPedidos)) ||
+            (l.titulo && String(l.titulo).toLowerCase().includes(filtroTextoLibrosPedidos)) ||
+            (l.autor && String(l.autor).toLowerCase().includes(filtroTextoLibrosPedidos)) ||
+            ((l.categoria || l.cat) && String(l.categoria || l.cat).toLowerCase().includes(filtroTextoLibrosPedidos)) ||
             (l.id && String(l.id).toLowerCase().includes(filtroTextoLibrosPedidos))
         );
     }
 
-    if (librosFiltrados.length === 0) {
+    if (!librosFiltrados || librosFiltrados.length === 0) {
         const msj = filtroTextoLibrosPedidos
             ? 'No se encontraron libros que coincidan con la búsqueda.'
             : 'No hay libros registrados en la biblioteca.';
@@ -2719,13 +2983,14 @@ function renderizarLibrosPedidos() {
         return;
     }
 
-    let html = '<div style="overflow-x:auto;"><table class="tabla-libros" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:680px;">';
+    let html = '<div class="tabla-contenedor-scroll" style="overflow-x:auto; -webkit-overflow-scrolling:touch; width:100%;"><table class="tabla-libros" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:720px;">';
     html += '<thead><tr style="background:#1a3a4a; color:white; text-align:left;">';
-    html += '<th style="padding:0.7rem;">ID / Título del Libro</th>';
-    html += '<th style="padding:0.7rem;">Autor</th>';
-    html += '<th style="padding:0.7rem;">Categoría</th>';
-    html += '<th style="padding:0.7rem;">Estado Actual</th>';
-    html += '<th style="padding:0.7rem; text-align:center;">Cambiar Estado</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">ID / Título del Libro</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Autor</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Categoría</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Estado Actual</th>';
+    html += '<th style="padding:0.75rem 0.6rem; text-align:center;">Cambiar Estado</th>';
+    html += '<th style="padding:0.75rem 0.6rem; text-align:center;">Acciones</th>';
     html += '</tr></thead><tbody>';
 
     librosFiltrados.forEach((l, index) => {
@@ -2742,19 +3007,22 @@ function renderizarLibrosPedidos() {
         }
 
         html += `<tr style="background:${bgRow}; border-bottom:1px solid #eee;">
-            <td style="padding:0.7rem; font-weight:600; color:#1a3a4a;">
+            <td style="padding:0.7rem 0.6rem; font-weight:600; color:#1a3a4a;">
                 <div><span style="font-size:0.75rem; color:#d4a038; font-weight:700;">[ID: ${l.id}]</span> ${l.titulo || 'Sin título'}</div>
             </td>
-            <td style="padding:0.7rem; color:#5a6474;">${l.autor || '-'}</td>
-            <td style="padding:0.7rem; color:#5a6474;">${l.categoria || l.cat || 'General'}</td>
-            <td style="padding:0.7rem;">${estadoBadge}</td>
-            <td style="padding:0.7rem; text-align:center;">
-                <select onchange="cambiarEstadoLibroDirecto('${l.id}', this.value)" style="padding:0.4rem 0.6rem; border-radius:0.8rem; border:1px solid #1a3a4a; font-weight:600; font-size:0.8rem; min-height:44px; cursor:pointer; background:white; color:#1a3a4a; outline:none;">
+            <td style="padding:0.7rem 0.6rem; color:#5a6474;">${l.autor || '-'}</td>
+            <td style="padding:0.7rem 0.6rem; color:#5a6474;">${l.categoria || l.cat || 'General'}</td>
+            <td style="padding:0.7rem 0.6rem;">${estadoBadge}</td>
+            <td style="padding:0.7rem 0.6rem; text-align:center;">
+                <select data-csp-change="cambiarEstadoLibroDirecto('${l.id}', this.value)" style="padding:0.4rem 0.6rem; border-radius:0.8rem; border:1px solid #1a3a4a; font-weight:600; font-size:0.8rem; min-height:40px; cursor:pointer; background:white; color:#1a3a4a; outline:none;">
                     <option value="Disponible" ${estado === 'Disponible' ? 'selected' : ''}>🟢 Disponible</option>
                     <option value="En curso" ${estado === 'En curso' ? 'selected' : ''}>🟠 En curso</option>
                     <option value="Prestado" ${estado === 'Prestado' ? 'selected' : ''}>🔴 Prestado</option>
                     <option value="Dañado" ${estado === 'Dañado' ? 'selected' : ''}>⚪ Dañado</option>
                 </select>
+            </td>
+            <td style="padding:0.7rem 0.6rem; text-align:center; white-space:nowrap;">
+                <button type="button" data-csp-click="abrirModalEditarLibro('${l.id}')" style="background:#f0a800; color:white; border:none; padding:0.35rem 0.75rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Editar libro">✏️ Editar</button>
             </td>
         </tr>`;
     });
@@ -2769,8 +3037,12 @@ function cambiarEstadoLibroDirecto(id, nuevoEstado) {
     if (idx !== -1) {
         libros[idx].estado = nuevoEstado;
         guardarLibros(libros);
+
         mostrarToastBiblio(`<i class="fas fa-sync-alt"></i> Estado del libro cambiado a "${nuevoEstado}"`);
         renderizarSeccionVerPedidos();
+        if (typeof renderizarCatalogo === 'function') {
+            renderizarCatalogo();
+        }
     }
 }
 
@@ -2809,7 +3081,7 @@ function renderizarPedidos() {
         pedidos = todosPedidos.filter(p => p.estado !== 'Entregado' && p.estado !== 'Cancelado');
     }
 
-    if (pedidos.length === 0) {
+    if (!pedidos || pedidos.length === 0) {
         const msj = filtroPedidosTabActual === 'Pendientes'
             ? 'No hay solicitudes de préstamos pendientes.'
             : 'No se encontraron registros de pedidos.';
@@ -2817,46 +3089,51 @@ function renderizarPedidos() {
         return;
     }
 
-    let html = '<div style="overflow-x:auto;"><table class="tabla-libros" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:680px;">';
+    let html = '<div class="tabla-contenedor-scroll" style="overflow-x:auto; -webkit-overflow-scrolling:touch; width:100%;"><table class="tabla-libros" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:760px;">';
     html += '<thead><tr style="background:#1a3a4a; color:white; text-align:left;">';
-    html += '<th style="padding:0.7rem;">Solicitante</th>';
-    html += '<th style="padding:0.7rem;">Contacto</th>';
-    html += '<th style="padding:0.7rem;">Libro Solicitado</th>';
-    html += '<th style="padding:0.7rem;">Fecha</th>';
-    html += '<th style="padding:0.7rem;">Estado</th>';
-    html += '<th style="padding:0.7rem; text-align:center;">Acciones</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Solicitante</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Contacto</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Libro Solicitado</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Fecha</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Estado</th>';
+    html += '<th style="padding:0.75rem 0.6rem; text-align:center;">Acciones</th>';
     html += '</tr></thead><tbody>';
 
     pedidos.forEach((p, index) => {
         const bgRow = index % 2 === 0 ? '#ffffff' : '#f9f8f5';
-        const libroEncontrado = libros.find(l => String(l.id) === String(p.libroId));
-        const tituloLibro = libroEncontrado ? libroEncontrado.titulo : (p.tituloLibro || 'Libro sin título');
+        const libroEncontrado = libros.find(l => String(l.id) === String(p.libroId || p.libro_id));
+        const tituloLibro = libroEncontrado ? libroEncontrado.titulo : (p.tituloLibro || p.titulo_libro || 'Libro sin título');
         const fechaTexto = p.fecha ? new Date(p.fecha).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
         const estado = p.estado || 'Pendiente';
 
-        let estadoBadge = '<span style="background:#fff3e0; color:#e65100; padding:0.2rem 0.6rem; border-radius:1rem; font-weight:600; font-size:0.75rem;">Pendiente</span>';
+        let estadoBadge = '<span style="background:#fff3e0; color:#e65100; padding:0.25rem 0.65rem; border-radius:1rem; font-weight:600; font-size:0.75rem;">Pendiente</span>';
         if (estado === 'Entregado') {
-            estadoBadge = '<span style="background:#e8f5e9; color:#2e7d32; padding:0.2rem 0.6rem; border-radius:1rem; font-weight:600; font-size:0.75rem;">Entregado</span>';
+            estadoBadge = '<span style="background:#e8f5e9; color:#2e7d32; padding:0.25rem 0.65rem; border-radius:1rem; font-weight:600; font-size:0.75rem;">Entregado</span>';
         } else if (estado === 'Cancelado') {
-            estadoBadge = '<span style="background:#ffebee; color:#c62828; padding:0.2rem 0.6rem; border-radius:1rem; font-weight:600; font-size:0.75rem;">Cancelado</span>';
+            estadoBadge = '<span style="background:#ffebee; color:#c62828; padding:0.25rem 0.65rem; border-radius:1rem; font-weight:600; font-size:0.75rem;">Cancelado</span>';
         }
 
-        const telefonoHtml = p.telefono ? `<div>📱 ${p.telefono}</div>` : '';
-        const emailHtml = p.email ? `<div style="font-size:0.75rem; color:#5a6474;">✉️ ${p.email}</div>` : '';
+        const phoneClean = p.telefono ? String(p.telefono).replace(/\D/g, '') : '';
+        const telefonoHtml = p.telefono
+            ? (phoneClean.length >= 7
+                ? `<div><a href="https://wa.me/${phoneClean}" target="_blank" rel="noopener noreferrer" style="color:#2e7d32; font-weight:700; text-decoration:none;" title="Abrir WhatsApp">📱 ${p.telefono}</a></div>`
+                : `<div>📱 ${p.telefono}</div>`)
+            : '';
+        const emailHtml = p.email && p.email !== 'No especificado' ? `<div style="font-size:0.75rem; color:#5a6474;">✉️ ${p.email}</div>` : '';
 
         html += `<tr style="background:${bgRow}; border-bottom:1px solid #eee;">
-            <td style="padding:0.7rem; font-weight:600; color:#1a3a4a;">${p.solicitante || 'Anónimo'}</td>
-            <td style="padding:0.7rem; color:#1a3a4a;">${telefonoHtml}${emailHtml || '-'}</td>
-            <td style="padding:0.7rem; font-weight:600; color:#2c5f7c;">${tituloLibro}</td>
-            <td style="padding:0.7rem; color:#5a6474; white-space:nowrap;">${fechaTexto}</td>
-            <td style="padding:0.7rem;">${estadoBadge}</td>
-            <td style="padding:0.7rem; text-align:center; white-space:nowrap;">`;
+            <td style="padding:0.7rem 0.6rem; font-weight:600; color:#1a3a4a;">${p.solicitante || 'Anónimo'}</td>
+            <td style="padding:0.7rem 0.6rem; color:#1a3a4a;">${telefonoHtml || ''}${emailHtml || (telefonoHtml ? '' : '-')}</td>
+            <td style="padding:0.7rem 0.6rem; font-weight:600; color:#2c5f7c;">${tituloLibro}</td>
+            <td style="padding:0.7rem 0.6rem; color:#5a6474; white-space:nowrap;">${fechaTexto}</td>
+            <td style="padding:0.7rem 0.6rem;">${estadoBadge}</td>
+            <td style="padding:0.7rem 0.6rem; text-align:center; white-space:nowrap;">`;
 
         if (estado !== 'Entregado') {
-            html += `<button type="button" class="btn-accion-libro btn-entregar-libro" onclick="marcarEntregadoPedido('${p.id}')" style="background:#2e7d32; color:white; border:none; padding:0.4rem 0.8rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;">✅ Entregar</button>`;
+            html += `<button type="button" class="btn-accion-libro btn-entregar-libro" data-csp-click="marcarEntregadoPedido('${p.id}')" style="background:#2e7d32; color:white; border:none; padding:0.4rem 0.8rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;">✅ Entregar</button>`;
         }
         if (estado !== 'Cancelado' && estado !== 'Entregado') {
-            html += `<button type="button" onclick="cancelarPedido('${p.id}')" style="background:#757575; color:white; border:none; padding:0.4rem 0.6rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;">❌ Cancelar</button>`;
+            html += `<button type="button" data-csp-click="cancelarPedido('${p.id}')" style="background:#757575; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;">❌ Cancelar</button>`;
         }
         if (estado === 'Entregado') {
             html += `<span style="color:#2e7d32; font-weight:600; font-size:0.8rem;">✔️ Completado</span>`;
@@ -2873,20 +3150,20 @@ function renderizarPedidosEnCurso(contenedor) {
     const libros = cargarLibros();
     const todosPedidos = cargarPedidos();
 
-    const librosEnCurso = libros.filter(l => l.estado === 'En curso');
+    const librosEnCurso = libros.filter(l => l.estado === 'En curso' || l.estado === 'Prestado');
 
-    if (librosEnCurso.length === 0) {
-        contenedor.innerHTML = `<p style="text-align:center; color:#5a6474; padding:2rem 1rem;">No hay libros actualmente en curso en la biblioteca.</p>`;
+    if (!librosEnCurso || librosEnCurso.length === 0) {
+        contenedor.innerHTML = `<p style="text-align:center; color:#5a6474; padding:2rem 1rem;">No hay libros actualmente en curso o prestados en la biblioteca.</p>`;
         return;
     }
 
-    let html = '<div style="overflow-x:auto;"><table class="tabla-libros" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:720px;">';
+    let html = '<div class="tabla-contenedor-scroll" style="overflow-x:auto; -webkit-overflow-scrolling:touch; width:100%;"><table class="tabla-libros" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:760px;">';
     html += '<thead><tr style="background:#1a3a4a; color:white; text-align:left;">';
-    html += '<th style="padding:0.7rem;">Título del Libro</th>';
-    html += '<th style="padding:0.7rem;">Solicitante / Contacto</th>';
-    html += '<th style="padding:0.7rem;">Fecha Solicitud</th>';
-    html += '<th style="padding:0.7rem;">Fecha Devolución (+14 días)</th>';
-    html += '<th style="padding:0.7rem; text-align:center;">Acciones</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Título del Libro</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Solicitante / Contacto</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Fecha Solicitud</th>';
+    html += '<th style="padding:0.75rem 0.6rem;">Fecha Devolución (+14 días)</th>';
+    html += '<th style="padding:0.75rem 0.6rem; text-align:center;">Acciones</th>';
     html += '</tr></thead><tbody>';
 
     librosEnCurso.forEach((l, index) => {
@@ -2895,7 +3172,7 @@ function renderizarPedidosEnCurso(contenedor) {
         const pedidoAsociado = todosPedidos.slice().reverse().find(p => 
             p.estado !== 'Cancelado' &&
             ((p.libroId && String(p.libroId) === String(l.id)) || 
-             (l.titulo && p.tituloLibro && l.titulo.toLowerCase().trim() === p.tituloLibro.toLowerCase().trim()))
+             (l.titulo && p.tituloLibro && String(l.titulo).toLowerCase().trim() === String(p.tituloLibro).toLowerCase().trim()))
         );
 
         let solicitanteHtml = '<span style="color:#757575; font-style:italic;">Sin solicitante registrado</span>';
@@ -2903,9 +3180,14 @@ function renderizarPedidosEnCurso(contenedor) {
         let fechaDevTexto = 'No aplica';
 
         if (pedidoAsociado) {
-            const tel = pedidoAsociado.telefono ? ` 📱 ${pedidoAsociado.telefono}` : '';
-            const email = pedidoAsociado.email ? ` ✉️ ${pedidoAsociado.email}` : '';
-            solicitanteHtml = `<strong style="color:#1a3a4a;">${pedidoAsociado.solicitante || 'Anónimo'}</strong><div style="font-size:0.75rem; color:#5a6474;">${tel}${email}</div>`;
+            const phoneClean = pedidoAsociado.telefono ? String(pedidoAsociado.telefono).replace(/\D/g, '') : '';
+            const tel = pedidoAsociado.telefono
+                ? (phoneClean.length >= 7
+                    ? ` <div><a href="https://wa.me/${phoneClean}" target="_blank" rel="noopener noreferrer" style="color:#2e7d32; font-weight:700; text-decoration:none;">📱 ${pedidoAsociado.telefono}</a></div>`
+                    : ` <div>📱 ${pedidoAsociado.telefono}</div>`)
+                : '';
+            const email = (pedidoAsociado.email && pedidoAsociado.email !== 'No especificado') ? ` <div style="font-size:0.75rem; color:#5a6474;">✉️ ${pedidoAsociado.email}</div>` : '';
+            solicitanteHtml = `<strong style="color:#1a3a4a;">${pedidoAsociado.solicitante || 'Anónimo'}</strong>${tel}${email}`;
 
             if (pedidoAsociado.fecha) {
                 const fechaObj = new Date(pedidoAsociado.fecha);
@@ -2918,19 +3200,19 @@ function renderizarPedidosEnCurso(contenedor) {
         }
 
         html += `<tr style="background:${bgRow}; border-bottom:1px solid #eee;">
-            <td style="padding:0.7rem; font-weight:600; color:#1a3a4a;">
+            <td style="padding:0.7rem 0.6rem; font-weight:600; color:#1a3a4a;">
                 <div><span style="font-size:0.75rem; color:#d4a038; font-weight:700;">[ID: ${l.id}]</span> ${l.titulo || 'Sin título'}</div>
                 <div style="font-size:0.75rem; color:#5a6474; font-weight:normal;">Autor: ${l.autor || '-'}</div>
             </td>
-            <td style="padding:0.7rem;">${solicitanteHtml}</td>
-            <td style="padding:0.7rem; color:#1a3a4a; white-space:nowrap; font-weight:600;">
+            <td style="padding:0.7rem 0.6rem;">${solicitanteHtml}</td>
+            <td style="padding:0.7rem 0.6rem; color:#1a3a4a; white-space:nowrap; font-weight:600;">
                 <i class="fas fa-calendar-alt" style="color:#1a3a4a; font-size:0.8rem;"></i> ${fechaSolTexto}
             </td>
-            <td style="padding:0.7rem; color:#e65100; white-space:nowrap; font-weight:700;">
+            <td style="padding:0.7rem 0.6rem; color:#e65100; white-space:nowrap; font-weight:700;">
                 <i class="fas fa-clock" style="color:#e65100; font-size:0.8rem;"></i> ${fechaDevTexto}
             </td>
-            <td style="padding:0.7rem; text-align:center; white-space:nowrap;">
-                <button type="button" onclick="completarEnCurso('${l.id}', '${pedidoAsociado ? pedidoAsociado.id : ''}')" style="background:#2e7d32; color:white; border:none; padding:0.45rem 0.9rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; min-height:44px; display:inline-flex; align-items:center; gap:0.4rem;">
+            <td style="padding:0.7rem 0.6rem; text-align:center; white-space:nowrap;">
+                <button type="button" data-csp-click="completarEnCurso('${l.id}', '${pedidoAsociado ? pedidoAsociado.id : ''}')" style="background:#2e7d32; color:white; border:none; padding:0.45rem 0.9rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; min-height:40px; display:inline-flex; align-items:center; gap:0.4rem;">
                     <i class="fas fa-check-circle"></i> Marcar Disponible
                 </button>
             </td>
@@ -2960,16 +3242,34 @@ function completarEnCurso(libroId, pedidoId) {
 
     mostrarToastBiblio('<i class="fas fa-check-circle"></i> Libro devuelto y marcado como Disponible');
     renderizarSeccionVerPedidos();
+    if (typeof renderizarCatalogo === 'function') {
+        renderizarCatalogo();
+    }
 }
 
 function marcarEntregadoPedido(id) {
     let pedidos = cargarPedidos();
+    let libros = cargarLibros();
     const pedido = pedidos.find(p => String(p.id) === String(id));
     if (pedido) {
         pedido.estado = 'Entregado';
         guardarPedidos(pedidos);
+
+        // Actualizar libro asociado a "En curso"
+        const libroEncontrado = libros.find(l => 
+            (pedido.libroId && String(l.id) === String(pedido.libroId)) ||
+            (pedido.tituloLibro && l.titulo && String(l.titulo).toLowerCase().trim() === String(pedido.tituloLibro).toLowerCase().trim())
+        );
+        if (libroEncontrado) {
+            libroEncontrado.estado = 'En curso';
+            guardarLibros(libros);
+        }
+
         renderizarSeccionVerPedidos();
-        mostrarToastBiblio('<i class="fas fa-check-circle"></i> Pedido marcado como entregado');
+        if (typeof renderizarCatalogo === 'function') {
+            renderizarCatalogo();
+        }
+        mostrarToastBiblio('<i class="fas fa-check-circle"></i> Pedido marcado como entregado y libro en curso');
     }
 }
 
@@ -2980,6 +3280,9 @@ function cancelarPedido(id) {
         pedido.estado = 'Cancelado';
         guardarPedidos(pedidos);
         renderizarSeccionVerPedidos();
+        if (typeof renderizarCatalogo === 'function') {
+            renderizarCatalogo();
+        }
         mostrarToastBiblio('<i class="fas fa-ban"></i> Pedido cancelado', '#757575');
     }
 }
@@ -3054,13 +3357,21 @@ function abrirModalAgregarAnuncio() {
     if (tituloEl) tituloEl.innerHTML = '<i class="fas fa-bullhorn"></i> Publicar Nuevo Anuncio';
     if (btnEl) btnEl.innerHTML = '<i class="fas fa-paper-plane"></i> Publicar Evento';
 
-    document.getElementById('modalAgregarAnuncio').classList.add('active');
+    const modal = document.getElementById('modalAgregarAnuncio');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+    }
     document.body.style.overflow = 'hidden';
 }
 
 function cerrarModalAgregarAnuncio(event) {
-    if (event && event.target !== document.getElementById('modalAgregarAnuncio')) return;
-    document.getElementById('modalAgregarAnuncio').classList.remove('active');
+    const modal = document.getElementById('modalAgregarAnuncio');
+    if (event && event.target !== modal && !event.target.classList.contains('cerrar-modal')) return;
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('active');
+    }
     document.body.style.overflow = '';
     anuncioPendienteEditarId = null;
 }
@@ -3087,10 +3398,11 @@ function abrirModalEditarAnuncio(id) {
     if (tituloEl) tituloEl.innerHTML = '<i class="fas fa-edit"></i> Editar Anuncio';
     if (btnEl) btnEl.innerHTML = '<i class="fas fa-save"></i> Guardar Cambios';
 
-    const modalQuitar = document.getElementById('modalQuitarAnuncio');
-    if (modalQuitar) modalQuitar.classList.remove('active');
-
-    document.getElementById('modalAgregarAnuncio').classList.add('active');
+    const modal = document.getElementById('modalAgregarAnuncio');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+    }
     document.body.style.overflow = 'hidden';
 }
 
@@ -3281,13 +3593,21 @@ function abrirModalQuitarAnuncio() {
     if (buscador) buscador.value = '';
     const anuncios = cargarAnuncios().sort((a, b) => (b.fechaInicio || '').localeCompare(a.fechaInicio || ''));
     renderizarListaQuitar(anuncios);
-    document.getElementById('modalQuitarAnuncio').classList.add('active');
+    const modal = document.getElementById('modalQuitarAnuncio');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+    }
     document.body.style.overflow = 'hidden';
 }
 
 function cerrarModalQuitarAnuncio(event) {
-    if (event && event.target !== document.getElementById('modalQuitarAnuncio')) return;
-    document.getElementById('modalQuitarAnuncio').classList.remove('active');
+    const modal = document.getElementById('modalQuitarAnuncio');
+    if (event && event.target !== modal && !event.target.classList.contains('cerrar-modal')) return;
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('active');
+    }
     document.body.style.overflow = '';
 }
 
@@ -3334,8 +3654,8 @@ function renderizarListaQuitar(anuncios) {
         <td style="padding:0.7rem; color:#5a6474;">${a.categoria || 'Anuncio General'}</td>
         <td style="padding:0.7rem; color:#5a6474; white-space:nowrap;">${fecha}</td>
         <td style="padding:0.7rem; text-align:center; white-space:nowrap;">
-            <button type="button" onclick="abrirModalEditarAnuncio('${a.id}')" style="background:#f0a800; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;" title="Editar anuncio">✏️ Editar</button>
-            <button type="button" onclick="confirmarEliminarAnuncio('${a.id}')" style="background:#c62828; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar anuncio">🗑️ Eliminar</button>
+            <button type="button" data-csp-click="abrirModalEditarAnuncio('${a.id}')" style="background:#f0a800; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;" title="Editar anuncio">✏️ Editar</button>
+            <button type="button" data-csp-click="confirmarEliminarAnuncio('${a.id}')" style="background:#c62828; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar anuncio">🗑️ Eliminar</button>
         </td>
     </tr>`;
     });
@@ -3378,7 +3698,30 @@ function abrirVerInteresados() {
     seccion.innerHTML = generarHTMLInteresados();
     seccion.style.display = 'block';
     if (panel) panel.style.display = 'none';
+
+    // Disparar carga fresca desde Supabase
+    if (window.supabaseClient) {
+        window.supabaseClient.from('interesados').select('*').then(({ data, error }) => {
+            if (!error && Array.isArray(data)) {
+                const transformer = (window.TABLE_TRANSFORMERS && window.TABLE_TRANSFORMERS.interesados) ? window.TABLE_TRANSFORMERS.interesados.fromDb : null;
+                const items = transformer ? transformer(data) : data;
+                localStorage.setItem(STORAGE_INTERESADOS, JSON.stringify(items));
+                const sec = document.getElementById('seccionVerInteresados');
+                if (sec && sec.style.display !== 'none') {
+                    sec.innerHTML = generarHTMLInteresados();
+                }
+            }
+        }).catch(() => {});
+    }
 }
+
+// Escuchar sincronizaciones en tiempo real
+window.addEventListener('supabase_synced_interesados', function() {
+    const seccion = document.getElementById('seccionVerInteresados');
+    if (seccion && seccion.style.display !== 'none') {
+        seccion.innerHTML = generarHTMLInteresados();
+    }
+});
 
 function cerrarVerInteresados() {
     const seccion = document.getElementById('seccionVerInteresados');
@@ -3397,7 +3740,7 @@ function guardarInteresados(lista) {
 
 function toggleContactadoInteresado(id) {
     const lista = cargarInteresados();
-    const index = lista.findIndex(item => item && String(item.id) === String(id));
+    const index = lista.findIndex(item => String(item.id) === String(id));
     if (index !== -1) {
         lista[index].contactado = !lista[index].contactado;
         guardarInteresados(lista);
@@ -3409,32 +3752,22 @@ function toggleContactadoInteresado(id) {
 function eliminarInteresado(id) {
     if (confirm('¿Estás seguro de que deseas eliminar a este interesado de la lista?')) {
         let lista = cargarInteresados();
-        lista = lista.filter(item => item && String(item.id) !== String(id));
+        lista = lista.filter(item => String(item.id) !== String(id));
         guardarInteresados(lista);
-        if (window.SupabaseSync) {
-            window.SupabaseSync.delete('interesados', 'interesados', 'id', String(id));
-        }
         const seccion = document.getElementById('seccionVerInteresados');
         if (seccion) seccion.innerHTML = generarHTMLInteresados();
     }
 }
 
-window.addEventListener('supabase_synced_interesados', () => {
-    const seccion = document.getElementById('seccionVerInteresados');
-    if (seccion && seccion.style.display !== 'none' && typeof generarHTMLInteresados === 'function') {
-        seccion.innerHTML = generarHTMLInteresados();
-    }
-});
-
 function generarHTMLInteresados() {
-    const lista = cargarInteresados().reverse();
+    const lista = cargarInteresados().slice().reverse();
     const total = lista.length;
     const contactados = lista.filter(i => i.contactado).length;
     const pendientes = total - contactados;
 
     let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;box-shadow:0 4px 15px rgba(0,0,0,0.1);">';
     html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;display:flex;align-items:center;gap:0.5rem;"><i class="fas fa-users"></i> Personas Interesadas (¡Queremos conocerte!)</h3>';
-    html += '<button onclick="cerrarVerInteresados()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;transition:all 0.2s;"><i class="fas fa-arrow-left"></i> Volver</button></div>';
+    html += '<button data-csp-click="cerrarVerInteresados()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;transition:all 0.2s;"><i class="fas fa-arrow-left"></i> Volver</button></div>';
 
     html += '<div style="max-width:1100px;margin:1.5rem auto;padding:0 1rem;">';
 
@@ -3462,7 +3795,7 @@ function generarHTMLInteresados() {
         html += '<div style="text-align:center;padding:3rem 1rem;color:#666;">';
         html += '<i class="fas fa-inbox" style="font-size:3rem;color:#ccc;margin-bottom:1rem;"></i>';
         html += '<p style="font-size:1.1rem;margin:0;">No hay personas registradas por el momento.</p>';
-        html += '<p style="font-size:0.9rem;color:#999;margin-top:0.3rem;">Cuando los visitantes envíen el formulario "¡Queremos conocerte!", aparecerán aquí.</p>';
+        html += '<p style="font-size:0.9rem;color:#999;margin-top:0.3rem;">Cuando los visitantes envíen el formulario "¡Queremos conocerte!", aparecerán aquí en tiempo real.</p>';
         html += '</div>';
     } else {
         html += '<div style="overflow-x:auto;">';
@@ -3486,22 +3819,32 @@ function generarHTMLInteresados() {
             const btnContactoColor = item.contactado ? '#6c757d' : '#28a745';
             const btnContactoIcon = item.contactado ? 'fa-undo' : 'fa-check';
 
-            const cleanWa = (item.whatsapp || '').replace(/\\D/g, '');
-            const waLink = cleanWa ? `<a href="https://wa.me/${cleanWa}" target="_blank" style="color:#25D366;text-decoration:none;font-weight:600;"><i class="fab fa-whatsapp"></i> ${item.whatsapp}</a>` : (item.whatsapp || '-');
+            const cleanWa = (item.whatsapp || item.telefono || '').toString().replace(/\D/g, '');
+            const waLink = cleanWa ? `<a href="https://wa.me/${cleanWa}" target="_blank" style="color:#25D366;text-decoration:none;font-weight:600;"><i class="fab fa-whatsapp"></i> ${item.whatsapp || item.telefono}</a>` : (item.whatsapp || item.telefono || '-');
+
+            let fechaStr = item.fecha || '-';
+            try {
+                if (item.fecha && item.fecha.includes('T')) {
+                    const d = new Date(item.fecha);
+                    if (!isNaN(d.getTime())) {
+                        fechaStr = d.toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                    }
+                }
+            } catch (e) {}
 
             html += `<tr style="border-bottom:1px solid #f0f0f0;">
                 <td style="padding:0.9rem 0.8rem;color:#888;">${total - index}</td>
                 <td style="padding:0.9rem 0.8rem;font-weight:600;color:#1a3a4a;">${item.nombre}</td>
                 <td style="padding:0.9rem 0.8rem;">${waLink}</td>
                 <td style="padding:0.9rem 0.8rem;color:#555;">${item.email || 'No proporcionado'}</td>
-                <td style="padding:0.9rem 0.8rem;color:#777;font-size:0.85rem;">${item.fecha}</td>
+                <td style="padding:0.9rem 0.8rem;color:#777;font-size:0.85rem;">${fechaStr}</td>
                 <td style="padding:0.9rem 0.8rem;">${estadoBadge}</td>
                 <td style="padding:0.9rem 0.8rem;text-align:center;">
                     <div style="display:flex;gap:0.4rem;justify-content:center;">
-                        <button onclick="toggleContactadoInteresado('${item.id}')" title="${btnContactoText}" style="background:${btnContactoColor};color:white;border:none;padding:0.4rem 0.8rem;border-radius:0.5rem;cursor:pointer;font-size:0.8rem;font-weight:600;">
+                        <button data-csp-click="toggleContactadoInteresado('${item.id}')" title="${btnContactoText}" style="background:${btnContactoColor};color:white;border:none;padding:0.4rem 0.8rem;border-radius:0.5rem;cursor:pointer;font-size:0.8rem;font-weight:600;">
                             <i class="fas ${btnContactoIcon}"></i>
                         </button>
-                        <button onclick="eliminarInteresado('${item.id}')" title="Eliminar" style="background:#dc3545;color:white;border:none;padding:0.4rem 0.8rem;border-radius:0.5rem;cursor:pointer;font-size:0.8rem;">
+                        <button data-csp-click="eliminarInteresado('${item.id}')" title="Eliminar" style="background:#dc3545;color:white;border:none;padding:0.4rem 0.8rem;border-radius:0.5rem;cursor:pointer;font-size:0.8rem;">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -3527,8 +3870,8 @@ window.cerrarModalConfirmarEliminarBD = cerrarModalConfirmarEliminarBD;
 window.filtrarMiembrosBD = filtrarMiembrosBD;
 window.abrirCronograma = abrirCronograma;
 window.cerrarCronograma = cerrarCronograma;
-if (typeof agregarEvento !== 'undefined') window.agregarEvento = agregarEvento;
-if (typeof eliminarEvento !== 'undefined') window.eliminarEvento = eliminarEvento;
+window.agregarEvento = agregarEvento;
+window.eliminarEvento = eliminarEvento;
 window.abrirEncuestas = abrirEncuestas;
 window.cerrarEncuestas = cerrarEncuestas;
 window.agregarEncuesta = agregarEncuesta;
@@ -3545,6 +3888,12 @@ window.eliminarEventoClubAdmin = eliminarEventoClubAdmin;
 window.abrirCuotasClub = abrirCuotasClub;
 window.cerrarSeccionCuotas = cerrarSeccionCuotas;
 window.descargarExcelCuotas = descargarExcelCuotas;
+window.agregarMiembroCuotas = agregarMiembroCuotas;
+window.eliminarMiembroCuotas = eliminarMiembroCuotas;
+window.confirmarEliminarMiembro = confirmarEliminarMiembro;
+window.cerrarModalConfirmarEliminar = cerrarModalConfirmarEliminar;
+window.guardarYCerrarCuotas = guardarYCerrarCuotas;
+window.actualizarTotalesCuotas = actualizarTotalesCuotas;
 window.abrirModalEditarMiembroBD = abrirModalEditarMiembroBD;
 window.abrirEditarEventoClub = abrirEditarEventoClub;
 window.toggleCampoRecurrencia = toggleCampoRecurrencia;
@@ -3632,7 +3981,7 @@ function renderizarAdminTransmisiones() {
             ${transEdit ? 'Editar Transmisión' : 'Agregar Nueva Transmisión'}
         </h4>
 
-        <form id="formTransmisionAdmin" onsubmit="guardarTransmisionForm(event)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+        <form id="formTransmisionAdmin" data-csp-submit="guardarTransmisionForm(event)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
             <div>
                 <label style="display:block; font-weight:600; font-size:0.85rem; color:#1a3a4a; margin-bottom:0.3rem;">Categoría *</label>
                 <select id="transCategoria" required style="width:100%; padding:0.65rem; border-radius:0.6rem; border:1px solid #cbd5e1; font-family:Inter,sans-serif;">
@@ -3685,7 +4034,7 @@ function renderizarAdminTransmisiones() {
 
             <div style="grid-column: 1 / -1; display:flex; gap:0.8rem; justify-content:flex-end; margin-top:0.5rem;">
                 ${transEdit ? `
-                <button type="button" onclick="cancelarEdicionTransmision()" style="background:#e2e8f0; color:#475569; border:none; padding:0.7rem 1.2rem; border-radius:0.8rem; font-weight:600; cursor:pointer; font-family:Inter,sans-serif;">
+                <button type="button" data-csp-click="cancelarEdicionTransmision()" style="background:#e2e8f0; color:#475569; border:none; padding:0.7rem 1.2rem; border-radius:0.8rem; font-weight:600; cursor:pointer; font-family:Inter,sans-serif;">
                     Cancelar Edición
                 </button>
                 ` : ''}
@@ -3702,7 +4051,7 @@ function renderizarAdminTransmisiones() {
             <h4 style="margin:0; color:#1a3a4a; font-size:1.1rem;">
                 <i class="fas fa-list"></i> Transmisiones Registradas (${transmisiones.length})
             </h4>
-            <select id="filtroCategoriaAdmin" onchange="filtrarTransmisionesAdminList(this.value)" style="padding:0.45rem 0.8rem; border-radius:0.6rem; border:1px solid #cbd5e1; font-size:0.85rem; font-family:Inter,sans-serif;">
+            <select id="filtroCategoriaAdmin" data-csp-change="filtrarTransmisionesAdminList(this.value)" style="padding:0.45rem 0.8rem; border-radius:0.6rem; border:1px solid #cbd5e1; font-size:0.85rem; font-family:Inter,sans-serif;">
                 <option value="TODAS">Todas las categorías</option>
                 <option value="Sábado (Culto)">🎥 Sábado (Culto)</option>
                 <option value="Sociedad de Jóvenes">🙌 Sociedad de Jóvenes</option>
@@ -3767,10 +4116,10 @@ function generarTablaTransmisionesAdminHTML(lista) {
             </td>
             <td style="padding:0.65rem 0.8rem; text-align:center;">
                 <div style="display:flex; gap:0.4rem; justify-content:center;">
-                    <button onclick="editarTransmisionAdmin('${t.id}')" style="background:#e0f2fe; color:#0369a1; border:none; padding:0.35rem 0.7rem; border-radius:0.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Editar">
+                    <button data-csp-click="editarTransmisionAdmin('${t.id}')" style="background:#e0f2fe; color:#0369a1; border:none; padding:0.35rem 0.7rem; border-radius:0.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Editar">
                         ✏️ Editar
                     </button>
-                    <button onclick="eliminarTransmisionAdmin('${t.id}')" style="background:#fee2e2; color:#991b1b; border:none; padding:0.35rem 0.7rem; border-radius:0.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar">
+                    <button data-csp-click="eliminarTransmisionAdmin('${t.id}')" style="background:#fee2e2; color:#991b1b; border:none; padding:0.35rem 0.7rem; border-radius:0.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar">
                         🗑️ Eliminar
                     </button>
                 </div>
@@ -3874,7 +4223,7 @@ function guardarTransmisionForm(e) {
     if (typeof guardarTransmisiones === 'function') {
         guardarTransmisiones(transmisiones);
     } else {
-        localStorage.setItem('transmisiones', JSON.stringify(transmisiones));
+        StorageHelper.set('transmisiones', transmisiones);
         window.dispatchEvent(new CustomEvent('transmisionesActualizadas'));
     }
 
@@ -3906,7 +4255,7 @@ function eliminarTransmisionAdmin(id) {
         if (typeof guardarTransmisiones === 'function') {
             guardarTransmisiones(filtradas);
         } else {
-            localStorage.setItem('transmisiones', JSON.stringify(filtradas));
+            StorageHelper.set('transmisiones', filtradas);
         }
 
         if (transmisionEditandoId === id) transmisionEditandoId = null;
@@ -3977,7 +4326,7 @@ function generarHTMLCalendarioIglesia() {
 
     let html = '<div style="background:linear-gradient(135deg,#1a3a4a 0%,#2c5f7c 100%);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;">';
     html += '<h3 style="color:#c9a53b;margin:0;font-size:1.2rem;">📅 Calendario General de la Iglesia</h3>';
-    html += '<button onclick="cerrarCalendarioIglesiaAdmin()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver al Panel</button></div>';
+    html += '<button data-csp-click="cerrarCalendarioIglesiaAdmin()" style="background:rgba(255,255,255,0.2);color:white;border:none;padding:0.5rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;font-family:Inter,sans-serif;"><i class="fas fa-arrow-left"></i> Volver al Panel</button></div>';
     html += '<div style="max-width:800px;margin:0 auto;padding:1rem;">';
     
     // Formulario
@@ -3992,14 +4341,14 @@ function generarHTMLCalendarioIglesia() {
     
     // Recurrencia
     html += '<div class="recurrencia-opcion" style="margin-bottom:0.5rem;">';
-    html += '<label style="font-weight:600;color:#1a3a4a;cursor:pointer;"><input type="checkbox" id="eventoIglesiaRecurrente" onchange="toggleCampoRecurrenciaIglesia()"> 📅 Repetir semanalmente</label>';
+    html += '<label style="font-weight:600;color:#1a3a4a;cursor:pointer;"><input type="checkbox" id="eventoIglesiaRecurrente" data-csp-change="toggleCampoRecurrenciaIglesia()"> 📅 Repetir semanalmente</label>';
     html += '</div>';
     html += '<div class="campo-recurrencia" id="campoRecurrenciaIglesia" style="display:none;margin-bottom:1rem;padding:0.8rem;background:#faf8f5;border-radius:0.8rem;border:1px solid #e8e3d8;">';
     html += '<label style="font-weight:600;color:#1a3a4a;margin-right:0.5rem;">Semanas a repetir:</label>';
     html += '<input type="number" id="eventoIglesiaSemanas" min="1" max="52" value="4" style="width:80px;padding:0.4rem 0.6rem;border-radius:0.5rem;border:1px solid #cbd5e1;">';
     html += '</div>';
     
-    html += '<button onclick="agregarEventoIglesiaAdmin()" id="btnGuardarEventoIglesia" style="margin-top:0.5rem;width:100%;padding:0.8rem;background:linear-gradient(135deg,#d4a038 0%,#c9a53b 100%);color:#1a3a4a;border:none;border-radius:2rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;"><i class="fas fa-plus"></i> Agregar Evento</button>';
+    html += '<button data-csp-click="agregarEventoIglesiaAdmin()" id="btnGuardarEventoIglesia" style="margin-top:0.5rem;width:100%;padding:0.8rem;background:linear-gradient(135deg,#d4a038 0%,#c9a53b 100%);color:#1a3a4a;border:none;border-radius:2rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;"><i class="fas fa-plus"></i> Agregar Evento</button>';
     html += '</div>';
 
     // Lista de eventos
@@ -4013,8 +4362,8 @@ function generarHTMLCalendarioIglesia() {
             html += '<div class="evento-info"><div class="evento-titulo" style="font-weight:700;color:#1a3a4a;">' + ev.titulo + (ev.recurrente ? ' <span style="font-size:0.75rem;background:#fef3c7;color:#b45309;padding:0.15rem 0.5rem;border-radius:0.8rem;">🔄 Semanal</span>' : '') + '</div>';
             html += '<div class="evento-fecha" style="font-size:0.85rem;color:#5a6474;"><i class="far fa-calendar-alt"></i> ' + ev.fecha + (ev.hora ? ' a las ' + ev.hora : '') + (ev.descripcion ? ' · ' + ev.descripcion : '') + '</div></div>';
             html += '<div style="display:flex;gap:0.4rem;">';
-            html += '<button class="btn-editar-evento" onclick="abrirEditarEventoIglesia(' + ev.id + ')" title="Editar" style="background:#e0f2fe;color:#0369a1;border:none;padding:0.4rem 0.7rem;border-radius:0.5rem;cursor:pointer;font-weight:600;">✏️</button>';
-            html += '<button class="btn-eliminar-miembro" onclick="eliminarEventoIglesiaAdmin(' + ev.id + ')" title="Quitar" style="background:#fee2e2;color:#991b1b;border:none;padding:0.4rem 0.7rem;border-radius:0.5rem;cursor:pointer;font-weight:600;">🗑️</button>';
+            html += '<button class="btn-editar-evento" data-csp-click="abrirEditarEventoIglesia(' + ev.id + ')" title="Editar" style="background:#e0f2fe;color:#0369a1;border:none;padding:0.4rem 0.7rem;border-radius:0.5rem;cursor:pointer;font-weight:600;">✏️</button>';
+            html += '<button class="btn-eliminar-miembro" data-csp-click="eliminarEventoIglesiaAdmin(' + ev.id + ')" title="Quitar" style="background:#fee2e2;color:#991b1b;border:none;padding:0.4rem 0.7rem;border-radius:0.5rem;cursor:pointer;font-weight:600;">🗑️</button>';
             html += '</div>';
             html += '</div>';
         });
@@ -4170,5 +4519,656 @@ window.eliminarEventoIglesiaAdmin = eliminarEventoIglesiaAdmin;
 window.toggleCampoRecurrenciaIglesia = toggleCampoRecurrenciaIglesia;
 window.bloquearScrollAdmin = bloquearScrollAdmin;
 window.desbloquearScrollAdmin = desbloquearScrollAdmin;
+
+/* =========================================================================
+   CENTRO DE GESTIÓN DE BASE DE DATOS Y CONEXIÓN SUPABASE
+   IASD Belén · Iglesia Adventista del Séptimo Día
+   ========================================================================= */
+
+let tabActivoBD = 'conexion';
+
+function abrirModalBaseDatos() {
+    let modal = document.getElementById('modalBaseDatosAdmin');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalBaseDatosAdmin';
+        modal.className = 'modal-overlay';
+        modal.style.zIndex = '100002';
+        document.body.appendChild(modal);
+    }
+
+    bloquearScrollAdmin('modalBaseDatosAdmin');
+    renderizarModalBaseDatos();
+    modal.style.display = 'flex';
+    modal.style.opacity = '1';
+    modal.style.visibility = 'visible';
+
+    // Probar conexión automáticamente al abrir
+    setTimeout(function() {
+        probarConexionBaseDatosUI(true);
+    }, 200);
+}
+
+function cerrarModalBaseDatos(event) {
+    if (event && event.target !== document.getElementById('modalBaseDatosAdmin')) return;
+    const modal = document.getElementById('modalBaseDatosAdmin');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.style.visibility = 'hidden';
+    }
+    desbloquearScrollAdmin('modalBaseDatosAdmin');
+}
+
+function cambiarTabBaseDatos(tabId) {
+    tabActivoBD = tabId;
+    renderizarModalBaseDatos();
+}
+
+function renderizarModalBaseDatos() {
+    const modal = document.getElementById('modalBaseDatosAdmin');
+    if (!modal) return;
+
+    const creds = window.getActiveSupabaseCredentials ? window.getActiveSupabaseCredentials() : {
+        url: window.SUPABASE_URL || 'https://ojfpzlvayjfzzqtqydgy.supabase.co',
+        anonKey: window.SUPABASE_ANON_KEY || '',
+        isCustom: false
+    };
+
+    const status = window.getSupabaseConnectionStatus ? window.getSupabaseConnectionStatus() : { ok: false, message: 'Estado no verificado' };
+
+    let badgeClase = 'badge-status prestado';
+    let badgeTexto = '🔴 Desconectado (Modo Local Offline Activo)';
+    let badgeColor = '#e53935';
+
+    if (status.ok) {
+        badgeClase = 'badge-status disponible';
+        badgeTexto = '🟢 Conectado a la Nube (Supabase Live)';
+        badgeColor = '#2e7d32';
+    } else if (status.code === '401_UNAUTHORIZED') {
+        badgeTexto = '⚠️ Clave API Anon Inválida / Expirada';
+        badgeColor = '#d97706';
+    } else if (status.code === 'TABLES_MISSING') {
+        badgeTexto = '⚠️ Conectado · Faltan tablas (Ejecutar SQL)';
+        badgeColor = '#d97706';
+    }
+
+    // Recuento de tablas locales
+    const conteoTablas = [
+        { nombre: 'Anuncios y Eventos', clave: 'anuncios_eventos', tabla: 'anuncios', icono: 'fa-bullhorn' },
+        { nombre: 'Catálogo de Libros', clave: 'libros_biblioteca', tabla: 'libros', icono: 'fa-book' },
+        { nombre: 'Pedidos de Biblioteca', clave: 'libros_pedidos', tabla: 'pedidos_libros', icono: 'fa-hand-holding' },
+        { nombre: 'Eventos de la Iglesia', clave: 'eventosIglesia', tabla: 'eventos_iglesia', icono: 'fa-calendar-alt' },
+        { nombre: 'Cronograma Predicadores', clave: 'cronograma_predicadores_fechas', tabla: 'cronograma_predicadores', icono: 'fa-pray' },
+        { nombre: 'Encuestas Comunitarias', clave: 'encuestasIglesia', tabla: 'encuestas', icono: 'fa-poll' },
+        { nombre: 'Alumnos / Identidades LMS', clave: 'alumnos_identidades', tabla: 'alumnos_identidades', icono: 'fa-user-graduate' },
+        { nombre: 'Exámenes & Cuestionarios', clave: 'db_examenes', tabla: 'examenes', icono: 'fa-file-alt' },
+        { nombre: 'Respuestas de Exámenes', clave: 'examenesRealizados', tabla: 'respuestas_examenes', icono: 'fa-check-circle' },
+        { nombre: 'Club Aventureros', clave: 'bd_aventureros', tabla: 'bd_aventureros', icono: 'fa-seedling' },
+        { nombre: 'Club Conquistadores', clave: 'bd_conquistadores', tabla: 'bd_conquistadores', icono: 'fa-hiking' },
+        { nombre: 'Club Guías Mayores', clave: 'bd_guias_mayores', tabla: 'bd_guias_mayores', icono: 'fa-compass' },
+        { nombre: 'Personas Interesadas', clave: 'interesados', tabla: 'interesados', icono: 'fa-users' },
+        { nombre: 'Transmisiones en Vivo', clave: 'transmisiones', tabla: 'transmisiones', icono: 'fa-video' }
+    ].map(t => {
+        let count = 0;
+        try {
+            const raw = localStorage.getItem(t.clave);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) count = parsed.length;
+                else if (typeof parsed === 'object' && parsed !== null) count = Object.keys(parsed).length;
+            }
+        } catch(e){}
+        return { ...t, count };
+    });
+
+    const totalRegistrosLocales = conteoTablas.reduce((acc, t) => acc + t.count, 0);
+
+    modal.innerHTML = `
+    <div class="modal-card" data-csp-click="event.stopPropagation()" style="max-width: 860px; width: 94%; max-height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: 1.8rem; box-shadow: 0 30px 80px rgba(0,0,0,0.4); border: 2px solid rgba(201,157,59,0.3); background: #ffffff;">
+        
+        <!-- HEADER -->
+        <div style="background: linear-gradient(135deg, #07192d 0%, #0b2b4f 60%, #153a63 100%); padding: 1.6rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(201,157,59,0.4); color: white;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(201,157,59,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #dfb75c; border: 1px solid rgba(201,157,59,0.4);">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div>
+                    <h2 style="font-size: 1.4rem; margin: 0; color: #ffffff; font-family: 'Playfair Display', serif; letter-spacing: 0.5px;">Gestión de Base de Datos y Supabase</h2>
+                    <p style="margin: 0.2rem 0 0; font-size: 0.85rem; color: rgba(255,255,255,0.75); font-family: 'Inter', sans-serif;">IASD Belén · Sincronización en la Nube y Almacenamiento Seguro</p>
+                </div>
+            </div>
+            <button data-csp-click="cerrarModalBaseDatos()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); width: 38px; height: 38px; border-radius: 50%; color: white; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;" data-csp-mouseover="this.style.background='#e53935'" data-csp-mouseout="this.style.background='rgba(255,255,255,0.1)'">&times;</button>
+        </div>
+
+        <!-- BARRA DE ESTADO DE CONEXIÓN -->
+        <div style="background: #f8fafc; padding: 0.9rem 2rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e2e8f0; font-size: 0.88rem; flex-wrap: wrap; gap: 0.8rem;">
+            <div style="display: flex; align-items: center; gap: 0.8rem;">
+                <span style="font-weight: 700; color: #334155;">Estado:</span>
+                <span id="badgeEstadoSupabase" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.9rem; border-radius: 2rem; font-weight: 600; font-size: 0.82rem; background: ${badgeColor}15; color: ${badgeColor}; border: 1px solid ${badgeColor}40;">
+                    ${badgeTexto}
+                </span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <button data-csp-click="probarConexionBaseDatosUI()" class="btn-sm" style="background: #0b2b4f; color: white; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem;">
+                    <i class="fas fa-sync-alt" id="iconoRefrescarTest"></i> Probar Conexión
+                </button>
+            </div>
+        </div>
+
+        <!-- PESTAÑAS (TABS) -->
+        <div style="display: flex; background: #f1f5f9; border-bottom: 1px solid #cbd5e1; padding: 0 1.5rem; gap: 0.5rem; overflow-x: auto;">
+            <button data-csp-click="cambiarTabBaseDatos('conexion')" style="padding: 0.9rem 1.4rem; border: none; background: ${tabActivoBD === 'conexion' ? '#ffffff' : 'transparent'}; font-weight: 700; color: ${tabActivoBD === 'conexion' ? '#0b2b4f' : '#64748b'}; border-top: 3px solid ${tabActivoBD === 'conexion' ? '#c99d3b' : 'transparent'}; cursor: pointer; border-radius: 8px 8px 0 0; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+                <i class="fas fa-plug"></i> Conexión & Credenciales
+            </button>
+            <button data-csp-click="cambiarTabBaseDatos('tablas')" style="padding: 0.9rem 1.4rem; border: none; background: ${tabActivoBD === 'tablas' ? '#ffffff' : 'transparent'}; font-weight: 700; color: ${tabActivoBD === 'tablas' ? '#0b2b4f' : '#64748b'}; border-top: 3px solid ${tabActivoBD === 'tablas' ? '#c99d3b' : 'transparent'}; cursor: pointer; border-radius: 8px 8px 0 0; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+                <i class="fas fa-table"></i> Tablas y Registros (${totalRegistrosLocales})
+            </button>
+            <button data-csp-click="cambiarTabBaseDatos('sincronizar')" style="padding: 0.9rem 1.4rem; border: none; background: ${tabActivoBD === 'sincronizar' ? '#ffffff' : 'transparent'}; font-weight: 700; color: ${tabActivoBD === 'sincronizar' ? '#0b2b4f' : '#64748b'}; border-top: 3px solid ${tabActivoBD === 'sincronizar' ? '#c99d3b' : 'transparent'}; cursor: pointer; border-radius: 8px 8px 0 0; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+                <i class="fas fa-cloud-upload-alt"></i> Sincronizar Nube
+            </button>
+            <button data-csp-click="cambiarTabBaseDatos('sql')" style="padding: 0.9rem 1.4rem; border: none; background: ${tabActivoBD === 'sql' ? '#ffffff' : 'transparent'}; font-weight: 700; color: ${tabActivoBD === 'sql' ? '#0b2b4f' : '#64748b'}; border-top: 3px solid ${tabActivoBD === 'sql' ? '#c99d3b' : 'transparent'}; cursor: pointer; border-radius: 8px 8px 0 0; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+                <i class="fas fa-code"></i> Asistente SQL
+            </button>
+        </div>
+
+        <!-- CUERPO DEL CONTENIDO -->
+        <div style="flex: 1; overflow-y: auto; padding: 1.8rem 2rem; background: #ffffff;">
+            
+            <!-- TAB 1: CONEXIÓN & CREDENCIALES -->
+            ${tabActivoBD === 'conexion' ? `
+                <div style="max-width: 720px; margin: 0 auto;">
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 1.2rem; padding: 1.5rem; margin-bottom: 1.5rem;">
+                        <h3 style="font-size: 1.1rem; color: #0b2b4f; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-key" style="color: #c99d3b;"></i> Configurar Credenciales de Supabase
+                        </h3>
+                        <p style="font-size: 0.88rem; color: #64748b; line-height: 1.5; margin-bottom: 1.2rem;">
+                            Ingresa los datos de tu proyecto de Supabase (obtenidos en <em>Project Settings ➔ API</em> en supabase.com). Los cambios se guardan y aplican al instante.
+                        </p>
+
+                        <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+                            <div>
+                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #334155; margin-bottom: 0.4rem;">
+                                    <i class="fas fa-link" style="color: #0b2b4f;"></i> Supabase Project URL:
+                                </label>
+                                <input type="url" id="inputSupabaseUrlUI" value="${creds.url}" placeholder="https://tu-proyecto.supabase.co" style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid #cbd5e1; border-radius: 0.8rem; font-family: monospace; font-size: 0.9rem; background: #ffffff;">
+                            </div>
+
+                            <div>
+                                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #334155; margin-bottom: 0.4rem;">
+                                    <i class="fas fa-shield-alt" style="color: #0b2b4f;"></i> Supabase Anon Key (Public API Key):
+                                </label>
+                                <textarea id="inputSupabaseKeyUI" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid #cbd5e1; border-radius: 0.8rem; font-family: monospace; font-size: 0.85rem; background: #ffffff; resize: vertical;">${creds.anonKey}</textarea>
+                            </div>
+
+                            <div style="display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; justify-content: space-between; padding-top: 0.5rem;">
+                                <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+                                    <button data-csp-click="guardarCredencialesSupabaseUI()" class="btn-sm" style="background: #c99d3b; color: #0b2b4f; font-weight: 700; padding: 0.65rem 1.6rem; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; border: none; box-shadow: 0 4px 14px rgba(201,157,59,0.3);">
+                                        <i class="fas fa-save"></i> Guardar y Conectar
+                                    </button>
+                                    <button data-csp-click="probarConexionBaseDatosUI()" class="btn-sm" style="background: #0b2b4f; color: white; font-weight: 600; padding: 0.65rem 1.4rem; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem; border: none;">
+                                        <i class="fas fa-bolt"></i> Probar Conexión
+                                    </button>
+                                </div>
+                                <button data-csp-click="restablecerCredencialesSupabaseUI()" class="btn-sm" style="background: transparent; color: #64748b; border: 1px solid #cbd5e1; padding: 0.55rem 1rem; font-size: 0.82rem;">
+                                    <i class="fas fa-undo"></i> Restablecer por Defecto
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CAJA DE DIAGNÓSTICO -->
+                    <div id="cajaDiagnosticoBD" style="background: #f1f5f9; border-radius: 1rem; padding: 1.2rem 1.5rem; border: 1px solid #cbd5e1;">
+                        <h4 style="font-size: 0.9rem; color: #334155; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
+                            <i class="fas fa-info-circle" style="color: #0b2b4f;"></i> Diagnóstico del Servidor:
+                        </h4>
+                        <div id="textoDiagnosticoBD" style="font-size: 0.85rem; color: #475569; line-height: 1.5; font-family: 'Inter', sans-serif;">
+                            ${status.message}
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
+
+            <!-- TAB 2: TABLAS Y REGISTROS -->
+            ${tabActivoBD === 'tablas' ? `
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.8rem;">
+                        <div>
+                            <h3 style="font-size: 1.15rem; color: #0b2b4f; margin: 0;">Colecciones de la Iglesia</h3>
+                            <p style="font-size: 0.85rem; color: #64748b; margin: 0.2rem 0 0;">Visualiza el número de registros en almacenamiento local sincronizado.</p>
+                        </div>
+                        <div style="display: flex; gap: 0.6rem;">
+                            <button data-csp-click="descargarRespaldoJSON()" class="btn-sm" style="background: #0b2b4f; color: white; display: inline-flex; align-items: center; gap: 0.4rem;">
+                                <i class="fas fa-download"></i> Descargar Respaldo JSON
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+                        ${conteoTablas.map(t => `
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.1rem 1.3rem; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s ease;" data-csp-mouseover="this.style.borderColor='#c99d3b'; this.style.transform='translateY(-2px)'" data-csp-mouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'">
+                                <div style="display: flex; align-items: center; gap: 0.8rem;">
+                                    <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(11,43,79,0.08); display: flex; align-items: center; justify-content: center; color: #0b2b4f; font-size: 1.1rem;">
+                                        <i class="fas ${t.icono}"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 700; color: #1e293b; font-size: 0.88rem;">${t.nombre}</div>
+                                        <div style="font-size: 0.75rem; color: #64748b; font-family: monospace;">${t.tabla}</div>
+                                    </div>
+                                </div>
+                                <div style="background: #0b2b4f; color: #ffffff; padding: 0.25rem 0.7rem; border-radius: 1rem; font-weight: 700; font-size: 0.85rem;">
+                                    ${t.count}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+
+            <!-- TAB 3: SINCRONIZAR NUBE -->
+            ${tabActivoBD === 'sincronizar' ? `
+                <div style="max-width: 680px; margin: 0 auto; text-align: center;">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(201,157,59,0.15); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #c99d3b; margin: 0 auto 1.2rem;">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3 style="font-size: 1.3rem; color: #0b2b4f; margin-bottom: 0.5rem;">Sincronización Total Local ➔ Supabase</h3>
+                    <p style="font-size: 0.9rem; color: #64748b; line-height: 1.6; margin-bottom: 1.8rem;">
+                        Esta acción enviará todos los eventos, libros, encuestas, preguntas de examen, miembros de clubes y registros locales directamente a tu base de datos Supabase en la nube.
+                    </p>
+
+                    <div id="progresoSyncContenedor" style="display: none; margin-bottom: 1.5rem; text-align: left; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.2rem;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; color: #334155; margin-bottom: 0.5rem;">
+                            <span id="textoProgresoSync">Sincronizando...</span>
+                            <span id="porcentajeProgresoSync">0%</span>
+                        </div>
+                        <div style="width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden;">
+                            <div id="barraProgresoSync" style="width: 0%; height: 100%; background: linear-gradient(90deg, #c99d3b, #0b2b4f); transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+
+                    <button data-csp-click="sincronizarBaseDatosUI()" id="btnIniciarSync" class="btn" style="background: #c99d3b; color: #0b2b4f; font-weight: 800; padding: 0.9rem 2.5rem; font-size: 1rem; border-radius: 2.5rem; display: inline-flex; align-items: center; gap: 0.6rem; border: none; cursor: pointer; box-shadow: 0 8px 24px rgba(201,157,59,0.35);">
+                        <i class="fas fa-sync-alt"></i> Iniciar Sincronización Ahora
+                    </button>
+                </div>
+            ` : ''}
+
+            <!-- TAB 4: ASISTENTE SQL -->
+            ${tabActivoBD === 'sql' ? `
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.8rem;">
+                        <div>
+                            <h3 style="font-size: 1.15rem; color: #0b2b4f; margin: 0;">Script de Creación de Tablas (supabase_setup.sql)</h3>
+                            <p style="font-size: 0.85rem; color: #64748b; margin: 0.2rem 0 0;">Copia y ejecuta este script en el <strong>SQL Editor</strong> de Supabase para inicializar todas las tablas, columnas y políticas RLS.</p>
+                        </div>
+                        <button data-csp-click="copiarSQLSupabaseUI()" id="btnCopiarSQL" class="btn-sm" style="background: #0b2b4f; color: white; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.2rem; font-size: 0.88rem;">
+                            <i class="fas fa-copy"></i> Copiar Todo el SQL
+                        </button>
+                    </div>
+
+                    <div style="background: #0f172a; border-radius: 1rem; padding: 1.2rem; overflow-x: auto; border: 1px solid #1e293b; max-height: 380px;">
+                        <pre style="margin: 0; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.82rem; color: #94a3b8; line-height: 1.5; white-space: pre-wrap;" id="codigoSQLEditor">-- ============================================================
+-- SCRIPT DEFINITIVO DE CONFIGURACIÓN EN SUPABASE
+-- IASD Belén · Iglesia Adventista del Séptimo Día
+-- ============================================================
+
+-- 1. TABLA ENCUESTAS
+CREATE TABLE IF NOT EXISTS public.encuestas (
+    id TEXT PRIMARY KEY,
+    pregunta TEXT DEFAULT '',
+    titulo TEXT DEFAULT '',
+    opciones JSONB DEFAULT '[]'::jsonb,
+    votos JSONB DEFAULT '[]'::jsonb,
+    activa BOOLEAN DEFAULT true
+);
+
+-- 2. TABLA ALUMNOS_IDENTIDADES
+CREATE TABLE IF NOT EXISTS public.alumnos_identidades (
+    documento TEXT PRIMARY KEY,
+    nombre TEXT,
+    whatsapp TEXT,
+    grupo TEXT DEFAULT 'General',
+    pin TEXT,
+    fecharegistro TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- 3. TABLA CRONOGRAMA_PREDICADORES
+CREATE TABLE IF NOT EXISTS public.cronograma_predicadores (
+    id TEXT PRIMARY KEY,
+    fecha TEXT,
+    predicador TEXT,
+    culto_tipo TEXT,
+    actividad TEXT DEFAULT 'Culto',
+    tema TEXT,
+    curso TEXT,
+    recurrente BOOLEAN DEFAULT false,
+    semanas INTEGER DEFAULT 1
+);
+
+-- 4. TABLA LIBROS Y BIBLIOTECA
+CREATE TABLE IF NOT EXISTS public.libros (
+    id TEXT PRIMARY KEY,
+    titulo TEXT DEFAULT '',
+    autor TEXT DEFAULT '',
+    categoria TEXT DEFAULT 'General',
+    cant INTEGER DEFAULT 1,
+    estado TEXT DEFAULT 'Disponible',
+    ubicacion TEXT DEFAULT 'Biblioteca',
+    numero_inventario TEXT DEFAULT '',
+    portada_url TEXT DEFAULT '',
+    disponible BOOLEAN DEFAULT true
+);
+ALTER TABLE public.libros ADD COLUMN IF NOT EXISTS cant INTEGER DEFAULT 1;
+ALTER TABLE public.libros ADD COLUMN IF NOT EXISTS ubicacion TEXT DEFAULT 'Biblioteca';
+ALTER TABLE public.libros ADD COLUMN IF NOT EXISTS numero_inventario TEXT DEFAULT '';
+ALTER TABLE public.libros ADD COLUMN IF NOT EXISTS portada_url TEXT DEFAULT '';
+ALTER TABLE public.libros ALTER COLUMN numero_inventario DROP NOT NULL;
+ALTER TABLE public.libros ALTER COLUMN numero_inventario SET DEFAULT '';
+
+CREATE TABLE IF NOT EXISTS public.pedidos_libros (
+    id TEXT PRIMARY KEY,
+    libro_id TEXT,
+    libroid INTEGER DEFAULT 0,
+    solicitante TEXT,
+    solicitante_nombre TEXT,
+    telefono TEXT,
+    email TEXT,
+    fecha TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    estado TEXT DEFAULT 'Pendiente',
+    titulo_libro TEXT,
+    titulolibro TEXT
+);
+
+CREATE TABLE IF NOT EXISTS public.interesados (
+    id TEXT PRIMARY KEY,
+    nombre TEXT,
+    telefono TEXT,
+    whatsapp TEXT,
+    direccion TEXT,
+    email TEXT,
+    estudio_interes TEXT DEFAULT 'Estudio Bíblico',
+    estado TEXT DEFAULT 'nuevo',
+    contactado BOOLEAN DEFAULT false,
+    fecha TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    notas TEXT
+);
+
+-- 5. TABLA ANUNCIOS Y EVENTOS
+CREATE TABLE IF NOT EXISTS public.anuncios (
+    id TEXT PRIMARY KEY,
+    titulo TEXT,
+    descripcion TEXT,
+    imagen TEXT,
+    url TEXT,
+    categoria TEXT DEFAULT 'General',
+    fecha TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    creadopor TEXT DEFAULT 'admin'
+);
+
+CREATE TABLE IF NOT EXISTS public.eventos_iglesia (
+    id TEXT PRIMARY KEY,
+    titulo TEXT,
+    descripcion TEXT,
+    fecha TEXT,
+    hora TEXT,
+    tipo TEXT DEFAULT 'General',
+    lugar TEXT DEFAULT 'Templo Principal'
+);
+
+-- 6. TABLAS DE CLUBES
+CREATE TABLE IF NOT EXISTS public.bd_aventureros (
+    id TEXT PRIMARY KEY, nombre TEXT, apellido TEXT, documento TEXT, fecha_nacimiento TEXT, tutor_nombre TEXT, celular TEXT, unidad TEXT, cargo TEXT DEFAULT 'Miembro', tipo_sangre TEXT, cartillas TEXT, especialidades TEXT, estado TEXT DEFAULT 'activo'
+);
+
+CREATE TABLE IF NOT EXISTS public.bd_conquistadores (
+    id TEXT PRIMARY KEY, nombre TEXT, apellido TEXT, documento TEXT, fecha_nacimiento TEXT, tutor_nombre TEXT, celular TEXT, unidad TEXT, cargo TEXT DEFAULT 'Miembro', tipo_sangre TEXT, cartillas TEXT, especialidades TEXT, estado TEXT DEFAULT 'activo'
+);
+
+CREATE TABLE IF NOT EXISTS public.bd_guias_mayores (
+    id TEXT PRIMARY KEY, nombre TEXT, apellido TEXT, documento TEXT, fecha_nacimiento TEXT, tutor_nombre TEXT, celular TEXT, unidad TEXT, cargo TEXT DEFAULT 'Miembro', tipo_sangre TEXT, cartillas TEXT, especialidades TEXT, estado TEXT DEFAULT 'activo'
+);
+
+-- 7. TABLAS LMS Y EVALUACIÓN
+CREATE TABLE IF NOT EXISTS public.examenes (
+    id TEXT PRIMARY KEY,
+    id_curso TEXT DEFAULT 'general',
+    titulo TEXT,
+    descripcion TEXT,
+    duracion_min INTEGER DEFAULT 30,
+    preguntas JSONB DEFAULT '[]'::jsonb,
+    cantidadpreguntas INTEGER DEFAULT 0,
+    activo BOOLEAN DEFAULT true
+);
+
+CREATE TABLE IF NOT EXISTS public.respuestas_examenes (
+    id TEXT PRIMARY KEY,
+    examen_id TEXT,
+    alumno_documento TEXT,
+    alumno_nombre TEXT,
+    calificacion NUMERIC DEFAULT 0,
+    respuestas JSONB DEFAULT '{}'::jsonb,
+    intento INTEGER DEFAULT 1,
+    estado TEXT DEFAULT 'aprobado',
+    fecha_rendido TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Habilitar RLS público para lectura/escritura anónima
+ALTER TABLE public.encuestas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.alumnos_identidades ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cronograma_predicadores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.libros ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.pedidos_libros ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.interesados ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.anuncios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.eventos_iglesia ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.bd_aventureros ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.bd_conquistadores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.bd_guias_mayores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.examenes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.respuestas_examenes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Acceso total encuestas" ON public.encuestas FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Acceso total alumnos" ON public.alumnos_identidades FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Acceso total cronograma" ON public.cronograma_predicadores FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Acceso total libros" ON public.libros FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Acceso total pedidos" ON public.pedidos_libros FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Acceso total interesados" ON public.interesados FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Acceso total anuncios" ON public.anuncios FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Acceso total eventos" ON public.eventos_iglesia FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Acceso total aventureros" ON public.bd_aventureros FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Acceso total conquistadores" ON public.bd_conquistadores FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Acceso total guias" ON public.bd_guias_mayores FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Acceso total examenes" ON public.examenes FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Acceso total respuestas" ON public.respuestas_examenes FOR ALL TO anon USING (true) WITH CHECK (true);
+</pre>
+                    </div>
+                </div>
+            ` : ''}
+
+        </div>
+    </div>
+    `;
+}
+
+async function probarConexionBaseDatosUI(silencioso) {
+    const icono = document.getElementById('iconoRefrescarTest');
+    if (icono) icono.classList.add('fa-spin');
+
+    const badge = document.getElementById('badgeEstadoSupabase');
+    const diagnostico = document.getElementById('textoDiagnosticoBD');
+
+    if (badge) {
+        badge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando conexión...';
+        badge.style.color = '#d97706';
+    }
+
+    if (window.testSupabaseConnection) {
+        const res = await window.testSupabaseConnection();
+
+        if (icono) icono.classList.remove('fa-spin');
+
+        if (res.ok) {
+            if (badge) {
+                badge.innerHTML = '🟢 Conectado a la Nube (Supabase Live)';
+                badge.style.color = '#2e7d32';
+                badge.style.background = '#2e7d3215';
+                badge.style.borderColor = '#2e7d3240';
+            }
+            if (diagnostico) {
+                diagnostico.innerHTML = `<span style="color: #2e7d32; font-weight: 700;">✅ ${res.message}</span>`;
+            }
+        } else {
+            if (badge) {
+                if (res.code === '401_UNAUTHORIZED') {
+                    badge.innerHTML = '⚠️ Clave Anon Inválida / Expirada';
+                    badge.style.color = '#d97706';
+                } else {
+                    badge.innerHTML = '🔴 Desconectado (Modo Local Seguro)';
+                    badge.style.color = '#e53935';
+                }
+            }
+            if (diagnostico) {
+                diagnostico.innerHTML = `<span style="color: #e53935; font-weight: 600;">⚠️ ${res.message}</span><br><small style="color:#64748b;">(La aplicación continúa operando con persistencia local de forma automática).</small>`;
+            }
+        }
+
+        if (!silencioso && window.mostrarAlertaAdmin) {
+            if (res.ok) {
+                mostrarAlertaAdmin('✅ ¡Conexión con Supabase verificada exitosamente!');
+            } else {
+                mostrarAlertaAdmin(`⚠️ Nota de conexión: ${res.message}\n\nIngresa una URL y Clave Anon válidas en la pestaña "Conexión & Credenciales".`);
+            }
+        }
+    }
+}
+
+async function guardarCredencialesSupabaseUI() {
+    const inputUrl = document.getElementById('inputSupabaseUrlUI');
+    const inputKey = document.getElementById('inputSupabaseKeyUI');
+
+    if (!inputUrl || !inputKey) return;
+
+    const url = inputUrl.value.trim();
+    const key = inputKey.value.trim();
+
+    if (!url || !url.startsWith('http')) {
+        alert('Por favor ingresa una URL válida de Supabase (ej: https://xyz.supabase.co)');
+        return;
+    }
+    if (!key || key.length < 20) {
+        alert('Por favor ingresa una clave Anon Key válida.');
+        return;
+    }
+
+    if (window.setSupabaseCredentials) {
+        const res = await window.setSupabaseCredentials(url, key);
+        renderizarModalBaseDatos();
+        probarConexionBaseDatosUI();
+        if (res.ok) {
+            alert('✅ Credenciales guardadas y conexión exitosa con Supabase.');
+        } else {
+            alert(`⚠️ Credenciales guardadas. Nota: ${res.message}`);
+        }
+    }
+}
+
+async function restablecerCredencialesSupabaseUI() {
+    if (confirm('¿Restablecer las credenciales de Supabase a los valores por defecto del proyecto?')) {
+        if (window.resetSupabaseCredentials) {
+            await window.resetSupabaseCredentials();
+            renderizarModalBaseDatos();
+            probarConexionBaseDatosUI();
+        }
+    }
+}
+
+async function sincronizarBaseDatosUI() {
+    const btn = document.getElementById('btnIniciarSync');
+    const contenedorProgreso = document.getElementById('progresoSyncContenedor');
+    const textoProgreso = document.getElementById('textoProgresoSync');
+    const porcentajeProgreso = document.getElementById('porcentajeProgresoSync');
+    const barra = document.getElementById('barraProgresoSync');
+
+    if (btn) btn.disabled = true;
+    if (contenedorProgreso) contenedorProgreso.style.display = 'block';
+
+    if (window.sincronizarTodoASupabase) {
+        const res = await window.sincronizarTodoASupabase(function(actual, total, tabla) {
+            const pct = Math.round((actual / total) * 100);
+            if (textoProgreso) textoProgreso.textContent = `Sincronizando ${tabla} (${actual}/${total})...`;
+            if (porcentajeProgreso) porcentajeProgreso.textContent = `${pct}%`;
+            if (barra) barra.style.width = `${pct}%`;
+        });
+
+        if (btn) btn.disabled = false;
+        if (textoProgreso) textoProgreso.textContent = res.message;
+        if (porcentajeProgreso) porcentajeProgreso.textContent = '100%';
+        if (barra) barra.style.width = '100%';
+
+        if (window.mostrarAlertaAdmin) {
+            mostrarAlertaAdmin(`✅ ${res.message}`);
+        } else {
+            alert(res.message);
+        }
+    }
+}
+
+function copiarSQLSupabaseUI() {
+    const pre = document.getElementById('codigoSQLEditor');
+    const btn = document.getElementById('btnCopiarSQL');
+    if (!pre) return;
+
+    const texto = pre.innerText || pre.textContent;
+    navigator.clipboard.writeText(texto).then(function() {
+        if (btn) {
+            btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+            btn.style.background = '#2e7d32';
+            setTimeout(function() {
+                btn.innerHTML = '<i class="fas fa-copy"></i> Copiar Todo el SQL';
+                btn.style.background = '#0b2b4f';
+            }, 2500);
+        }
+    }).catch(function() {
+        alert('No se pudo copiar automáticamente. Por favor selecciona el texto y presiona Ctrl+C.');
+    });
+}
+
+function descargarRespaldoJSON() {
+    const keys = Object.keys(window.KEY_TO_TABLE || {});
+    const respaldo = {
+        fechaExportacion: new Date().toISOString(),
+        version: '1.0',
+        iglesia: 'IASD Belén',
+        datos: {}
+    };
+
+    keys.forEach(k => {
+        try {
+            const raw = localStorage.getItem(k);
+            if (raw) respaldo.datos[k] = JSON.parse(raw);
+        } catch(e){}
+    });
+
+    const blob = new Blob([JSON.stringify(respaldo, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `respaldo_iasd_belen_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+}
+
+// Exportar funciones del módulo de base de datos a window
+window.abrirModalBaseDatos = abrirModalBaseDatos;
+window.cerrarModalBaseDatos = cerrarModalBaseDatos;
+window.cambiarTabBaseDatos = cambiarTabBaseDatos;
+window.renderizarModalBaseDatos = renderizarModalBaseDatos;
+window.probarConexionBaseDatosUI = probarConexionBaseDatosUI;
+window.guardarCredencialesSupabaseUI = guardarCredencialesSupabaseUI;
+window.restablecerCredencialesSupabaseUI = restablecerCredencialesSupabaseUI;
+window.sincronizarBaseDatosUI = sincronizarBaseDatosUI;
+window.copiarSQLSupabaseUI = copiarSQLSupabaseUI;
+window.descargarRespaldoJSON = descargarRespaldoJSON;
+
 
 

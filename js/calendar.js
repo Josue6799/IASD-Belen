@@ -182,7 +182,7 @@ const CalendarManager = {
 
             // Solo mostrar botón de eliminar si NO es un club (el tipo 'aventureros','conquistadores','guias')
             if (type === 'general') {
-                html += `<button onclick="CalendarManager.eliminarEvento('${type}', '${fechaClave}', ${index})" class="btn-sm btn-danger">
+                html += `<button data-csp-click="CalendarManager.eliminarEvento('${type}', '${fechaClave}', ${index})" class="btn-sm btn-danger">
                 <i class="fas fa-trash"></i>
             </button>`;
             } else {

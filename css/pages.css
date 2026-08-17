@@ -4,9 +4,143 @@
    ======================================== */
 
 /* ==================== CREENCIAS & BUSCADOR ==================== */
-.search-creencias-box {
-    max-width: 600px;
+.creencias-hero-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* ==================== BANNER INTERACTIVO 28 CREENCIAS ==================== */
+.cta-creencias-banner {
+    max-width: 850px;
     margin: 0 auto 2.5rem;
+    background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%);
+    border-radius: 1.8rem;
+    padding: 2.2rem 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(26, 58, 74, 0.18);
+    border: 1px solid rgba(201, 165, 59, 0.35);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.cta-creencias-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(201, 165, 59, 0.25) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.cta-creencias-banner:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 35px rgba(26, 58, 74, 0.25);
+    border-color: var(--golden);
+}
+
+.cta-creencias-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cta-creencias-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(201, 165, 59, 0.25);
+    color: #ffd700;
+    border: 1px solid rgba(201, 165, 59, 0.4);
+    padding: 0.35rem 1.1rem;
+    border-radius: 2rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 0.9rem;
+}
+
+.cta-creencias-title {
+    font-family: 'Montserrat', 'Inter', sans-serif;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 0.6rem;
+    line-height: 1.3;
+}
+
+.cta-creencias-description {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+    max-width: 650px;
+    margin: 0 auto 1.6rem;
+    line-height: 1.6;
+}
+
+.btn-cta-creencias {
+    background: linear-gradient(135deg, #c9a53b 0%, #b08d2b 100%);
+    color: #1a3a4a;
+    padding: 0.9rem 2.2rem;
+    border-radius: 2rem;
+    font-weight: 800;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 4px 20px rgba(201, 165, 59, 0.35);
+    border: none;
+    cursor: pointer;
+    min-height: 44px;
+}
+
+.btn-cta-creencias:hover {
+    background: linear-gradient(135deg, #ffd700 0%, #c9a53b 100%);
+    color: #0b1d28;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(201, 165, 59, 0.5);
+}
+
+@media (max-width: 768px) {
+    .cta-creencias-banner {
+        padding: 1.6rem 1.2rem;
+        margin-bottom: 1.8rem;
+        border-radius: 1.4rem;
+    }
+
+    .btn-cta-creencias {
+        width: 100%;
+        justify-content: center;
+        padding: 0.85rem 1.5rem;
+    }
+}
+
+.creencias-badge-pill {
+    background: rgba(201, 157, 59, 0.12);
+    color: var(--golden);
+    border: 1px solid rgba(201, 157, 59, 0.3);
+    padding: 0.35rem 1.2rem;
+    border-radius: 2rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.search-creencias-box {
+    max-width: 650px;
+    margin: 0 auto 1.5rem;
     position: relative;
 }
 
@@ -14,11 +148,11 @@
     width: 100%;
     padding: 1rem 1.4rem 1rem 3.2rem;
     border-radius: 3rem;
-    border: 2px solid var(--golden-light);
+    border: 2px solid rgba(201, 157, 59, 0.25);
     background: var(--pure-white);
     font-family: 'Inter', sans-serif;
-    font-size: 1rem;
-    box-shadow: var(--shadow-sm);
+    font-size: 0.98rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
     transition: var(--transition);
 }
 
@@ -37,48 +171,188 @@
     font-size: 1.2rem;
 }
 
-.creencia-card {
-    background: var(--pure-white);
-    border-radius: 1.6rem;
-    padding: 1.8rem;
-    margin-bottom: 1.6rem;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid rgba(201, 157, 59, 0.12);
-    border-left: 5px solid var(--golden);
-    transition: var(--transition);
+/* Category Filter Tabs */
+.creencias-filter-wrapper {
+    margin-bottom: 2.2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
 }
 
-.creencia-card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-3px);
+.creencias-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    max-width: 960px;
+    margin: 0 auto;
 }
 
-.creencia-card h3 {
+.creencia-tab-btn {
+    padding: 0.55rem 1.15rem;
+    border-radius: 2rem;
+    border: 1px solid rgba(11, 43, 79, 0.15);
+    background: #ffffff;
     color: var(--deep-blue);
-    font-size: 1.25rem;
-    margin-bottom: 0.6rem;
-}
-
-.creencia-card .versiculos-box {
-    background: var(--cream);
-    padding: 1rem 1.4rem;
-    border-radius: 1rem;
-    margin-top: 1rem;
-    border-left: 4px solid var(--golden);
-}
-
-.creencia-card .versiculos-box p {
     font-weight: 600;
-    color: var(--deep-blue);
-    font-size: 0.9rem;
+    font-size: 0.86rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    font-family: 'Inter', sans-serif;
 }
 
-.creencia-card .versiculos-box ul {
-    padding-left: 1.2rem;
-    line-height: 1.8;
+.creencia-tab-btn:hover {
+    border-color: var(--golden);
+    background: rgba(201, 157, 59, 0.08);
+    transform: translateY(-1px);
+}
+
+.creencia-tab-btn.active {
+    background: var(--deep-blue) !important;
+    color: #ffffff !important;
+    border-color: var(--deep-blue) !important;
+    box-shadow: 0 4px 14px rgba(11, 43, 79, 0.25);
+}
+
+.creencia-tab-btn.active i {
+    color: var(--golden-light);
+}
+
+/* Grid de creencias */
+.creencias-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    .creencias-grid {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+    }
+}
+
+.creencia-item-card {
+    background: #ffffff;
+    border-radius: 1.4rem;
+    padding: 1.8rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    border: 1px solid rgba(201, 157, 59, 0.16);
+    border-left: 5px solid var(--golden);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+.creencia-item-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.08);
+    border-color: rgba(201, 157, 59, 0.35);
+}
+
+.creencia-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.creencia-num-badge {
+    background: linear-gradient(135deg, var(--deep-blue), var(--deep-blue-light));
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.78rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.creencia-category-tag {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--golden);
+    background: rgba(201, 157, 59, 0.10);
+    padding: 0.25rem 0.7rem;
+    border-radius: 1rem;
+}
+
+.creencia-item-card h3 {
+    color: var(--deep-blue);
+    font-size: 1.22rem;
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    margin-bottom: 0.7rem;
+    line-height: 1.35;
+}
+
+.creencia-item-card p {
+    color: var(--dark-text);
+    font-size: 0.93rem;
+    line-height: 1.65;
+    margin-bottom: 0.8rem;
+}
+
+/* Versículos desplegables */
+.creencia-verses-toggle {
+    margin-top: auto;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.verses-btn {
+    background: transparent;
+    border: none;
+    color: var(--deep-blue);
+    font-weight: 600;
+    font-size: 0.86rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.2s ease;
+    padding: 0.2rem 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.verses-btn:hover {
+    color: var(--golden);
+}
+
+.verses-content {
+    background: var(--cream, #fdfaf3);
+    border-radius: 0.9rem;
+    padding: 0.9rem 1.2rem;
+    margin-top: 0.6rem;
+    border: 1px solid rgba(201, 157, 59, 0.18);
+    border-left: 4px solid var(--golden);
+    font-size: 0.86rem;
     color: var(--muted-text);
-    font-size: 0.88rem;
-    margin-top: 0.4rem;
+    line-height: 1.6;
+    display: none;
+}
+
+.verses-content.open {
+    display: block;
+    animation: fadeUp 0.3s ease;
+}
+
+.verses-content ul {
+    padding-left: 1.2rem;
+    margin-top: 0.3rem;
+}
+
+.verses-content ul li {
+    margin-bottom: 0.4rem;
+    color: var(--dark-text);
 }
 
 /* ==================== CLUBES ==================== */
@@ -1640,14 +1914,65 @@
     background: var(--pure-white);
     border-radius: 1.5rem;
     padding: 2rem;
-    width: 90%;
+    width: 92%;
     max-width: 600px;
-    max-height: 80vh;
+    max-height: 85vh;
     overflow-y: auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     box-shadow: var(--shadow-lg);
     border: 2px solid rgba(201, 157, 59, 0.25);
     animation: slideUp 0.3s ease;
     font-family: 'Inter', sans-serif;
+    scrollbar-width: thin;
+    scrollbar-color: var(--golden) #f5efe6;
+}
+
+.modal-biblioteca-card::-webkit-scrollbar,
+#listaEliminarLibros::-webkit-scrollbar,
+#listaLibrosAdminEstados::-webkit-scrollbar,
+#listaPedidosLibros::-webkit-scrollbar,
+.tabla-contenedor-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.modal-biblioteca-card::-webkit-scrollbar-track,
+#listaEliminarLibros::-webkit-scrollbar-track,
+#listaLibrosAdminEstados::-webkit-scrollbar-track,
+#listaPedidosLibros::-webkit-scrollbar-track,
+.tabla-contenedor-scroll::-webkit-scrollbar-track {
+    background: #f5efe6;
+    border-radius: 6px;
+}
+
+.modal-biblioteca-card::-webkit-scrollbar-thumb,
+#listaEliminarLibros::-webkit-scrollbar-thumb,
+#listaLibrosAdminEstados::-webkit-scrollbar-thumb,
+#listaPedidosLibros::-webkit-scrollbar-thumb,
+.tabla-contenedor-scroll::-webkit-scrollbar-thumb {
+    background: var(--golden, #c99d3b);
+    border-radius: 6px;
+}
+
+.modal-biblioteca-card::-webkit-scrollbar-thumb:hover,
+#listaEliminarLibros::-webkit-scrollbar-thumb:hover,
+#listaLibrosAdminEstados::-webkit-scrollbar-thumb:hover,
+#listaPedidosLibros::-webkit-scrollbar-thumb:hover,
+.tabla-contenedor-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--deep-blue, #1a3a4a);
+}
+
+#listaEliminarLibros,
+#listaLibrosAdminEstados,
+#listaPedidosLibros,
+.tabla-contenedor-scroll {
+    overflow-x: auto !important;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--golden, #c99d3b) #f5efe6;
+    padding-bottom: 0.6rem;
 }
 
 .modal-biblioteca-card h3 {

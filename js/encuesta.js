@@ -42,7 +42,7 @@ const EncuestaManager = {
         // Generar los botones de voto
         if (elOpciones) {
             elOpciones.innerHTML = (enc.opciones || []).map((op, i) => `
-                <button class="opcion-btn" onclick="EncuestaManager.votar(${i})" ${yaVotado ? 'disabled' : ''}>
+                <button class="opcion-btn" data-csp-click="EncuestaManager.votar(${i})" ${yaVotado ? 'disabled' : ''}>
                     ${op}
                 </button>
             `).join('');
@@ -93,12 +93,25 @@ const EncuestaManager = {
 
         // Sincronizar voto individual en Supabase votos_encuestas
         if (window.supabaseClient && enc.id) {
-          const userFingerprint = localStorage.getItem('alumnoIdentidad') || 'anon_' + Date.now();
+          let userFingerprint = 'anon_' + Date.now();
+          try {
+            const rawIdent = localStorage.getItem('alumnoIdentidad');
+            if (rawIdent) {
+              const parsed = JSON.parse(rawIdent);
+              if (parsed && parsed.documento) userFingerprint = String(parsed.documento);
+            }
+          } catch (e) {}
+
           window.supabaseClient.from('votos_encuestas').insert([{
-            encuesta_id: enc.id,
+            id: String(Date.now()),
+            encuesta_id: String(enc.id),
             usuario_identificador: userFingerprint,
-            opcion_index: indexOp
-          }]).catch(err => console.warn('[Encuesta] Error guardando voto en Supabase:', err));
+            opcion_index: indexOp,
+            fecha: new Date().toISOString()
+          }]).then(({ error }) => {
+            if (error) console.error('[Encuesta] Error guardando voto en Supabase:', error);
+            else console.log('[Encuesta] ✅ Voto registrado en Supabase');
+          }).catch(err => console.warn('[Encuesta] Error guardando voto en Supabase:', err));
         }
 
         this.render();
@@ -109,6 +122,62 @@ const EncuestaManager = {
 function mostrarEncuesta() { EncuestaManager.render(); }
 function votar(index) { EncuestaManager.votar(index); }
 
+function toggleAdmin() {
+    const sec = document.getElementById('adminEncuesta');
+    if (!sec) return;
+    if (sec.style.display === 'none' || !sec.style.display) {
+        const pwd = prompt('🔐 Contraseña de Administración de Encuestas:');
+        if (pwd === 'admin2026' || pwd === 'admin2026!' || pwd === 'belen2026' || pwd === 'belen2026!') {
+            sec.style.display = 'block';
+        } else if (pwd !== null) {
+            alert('❌ Contraseña incorrecta.');
+        }
+    } else {
+        sec.style.display = 'none';
+    }
+}
+
+function guardarPreguntaAdmin() {
+    const pregInp = document.getElementById('inputPreguntaAdmin');
+    const opcInp = document.getElementById('inputOpcionesAdmin');
+    const preg = pregInp ? pregInp.value.trim() : '';
+    const opcRaw = opcInp ? opcInp.value.trim() : '';
+
+    if (!preg || !opcRaw) {
+        alert('⚠️ Por favor ingresa la pregunta y las opciones separadas por coma.');
+        return;
+    }
+
+    const opciones = opcRaw.split(',').map(o => o.trim()).filter(Boolean);
+    if (opciones.length < 2) {
+        alert('⚠️ Ingresa al menos 2 opciones separadas por coma.');
+        return;
+    }
+
+    const encuestas = EncuestaManager.cargar();
+    const nuevaEncuesta = {
+        id: String(Date.now()),
+        pregunta: preg,
+        titulo: preg,
+        opciones: opciones,
+        votos: new Array(opciones.length).fill(0),
+        activa: true
+    };
+
+    encuestas.unshift(nuevaEncuesta);
+    EncuestaManager.guardar(encuestas);
+
+    if (pregInp) pregInp.value = '';
+    if (opcInp) opcInp.value = '';
+    const sec = document.getElementById('adminEncuesta');
+    if (sec) sec.style.display = 'none';
+
+    EncuestaManager.render();
+    alert('✅ Encuesta agregada y publicada exitosamente');
+}
+
+window.toggleAdmin = toggleAdmin;
+window.guardarPreguntaAdmin = guardarPreguntaAdmin;
 
 // ===== CONEXIÓN CON EL ADMIN =====
 // Cuando el Admin agregue o elimine una encuesta, la página se actualizará sola.

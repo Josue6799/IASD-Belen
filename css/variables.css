@@ -1,43 +1,60 @@
 /* ========================================
-   VARIABLES & DESIGN TOKENS
-   IASD Belén · Iglesia Adventista
+   VARIABLES & DESIGN TOKENS (PREMIUM EDITION)
+   IASD Belén · Iglesia Adventista del Séptimo Día
    ======================================== */
 :root {
-    /* Paleta Institucional */
+    /* Paleta Institucional Noble */
     --deep-blue: #0b2b4f;
-    --deep-blue-light: #1a3f6a;
+    --deep-blue-dark: #07192d;
+    --deep-blue-light: #163e6e;
+    --deep-blue-soft: rgba(11, 43, 79, 0.08);
+
+    /* Oro Institucional y Acentos Cálidos */
     --golden: #c99d3b;
-    --golden-light: #e7c87b;
-    --golden-glow: rgba(201, 157, 59, 0.25);
+    --golden-light: #dfb75c;
+    --golden-soft: #f4e8cb;
+    --golden-glow: rgba(201, 157, 59, 0.22);
+    --golden-border: rgba(201, 157, 59, 0.35);
 
     /* Neutros & Fondos */
-    --cream: #fdfaf3;
-    --cream-dark: #f5f0e4;
+    --cream: #fbf9f5;
+    --cream-card: #ffffff;
+    --cream-dark: #f3ede2;
     --pure-white: #ffffff;
-    --dark-text: #1a2330;
-    --muted-text: #5a6070;
+    --dark-text: #141f2d;
+    --dark-text-secondary: #2b3a4a;
+    --muted-text: #596579;
+    --border-subtle: #e8e3d8;
 
     /* Estados & Feedback */
-    --success: #4caf50;
-    --danger: #e53935;
+    --success: #2e7d32;
+    --success-bg: #e8f5e9;
+    --danger: #d32f2f;
+    --danger-bg: #ffebee;
+    --warning: #ed6c02;
 
-    /* Sombras & Elevaciones */
-    --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.07);
-    --shadow-lg: 0 24px 56px rgba(0, 0, 0, 0.10);
+    /* Sombras & Elevaciones Ópticas */
+    --shadow-xs: 0 2px 8px rgba(11, 43, 79, 0.04);
+    --shadow-sm: 0 6px 20px rgba(11, 43, 79, 0.06);
+    --shadow-md: 0 14px 36px rgba(11, 43, 79, 0.09);
+    --shadow-lg: 0 24px 60px rgba(11, 43, 79, 0.14);
+    --shadow-golden: 0 8px 26px rgba(201, 157, 59, 0.28);
 
     /* Geometría */
-    --radius-card: 1.6rem;
-    --radius-btn: 3rem;
+    --radius-sm: 0.6rem;
+    --radius-md: 1rem;
+    --radius-card: 1.4rem;
+    --radius-btn: 2.4rem;
+    --transition: all 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
 
     /* Tipografía */
-    --font-heading: 'Playfair Display', Georgia, serif;
-    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-sans: 'Montserrat', sans-serif;
 }
 
 /* Reset Global */
-* {
+*, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -45,55 +62,57 @@
 
 html {
     scroll-behavior: smooth;
+    font-size: 16px;
 }
 
 body {
     font-family: var(--font-body);
     background: var(--cream);
     color: var(--dark-text);
-    line-height: 1.6;
-    letter-spacing: 0.02em;
+    line-height: 1.65;
+    letter-spacing: 0.01em;
     font-size: 1.05rem;
     min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
-h1,
-h2,
-h3 {
+h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    letter-spacing: 0.01em;
+    color: var(--deep-blue);
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
 h1 {
-    font-size: clamp(2.6rem, 5vw, 3.6rem);
-    font-weight: 700;
-    line-height: 1.25;
+    font-size: clamp(2.4rem, 4.5vw, 3.4rem);
+    line-height: 1.2;
 }
 
 h2 {
-    font-size: clamp(1.9rem, 3.5vw, 2.4rem);
-    font-weight: 700;
-    line-height: 1.35;
+    font-size: clamp(1.8rem, 3.2vw, 2.3rem);
+    line-height: 1.3;
 }
 
 h3 {
-    font-size: clamp(1.35rem, 2.5vw, 1.7rem);
-    font-weight: 600;
-    line-height: 1.4;
-}
-
-h4 {
-    font-family: var(--font-body);
-    font-weight: 700;
+    font-size: clamp(1.3rem, 2.2vw, 1.6rem);
+    line-height: 1.35;
 }
 
 a {
     text-decoration: none;
     color: inherit;
+    transition: var(--transition);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1260px;
     margin: 0 auto;
     padding: 0 1.8rem;
 }

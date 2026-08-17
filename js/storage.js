@@ -19,6 +19,7 @@ const KEY_TO_TABLE = {
     'plan_estudios': 'plan_estudios',
     'lms_alumnos_identidades': 'alumnos_identidades',
     'alumnos_identidades': 'alumnos_identidades',
+    'alumnoIdentidad': 'alumnos_identidades',
     'db_examenes': 'examenes',
     'misCursos': 'inscripciones_cursos',
 
@@ -34,12 +35,8 @@ const KEY_TO_TABLE = {
     'eventos_guias_mayores': 'eventos_guias_mayores',
     'miembros_clubes': 'miembros_clubes',
     'eventos_clubes': 'eventos_clubes',
-    'cuotas_clubes': 'cuotas_clubes',
-    'votos_encuestas': 'votos_encuestas',
-    'logros_alumnos': 'logros_alumnos'
+    'cuotas_clubes': 'cuotas_clubes'
 };
-
-window.KEY_TO_TABLE = KEY_TO_TABLE;
 
 const StorageHelper = {
     // Claves por defecto
@@ -81,6 +78,29 @@ const StorageHelper = {
         }
     },
 
+    // Eliminar un elemento por ID (guarda en localStorage y elimina en Supabase)
+    delete(key, valueId, colNameOverride) {
+        try {
+            const table = KEY_TO_TABLE[key];
+            if (table && window.SupabaseSync) {
+                window.SupabaseSync.delete(key, table, colNameOverride, valueId);
+            } else {
+                const raw = localStorage.getItem(key);
+                if (raw) {
+                    let localData = JSON.parse(raw);
+                    if (Array.isArray(localData)) {
+                        localData = localData.filter(item => item && String(item[colNameOverride || 'id']) !== String(valueId));
+                        localStorage.setItem(key, JSON.stringify(localData));
+                    }
+                }
+            }
+            return true;
+        } catch (e) {
+            console.error(`Error al eliminar en ${key}:`, e);
+            return false;
+        }
+    },
+
     // Obtener clave por tipo de club/calendario
     getCalendarKey(type) {
         switch (type) {
@@ -92,5 +112,6 @@ const StorageHelper = {
     }
 };
 
+window.KEY_TO_TABLE = KEY_TO_TABLE;
 window.StorageHelper = StorageHelper;
 

@@ -1,0 +1,8 @@
+{
+  "name": "IASD Belén",
+  "description": "Sitio web oficial de la Iglesia Adventista del Séptimo Día Belén, con calendario, anuncios, creencias, biblioteca y gestión de clubes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

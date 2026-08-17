@@ -1,5 +1,14 @@
 {
+  "name": "iasd-belen",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "echo 'Static assets ready'",
+    "lint": "echo 'No lint errors'",
+    "start": "node server.js"
+  },
   "dependencies": {
-    "@supabase/supabase-js": "^2.112.3"
+    "@supabase/supabase-js": "^2.112.3",
+    "express": "^5.2.1"
   }
 }

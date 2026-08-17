@@ -360,28 +360,13 @@ function enviarFormulario(event) {
             id: String(Date.now()),
             nombre: nombre,
             whatsapp: whatsapp,
-            telefono: whatsapp,
             email: email || 'No proporcionado',
-            fecha: new Date().toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' }),
-            fecha_contacto: new Date().toISOString(),
-            contactado: false,
-            estudio_interes: 'Estudio Bíblico',
-            estado: 'nuevo',
-            direccion: '',
-            notas: ''
+            fecha: new Date().toISOString(),
+            contactado: false
         };
 
-        const idx = interesados.findIndex(i => i && String(i.id) === String(nuevoInteresado.id));
-        if (idx === -1) {
-            interesados.push(nuevoInteresado);
-        } else {
-            interesados[idx] = nuevoInteresado;
-        }
-
+        interesados.push(nuevoInteresado);
         StorageHelper.set('interesados', interesados);
-        if (window.SupabaseSync) {
-            window.SupabaseSync.insert('interesados', 'interesados', nuevoInteresado);
-        }
 
         // Si la sección de administración de interesados está visible, actualizarla
         const seccion = document.getElementById('seccionVerInteresados');
@@ -389,7 +374,7 @@ function enviarFormulario(event) {
             seccion.innerHTML = window.generarHTMLInteresados();
         }
     } catch (e) {
-        console.error('Error al guardar interesado:', e);
+        console.error('Error al guardar interesado en localStorage:', e);
     }
 
     cerrarModal();
@@ -438,7 +423,7 @@ function renderGaleria() {
                     <i class="far fa-calendar-alt"></i> ${foto.fecha || 'Fecha no especificada'}
                 </p>
                 ${session.nivel === 4 ? `
-                    <button onclick="eliminarFoto(${index})" class="btn btn-danger btn-sm" style="margin-top: 0.5rem;">
+                    <button data-csp-click="eliminarFoto(${index})" class="btn btn-danger btn-sm" style="margin-top: 0.5rem;">
                         <i class="fas fa-trash"></i> Eliminar
                     </button>
                 ` : ''}
@@ -502,7 +487,7 @@ function eliminarFoto(index) {
 
     if (confirm('¿Estás seguro de eliminar esta foto?')) {
         galeriaFotos.splice(index, 1);
-        localStorage.setItem('galeria_fotos', JSON.stringify(galeriaFotos));
+        StorageHelper.set('galeria_fotos', galeriaFotos);
         renderGaleria();
         mostrarNotificacionGaleria('🗑️ Foto eliminada', 'info');
     }
@@ -638,11 +623,8 @@ function initAllAnimations() {
     }, 200);
 }
 
-const originalShowPage = window.showPage;
-
-window.showPage = function (pageId) {
-    originalShowPage(pageId);
-
+// Integración de Scroll Reveal con cambios de página
+window.addEventListener('pageChanged', function () {
     setTimeout(() => {
         resetScrollReveal();
         setTimeout(() => {
@@ -652,9 +634,9 @@ window.showPage = function (pageId) {
                     el.classList.add('visible');
                 }
             });
-        }, 300);
-    }, 200);
-};
+        }, 200);
+    }, 100);
+});
 
 document.addEventListener('DOMContentLoaded', function () {
     setTimeout(initAllAnimations, 500);
@@ -790,7 +772,7 @@ function generarHTMLTablaPredicadoresPublico(actividadNombre, mesAnno, diaSemana
             </div>
             <div class="selector-mes-wrapper" style="display: flex; align-items: center; gap: 0.5rem;">
                 <label style="font-size: 0.85rem; font-weight: 600; color: var(--muted-text);">Mes:</label>
-                <input type="month" value="${mesAnno}" onchange="cambiarMesPublico('${actividadNombre}', this.value, '${targetContainerId}', ${diaSemanaTarget})" style="padding: 0.35rem 0.7rem; border: 1px solid #cbd5e1; border-radius: 0.6rem; font-family: Inter, sans-serif; font-size: 0.85rem; outline: none; cursor: pointer; color: var(--deep-blue); font-weight: 600;">
+                <input type="month" value="${mesAnno}" data-csp-change="cambiarMesPublico('${actividadNombre}', this.value, '${targetContainerId}', ${diaSemanaTarget})" style="padding: 0.35rem 0.7rem; border: 1px solid #cbd5e1; border-radius: 0.6rem; font-family: Inter, sans-serif; font-size: 0.85rem; outline: none; cursor: pointer; color: var(--deep-blue); font-weight: 600;">
             </div>
         </div>
 
@@ -884,7 +866,7 @@ function mostrarGrupo(grupoId) {
 
     container.innerHTML = `
         <div class="grupo-card">
-            <button class="grupo-card-close" onclick="cerrarGrupoCard()" title="Cerrar">&times;</button>
+            <button class="grupo-card-close" data-csp-click="cerrarGrupoCard()" title="Cerrar">&times;</button>
             <div class="titulo-grupo">
                 <i class="fas ${grupo.icono}"></i>
                 ${grupo.nombre}
@@ -1140,7 +1122,7 @@ function aplicarEstadoBloqueoCandado() {
                             <i class="fas fa-lock"></i>
                         </div>
                         <span class="candado-titulo">Contenido Protegido</span>
-                        <button type="button" class="btn-ver-candado" onclick="abrirModalDesbloqueoCandado()">
+                        <button type="button" class="btn-ver-candado" data-csp-click="abrirModalDesbloqueoCandado()">
                             <i class="fas fa-eye"></i> Ver
                         </button>
                     </div>
@@ -1258,7 +1240,7 @@ function renderizarActividadPublica(pageId, mesAnno) {
     const info = ACTIVIDADES_MAPA[pageId] || { nombre: pageId, diaSemana: 6, diaNombre: 'Sábados', icono: 'fa-calendar', categoria: 'Cronograma' };
 
     pageEl.innerHTML = `
-        <button class="back-link" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <button class="back-link" data-csp-click="showPage('home')"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
         <div class="service-box" style="max-width: 900px; margin: 0 auto;">
             <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem; border-bottom:2px solid var(--cream-dark); padding-bottom:1rem;">
                 <div style="width:50px; height:50px; background:linear-gradient(135deg, var(--deep-blue) 0%, var(--deep-blue-light) 100%); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--golden); font-size:1.5rem;">
@@ -1333,7 +1315,7 @@ function renderizarCronogramaPublico(mesAnno) {
     ];
 
     let html = `
-        <button class="back-link" onclick="showPage('home')"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
+        <button class="back-link" data-csp-click="showPage('home')"><i class="fas fa-arrow-left"></i> Volver al Inicio</button>
         <div class="service-box" style="max-width:1100px; margin:0 auto; padding:2rem;">
             <div style="text-align:center; margin-bottom:2rem;">
                 <h2 style="color:var(--deep-blue); font-size:2rem; font-family:'Montserrat',sans-serif; margin-bottom:0.5rem;">
@@ -1345,7 +1327,7 @@ function renderizarCronogramaPublico(mesAnno) {
             <div style="background:var(--cream); padding:1.2rem 1.8rem; border-radius:1.2rem; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:2rem; border:1px solid rgba(201,157,59,0.2);">
                 <div style="display:flex; align-items:center; gap:0.8rem;">
                     <label style="font-weight:700; color:var(--deep-blue); font-size:0.95rem;">📆 Seleccionar Mes:</label>
-                    <input type="month" value="${mesAnno}" onchange="renderizarCronogramaPublico(this.value)" style="padding:0.5rem 0.9rem; border:1px solid #cbd5e1; border-radius:0.6rem; font-family:Inter,sans-serif; font-size:0.95rem; font-weight:600; color:var(--deep-blue); outline:none; cursor:pointer;">
+                    <input type="month" value="${mesAnno}" data-csp-change="renderizarCronogramaPublico(this.value)" style="padding:0.5rem 0.9rem; border:1px solid #cbd5e1; border-radius:0.6rem; font-family:Inter,sans-serif; font-size:0.95rem; font-weight:600; color:var(--deep-blue); outline:none; cursor:pointer;">
                 </div>
                 <span style="font-weight:700; color:var(--deep-blue); background:white; padding:0.5rem 1.2rem; border-radius:1rem; border:1px solid rgba(11,43,79,0.1); font-size:1rem;">
                     📅 ${mesNombre} ${ano}
@@ -1493,7 +1475,7 @@ function obtenerTransmisiones() {
 }
 
 function guardarTransmisiones(lista) {
-    localStorage.setItem('transmisiones', JSON.stringify(lista));
+    StorageHelper.set('transmisiones', lista);
     actualizarBotonFlotanteEnVivo();
     window.dispatchEvent(new CustomEvent('transmisionesActualizadas'));
 }
@@ -1568,7 +1550,7 @@ function renderizarVistaCategoriasEnVivo() {
         const hayLive = videosCat.some(t => t.enVivo);
 
         html += `
-        <div class="envivo-card-cat" onclick="abrirCategoriaEnVivo('${cat.nombre}')">
+        <div class="envivo-card-cat" data-csp-click="abrirCategoriaEnVivo('${cat.nombre}')">
             <div class="envivo-cat-icon" style="background: linear-gradient(135deg, ${cat.color} 0%, #2c5f7c 100%);">
                 ${cat.icono}
             </div>
@@ -1594,7 +1576,7 @@ function abrirCategoriaEnVivo(categoriaNombre) {
 
     titulo.innerHTML = `
     <div style="display:flex; align-items:center; gap:0.8rem;">
-        <button onclick="renderizarVistaCategoriasEnVivo()" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:0.4rem 0.8rem; border-radius:1rem; font-size:0.85rem; cursor:pointer; font-weight:600; font-family:Inter,sans-serif;">
+        <button data-csp-click="renderizarVistaCategoriasEnVivo()" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:0.4rem 0.8rem; border-radius:1rem; font-size:0.85rem; cursor:pointer; font-weight:600; font-family:Inter,sans-serif;">
             <i class="fas fa-arrow-left"></i> Categorías
         </button>
         <span>${catObj.icono} ${categoriaNombre}</span>
@@ -1609,7 +1591,7 @@ function abrirCategoriaEnVivo(categoriaNombre) {
             <i class="fas fa-video-slash" style="font-size:3rem; color:#cbd5e1; margin-bottom:1rem;"></i>
             <h3 style="color:#1a3a4a; margin-bottom:0.5rem;">No hay transmisiones disponibles</h3>
             <p style="color:#64748b;">Aún no se han agregado transmisiones en la categoría <strong>${categoriaNombre}</strong>.</p>
-            <button onclick="renderizarVistaCategoriasEnVivo()" class="btn-ver-video" style="max-width:200px; margin:1.5rem auto 0;">
+            <button data-csp-click="renderizarVistaCategoriasEnVivo()" class="btn-ver-video" style="max-width:200px; margin:1.5rem auto 0;">
                 <i class="fas fa-arrow-left"></i> Volver a Categorías
             </button>
         </div>
@@ -1679,7 +1661,7 @@ function abrirCategoriaEnVivo(categoriaNombre) {
             html += `
             <div class="envivo-video-item">
                 <div class="envivo-thumb-wrapper">
-                    <img src="${thumbUrl}" alt="${t.titulo}" class="envivo-thumb-img" onerror="this.src='img/Logo adventista.png'">
+                    <img src="${thumbUrl}" alt="${t.titulo}" class="envivo-thumb-img" data-csp-error="this.src='img/Logo adventista.png'">
                     <span class="envivo-plat-badge envivo-plat-${t.plataforma}">
                         <i class="fab fa-${t.plataforma}"></i> ${t.plataforma}
                     </span>
@@ -1690,7 +1672,7 @@ function abrirCategoriaEnVivo(categoriaNombre) {
                         <div class="envivo-video-title">${t.titulo}</div>
                         <div class="envivo-video-fecha"><i class="far fa-calendar-alt"></i> ${t.fecha}</div>
                     </div>
-                    <button onclick="conmutarVideo(${t.id}, '${categoriaNombre}')" class="btn-ver-video">
+                    <button data-csp-click="conmutarVideo(${t.id}, '${categoriaNombre}')" class="btn-ver-video">
                         <i class="fas fa-play"></i> Ver Transmisión
                     </button>
                 </div>
@@ -1820,5 +1802,15 @@ function inicializarAnimacionesUniformes() {
 
 document.addEventListener('DOMContentLoaded', inicializarAnimacionesUniformes);
 window.inicializarAnimacionesUniformes = inicializarAnimacionesUniformes;
+
+function cerrarModalInscripcion() {
+    const modal = document.getElementById('modalInscripcion');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('active');
+    }
+    document.body.style.overflow = '';
+}
+window.cerrarModalInscripcion = cerrarModalInscripcion;
 
 console.log('✅ app.js (Iglesia & En Vivo & Animaciones) cargado correctamente');
