@@ -7,17 +7,12 @@ const EncuestaManager = {
 
     // Cargar el array de encuestas que guardó el Admin
     cargar() {
-        try {
-            const data = localStorage.getItem('encuestasIglesia');
-            return data ? JSON.parse(data) : [];
-        } catch (e) {
-            return [];
-        }
+        return StorageHelper.get('encuestasIglesia', []);
     },
 
     // Guardar el array (para actualizar los votos)
     guardar(encuestas) {
-        localStorage.setItem('encuestasIglesia', JSON.stringify(encuestas));
+        StorageHelper.set('encuestasIglesia', encuestas);
     },
 
     // Renderizar la primera encuesta del array
@@ -42,17 +37,16 @@ const EncuestaManager = {
         const yaVotado = localStorage.getItem('yaVotado_' + enc.id);
 
         // Mostrar la pregunta
-        if (elPregunta) elPregunta.textContent = enc.pregunta;
+        if (elPregunta) elPregunta.textContent = enc.pregunta || enc.titulo;
 
         // Generar los botones de voto
         if (elOpciones) {
-            elOpciones.innerHTML = enc.opciones.map((op, i) => `
+            elOpciones.innerHTML = (enc.opciones || []).map((op, i) => `
                 <button class="opcion-btn" onclick="EncuestaManager.votar(${i})" ${yaVotado ? 'disabled' : ''}>
                     ${op}
                 </button>
             `).join('');
 
-            // Si ya votó, agregar un mensaje de aviso (los botones ya están deshabilitados)
             if (yaVotado) {
                 elOpciones.innerHTML += `<p style="margin-top:0.8rem; color:#2e7d32; font-weight:600; font-size:0.9rem;">✅ Ya has votado en esta encuesta. ¡Gracias por tu participación!</p>`;
             }
@@ -61,8 +55,8 @@ const EncuestaManager = {
         // Generar la barra de resultados y porcentajes
         if (elResultados) {
             const totalVotos = (enc.votos || []).reduce((a, b) => a + (b || 0), 0);
-            elResultados.innerHTML = enc.opciones.map((op, i) => {
-                const votosOp = enc.votos[i] || 0;
+            elResultados.innerHTML = (enc.opciones || []).map((op, i) => {
+                const votosOp = (enc.votos && enc.votos[i]) || 0;
                 const porcentaje = totalVotos > 0 ? Math.round((votosOp / totalVotos) * 100) : 0;
                 return `
                     <div class="resultado-item">
@@ -86,26 +80,28 @@ const EncuestaManager = {
 
         const enc = encuestas[0];
 
-        // ⚠️ Verificar si ya votó antes de procesar el voto
         if (localStorage.getItem('yaVotado_' + enc.id)) {
             alert('Ya has votado en esta encuesta.');
             return;
         }
 
         if (!enc.votos) enc.votos = new Array(enc.opciones.length).fill(0);
-
-        // Incrementar el voto
         enc.votos[indexOp] = (enc.votos[indexOp] || 0) + 1;
 
-        // Guardar los cambios en localStorage
         this.guardar(encuestas);
-
-        // ✅ Marcar en el navegador del usuario que ya votó en esta encuesta
         localStorage.setItem('yaVotado_' + enc.id, 'true');
 
-        // Volver a renderizar para mostrar el cambio y deshabilitar los botones
-        this.render();
+        // Sincronizar voto individual en Supabase votos_encuestas
+        if (window.supabaseClient && enc.id) {
+          const userFingerprint = localStorage.getItem('alumnoIdentidad') || 'anon_' + Date.now();
+          window.supabaseClient.from('votos_encuestas').insert([{
+            encuesta_id: enc.id,
+            usuario_identificador: userFingerprint,
+            opcion_index: indexOp
+          }]).catch(err => console.warn('[Encuesta] Error guardando voto en Supabase:', err));
+        }
 
+        this.render();
     }
 };
 

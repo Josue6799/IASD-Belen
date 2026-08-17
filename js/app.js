@@ -355,18 +355,33 @@ function enviarFormulario(event) {
     }
 
     try {
-        const interesados = JSON.parse(localStorage.getItem('interesados')) || [];
+        const interesados = StorageHelper.get('interesados', []);
         const nuevoInteresado = {
-            id: Date.now(),
+            id: String(Date.now()),
             nombre: nombre,
             whatsapp: whatsapp,
+            telefono: whatsapp,
             email: email || 'No proporcionado',
             fecha: new Date().toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' }),
-            contactado: false
+            fecha_contacto: new Date().toISOString(),
+            contactado: false,
+            estudio_interes: 'Estudio Bíblico',
+            estado: 'nuevo',
+            direccion: '',
+            notas: ''
         };
 
-        interesados.push(nuevoInteresado);
-        localStorage.setItem('interesados', JSON.stringify(interesados));
+        const idx = interesados.findIndex(i => i && String(i.id) === String(nuevoInteresado.id));
+        if (idx === -1) {
+            interesados.push(nuevoInteresado);
+        } else {
+            interesados[idx] = nuevoInteresado;
+        }
+
+        StorageHelper.set('interesados', interesados);
+        if (window.SupabaseSync) {
+            window.SupabaseSync.insert('interesados', 'interesados', nuevoInteresado);
+        }
 
         // Si la sección de administración de interesados está visible, actualizarla
         const seccion = document.getElementById('seccionVerInteresados');
@@ -374,7 +389,7 @@ function enviarFormulario(event) {
             seccion.innerHTML = window.generarHTMLInteresados();
         }
     } catch (e) {
-        console.error('Error al guardar interesado en localStorage:', e);
+        console.error('Error al guardar interesado:', e);
     }
 
     cerrarModal();
@@ -395,14 +410,7 @@ function enviarFormulario(event) {
 let galeriaFotos = [];
 
 function cargarGaleria() {
-    const saved = localStorage.getItem('galeria_fotos');
-    if (saved) {
-        try {
-            galeriaFotos = JSON.parse(saved);
-        } catch (e) {
-            galeriaFotos = [];
-        }
-    }
+    galeriaFotos = StorageHelper.get('galeria_fotos', []);
     renderGaleria();
 }
 
@@ -474,7 +482,7 @@ function agregarFoto() {
         };
 
         galeriaFotos.unshift(nuevaFoto);
-        localStorage.setItem('galeria_fotos', JSON.stringify(galeriaFotos));
+        StorageHelper.set('galeria_fotos', galeriaFotos);
         renderGaleria();
 
         titulo.value = '';
@@ -742,11 +750,7 @@ function obtenerMesAnnoActual() {
 }
 
 function cargarPredicadoresFechasPublico() {
-    try {
-        return JSON.parse(localStorage.getItem('cronograma_predicadores_fechas')) || {};
-    } catch (e) {
-        return {};
-    }
+    return StorageHelper.get('cronograma_predicadores_fechas', {});
 }
 
 function calcularFechasDelMesPublico(ano, mesIndex, diaSemanaTarget) {
@@ -1033,7 +1037,7 @@ function enviarSolicitud(event) {
 
     // Guardar el pedido en localStorage con la clave libros_pedidos
     try {
-        const pedidos = JSON.parse(localStorage.getItem('libros_pedidos')) || [];
+        const pedidos = StorageHelper.get('libros_pedidos', []);
         pedidos.push({
             id: Date.now(),
             libroId: 0,
@@ -1044,7 +1048,7 @@ function enviarSolicitud(event) {
             estado: 'Pendiente',
             tituloLibro: libro
         });
-        localStorage.setItem('libros_pedidos', JSON.stringify(pedidos));
+        StorageHelper.set('libros_pedidos', pedidos);
 
         // Notificar cambios para sincronizar con el panel del administrador
         window.dispatchEvent(new CustomEvent('datosBibliotecaActualizados'));
@@ -1485,17 +1489,7 @@ const TRANSMISIONES_INICIALES = [
 let videoActivoEnVivoId = null;
 
 function obtenerTransmisiones() {
-    const data = localStorage.getItem('transmisiones');
-    if (!data) {
-        localStorage.setItem('transmisiones', JSON.stringify(TRANSMISIONES_INICIALES));
-        return TRANSMISIONES_INICIALES;
-    }
-    try {
-        const parsed = JSON.parse(data);
-        return Array.isArray(parsed) ? parsed : TRANSMISIONES_INICIALES;
-    } catch (e) {
-        return TRANSMISIONES_INICIALES;
-    }
+    return StorageHelper.get('transmisiones', TRANSMISIONES_INICIALES);
 }
 
 function guardarTransmisiones(lista) {

@@ -25,23 +25,9 @@ const CalendarManager = {
     },
 
     getEventos(type) {
+        let data = [];
         if (type === 'general') {
-            try {
-                const data = localStorage.getItem('eventosIglesia');
-                if (!data) return {};
-                const eventos = JSON.parse(data);
-                if (Array.isArray(eventos)) {
-                    const map = {};
-                    eventos.forEach(ev => {
-                        if (!map[ev.fecha]) map[ev.fecha] = [];
-                        map[ev.fecha].push({ titulo: ev.titulo, hora: ev.hora || '' });
-                    });
-                    return map;
-                }
-                return eventos;
-            } catch (e) {
-                return {};
-            }
+            data = StorageHelper.get('eventosIglesia', []);
         } else {
             const keys = {
                 'aventureros': 'eventos_aventureros',
@@ -49,23 +35,22 @@ const CalendarManager = {
                 'guias': 'eventos_guias_mayores'
             };
             const storageKey = keys[type] || ('eventos_' + type);
-            try {
-                const data = localStorage.getItem(storageKey);
-                if (!data) return {};
-                const eventos = JSON.parse(data);
-                if (Array.isArray(eventos)) {
-                    const map = {};
-                    eventos.forEach(ev => {
-                        if (!map[ev.fecha]) map[ev.fecha] = [];
-                        map[ev.fecha].push({ titulo: ev.titulo, hora: ev.hora || '' });
-                    });
-                    return map;
-                }
-                return eventos;
-            } catch (e) {
-                return {};
-            }
+            data = StorageHelper.get(storageKey, []);
         }
+
+        if (!data) return {};
+        if (Array.isArray(data)) {
+            const map = {};
+            data.forEach(ev => {
+                const fechaStr = ev.fecha || ev.date;
+                if (fechaStr) {
+                    if (!map[fechaStr]) map[fechaStr] = [];
+                    map[fechaStr].push({ titulo: ev.titulo || ev.nombre || ev, hora: ev.hora || '' });
+                }
+            });
+            return map;
+        }
+        return data;
     },
 
     // Renderizar calendario según tipo ('general', 'aventureros', 'conquistadores', 'guias')
@@ -261,6 +246,25 @@ const CalendarManager = {
         eventosMap[fechaClave].push(nombre);
         this.saveEventos(type, eventosMap);
         this.render(type);
+    },
+
+    saveEventos(type, eventosMap) {
+        const keys = {
+            'general': 'eventosIglesia',
+            'aventureros': 'eventos_aventureros',
+            'conquistadores': 'eventos_conquistadores',
+            'guias': 'eventos_guias_mayores'
+        };
+        const storageKey = keys[type] || ('eventos_' + type);
+        const list = [];
+        Object.keys(eventosMap).forEach(fecha => {
+            (eventosMap[fecha] || []).forEach(item => {
+                const titulo = typeof item === 'string' ? item : (item.titulo || 'Evento');
+                const hora = typeof item === 'string' ? '09:00' : (item.hora || '09:00');
+                list.push({ fecha, titulo, hora, categoria: type });
+            });
+        });
+        StorageHelper.set(storageKey, list);
     },
 
     // Eliminar evento

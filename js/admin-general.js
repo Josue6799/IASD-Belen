@@ -846,12 +846,11 @@ function cerrarCalendarioClub() {
 }
 
 function cargarEventosClub() {
-    try { return JSON.parse(localStorage.getItem(storageKeyCalendarioClub)) || []; }
-    catch (e) { return []; }
+    return StorageHelper.get(storageKeyCalendarioClub || 'eventos_aventureros', []);
 }
 
 function guardarEventosClub(eventos) {
-    localStorage.setItem(storageKeyCalendarioClub, JSON.stringify(eventos));
+    StorageHelper.set(storageKeyCalendarioClub || 'eventos_aventureros', eventos);
 }
 
 function generarHTMLCalendarioClub(clubNombre) {
@@ -1115,20 +1114,11 @@ function cerrarSeccionCuotas() {
 // ===== FUNCIONES AUXILIARES DE CUOTAS (MODIFICADAS) =====
 
 function cargarCuotas(storageKey) {
-    try {
-        const data = localStorage.getItem(storageKey);
-        return data ? JSON.parse(data) : [];
-    } catch (e) {
-        return [];
-    }
+    return StorageHelper.get(storageKey || 'cuotas_aventureros', []);
 }
 
 function guardarCuotas(storageKey, datos) {
-    try {
-        localStorage.setItem(storageKey, JSON.stringify(datos));
-    } catch (e) {
-        console.warn('Error guardando cuotas:', e);
-    }
+    StorageHelper.set(storageKey || 'cuotas_aventureros', datos);
 }
 
 function generarMesesCuotas() {
@@ -1218,7 +1208,7 @@ function generarHTMLCuotas(clubNombre, miembros, storageKey) {
             html += '<td class="col-total-miembro cuotas-total-mes" data-miembro="' + miembro.id + '" data-mes="' + mes.clave + '">$0</td>';
         });
         html += '<td class="col-total-miembro cuotas-total-general" data-miembro="' + miembro.id + '">$0</td>';
-        html += '<td class="col-acciones"><button class="btn-eliminar-miembro" onclick="eliminarMiembroCuotas(' + miembro.id + ')" title="Eliminar miembro">🗑️</button></td>';
+        html += '<td class="col-acciones"><button class="btn-eliminar-miembro" onclick="eliminarMiembroCuotas(\'' + miembro.id + '\')" title="Eliminar miembro">🗑️</button></td>';
         html += '</tr>';
     });
     html += '</tbody></table></div>';
@@ -1509,20 +1499,11 @@ function cerrarSeccionBD() {
 
 // ===== FUNCIONES DE DATOS =====
 function cargarMiembrosBD(storageKey) {
-    try {
-        const data = localStorage.getItem(storageKey);
-        return data ? JSON.parse(data) : [];
-    } catch (e) {
-        return [];
-    }
+    return StorageHelper.get(storageKey || 'bd_aventureros', []);
 }
 
 function guardarMiembrosBD(storageKey, datos) {
-    try {
-        localStorage.setItem(storageKey, JSON.stringify(datos));
-    } catch (e) {
-        console.warn('Error guardando miembros BD:', e);
-    }
+    StorageHelper.set(storageKey || 'bd_aventureros', datos);
 }
 
 // ===== GENERAR HTML DE LA VISTA =====
@@ -1572,8 +1553,8 @@ function generarFilaMiembroBD(miembro, storageKey) {
         '<td>' + (miembro.cartillas || '-') + '</td>' +
         '<td>' + (miembro.especialidades || '-') + '</td>' +
         '<td>' +
-        '<button class="btn-editar-miembro" onclick="abrirModalEditarMiembroBD(' + miembro.id + ',\'' + storageKey + '\')" title="Editar">✏️</button>' +
-        '<button class="btn-eliminar-miembro" onclick="solicitarEliminarMiembroBD(' + miembro.id + ',\'' + storageKey + '\')" title="Eliminar">🗑️</button>' +
+        '<button class="btn-editar-miembro" onclick="abrirModalEditarMiembroBD(\'' + miembro.id + '\',\'' + storageKey + '\')" title="Editar">✏️</button>' +
+        '<button class="btn-eliminar-miembro" onclick="solicitarEliminarMiembroBD(\'' + miembro.id + '\',\'' + storageKey + '\')" title="Eliminar">🗑️</button>' +
         '</td>' +
         '</tr>';
 }
@@ -1674,9 +1655,18 @@ function guardarNuevoMiembroBD() {
 
     const miembros = cargarMiembrosBD(storageKey);
 
+    // Mapeo de clave de cuotas según el club
+    const cuotasKeyMap = {
+        'bd_aventureros': 'cuotas_aventureros',
+        'bd_conquistadores': 'cuotas_conquistadores',
+        'bd_guias_mayores': 'cuotas_guias_mayores'
+    };
+    const cuotasKey = cuotasKeyMap[storageKey] || 'cuotas_aventureros';
+    let cuotasList = cargarCuotas(cuotasKey);
+
     if (miembroBDPendienteEditarId) {
         // Actualizar miembro existente
-        const index = miembros.findIndex(m => m.id === miembroBDPendienteEditarId);
+        const index = miembros.findIndex(m => String(m.id) === String(miembroBDPendienteEditarId));
         if (index !== -1) {
             miembros[index].nombre = nombre;
             miembros[index].cc = cc;
@@ -1685,17 +1675,32 @@ function guardarNuevoMiembroBD() {
             miembros[index].cartillas = cartillas;
             miembros[index].especialidades = especialidades;
         }
+
+        // Actualizar nombre en Cuotas
+        const idxCuotas = cuotasList.findIndex(c => String(c.id) === String(miembroBDPendienteEditarId));
+        if (idxCuotas !== -1) {
+            cuotasList[idxCuotas].nombre = nombre;
+            guardarCuotas(cuotasKey, cuotasList);
+        }
     } else {
         // Agregar nuevo miembro
-        miembros.push({
-            id: Date.now(),
+        const nuevoId = Date.now().toString();
+        const nuevoMiembro = {
+            id: nuevoId,
             nombre: nombre,
             cc: cc,
             tipoSangre: tipoSangre,
             fechaNacimiento: fechaNacimiento,
             cartillas: cartillas,
             especialidades: especialidades
-        });
+        };
+        miembros.push(nuevoMiembro);
+
+        // Conectar automáticamente con Cuotas del club
+        if (!cuotasList.some(c => String(c.id) === String(nuevoId))) {
+            cuotasList.push({ id: nuevoId, nombre: nombre, pagos: {} });
+            guardarCuotas(cuotasKey, cuotasList);
+        }
     }
 
     guardarMiembrosBD(storageKey, miembros);
@@ -1733,8 +1738,28 @@ function confirmarEliminarMiembroBD() {
     if (miembroBDPendienteEliminarId === null || !storageKeyBDPendiente) return;
 
     let miembros = cargarMiembrosBD(storageKeyBDPendiente);
-    miembros = miembros.filter(function (m) { return m.id !== miembroBDPendienteEliminarId; });
+    miembros = miembros.filter(function (m) { return String(m.id) !== String(miembroBDPendienteEliminarId); });
     guardarMiembrosBD(storageKeyBDPendiente, miembros);
+
+    // Conexión automática: Eliminar también de las Cuotas del club
+    const cuotasKeyMap = {
+        'bd_aventureros': 'cuotas_aventureros',
+        'bd_conquistadores': 'cuotas_conquistadores',
+        'bd_guias_mayores': 'cuotas_guias_mayores'
+    };
+    const cuotasKey = cuotasKeyMap[storageKeyBDPendiente];
+    if (cuotasKey) {
+        let cuotasList = cargarCuotas(cuotasKey);
+        cuotasList = cuotasList.filter(function (c) { return String(c.id) !== String(miembroBDPendienteEliminarId); });
+        guardarCuotas(cuotasKey, cuotasList);
+        if (window.SupabaseSync) {
+            window.SupabaseSync.delete(cuotasKey, cuotasKey, 'id', miembroBDPendienteEliminarId);
+        }
+    }
+
+    if (window.SupabaseSync) {
+        window.SupabaseSync.delete(storageKeyBDPendiente, storageKeyBDPendiente, 'id', miembroBDPendienteEliminarId);
+    }
 
     // Recargar vista
     const seccionBD = document.getElementById('seccionBaseDatosClub');
@@ -1833,15 +1858,11 @@ const ESTRUCTURA_ACTIVIDADES = [
 ];
 
 function cargarPredicadoresFechas() {
-    try {
-        return JSON.parse(localStorage.getItem(STORAGE_PREDICADORES_FECHAS)) || {};
-    } catch (e) {
-        return {};
-    }
+    return StorageHelper.get(STORAGE_PREDICADORES_FECHAS, {});
 }
 
 function guardarPredicadoresFechas(data) {
-    localStorage.setItem(STORAGE_PREDICADORES_FECHAS, JSON.stringify(data));
+    StorageHelper.set(STORAGE_PREDICADORES_FECHAS, data);
     window.dispatchEvent(new Event('datosCronogramaActualizados'));
     window.dispatchEvent(new Event('datosIglesiaActualizados'));
 }
@@ -2126,11 +2147,11 @@ function cerrarEncuestas() {
 }
 
 function cargarEncuestas() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_ENCUESTAS)) || []; }
-    catch (e) { return []; }
+    return StorageHelper.get(STORAGE_ENCUESTAS, []);
 }
+
 function guardarEncuestas(encuestas) {
-    localStorage.setItem(STORAGE_ENCUESTAS, JSON.stringify(encuestas));
+    StorageHelper.set(STORAGE_ENCUESTAS, encuestas);
 }
 
 function generarHTMLEncuestas() {
@@ -2319,14 +2340,10 @@ function importarDatosClub(event) {
                 const bdKey = CLUBES_STORAGE_BD[club] || 'bd_aventureros';
                 const eventosKey = CLUBES_STORAGE_CALENDARIO[club] || 'eventos_aventureros';
 
-                // Guardar en localStorage
-                guardarCuotas(cuotasKey, data.cuotas);
-                guardarMiembrosBD(bdKey, data.bd);
-                try {
-                    localStorage.setItem(eventosKey, JSON.stringify(data.eventos));
-                } catch (err) {
-                    console.error('Error guardando eventos en localStorage:', err);
-                }
+                // Guardar en StorageHelper (guarda en localStorage + sincroniza automáticamente a las 3 tablas de Supabase)
+                StorageHelper.set(cuotasKey, data.cuotas);
+                StorageHelper.set(bdKey, data.bd);
+                StorageHelper.set(eventosKey, data.eventos);
 
                 // Disparar eventos de actualización
                 window.dispatchEvent(new CustomEvent('datosClubActualizados', { detail: { club: club } }));
@@ -2373,31 +2390,21 @@ let seccionVerPedidosActual = 'Libros'; // 'Libros' o 'Pedidos'
 let filtroTextoLibrosPedidos = '';
 
 function cargarLibros() {
-    try {
-        const data = localStorage.getItem(STORAGE_LIBROS);
-        return data ? JSON.parse(data) : [];
-    } catch (e) {
-        return [];
-    }
+    return StorageHelper.get(STORAGE_LIBROS, []);
 }
 
 function guardarLibros(libros) {
-    localStorage.setItem(STORAGE_LIBROS, JSON.stringify(libros));
+    StorageHelper.set(STORAGE_LIBROS, libros);
     window.dispatchEvent(new CustomEvent('datosBibliotecaActualizados'));
     window.dispatchEvent(new Event('datosBibliotecaActualizados'));
 }
 
 function cargarPedidos() {
-    try {
-        const data = localStorage.getItem(STORAGE_PEDIDOS);
-        return data ? JSON.parse(data) : [];
-    } catch (e) {
-        return [];
-    }
+    return StorageHelper.get(STORAGE_PEDIDOS, []);
 }
 
 function guardarPedidos(pedidos) {
-    localStorage.setItem(STORAGE_PEDIDOS, JSON.stringify(pedidos));
+    StorageHelper.set(STORAGE_PEDIDOS, pedidos);
     window.dispatchEvent(new CustomEvent('datosBibliotecaActualizados'));
     window.dispatchEvent(new Event('datosBibliotecaActualizados'));
 }
@@ -2583,6 +2590,7 @@ function renderizarEliminarLibro(libros) {
 
     let html = '<div style="overflow-x:auto;"><table class="tabla-libros" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:600px;">';
     html += '<thead><tr style="background:#1a3a4a; color:white; text-align:left;">';
+    html += '<th style="padding:0.7rem;"># Inv.</th>';
     html += '<th style="padding:0.7rem;">Título</th>';
     html += '<th style="padding:0.7rem;">Autor</th>';
     html += '<th style="padding:0.7rem; text-align:center;">Cant.</th>';
@@ -2592,6 +2600,7 @@ function renderizarEliminarLibro(libros) {
 
     libros.forEach((lib, index) => {
         const bgRow = index % 2 === 0 ? '#ffffff' : '#f9f8f5';
+        const numInv = lib.numero_inventario ? `#${lib.numero_inventario}` : `#${index + 1}`;
         const cant = lib.cant || lib.cantidad || 1;
         const estado = lib.estado || 'Disponible';
         const estadoBadgeClass = estado === 'Disponible'
@@ -2599,13 +2608,14 @@ function renderizarEliminarLibro(libros) {
             : 'background:#fff3e0; color:#e65100; padding:0.2rem 0.6rem; border-radius:1rem; font-weight:600; font-size:0.75rem;';
 
         html += `<tr style="background:${bgRow}; border-bottom:1px solid #eee;">
+            <td style="padding:0.7rem; font-weight:600; color:#5a6474;">${numInv}</td>
             <td style="padding:0.7rem; font-weight:600; color:#1a3a4a;">${lib.titulo}</td>
             <td style="padding:0.7rem; color:#5a6474;">${lib.autor || '-'}</td>
             <td style="padding:0.7rem; text-align:center; font-weight:600;">${cant}</td>
             <td style="padding:0.7rem;"><span style="${estadoBadgeClass}">${estado}</span></td>
             <td style="padding:0.7rem; text-align:center; white-space:nowrap;">
-                <button type="button" onclick="abrirModalEditarLibro(${lib.id})" style="background:#f0a800; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;" title="Editar libro">✏️ Editar</button>
-                <button type="button" onclick="confirmarEliminarLibro(${lib.id})" style="background:#c62828; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar libro">🗑️ Eliminar</button>
+                <button type="button" onclick="abrirModalEditarLibro('${lib.id}')" style="background:#f0a800; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;" title="Editar libro">✏️ Editar</button>
+                <button type="button" onclick="confirmarEliminarLibro('${lib.id}')" style="background:#c62828; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar libro">🗑️ Eliminar</button>
             </td>
         </tr>`;
     });
@@ -2622,6 +2632,9 @@ function confirmarEliminarLibro(id) {
     mostrarConfirmAdmin(`¿Estás seguro de que deseas eliminar <strong>"${tituloLibro}"</strong> de la biblioteca?`, 'Eliminar libro', function () {
         let nuevosLibros = cargarLibros().filter(l => String(l.id) !== String(id));
         guardarLibros(nuevosLibros);
+        if (window.SupabaseSync) {
+            window.SupabaseSync.delete('libros_biblioteca', 'libros', 'id', String(id));
+        }
         _librosFiltrados = nuevosLibros;
         filtrarEliminarLibro();
         mostrarToastBiblio('<i class="fas fa-trash"></i> Libro eliminado correctamente', '#c62828');
@@ -2840,10 +2853,10 @@ function renderizarPedidos() {
             <td style="padding:0.7rem; text-align:center; white-space:nowrap;">`;
 
         if (estado !== 'Entregado') {
-            html += `<button type="button" class="btn-accion-libro btn-entregar-libro" onclick="marcarEntregadoPedido(${p.id})" style="background:#2e7d32; color:white; border:none; padding:0.4rem 0.8rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;">✅ Entregar</button>`;
+            html += `<button type="button" class="btn-accion-libro btn-entregar-libro" onclick="marcarEntregadoPedido('${p.id}')" style="background:#2e7d32; color:white; border:none; padding:0.4rem 0.8rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;">✅ Entregar</button>`;
         }
         if (estado !== 'Cancelado' && estado !== 'Entregado') {
-            html += `<button type="button" onclick="cancelarPedido(${p.id})" style="background:#757575; color:white; border:none; padding:0.4rem 0.6rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;">❌ Cancelar</button>`;
+            html += `<button type="button" onclick="cancelarPedido('${p.id}')" style="background:#757575; color:white; border:none; padding:0.4rem 0.6rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;">❌ Cancelar</button>`;
         }
         if (estado === 'Entregado') {
             html += `<span style="color:#2e7d32; font-weight:600; font-size:0.8rem;">✔️ Completado</span>`;
@@ -3001,16 +3014,11 @@ const STORAGE_ANUNCIOS = 'anuncios_eventos';
 let anuncioPendienteEditarId = null;
 
 function cargarAnuncios() {
-    try {
-        const data = localStorage.getItem(STORAGE_ANUNCIOS);
-        return data ? JSON.parse(data) : [];
-    } catch (e) {
-        return [];
-    }
+    return StorageHelper.get(STORAGE_ANUNCIOS, []);
 }
 
 function guardarAnuncios(anuncios) {
-    localStorage.setItem(STORAGE_ANUNCIOS, JSON.stringify(anuncios));
+    StorageHelper.set(STORAGE_ANUNCIOS, anuncios);
     window.dispatchEvent(new CustomEvent('datosAnunciosActualizados'));
     window.dispatchEvent(new Event('datosAnunciosActualizados'));
 }
@@ -3326,8 +3334,8 @@ function renderizarListaQuitar(anuncios) {
         <td style="padding:0.7rem; color:#5a6474;">${a.categoria || 'Anuncio General'}</td>
         <td style="padding:0.7rem; color:#5a6474; white-space:nowrap;">${fecha}</td>
         <td style="padding:0.7rem; text-align:center; white-space:nowrap;">
-            <button type="button" onclick="abrirModalEditarAnuncio(${a.id})" style="background:#f0a800; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;" title="Editar anuncio">✏️ Editar</button>
-            <button type="button" onclick="confirmarEliminarAnuncio(${a.id})" style="background:#c62828; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar anuncio">🗑️ Eliminar</button>
+            <button type="button" onclick="abrirModalEditarAnuncio('${a.id}')" style="background:#f0a800; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;" title="Editar anuncio">✏️ Editar</button>
+            <button type="button" onclick="confirmarEliminarAnuncio('${a.id}')" style="background:#c62828; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar anuncio">🗑️ Eliminar</button>
         </td>
     </tr>`;
     });
@@ -3380,20 +3388,16 @@ function cerrarVerInteresados() {
 }
 
 function cargarInteresados() {
-    try {
-        return JSON.parse(localStorage.getItem(STORAGE_INTERESADOS)) || [];
-    } catch (e) {
-        return [];
-    }
+    return StorageHelper.get(STORAGE_INTERESADOS, []);
 }
 
 function guardarInteresados(lista) {
-    localStorage.setItem(STORAGE_INTERESADOS, JSON.stringify(lista));
+    StorageHelper.set(STORAGE_INTERESADOS, lista);
 }
 
 function toggleContactadoInteresado(id) {
     const lista = cargarInteresados();
-    const index = lista.findIndex(item => item.id === id);
+    const index = lista.findIndex(item => item && String(item.id) === String(id));
     if (index !== -1) {
         lista[index].contactado = !lista[index].contactado;
         guardarInteresados(lista);
@@ -3405,12 +3409,22 @@ function toggleContactadoInteresado(id) {
 function eliminarInteresado(id) {
     if (confirm('¿Estás seguro de que deseas eliminar a este interesado de la lista?')) {
         let lista = cargarInteresados();
-        lista = lista.filter(item => item.id !== id);
+        lista = lista.filter(item => item && String(item.id) !== String(id));
         guardarInteresados(lista);
+        if (window.SupabaseSync) {
+            window.SupabaseSync.delete('interesados', 'interesados', 'id', String(id));
+        }
         const seccion = document.getElementById('seccionVerInteresados');
         if (seccion) seccion.innerHTML = generarHTMLInteresados();
     }
 }
+
+window.addEventListener('supabase_synced_interesados', () => {
+    const seccion = document.getElementById('seccionVerInteresados');
+    if (seccion && seccion.style.display !== 'none' && typeof generarHTMLInteresados === 'function') {
+        seccion.innerHTML = generarHTMLInteresados();
+    }
+});
 
 function generarHTMLInteresados() {
     const lista = cargarInteresados().reverse();
@@ -3484,10 +3498,10 @@ function generarHTMLInteresados() {
                 <td style="padding:0.9rem 0.8rem;">${estadoBadge}</td>
                 <td style="padding:0.9rem 0.8rem;text-align:center;">
                     <div style="display:flex;gap:0.4rem;justify-content:center;">
-                        <button onclick="toggleContactadoInteresado(${item.id})" title="${btnContactoText}" style="background:${btnContactoColor};color:white;border:none;padding:0.4rem 0.8rem;border-radius:0.5rem;cursor:pointer;font-size:0.8rem;font-weight:600;">
+                        <button onclick="toggleContactadoInteresado('${item.id}')" title="${btnContactoText}" style="background:${btnContactoColor};color:white;border:none;padding:0.4rem 0.8rem;border-radius:0.5rem;cursor:pointer;font-size:0.8rem;font-weight:600;">
                             <i class="fas ${btnContactoIcon}"></i>
                         </button>
-                        <button onclick="eliminarInteresado(${item.id})" title="Eliminar" style="background:#dc3545;color:white;border:none;padding:0.4rem 0.8rem;border-radius:0.5rem;cursor:pointer;font-size:0.8rem;">
+                        <button onclick="eliminarInteresado('${item.id}')" title="Eliminar" style="background:#dc3545;color:white;border:none;padding:0.4rem 0.8rem;border-radius:0.5rem;cursor:pointer;font-size:0.8rem;">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -3513,8 +3527,8 @@ window.cerrarModalConfirmarEliminarBD = cerrarModalConfirmarEliminarBD;
 window.filtrarMiembrosBD = filtrarMiembrosBD;
 window.abrirCronograma = abrirCronograma;
 window.cerrarCronograma = cerrarCronograma;
-window.agregarEvento = agregarEvento;
-window.eliminarEvento = eliminarEvento;
+if (typeof agregarEvento !== 'undefined') window.agregarEvento = agregarEvento;
+if (typeof eliminarEvento !== 'undefined') window.eliminarEvento = eliminarEvento;
 window.abrirEncuestas = abrirEncuestas;
 window.cerrarEncuestas = cerrarEncuestas;
 window.agregarEncuesta = agregarEncuesta;
@@ -3753,10 +3767,10 @@ function generarTablaTransmisionesAdminHTML(lista) {
             </td>
             <td style="padding:0.65rem 0.8rem; text-align:center;">
                 <div style="display:flex; gap:0.4rem; justify-content:center;">
-                    <button onclick="editarTransmisionAdmin(${t.id})" style="background:#e0f2fe; color:#0369a1; border:none; padding:0.35rem 0.7rem; border-radius:0.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Editar">
+                    <button onclick="editarTransmisionAdmin('${t.id}')" style="background:#e0f2fe; color:#0369a1; border:none; padding:0.35rem 0.7rem; border-radius:0.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Editar">
                         ✏️ Editar
                     </button>
-                    <button onclick="eliminarTransmisionAdmin(${t.id})" style="background:#fee2e2; color:#991b1b; border:none; padding:0.35rem 0.7rem; border-radius:0.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar">
+                    <button onclick="eliminarTransmisionAdmin('${t.id}')" style="background:#fee2e2; color:#991b1b; border:none; padding:0.35rem 0.7rem; border-radius:0.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar">
                         🗑️ Eliminar
                     </button>
                 </div>
@@ -3950,35 +3964,11 @@ function cerrarCalendarioIglesiaAdmin() {
 }
 
 function cargarEventosIglesiaAdmin() {
-    try {
-        const raw = localStorage.getItem('eventosIglesia');
-        if (!raw) return [];
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) return parsed;
-        const lista = [];
-        Object.keys(parsed).forEach(f => {
-            if (Array.isArray(parsed[f])) {
-                parsed[f].forEach((item) => {
-                    lista.push({
-                        id: Date.now() + Math.random(),
-                        titulo: typeof item === 'string' ? item : item.titulo,
-                        fecha: f,
-                        hora: typeof item === 'string' ? '' : (item.hora || ''),
-                        descripcion: typeof item === 'string' ? '' : (item.descripcion || ''),
-                        recurrente: false,
-                        semanas: 1
-                    });
-                });
-            }
-        });
-        return lista;
-    } catch (e) {
-        return [];
-    }
+    return StorageHelper.get('eventosIglesia', []);
 }
 
 function guardarEventosIglesiaAdmin(eventos) {
-    localStorage.setItem('eventosIglesia', JSON.stringify(eventos));
+    StorageHelper.set('eventosIglesia', eventos);
     window.dispatchEvent(new Event('datosIglesiaActualizados'));
 }
 

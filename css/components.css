@@ -3652,10 +3652,13 @@
 }
 
 @keyframes pulseEnVivo {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: scale(1);
         box-shadow: 0 6px 25px rgba(198, 40, 40, 0.45);
     }
+
     50% {
         transform: scale(1.05);
         box-shadow: 0 10px 30px rgba(198, 40, 40, 0.65);
@@ -3681,8 +3684,13 @@
 }
 
 @keyframes blinkDot {
-    from { opacity: 1; }
-    to { opacity: 0.3; }
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0.3;
+    }
 }
 
 .envivo-modal-overlay {
@@ -3966,7 +3974,7 @@
         font-size: 1.1rem;
     }
 
-#btnEnVivo,
+    #btnEnVivo,
     .btn-flotante-envivo {
         bottom: 1rem;
         right: calc(1rem + 55px + 0.8rem);
@@ -4622,6 +4630,7 @@
         opacity: 0;
         transform: scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -4629,9 +4638,21 @@
 }
 
 @keyframes shakeSeguridad {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-6px); }
-    40%, 80% { transform: translateX(6px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20%,
+    60% {
+        transform: translateX(-6px);
+    }
+
+    40%,
+    80% {
+        transform: translateX(6px);
+    }
 }
 
 .modal-seguridad-close {
@@ -4780,6 +4801,7 @@
         padding: 1.5rem 1.2rem;
         border-radius: 1.2rem;
     }
+
     .modal-seguridad-botones {
         flex-direction: column;
         gap: 0.6rem;
@@ -4790,95 +4812,99 @@
    ANIMACIONES DE UNIFORMES Y CATÁLOGO
    ======================================== */
 .uniforme-img-wrapper {
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  border-radius: 1rem 1rem 0 0;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    border-radius: 1rem 1rem 0 0;
 }
 
 .uniforme-img-wrapper img {
-  width: 100%;
-  height: auto;
-  display: block;
-  transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), filter 0.45s ease;
-  will-change: transform;
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1), filter 0.45s ease;
+    will-change: transform;
 }
 
 .uniforme-card {
-  background: var(--pure-white);
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  text-align: center;
-  border: 1px solid rgba(201, 157, 59, 0.2);
-  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s ease, border-color 0.35s ease;
-  opacity: 0;
-  transform: translateY(28px);
-  will-change: transform, opacity;
+    background: var(--pure-white);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+    border: 1px solid rgba(201, 157, 59, 0.2);
+    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+    opacity: 0;
+    transform: translateY(28px);
+    will-change: transform, opacity;
 }
 
 .uniforme-card.reveal-visible {
-  opacity: 1;
-  transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .uniforme-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
-  border-color: var(--golden);
+    transform: translateY(-8px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+    border-color: var(--golden);
 }
 
 .uniforme-card:hover .uniforme-img-wrapper img {
-  transform: scale(1.05);
-  filter: brightness(1.03);
+    transform: scale(1.05);
+    filter: brightness(1.03);
 }
 
 .uniforme-card p i {
-  transition: transform 0.3s ease, color 0.3s ease;
+    transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .uniforme-card:hover p i {
-  transform: scale(1.25);
-  color: var(--golden);
+    transform: scale(1.25);
+    color: var(--golden);
 }
 
 /* Efecto hover y pulso en botón de catálogo */
 .btn-catalogo-pulse {
-  position: relative;
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1) !important;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1) !important;
 }
 
 .btn-catalogo-pulse:hover {
-  transform: translateY(-4px) scale(1.02) !important;
-  box-shadow: 0 8px 30px rgba(201, 157, 59, 0.5) !important;
-  background: #d4a73b !important;
-  color: var(--deep-blue) !important;
+    transform: translateY(-4px) scale(1.02) !important;
+    box-shadow: 0 8px 30px rgba(201, 157, 59, 0.5) !important;
+    background: #d4a73b !important;
+    color: var(--deep-blue) !important;
 }
 
 .btn-catalogo-pulse:active {
-  transform: translateY(-1px) scale(0.99) !important;
+    transform: translateY(-1px) scale(0.99) !important;
 }
 
 @keyframes btnPulse {
-  0%, 100% {
-    box-shadow: 0 4px 15px rgba(201, 157, 59, 0.25);
-  }
-  50% {
-    box-shadow: 0 6px 22px rgba(201, 157, 59, 0.5);
-  }
+
+    0%,
+    100% {
+        box-shadow: 0 4px 15px rgba(201, 157, 59, 0.25);
+    }
+
+    50% {
+        box-shadow: 0 6px 22px rgba(201, 157, 59, 0.5);
+    }
 }
 
 .btn-catalogo-pulse {
-  animation: btnPulse 3.5s infinite ease-in-out;
+    animation: btnPulse 3.5s infinite ease-in-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .uniforme-card,
-  .uniforme-img-wrapper img,
-  .btn-catalogo-pulse {
-    animation: none !important;
-    transition: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
+
+    .uniforme-card,
+    .uniforme-img-wrapper img,
+    .btn-catalogo-pulse {
+        animation: none !important;
+        transition: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
 }

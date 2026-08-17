@@ -244,7 +244,7 @@
             }
 
             let html = '';
-            libros.forEach(libro => {
+            libros.forEach((libro, idx) => {
                 const estadoClase = libro.estado === 'Disponible' ? 'estado-disponible' : 'estado-en-curso';
                 // Adaptar los nombres de las propiedades
                 const cant = libro.cant || libro.cantidad || 1;
@@ -252,10 +252,13 @@
                 const ubi = libro.ubi || libro.ubicacion || '-';
                 const autor = libro.autor || '';
                 const estado = libro.estado || 'Disponible';
+                const idMostrar = (libro.numero_inventario || libro.numeroInventario) 
+                    ? (libro.numero_inventario || libro.numeroInventario)
+                    : (String(libro.id || '').length > 8 ? (idx + 1) : libro.id);
 
                 html += `
                     <tr>
-                        <td><strong>${libro.id}</strong></td>
+                        <td><strong>${idMostrar}</strong></td>
                         <td>${libro.titulo}</td>
                         <td style="text-align: center;">${cant}</td>
                         <td>${autor}</td>
@@ -344,7 +347,11 @@
             });
         });
     </script>
-    <script src="/js/animations.js"></script>
+    <script src="js/supabase.min.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/migrate_localStorage_to_supabase.js"></script>
+    <script src="js/animations.js"></script>
 </body>
 
 </html>

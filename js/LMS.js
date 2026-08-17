@@ -87,20 +87,11 @@ function generarNuevoId() {
 let EXAMENES_REALIZADOS = [];
 
 function cargarExamenesRealizados() {
-    try {
-        const data = localStorage.getItem('examenesRealizados');
-        EXAMENES_REALIZADOS = data ? JSON.parse(data) : [];
-    } catch (e) {
-        EXAMENES_REALIZADOS = [];
-    }
+    EXAMENES_REALIZADOS = StorageHelper.get('examenesRealizados', []);
 }
 
 function guardarExamenesRealizados() {
-    try {
-        localStorage.setItem('examenesRealizados', JSON.stringify(EXAMENES_REALIZADOS));
-    } catch (e) {
-        console.warn('⚠️ Error guardando exámenes realizados:', e);
-    }
+    StorageHelper.set('examenesRealizados', EXAMENES_REALIZADOS);
 }
 
 // ===== PLAN DE ESTUDIOS Y AYUDAS =====
@@ -147,22 +138,11 @@ const PLAN_ESTUDIOS_DEFAULT = {
 };
 
 function obtenerPlanEstudios() {
-    try {
-        const data = localStorage.getItem('plan_estudios');
-        if (data) return JSON.parse(data);
-        localStorage.setItem('plan_estudios', JSON.stringify(PLAN_ESTUDIOS_DEFAULT));
-        return PLAN_ESTUDIOS_DEFAULT;
-    } catch (e) {
-        return PLAN_ESTUDIOS_DEFAULT;
-    }
+    return StorageHelper.get('plan_estudios', PLAN_ESTUDIOS_DEFAULT);
 }
 
 function guardarPlanEstudios(planData) {
-    try {
-        localStorage.setItem('plan_estudios', JSON.stringify(planData));
-    } catch (e) {
-        console.warn('⚠️ Error guardando plan de estudios:', e);
-    }
+    StorageHelper.set('plan_estudios', planData);
 }
 
 // ===== DATOS DE CURSOS =====
@@ -307,18 +287,11 @@ document.addEventListener('keydown', function (e) {
 
 // ===== IDENTIDAD Y PINS DE ALUMNOS LMS =====
 function obtenerListaAlumnosIdentidades() {
-    try {
-        const data = localStorage.getItem('lms_alumnos_identidades');
-        return data ? JSON.parse(data) : [];
-    } catch (e) {
-        return [];
-    }
+    return StorageHelper.get('lms_alumnos_identidades', []);
 }
 
 function guardarListaAlumnosIdentidades(lista) {
-    try {
-        localStorage.setItem('lms_alumnos_identidades', JSON.stringify(lista));
-    } catch (e) { }
+    StorageHelper.set('lms_alumnos_identidades', lista);
 }
 
 function generarPinUnicoLMS() {
@@ -385,12 +358,7 @@ function obtenerOGenerarPinAlumno(nombre, documento, grupo = 'Clase Belén') {
 }
 
 function obtenerIdentidadAlumno() {
-    try {
-        const data = localStorage.getItem('alumnoIdentidad');
-        return data ? JSON.parse(data) : null;
-    } catch (e) {
-        return null;
-    }
+    return StorageHelper.get('alumnoIdentidad', null);
 }
 
 function guardarIdentidadAlumno(nombre, documento, grupo = 'Clase Belén', pin = '') {
@@ -398,7 +366,7 @@ function guardarIdentidadAlumno(nombre, documento, grupo = 'Clase Belén', pin =
     let alum = lista.find(a => String(a.documento).trim().toLowerCase() === String(documento).trim().toLowerCase());
     const pinFinal = pin || (alum ? alum.pin : '');
     const identidad = { nombre, documento, whatsapp: documento, grupo, pin: pinFinal };
-    localStorage.setItem('alumnoIdentidad', JSON.stringify(identidad));
+    StorageHelper.set('alumnoIdentidad', identidad);
     return identidad;
 }
 
@@ -416,42 +384,26 @@ function examenYaRealizado(curso, tituloExamen) {
 
 // ===== PERSISTENCIA Y CURSOS =====
 function cargarExamenesDesdeStorage() {
-    try {
-        const data = localStorage.getItem('db_examenes');
-        if (data) {
-            const parsed = JSON.parse(data);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-                DB_EXAMENES = parsed.filter(ex => ex && ex.titulo);
-                DB_EXAMENES.forEach(ex => { if (!ex.id) ex.id = generarNuevoId(); });
-                return;
-            }
-        }
-        DB_EXAMENES = JSON.parse(JSON.stringify(DB_EXAMENES_DEFAULT));
-        guardarExamenesEnStorage();
-    } catch (e) {
-        DB_EXAMENES = JSON.parse(JSON.stringify(DB_EXAMENES_DEFAULT));
+    const data = StorageHelper.get('db_examenes', null);
+    if (data && Array.isArray(data) && data.length > 0) {
+        DB_EXAMENES = data.filter(ex => ex && ex.titulo);
+        DB_EXAMENES.forEach(ex => { if (!ex.id) ex.id = generarNuevoId(); });
+        return;
     }
+    DB_EXAMENES = JSON.parse(JSON.stringify(DB_EXAMENES_DEFAULT));
+    guardarExamenesEnStorage();
 }
 
 function guardarExamenesEnStorage() {
-    try {
-        localStorage.setItem('db_examenes', JSON.stringify(DB_EXAMENES));
-    } catch (e) {
-        console.warn('⚠️ Error guardando exámenes:', e);
-    }
+    StorageHelper.set('db_examenes', DB_EXAMENES);
 }
 
 function obtenerMisCursos() {
-    try {
-        const data = localStorage.getItem('misCursos');
-        return data ? JSON.parse(data) : [];
-    } catch (e) {
-        return [];
-    }
+    return StorageHelper.get('misCursos', []);
 }
 
 function guardarMisCursos(cursos) {
-    localStorage.setItem('misCursos', JSON.stringify(cursos));
+    StorageHelper.set('misCursos', cursos);
 }
 
 function inscribirCurso(curso) {
@@ -2822,6 +2774,7 @@ function guardarExamenCompletoAdmin() {
             DB_EXAMENES[idx].preguntas = preguntas;
             DB_EXAMENES[idx].preguntasBanco = preguntas;
             DB_EXAMENES[idx].cantidadPreguntas = preguntas.length;
+            DB_EXAMENES[idx].cantidadpreguntas = preguntas.length;
         }
     } else {
         const nuevoExamen = {
@@ -2833,6 +2786,7 @@ function guardarExamenCompletoAdmin() {
             preguntas: preguntas,
             preguntasBanco: preguntas,
             cantidadPreguntas: preguntas.length,
+            cantidadpreguntas: preguntas.length,
             nota: 'Pendiente',
             calificacion: null
         };

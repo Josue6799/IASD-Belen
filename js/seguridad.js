@@ -34,12 +34,14 @@ const CONTRASENAS_ADMIN = {
   // Anuncios
   'anuncios': 'anuncios2026!',
 
-  // LMS
+  // LMS - Plataforma Educativa
   'lms_crear_examen': 'lmsAdmin2026!',
+  'lms_editar_examen': 'lmsAdmin2026!',
   'lms_editar_examenes': 'lmsAdmin2026!',
-  'lms_resultados': 'lmsNotas2026!',
+  'lms_gestion_pins': 'pinadmin2026!',
   'lms_plan_estudios': 'lmsAyuda2026!',
-  'lms_gestion_pins': 'pinadmin2026!'
+  'lms_gestionar_resultados': 'lmsNotas2026!',
+  'lms_resultados': 'lmsNotas2026!'
 };
 
 const NOMBRES_SECCIONES_ADMIN = {
@@ -62,10 +64,12 @@ const NOMBRES_SECCIONES_ADMIN = {
   'pedidos_biblioteca': 'Ver Pedidos de Biblioteca',
   'anuncios': 'Anuncios',
   'lms_crear_examen': 'LMS – Crear Nuevo Examen',
+  'lms_editar_examen': 'LMS – Editar Examen',
   'lms_editar_examenes': 'LMS – Editar / Eliminar Exámenes',
-  'lms_resultados': 'LMS – Gestionar Resultados',
+  'lms_gestion_pins': 'LMS – Gestión de PINs de Alumnos',
   'lms_plan_estudios': 'LMS – Plan de Estudios y Ayudas',
-  'lms_gestion_pins': 'LMS – Gestión de PINs de Alumnos'
+  'lms_gestionar_resultados': 'LMS – Gestionar Resultados',
+  'lms_resultados': 'LMS – Resultados de Exámenes'
 };
 
 let _callbackModalSeguridad = null;
@@ -258,6 +262,14 @@ window.CONTRASENAS_ADMIN = CONTRASENAS_ADMIN;
 window.verificarAccesoSeccion = verificarAccesoSeccion;
 window.mostrarModalContrasena = mostrarModalContrasena;
 window.cerrarModalContrasena = cerrarModalContrasena;
+
+// Guardián global para funciones de prueba u onclick no definidas (ej. test_miembro_1)
+if (typeof window.test_miembro_1 === 'undefined') {
+  window.test_miembro_1 = function (e) {
+    console.log('📌 Evento test_miembro_1 ejecutado');
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+  };
+}
 
 /*
  * ============================================================
