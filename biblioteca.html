@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Biblioteca Virtual · IASD Belén</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&display=swap" rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <!-- Hojas de Estilo Modulares -->
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/biblioteca.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+</head>
+
+<body>
+
+    <div class="main-container">
+
+        <!-- Botón de regreso -->
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Volver a la Iglesia Virtual
+        </a>
+
+        <!-- Héroe / Encabezado -->
+        <header class="biblioteca-hero">
+            <div class="hero-badge"><i class="fas fa-book-reader"></i> Catálogo Completo</div>
+            <h1>Biblioteca Virtual IASD Belén</h1>
+            <div class="linea-dorada"></div>
+            <p>Explora nuestra colección de literatura espiritual, profética y familiar. Puedes solicitar cualquier libro disponible para préstamo presencial en la iglesia.</p>
+
+            <!-- Tarjetas de Estadísticas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-books"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-num" id="statTotal">55</span>
+                        <span class="stat-label">Libros en Catálogo</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon disponible"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-num" id="statDisponibles">0</span>
+                        <span class="stat-label">Disponibles Ahora</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon prestado"><i class="fas fa-hand-holding-heart"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-num" id="statPrestados">0</span>
+                        <span class="stat-label">En Préstamo</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Botones de Pestañas de la Biblioteca -->
+        <div class="biblioteca-tabs">
+            <button class="tab-btn active" id="tabBtnGeneral" data-csp-click="mostrarBibliotecaGeneral()">📚 Biblioteca General</button>
+            <button class="tab-btn" id="tabBtnEGW" data-csp-click="mostrarBibliotecaEGW()">📖 Biblioteca Elena G. de White</button>
+        </div>
+
+        <!-- SECCIÓN BIBLIOTECA GENERAL -->
+        <div id="seccionBibliotecaGeneral" class="seccion-biblioteca">
+            <!-- Barra de Control: Buscador y Categorías -->
+            <section class="control-panel">
+                <div class="buscador-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="buscadorBibliotecaPublica" data-csp-input="filtrarBibliotecaPublica()" placeholder="Buscar por título, autor, categoría o número..." />
+                    <button class="btn-clear-search" data-csp-click="limpiarBuscador()" id="btnClearSearch" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Filtros de Categorías por Pills -->
+                <div class="categorias-pills" id="contenedorCategoriasPills">
+                    <button class="pill-btn active" data-cat="todas" data-csp-click="filtrarPorCategoria('todas', this)">Todas</button>
+                    <button class="pill-btn" data-cat="Espiritu de profecía" data-csp-click="filtrarPorCategoria('Espiritu de profecía', this)">Espíritu de Profecía</button>
+                    <button class="pill-btn" data-cat="Obra misionera" data-csp-click="filtrarPorCategoria('Obra misionera', this)">Obra Misionera</button>
+                    <button class="pill-btn" data-cat="Doctrinal" data-csp-click="filtrarPorCategoria('Doctrinal', this)">Doctrinal</button>
+                    <button class="pill-btn" data-cat="Juvenil" data-csp-click="filtrarPorCategoria('Juvenil', this)">Juvenil</button>
+                    <button class="pill-btn" data-cat="Salud" data-csp-click="filtrarPorCategoria('Salud', this)">Salud</button>
+                    <button class="pill-btn" data-cat="Familia" data-csp-click="filtrarPorCategoria('Familia', this)">Familia</button>
+                    <button class="pill-btn" data-cat="Otros" data-csp-click="filtrarPorCategoria('Otros', this)">Otros</button>
+                </div>
+            </section>
+
+            <!-- Vista de Libros en Grid / Tarjetas Elegantes -->
+            <section class="libros-section">
+                <div class="libros-grid" id="gridLibrosContainer">
+                    <!-- Tarjetas cargadas dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Formulario de Solicitud -->
+            <section class="formulario-card" id="pedir-libro">
+                <div class="form-header">
+                    <div class="form-icon"><i class="fas fa-hand-holding-box"></i></div>
+                    <div>
+                        <h2>Solicita tu libro en préstamo</h2>
+                        <p>Completa el formulario para reservar tu ejemplar. Tienes un plazo de 14 días para disfrutar la lectura.</p>
+                    </div>
+                </div>
+
+                <form id="formSolicitud" data-csp-submit="enviarSolicitud(event)">
+                    <div class="formulario-grid">
+                        <div class="form-group">
+                            <label for="solicitanteNombre"><i class="fas fa-user"></i> Nombre completo *</label>
+                            <input type="text" id="solicitanteNombre" placeholder="Ej: Juan Pérez" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="solicitanteWhatsapp"><i class="fab fa-whatsapp"></i> WhatsApp (Opcional)</label>
+                            <input type="tel" id="solicitanteWhatsapp" placeholder="Ej: 300 123 4567" />
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="solicitanteEmail"><i class="fas fa-envelope"></i> Correo electrónico (Opcional)</label>
+                            <input type="email" id="solicitanteEmail" placeholder="Ej: juan@email.com" />
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="solicitanteLibro"><i class="fas fa-book-open"></i> Título del libro deseado *</label>
+                            <input type="text" id="solicitanteLibro" placeholder="Ej: El conflicto de los siglos" required />
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-enviar-solicitud">
+                            <i class="fas fa-paper-plane"></i> Confirmar Solicitud de Préstamo
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        <!-- SECCIÓN BIBLIOTECA ELENA G. DE WHITE -->
+        <div id="seccionBibliotecaEGW" class="seccion-biblioteca" style="display: none;">
+            <!-- Encabezado de la sección EGW -->
+            <div class="egw-header-card">
+                <div class="egw-badge"><i class="fas fa-book-open"></i> Obras Completas</div>
+                <h2>📖 Biblioteca Elena G. de White</h2>
+                <p>Accede a las obras completas de la mensajera del Señor</p>
+            </div>
+
+            <!-- Buscador EGW -->
+            <section class="egw-control-panel">
+                <div class="buscador-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="buscadorEGW" data-csp-input="filtrarBibliotecaEGW()" placeholder="Buscar por título o autor..." />
+                    <button class="btn-clear-search" data-csp-click="limpiarBuscadorEGW()" id="btnClearSearchEGW" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Grid de Libros EGW -->
+            <section class="egw-libros-section">
+                <div class="egw-grid" id="gridLibrosEGWContainer">
+                    <!-- Tarjetas cargadas dinámicamente -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Modal de Confirmación -->
+        <div id="modalConfirmacion" class="modal-backdrop" data-csp-click="cerrarModalConfirmacion(event)">
+            <div class="modal-card-popup" data-csp-click="event.stopPropagation()">
+                <div class="popup-icon">📖</div>
+                <h3>¡Solicitud Registrada!</h3>
+                <p>
+                    Hemos recibido tu petición en el sistema. Recuerda que cuentas con
+                    <strong class="highlight-gold">14 días calendario</strong> para disfrutar tu lectura y devolverlo a la biblioteca de la iglesia.
+                </p>
+                <button data-csp-click="cerrarModalConfirmacion()" class="btn-popup-close">
+                    ¡Entendido, gracias!
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts de Funcionalidad y Sincronización Supabase (Safe CSP) -->
+    <script src="js/event-delegator.js"></script>
+    <script src="js/supabase.min.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/biblioteca.js"></script>
+    <script src="js/animations.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,882 @@
+/* ==========================================================================
+   SECCIÓN DE CLUBES: AVENTUREROS, CONQUISTADORES & GUÍAS MAYORES
+   Efectos WOW: Hero Cinematográfico, Partículas Canvas, Tarjetas 3D Tilt,
+   Pergamino Desplegable y Blobs Orgánicos de Fondo
+   IASD Belén · Iglesia Adventista del Séptimo Día
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CONTENEDOR PRINCIPAL Y CAPAS DE FONDO (BLOBS ORGÁNICOS)
+   -------------------------------------------------------------------------- */
+.club-page-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding-bottom: 3rem;
+}
+
+/* Capa de Blobs Orgánicos Flotantes */
+.club-blobs-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.club-blob {
+    position: absolute;
+    filter: blur(55px);
+    opacity: 0.18;
+    border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+    will-change: transform, border-radius;
+    animation: blobMorph 18s ease-in-out infinite alternate;
+}
+
+.blob-1 {
+    top: 5%;
+    right: -5%;
+    width: 480px;
+    height: 480px;
+    animation-duration: 22s;
+}
+
+.blob-2 {
+    top: 40%;
+    left: -8%;
+    width: 420px;
+    height: 420px;
+    animation-duration: 26s;
+    animation-delay: -5s;
+}
+
+.blob-3 {
+    bottom: 10%;
+    right: 5%;
+    width: 520px;
+    height: 520px;
+    animation-duration: 30s;
+    animation-delay: -10s;
+}
+
+/* Paleta de Blobs por Club */
+.aventureros-page .blob-1 { background: radial-gradient(circle, #f59e0b, #fbbf24); }
+.aventureros-page .blob-2 { background: radial-gradient(circle, #0284c7, #38bdf8); }
+.aventureros-page .blob-3 { background: radial-gradient(circle, #fbbf24, #f59e0b); }
+
+.conquistadores-page .blob-1 { background: radial-gradient(circle, #15803d, #22c55e); }
+.conquistadores-page .blob-2 { background: radial-gradient(circle, #b45309, #d97706); }
+.conquistadores-page .blob-3 { background: radial-gradient(circle, #166534, #15803d); }
+
+.guias-page .blob-1 { background: radial-gradient(circle, #1e40af, #3b82f6); }
+.guias-page .blob-2 { background: radial-gradient(circle, #b45309, #f59e0b); }
+.guias-page .blob-3 { background: radial-gradient(circle, #0369a1, #0284c7); }
+
+@keyframes blobMorph {
+    0% {
+        border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+    33% {
+        border-radius: 70% 30% 46% 54% / 30% 29% 71% 70%;
+        transform: translate(35px, -45px) rotate(60deg) scale(1.08);
+    }
+    66% {
+        border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;
+        transform: translate(-30px, 35px) rotate(120deg) scale(0.95);
+    }
+    100% {
+        border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+        transform: translate(0, 0) rotate(180deg) scale(1);
+    }
+}
+
+/* Contenido Principal sobre los Blobs */
+.club-main-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* --------------------------------------------------------------------------
+   2. HERO CINEMATOGRÁFICO CON PARALLAX Y PARTÍCULAS CANVAS
+   -------------------------------------------------------------------------- */
+.club-hero {
+    position: relative;
+    min-height: 380px;
+    border-radius: 2rem;
+    padding: 3rem 2rem;
+    margin-bottom: 2.5rem;
+    overflow: hidden;
+    box-shadow: 0 20px 45px rgba(11, 43, 79, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.4s ease-out;
+}
+
+/* Capas Temáticas de Gradientes Hero */
+.hero-aventureros {
+    background: linear-gradient(135deg, #0b2b4f 0%, #1e3a8a 45%, #b45309 100%);
+    border-color: rgba(245, 158, 11, 0.35);
+}
+
+.hero-conquistadores {
+    background: linear-gradient(135deg, #062b16 0%, #14532d 45%, #854d0e 100%);
+    border-color: rgba(34, 197, 94, 0.35);
+}
+
+.hero-guias {
+    background: linear-gradient(135deg, #091e3a 0%, #1e3a8a 50%, #92400e 100%);
+    border-color: rgba(59, 130, 246, 0.35);
+}
+
+/* Fondo decorativo con silueta / patrón */
+.club-hero-bg-overlay {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(201, 165, 59, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Canvas de Partículas Doradas */
+.club-particles-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Contenido del Hero */
+.club-hero-content {
+    position: relative;
+    z-index: 3;
+    max-width: 820px;
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.1rem;
+}
+
+.club-hero-logo-box {
+    position: relative;
+    width: 105px;
+    height: 105px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0.5rem;
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.45), 0 8px 24px rgba(0, 0, 0, 0.3);
+    border: 3px solid var(--golden);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.club-hero:hover .club-hero-logo-box {
+    transform: scale(1.08) rotate(3deg);
+}
+
+.club-hero-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+.club-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    color: #fef08a;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.4rem 1.3rem;
+    border-radius: 2rem;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.club-hero-title {
+    font-family: 'Montserrat', 'Inter', sans-serif;
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.15;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    letter-spacing: -0.5px;
+}
+
+.club-hero-subtitle {
+    font-size: clamp(0.95rem, 1.4vw, 1.12rem);
+    color: rgba(255, 255, 255, 0.92);
+    max-width: 640px;
+    line-height: 1.6;
+    margin: 0;
+    font-weight: 400;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Barra de Acceso Rápido / Chips de Navegación */
+.club-hero-chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.65rem;
+    margin-top: 0.6rem;
+}
+
+.club-hero-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.45rem 1.1rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.club-hero-chip:hover {
+    background: rgba(245, 158, 11, 0.28);
+    border-color: var(--golden);
+    color: #fef08a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* --------------------------------------------------------------------------
+   3. SECCIÓN DE IDEALES CON TARJETAS 3D TILT Y GLOW DINÁMICO
+   -------------------------------------------------------------------------- */
+.club-section-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.club-section-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.35rem 1.1rem;
+    border-radius: 2rem;
+    margin-bottom: 0.5rem;
+    background: rgba(201, 157, 59, 0.15);
+    color: #b45309;
+    border: 1px solid rgba(201, 157, 59, 0.3);
+}
+
+.club-section-title {
+    font-family: 'Montserrat', 'Inter', sans-serif;
+    font-size: clamp(1.4rem, 2.8vw, 1.95rem);
+    font-weight: 800;
+    color: var(--deep-blue);
+    margin: 0 0 0.4rem 0;
+}
+
+.club-section-desc {
+    color: #4b5563;
+    font-size: 0.95rem;
+    max-width: 580px;
+    margin: 0 auto;
+}
+
+/* Grid de Ideales */
+.club-ideales-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.8rem;
+    perspective: 1200px;
+}
+
+/* Tarjeta 3D Tilt */
+.tilt-card {
+    position: relative;
+    background: #ffffff;
+    border-radius: 1.4rem;
+    border: 1px solid rgba(201, 165, 59, 0.22);
+    box-shadow: 0 10px 30px rgba(11, 43, 79, 0.08);
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transition: box-shadow 0.35s ease, border-color 0.35s ease;
+    will-change: transform;
+    cursor: default;
+}
+
+.tilt-card:hover {
+    box-shadow: 0 20px 40px rgba(11, 43, 79, 0.15);
+    border-color: rgba(201, 165, 59, 0.55);
+}
+
+/* Glow Neón Dinámico que sigue al Cursor */
+.tilt-card-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: 1.4rem;
+    background: radial-gradient(
+        400px circle at var(--glow-x, 50%) var(--glow-y, 50%),
+        rgba(245, 158, 11, 0.18),
+        transparent 65%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.tilt-card:hover .tilt-card-glow {
+    opacity: 1;
+}
+
+/* Contenido Interno de la Tarjeta Tilt */
+.tilt-card-inner {
+    position: relative;
+    z-index: 2;
+    padding: 1.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 100%;
+}
+
+.tilt-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tilt-card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+/* Modificadores por tema de ideal */
+.tilt-badge-voto {
+    background: rgba(245, 158, 11, 0.14);
+    color: #b45309;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.tilt-badge-lema {
+    background: rgba(14, 165, 233, 0.14);
+    color: #0369a1;
+    border: 1px solid rgba(14, 165, 233, 0.3);
+}
+
+.tilt-badge-blanco {
+    background: rgba(34, 197, 94, 0.14);
+    color: #15803d;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.tilt-card-icon {
+    font-size: 1.35rem;
+    color: var(--golden);
+    opacity: 0.85;
+}
+
+.tilt-card-quote-icon {
+    font-size: 2rem;
+    line-height: 1;
+    color: rgba(201, 165, 59, 0.25);
+    margin-bottom: -0.5rem;
+}
+
+.tilt-card-text {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 1.08rem;
+    line-height: 1.65;
+    color: #1f2937;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.tilt-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-top: 1px dashed rgba(0, 0, 0, 0.08);
+    padding-top: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   4. HIMNO Y LEY CON EFECTO PERGAMINO / CINTA DESPLEGABLE
+   -------------------------------------------------------------------------- */
+.pergamino-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.pergamino-card {
+    position: relative;
+    border-radius: 1.6rem;
+    background: #fdfbf7;
+    border: 1px solid rgba(180, 83, 9, 0.25);
+    box-shadow: 0 12px 35px rgba(78, 52, 23, 0.09);
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.pergamino-card.abierto {
+    box-shadow: 0 18px 45px rgba(78, 52, 23, 0.16);
+    border-color: rgba(180, 83, 9, 0.5);
+}
+
+/* Rodillo Superior e Inferior del Pergamino */
+.pergamino-roller {
+    height: 14px;
+    background: linear-gradient(90deg, #78350f 0%, #b45309 30%, #f59e0b 50%, #b45309 70%, #78350f 100%);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    position: relative;
+}
+
+.pergamino-roller::before,
+.pergamino-roller::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, #fde047 0%, #b45309 80%);
+    border-radius: 50%;
+    border: 1px solid #78350f;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.pergamino-roller::before { left: -5px; }
+.pergamino-roller::after { right: -5px; }
+
+/* Botón / Gatillo de Despliegue con Sello de Cera */
+.pergamino-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.4rem 1.8rem;
+    background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.3s ease;
+    gap: 1rem;
+}
+
+.pergamino-trigger:hover {
+    background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%);
+}
+
+.pergamino-trigger-left {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+}
+
+/* Sello de Cera / Lacre Dorado */
+.pergamino-sello {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #f59e0b 0%, #b45309 70%, #78350f 100%);
+    border: 2px solid #fef08a;
+    box-shadow: 0 4px 12px rgba(120, 53, 15, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.pergamino-card.abierto .pergamino-sello {
+    transform: rotate(180deg) scale(1.05);
+}
+
+.pergamino-trigger-info h3 {
+    font-family: 'Montserrat', 'Inter', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #78350f;
+    margin: 0 0 0.2rem 0;
+}
+
+.pergamino-trigger-info p {
+    font-size: 0.82rem;
+    color: #92400e;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Botón indicador de acción */
+.pergamino-btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 1rem;
+    background: rgba(180, 83, 9, 0.12);
+    color: #78350f;
+    border: 1px solid rgba(180, 83, 9, 0.25);
+    border-radius: 2rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: all 0.25s ease;
+}
+
+.pergamino-btn-action .pergamino-chevron {
+    transition: transform 0.4s ease;
+}
+
+.pergamino-card.abierto .pergamino-btn-action .pergamino-chevron {
+    transform: rotate(180deg);
+}
+
+.pergamino-card.abierto .pergamino-btn-action {
+    background: #78350f;
+    color: #fef08a;
+    border-color: #78350f;
+}
+
+/* Cuerpo del Pergamino Desplegable (Animación de Desenrollado) */
+.pergamino-body {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.65s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+    background: 
+        radial-gradient(ellipse at center, rgba(254, 243, 199, 0.45) 0%, rgba(245, 230, 190, 0.85) 100%),
+        repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(180, 83, 9, 0.05) 28px);
+}
+
+.pergamino-card.abierto .pergamino-body {
+    max-height: 1400px;
+    opacity: 1;
+}
+
+.pergamino-content-inner {
+    padding: 2.2rem 2.5rem;
+    border-top: 1px dashed rgba(180, 83, 9, 0.25);
+}
+
+/* Estilos de Letras de Himno */
+.himno-lyrics-box {
+    position: relative;
+    max-width: 680px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.himno-lyrics {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
+    font-size: clamp(1rem, 1.8vw, 1.15rem);
+    line-height: 1.95;
+    color: #451a03;
+    margin: 0;
+    white-space: pre-line;
+}
+
+.himno-lyrics-icon {
+    font-size: 1.8rem;
+    color: #d97706;
+    margin-bottom: 0.8rem;
+    opacity: 0.8;
+}
+
+/* Estilos de Lista de Ley */
+.ley-list-container {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.ley-list-heading {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #78350f;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ley-items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0.85rem;
+}
+
+.ley-item {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 0.75rem 1.1rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(180, 83, 9, 0.15);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.ley-item:hover {
+    transform: translateX(4px);
+    background: rgba(255, 255, 255, 0.95);
+    border-color: #d97706;
+}
+
+.ley-num {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #b45309;
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ley-text {
+    font-weight: 600;
+    color: #451a03;
+    font-size: 0.92rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. POLISH PARA SECCIONES UNIFORMES Y CALENDARIO DE CLUBES
+   -------------------------------------------------------------------------- */
+.club-subcard-section {
+    background: #ffffff;
+    border-radius: 1.6rem;
+    padding: 2.2rem 2rem;
+    margin-bottom: 2.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 30px rgba(11, 43, 79, 0.06);
+    position: relative;
+    z-index: 2;
+}
+
+.club-subcard-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.4rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.club-subcard-header h3 {
+    font-family: 'Montserrat', 'Inter', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--deep-blue);
+    margin: 0;
+}
+
+.club-subcard-header i {
+    color: var(--golden);
+    font-size: 1.4rem;
+}
+
+/* --------------------------------------------------------------------------
+   6. RESPONSIVIDAD Y OPTIMIZACIONES MÓVILES
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+    .club-hero {
+        padding: 2.2rem 1.2rem;
+        min-height: 320px;
+        border-radius: 1.4rem;
+    }
+
+    .club-hero-logo-box {
+        width: 80px;
+        height: 80px;
+    }
+
+    .club-hero-chips {
+        gap: 0.45rem;
+    }
+
+    .club-hero-chip {
+        font-size: 0.76rem;
+        padding: 0.35rem 0.85rem;
+    }
+
+    .tilt-card-inner {
+        padding: 1.4rem;
+    }
+
+    .pergamino-card {
+        border-radius: 1.3rem;
+        margin-bottom: 1.5rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .pergamino-trigger {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.9rem;
+        padding: 1.3rem 1.1rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .pergamino-trigger-left {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.75rem;
+        width: 100%;
+    }
+
+    .pergamino-sello {
+        margin: 0 auto;
+    }
+
+    .pergamino-trigger-info {
+        text-align: center;
+        width: 100%;
+    }
+
+    .pergamino-trigger-info h3 {
+        font-size: 1.1rem;
+        text-align: center;
+        margin: 0 0 0.3rem 0;
+    }
+
+    .pergamino-trigger-info p {
+        font-size: 0.82rem;
+        text-align: center;
+        line-height: 1.4;
+    }
+
+    .pergamino-btn-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1.4rem;
+        font-size: 0.82rem;
+        margin: 0 auto;
+        width: auto;
+        max-width: fit-content;
+        box-sizing: border-box;
+    }
+
+    .pergamino-content-inner {
+        padding: 1.5rem 1.1rem;
+    }
+
+    .himno-lyrics {
+        font-size: 0.95rem;
+        line-height: 1.8;
+        padding: 0 0.5rem;
+        text-align: center;
+    }
+
+    .ley-items-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .ley-item {
+        padding: 0.7rem 0.9rem;
+    }
+
+    .ley-text {
+        font-size: 0.88rem;
+    }
+
+    .club-subcard-section {
+        padding: 1.5rem 1.1rem;
+        border-radius: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .pergamino-trigger {
+        padding: 1.1rem 0.75rem;
+        gap: 0.75rem;
+    }
+
+    .pergamino-sello {
+        width: 42px;
+        height: 42px;
+        font-size: 1.15rem;
+    }
+
+    .pergamino-trigger-info h3 {
+        font-size: 1.02rem;
+    }
+
+    .pergamino-trigger-info p {
+        font-size: 0.78rem;
+    }
+
+    .pergamino-btn-action {
+        padding: 0.45rem 1.2rem;
+        font-size: 0.78rem;
+    }
+
+    .himno-lyrics {
+        font-size: 0.88rem;
+        line-height: 1.7;
+    }
+
+    .ley-text {
+        font-size: 0.82rem;
+    }
+}

@@ -1,0 +1,387 @@
+/* ========================================
+   ENRUTADOR Y NAVEGACIÓN (ROUTER)
+   IASD Belén · Iglesia Adventista
+   ======================================== */
+
+// Definición de páginas con sus títulos
+const PAGINAS = {
+    // Página principal
+    home: { titulo: 'Inicio', nivel: 1 },
+
+    // Secciones públicas (nivel 1 - Visitante)
+    creencias: { titulo: 'Las 28 Creencias Fundamentales', nivel: 1 },
+    doctrinas: { titulo: 'Las 6 Doctrinas Fundamentales', nivel: 1 },
+    diezmo: { titulo: 'Diezmos y Ofrendas', nivel: 1 },
+    anuncios: { titulo: 'Anuncios Especiales', nivel: 1 },
+    visitantes: { titulo: '¿Quiénes son los adventistas del 7° día?', nivel: 1 },
+    historia: { titulo: 'Historia de la IASD', nivel: 1 },
+    estructura: { titulo: 'Estructura Organizacional', nivel: 1 },
+    cronograma: { titulo: 'Cronograma de la Iglesia', nivel: 1 },
+
+    // Secciones de clubes (públicas pero con contenido restringido)
+    clubes: { titulo: 'Clubes de la Iglesia', nivel: 1 },
+    aventureros: { titulo: 'Club de Aventureros', nivel: 2 },
+    conquistadores: { titulo: 'Club de Conquistadores', nivel: 2 },
+    guias: { titulo: 'Guías Mayores', nivel: 2 },
+
+    // Secciones para miembros (nivel 2 - Miembro)
+    calendario: { titulo: 'Calendario de Eventos', nivel: 2 },
+    culto: { titulo: 'Culto Divino', nivel: 2 },
+    canto: { titulo: 'Canto y Alabanza', nivel: 2 },
+    'escuela-sabatica': { titulo: 'Escuela Sabática', nivel: 2 },
+    'minuto-misionero': { titulo: 'Minuto Misionero', nivel: 2 },
+    'sociedad-jovenes': { titulo: 'Sociedad de Jóvenes', nivel: 2 },
+    'lunes-oracion': { titulo: 'Lunes de Oración', nivel: 2 },
+    'miercoles-testimonio': { titulo: 'Miércoles de Testimonio', nivel: 2 },
+    salud: { titulo: 'Salud y Bienestar (NEWSTART)', nivel: 1 },
+    planlectura: { titulo: 'Plan de Lectura Bíblica', nivel: 1 },
+    teologia_avanzada: { titulo: 'Teología Avanzada Adventista', nivel: 1 },
+    santuario: { titulo: 'El Santuario Celestial | Teología Avanzada', nivel: 1 },
+    inmortalidad: { titulo: 'La Inmortalidad del Alma | Teología Avanzada', nivel: 1 },
+    sabado: { titulo: 'El Sábado como Sello de Dios | Teología Avanzada', nivel: 1 },
+    conflicto: { titulo: 'La Gran Controversia | Teología Avanzada', nivel: 1 },
+    ley: { titulo: 'La Ley de Dios | Teología Avanzada', nivel: 1 },
+    trinidad: { titulo: 'La Trinidad | Teología Avanzada', nivel: 1 },
+    profecia: { titulo: 'Profecías de Daniel y Apocalipsis | Teología Avanzada', nivel: 1 }
+};
+
+// Estado para controlar la página activa actualmente
+let _currentPageId = 'home';
+
+// Control de barra de progreso superior
+function triggerPageProgressBar() {
+    let bar = document.getElementById('pageProgressBar');
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'pageProgressBar';
+        document.body.prepend(bar);
+    }
+    bar.classList.add('animating');
+    bar.style.width = '0%';
+    bar.style.opacity = '1';
+
+    // Rápido avance a 65%
+    setTimeout(() => {
+        bar.style.width = '68%';
+    }, 40);
+
+    // Completar a 100% y desvanecer
+    setTimeout(() => {
+        bar.style.width = '100%';
+        setTimeout(() => {
+            bar.style.opacity = '0';
+            setTimeout(() => {
+                bar.classList.remove('animating');
+                bar.style.width = '0%';
+            }, 300);
+        }, 220);
+    }, 280);
+}
+
+function showPage(pageId) {
+    // Prevenir apertura de URLs externas a través de showPage
+    if (pageId && (pageId.startsWith('http://') || pageId.startsWith('https://'))) {
+        window.open(pageId, '_blank');
+        return;
+    }
+
+    const pages = document.querySelectorAll('.page');
+    let targetPage = document.getElementById(pageId);
+
+    if (!targetPage) {
+        console.warn(`⚠️ Página "${pageId}" no encontrada`);
+        return;
+    }
+
+    // Si el elemento no es una página pero está dentro de una página (ej. un ancla de sección)
+    if (!targetPage.classList.contains('page')) {
+        const parentPage = targetPage.closest('.page');
+        if (parentPage && parentPage.id) {
+            const anchorEl = targetPage;
+            showPage(parentPage.id);
+            setTimeout(() => {
+                anchorEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 250);
+            return;
+        }
+        console.warn(`⚠️ Elemento "${pageId}" no es una página válida`);
+        return;
+    }
+
+    // Iniciar barra de progreso
+    triggerPageProgressBar();
+
+    const currentActive = document.querySelector('.page.active');
+
+    if (currentActive && currentActive !== targetPage) {
+        // Salida suave con clase page-exit
+        currentActive.classList.add('page-exit');
+        currentActive.classList.remove('visible');
+
+        setTimeout(() => {
+            pages.forEach(p => {
+                p.classList.remove('active', 'page-exit', 'visible', 'page-transition');
+            });
+
+            targetPage.classList.add('active', 'page-transition');
+            _currentPageId = pageId;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    targetPage.classList.add('visible');
+                    _afterShowPage(pageId);
+                });
+            });
+        }, 160);
+    } else {
+        // Re-activar si es la misma página o carga inicial
+        pages.forEach(p => {
+            p.classList.remove('active', 'page-exit', 'visible', 'page-transition');
+        });
+
+        targetPage.classList.add('active', 'page-transition');
+        _currentPageId = pageId;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        requestAnimationFrame(() => {
+            targetPage.classList.add('visible');
+            _afterShowPage(pageId);
+        });
+    }
+}
+
+function _afterShowPage(pageId) {
+    // Actualizar título de la página
+    const titulo = PAGINAS[pageId]?.titulo || 'IASD Belén';
+    document.title = `${titulo} · IASD Belén`;
+
+    // Actualizar estados activos en navbar
+    const navButtons = document.querySelectorAll('.nav-btn, .nav-links a[data-page]');
+    navButtons.forEach(btn => {
+        btn.classList.remove('active');
+        const pageAttr = btn.getAttribute('data-page');
+        const cspClick = btn.getAttribute('data-csp-click') || btn.getAttribute('onclick') || '';
+        if (pageAttr === pageId || cspClick.includes(`'${pageId}'`)) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Cerrar menú móvil y dropdowns
+    cerrarMenuMovilYDropdowns();
+
+    // Ocultar mensaje de acceso denegado si existe
+    const mensaje = document.getElementById('mensajeAccesoDenegado');
+    if (mensaje) mensaje.style.display = 'none';
+
+    // Reinicializar calendarios
+    if (typeof CalendarManager !== 'undefined') {
+        if (pageId === 'calendario') {
+            CalendarManager.render('general');
+        } else if (['aventureros', 'conquistadores', 'guias'].includes(pageId)) {
+            CalendarManager.render(pageId);
+        }
+    }
+
+    // Renderizar anuncios públicos al navegar a 'anuncios'
+    if (pageId === 'anuncios') {
+        if (typeof window.cargarAnunciosPublicos === 'function') {
+            window.cargarAnunciosPublicos();
+        } else if (typeof window.renderizarAnunciosPublicos === 'function') {
+            window.renderizarAnunciosPublicos();
+        }
+    }
+
+    // Renderizar cronograma público / actividades
+    if (pageId === 'cronograma' && typeof window.renderizarCronogramaPublico === 'function') {
+        window.renderizarCronogramaPublico();
+    } else if (['culto', 'canto', 'escuela-sabatica', 'minuto-misionero', 'sociedad-jovenes', 'lunes-oracion', 'miercoles-testimonio'].includes(pageId) && typeof window.renderizarActividadPublica === 'function') {
+        window.renderizarActividadPublica(pageId);
+    }
+
+    // Activar animaciones de uniformes y efectos WOW de clubes al navegar a clubes
+    if (['aventureros', 'conquistadores', 'guias'].includes(pageId)) {
+        if (typeof window.inicializarAnimacionesUniformes === 'function') {
+            setTimeout(window.inicializarAnimacionesUniformes, 60);
+        }
+        if (typeof ClubesManager !== 'undefined' && ClubesManager.initClubPage) {
+            ClubesManager.initClubPage(pageId);
+        }
+    }
+
+    // Inicializar o refrescar creencias al navegar a 'creencias'
+    if (pageId === 'creencias' && typeof CreenciasManager !== 'undefined') {
+        CreenciasManager.init();
+        CreenciasManager.applyFilters();
+    }
+
+    // Inicializar o refrescar doctrinas al navegar a 'doctrinas'
+    if (pageId === 'doctrinas' && typeof DoctrinasManager !== 'undefined') {
+        DoctrinasManager.init();
+    }
+
+    // Disparar evento de cambio de página
+    window.dispatchEvent(new CustomEvent('pageChanged', { detail: { pageId } }));
+
+    console.log(`📄 Página mostrada: ${pageId} - ${PAGINAS[pageId]?.titulo || ''}`);
+}
+
+function cerrarMenuMovilYDropdowns() {
+    const navLinks = document.getElementById('navLinks');
+    if (navLinks) navLinks.classList.remove('open');
+    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.dropdown-menu li, .has-submenu').forEach(li => li.classList.remove('open'));
+
+    // Resetear icono del botón hamburguesa a ☰
+    const toggleBtns = document.querySelectorAll('#mobileMenuToggle, #menu-toggle, .mobile-menu-toggle, .hamburger');
+    toggleBtns.forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-label', 'Abrir Menú');
+        const icon = btn.querySelector('i');
+        if (icon) {
+            icon.className = 'fas fa-bars';
+        }
+    });
+}
+
+function toggleMobileMenu() {
+    const navLinks = document.getElementById('navLinks');
+    if (!navLinks) return;
+
+    const isOpening = !navLinks.classList.contains('open');
+    const toggleBtns = document.querySelectorAll('#mobileMenuToggle, #menu-toggle, .mobile-menu-toggle, .hamburger');
+
+    if (!isOpening) {
+        cerrarMenuMovilYDropdowns();
+    } else {
+        navLinks.classList.add('open');
+        toggleBtns.forEach(btn => {
+            btn.classList.add('active');
+            btn.setAttribute('aria-label', 'Cerrar Menú');
+            const icon = btn.querySelector('i');
+            if (icon) {
+                icon.className = 'fas fa-times';
+            }
+        });
+    }
+}
+
+// Configuración de interacción y delegación para navegación y desplegables
+(function setupNavigationListeners() {
+    function isMobileView() {
+        return window.innerWidth <= 768 || window.matchMedia('(max-width: 768px)').matches;
+    }
+
+    // Vincular listener directo a los botones de menú hamburguesa
+    function initDirectToggleListeners() {
+        const toggleBtns = document.querySelectorAll('#mobileMenuToggle, #menu-toggle, .mobile-menu-toggle, .hamburger');
+        toggleBtns.forEach(btn => {
+            if (!btn.dataset.toggleBound) {
+                btn.dataset.toggleBound = 'true';
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleMobileMenu();
+                });
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initDirectToggleListeners);
+    } else {
+        initDirectToggleListeners();
+    }
+
+    document.addEventListener('click', function (e) {
+        // 1. Botón de menú hamburguesa (fallback por delegación)
+        const toggleBtn = e.target.closest('#mobileMenuToggle, #menu-toggle, .mobile-menu-toggle, .hamburger');
+        if (toggleBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMobileMenu();
+            return;
+        }
+
+        // 2. Clic en desplegables de primer nivel (Creencias, ¿Quiénes somos?, Clubes, Cronograma)
+        const dropdownBtn = e.target.closest('.dropdown > .nav-btn, .dropdown > .dropdown-trigger, .dropdown-trigger');
+        if (dropdownBtn) {
+            const parentDropdown = dropdownBtn.closest('.dropdown');
+            if (parentDropdown && isMobileView()) {
+                e.preventDefault();
+                e.stopPropagation();
+                const wasOpen = parentDropdown.classList.contains('open');
+
+                // Cerrar otros dropdowns hermanos
+                document.querySelectorAll('.dropdown').forEach(d => {
+                    if (d !== parentDropdown) {
+                        d.classList.remove('open');
+                        d.querySelectorAll('.has-submenu').forEach(sub => sub.classList.remove('open'));
+                    }
+                });
+
+                parentDropdown.classList.toggle('open', !wasOpen);
+                return;
+            }
+        }
+
+        // 3. Clic en submenús anidados (ej. Culto, Grupos Pequeños)
+        const submenuToggle = e.target.closest('.submenu-toggle, .has-submenu > a');
+        if (submenuToggle) {
+            const parentLi = submenuToggle.closest('.has-submenu') || submenuToggle.parentElement;
+            if (parentLi && isMobileView()) {
+                e.preventDefault();
+                e.stopPropagation();
+                const wasSubOpen = parentLi.classList.contains('open');
+
+                // Cerrar otros submenús en el mismo nivel
+                if (parentLi.parentElement) {
+                    parentLi.parentElement.querySelectorAll('.has-submenu').forEach(sub => {
+                        if (sub !== parentLi) sub.classList.remove('open');
+                    });
+                }
+
+                parentLi.classList.toggle('open', !wasSubOpen);
+                return;
+            }
+        }
+
+        // 4. Clic en enlaces de página con data-page o dentro del navbar
+        const pageLink = e.target.closest('#navLinks a[data-page], #navLinks button[data-page], .navbar [data-page]');
+        if (pageLink && !pageLink.classList.contains('dropdown-trigger') && !pageLink.closest('.dropdown-trigger')) {
+            const targetPageId = pageLink.getAttribute('data-page');
+            if (targetPageId) {
+                e.preventDefault();
+                showPage(targetPageId);
+                return;
+            }
+        }
+
+        // 5. Clic fuera del menú en móviles para cerrar automáticamente
+        const navPrincipal = document.getElementById('navPrincipal') || document.querySelector('.navbar-wrapper');
+        const navLinks = document.getElementById('navLinks');
+        if (navLinks && navLinks.classList.contains('open') && isMobileView()) {
+            if (navPrincipal && !navPrincipal.contains(e.target)) {
+                cerrarMenuMovilYDropdowns();
+            }
+        }
+    });
+
+    // Cerrar al cambiar el tamaño de pantalla a escritorio
+    window.addEventListener('resize', function () {
+        if (!isMobileView()) {
+            const navLinks = document.getElementById('navLinks');
+            if (navLinks && navLinks.classList.contains('open')) {
+                cerrarMenuMovilYDropdowns();
+            }
+        }
+    });
+})();
+
+// Exportar funciones
+window.showPage = showPage;
+window.toggleMobileMenu = toggleMobileMenu;
+window.cerrarMenuMovilYDropdowns = cerrarMenuMovilYDropdowns;
+window.PAGINAS = PAGINAS;
+
+console.log('✅ Router.js cargado correctamente');

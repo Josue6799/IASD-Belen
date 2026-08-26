@@ -1,0 +1,1379 @@
+/* ==========================================================================
+   MÓDULO DE HISTORIA INTERACTIVA - IASD BELÉN
+   Estilos para Línea de Tiempo, Carrusel, Juego y Mapa del Tiempo
+   ========================================================================== */
+
+/* Contenedor Principal */
+.historia-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 0.5rem 3rem;
+}
+
+/* Hero & Encabezado */
+.historia-hero {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 2.2rem 1.5rem 1.8rem;
+    background: linear-gradient(135deg, rgba(11, 43, 79, 0.04), rgba(201, 157, 59, 0.08));
+    border-radius: var(--radius-card, 1.4rem);
+    border: 1px solid var(--golden-border, rgba(201, 157, 59, 0.35));
+    position: relative;
+    overflow: hidden;
+}
+
+.historia-hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--golden, #c99d3b), transparent);
+    border-radius: 4px;
+}
+
+.historia-badge {
+    background: linear-gradient(135deg, var(--deep-blue, #0b2b4f), var(--deep-blue-light, #163e6e));
+    color: var(--golden, #c99d3b);
+    padding: 0.4rem 1.4rem;
+    border-radius: 2rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.9rem;
+    border: 1px solid var(--golden-border, rgba(201, 157, 59, 0.35));
+    box-shadow: var(--shadow-xs);
+}
+
+.historia-title {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    color: var(--deep-blue, #0b2b4f);
+    font-size: 2.1rem;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 0.6rem;
+}
+
+.historia-title span {
+    color: var(--golden, #c99d3b);
+}
+
+.historia-subtitle {
+    color: var(--muted-text, #596579);
+    max-width: 720px;
+    margin: 0 auto;
+    font-size: 1.02rem;
+    line-height: 1.6;
+}
+
+/* ==========================================================================
+   TABS / NAVEGACIÓN ENTRE VISTAS INTERACTIVAS
+   ========================================================================== */
+.historia-tabs-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 2.2rem;
+    padding: 0.5rem;
+    background: var(--cream, #fbf9f5);
+    border-radius: var(--radius-btn, 2.4rem);
+    border: 1px solid var(--border-subtle, #e8e3d8);
+    box-shadow: var(--shadow-sm);
+}
+
+.historia-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.75rem 1.35rem;
+    border-radius: 2rem;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--dark-text-secondary, #2b3a4a);
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition, all 0.28s ease);
+    white-space: nowrap;
+    outline: none;
+}
+
+.historia-tab-btn i {
+    font-size: 1rem;
+    color: var(--golden, #c99d3b);
+    transition: transform 0.2s ease;
+}
+
+.historia-tab-btn:hover {
+    background: rgba(201, 157, 59, 0.1);
+    color: var(--deep-blue, #0b2b4f);
+    border-color: var(--golden-border);
+}
+
+.historia-tab-btn.active {
+    background: linear-gradient(135deg, var(--deep-blue, #0b2b4f), #143e70);
+    color: var(--pure-white, #ffffff);
+    border-color: var(--golden);
+    box-shadow: var(--shadow-golden, 0 6px 18px rgba(201, 157, 59, 0.28));
+}
+
+.historia-tab-btn.active i {
+    color: var(--golden-light, #dfb75c);
+    transform: scale(1.1);
+}
+
+/* Paneles de Contenido */
+.historia-view-panel {
+    display: none;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.historia-view-panel.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   A) LÍNEA DE TIEMPO VERTICAL EXPANDIBLE (ACORDEÓN)
+   ========================================================================== */
+.historia-timeline-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 0.8rem 1.2rem;
+    background: var(--cream, #fbf9f5);
+    border-radius: var(--radius-md, 1rem);
+    border: 1px solid var(--border-subtle, #e8e3d8);
+}
+
+.timeline-info-text {
+    font-size: 0.88rem;
+    color: var(--muted-text);
+    font-weight: 500;
+}
+
+.timeline-toggle-all-btns {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.timeline-action-btn {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 1.5rem;
+    border: 1px solid var(--border-subtle);
+    background: var(--pure-white);
+    color: var(--deep-blue);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.timeline-action-btn:hover {
+    border-color: var(--golden);
+    background: var(--golden-soft);
+    color: var(--deep-blue);
+}
+
+.historia-timeline-container {
+    position: relative;
+    padding: 1rem 0 1.5rem 1.5rem;
+    margin-left: 0.5rem;
+}
+
+.historia-timeline-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 28px;
+    width: 3px;
+    background: linear-gradient(180deg, var(--golden, #c99d3b), var(--deep-blue, #0b2b4f) 70%, var(--golden-light, #dfb75c));
+    border-radius: 3px;
+}
+
+.timeline-node {
+    position: relative;
+    margin-bottom: 1.4rem;
+    padding-left: 2.8rem;
+    transition: all 0.3s ease;
+}
+
+.timeline-node-bullet {
+    position: absolute;
+    left: 14px;
+    top: 20px;
+    transform: translate(-50%, 0);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--pure-white);
+    border: 3px solid var(--node-color, var(--golden));
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.9), var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--node-color, var(--golden));
+    font-size: 0.85rem;
+    z-index: 2;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.timeline-node.expanded .timeline-node-bullet {
+    background: var(--node-color, var(--golden));
+    color: var(--pure-white);
+    transform: translate(-50%, 0) scale(1.15);
+    box-shadow: 0 0 0 5px rgba(201, 157, 59, 0.25), var(--shadow-md);
+}
+
+.timeline-card {
+    background: var(--pure-white, #ffffff);
+    border-radius: var(--radius-card, 1.4rem);
+    border: 1px solid var(--border-subtle, #e8e3d8);
+    border-left: 5px solid var(--node-color, var(--golden));
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.timeline-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--golden-border);
+}
+
+.timeline-card-header {
+    padding: 1.2rem 1.4rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    user-select: none;
+    background: var(--pure-white);
+    transition: background 0.2s ease;
+}
+
+.timeline-card-header:hover {
+    background: rgba(11, 43, 79, 0.02);
+}
+
+.timeline-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.timeline-year-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.22rem 0.75rem;
+    border-radius: 1rem;
+    background: rgba(11, 43, 79, 0.06);
+    color: var(--node-color, var(--deep-blue));
+    width: fit-content;
+    letter-spacing: 0.5px;
+}
+
+.timeline-card-title {
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--deep-blue, #0b2b4f);
+    margin: 0;
+    line-height: 1.35;
+}
+
+.timeline-header-toggle {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    background: var(--cream, #fbf9f5);
+    border: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--deep-blue);
+    font-size: 0.9rem;
+    transition: transform 0.3s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.timeline-node.expanded .timeline-header-toggle {
+    transform: rotate(180deg);
+    background: var(--deep-blue);
+    color: var(--golden-light);
+}
+
+.timeline-card-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+    padding: 0 1.4rem;
+    background: var(--pure-white);
+}
+
+.timeline-node.expanded .timeline-card-body {
+    max-height: 1200px;
+    padding: 0 1.4rem 1.4rem;
+    border-top: 1px dashed var(--border-subtle);
+}
+
+.timeline-narrative-text {
+    margin-top: 1rem;
+    color: var(--dark-text-secondary, #2b3a4a);
+    font-size: 0.98rem;
+    line-height: 1.8;
+}
+
+.timeline-narrative-text p + p {
+    margin-top: 0.75rem;
+}
+
+.timeline-quote-box {
+    margin-top: 1.1rem;
+    padding: 1rem 1.2rem;
+    border-radius: var(--radius-md, 1rem);
+    background: var(--cream, #fbf9f5);
+    border-left: 4px solid var(--node-color, var(--golden));
+    font-size: 0.92rem;
+}
+
+.timeline-quote-box .quote-header {
+    font-weight: 700;
+    color: var(--deep-blue);
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.timeline-quote-box .quote-text {
+    font-style: italic;
+    color: var(--dark-text);
+    line-height: 1.6;
+}
+
+.timeline-quote-box .quote-ref {
+    display: block;
+    margin-top: 0.4rem;
+    font-weight: 600;
+    color: var(--golden, #c99d3b);
+    text-align: right;
+    font-size: 0.85rem;
+}
+
+.timeline-significance-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted-text);
+    background: var(--cream-dark, #f3ede2);
+    padding: 0.35rem 0.85rem;
+    border-radius: 0.6rem;
+}
+
+/* ==========================================================================
+   B) CARRUSEL / SLIDER DE EVENTOS HISTÓRICOS
+   ========================================================================== */
+.historia-carousel-container {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    user-select: none;
+}
+
+.carousel-viewport-wrapper {
+    overflow: hidden;
+    border-radius: var(--radius-card, 1.4rem);
+    background: var(--pure-white);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    touch-action: pan-y pinch-zoom;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+    width: 100%;
+}
+
+.carousel-slide {
+    min-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 2.2rem 2.4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.carousel-slide-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.carousel-event-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--event-color, var(--golden));
+    color: var(--pure-white);
+    padding: 0.4rem 1.1rem;
+    border-radius: 2rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-xs);
+}
+
+.carousel-slide-counter {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--muted-text);
+    background: var(--cream);
+    padding: 0.35rem 0.8rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border-subtle);
+}
+
+.carousel-slide-title {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: 1.8rem;
+    color: var(--deep-blue);
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+.carousel-slide-content {
+    color: var(--dark-text-secondary);
+    font-size: 1rem;
+    line-height: 1.8;
+    margin-bottom: 1.4rem;
+}
+
+.carousel-slide-quote {
+    padding: 1.1rem 1.3rem;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, rgba(11, 43, 79, 0.03), rgba(201, 157, 59, 0.07));
+    border-left: 4px solid var(--event-color, var(--golden));
+    margin-top: 1rem;
+}
+
+.carousel-slide-quote p {
+    font-style: italic;
+    color: var(--dark-text);
+    line-height: 1.6;
+    margin-bottom: 0.3rem;
+}
+
+.carousel-slide-quote span {
+    display: block;
+    font-weight: 700;
+    color: var(--deep-blue);
+    font-size: 0.88rem;
+    text-align: right;
+}
+
+/* Controles de Navegación del Carrusel */
+.carousel-nav-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.4rem;
+    padding: 0 0.5rem;
+}
+
+.carousel-arrow-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--pure-white);
+    border: 1px solid var(--border-subtle);
+    color: var(--deep-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.carousel-arrow-btn:hover {
+    background: var(--deep-blue);
+    color: var(--golden);
+    border-color: var(--golden);
+    transform: scale(1.08);
+}
+
+.carousel-arrow-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.carousel-dots-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.carousel-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--border-subtle, #e8e3d8);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.carousel-dot.active {
+    width: 28px;
+    border-radius: 12px;
+    background: var(--golden, #c99d3b);
+    box-shadow: 0 2px 8px rgba(201, 157, 59, 0.4);
+}
+
+.carousel-swipe-hint {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--muted-text);
+    margin-top: 0.8rem;
+}
+
+/* ==========================================================================
+   C) JUEGO "ORDENA LA HISTORIA" (GAMIFICACIÓN)
+   ========================================================================== */
+.juego-historia-wrapper {
+    max-width: 950px;
+    margin: 0 auto;
+}
+
+.juego-instruction-card {
+    background: linear-gradient(135deg, var(--deep-blue), #163e6e);
+    color: var(--pure-white);
+    padding: 1.6rem 1.8rem;
+    border-radius: var(--radius-card);
+    border: 1px solid var(--golden-border);
+    margin-bottom: 1.8rem;
+    box-shadow: var(--shadow-md);
+    position: relative;
+}
+
+.juego-instruction-card h3 {
+    color: var(--golden-light);
+    font-size: 1.3rem;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.juego-instruction-card p {
+    font-size: 0.95rem;
+    opacity: 0.92;
+    line-height: 1.6;
+}
+
+.juego-stats-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.juego-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.juego-stat-pill {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.2rem 0.7rem;
+    border-radius: 1rem;
+    color: var(--golden-light);
+}
+
+.juego-gameplay-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+/* Área de tarjetas ordenables */
+.juego-slots-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.juego-card-item {
+    background: var(--pure-white);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--border-subtle);
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    box-shadow: var(--shadow-xs);
+    transition: all 0.25s ease;
+    cursor: grab;
+    user-select: none;
+    position: relative;
+}
+
+.juego-card-item:hover {
+    border-color: var(--golden-border);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-2px);
+}
+
+.juego-card-item.selected-for-swap {
+    border-color: var(--golden);
+    background: var(--golden-soft);
+    box-shadow: 0 0 0 3px rgba(201, 157, 59, 0.3);
+}
+
+.juego-card-item.correct {
+    border-color: var(--success, #2e7d32) !important;
+    background: #f0fdf4 !important;
+}
+
+.juego-card-item.incorrect {
+    border-color: var(--danger, #d32f2f) !important;
+    background: #fef2f2 !important;
+}
+
+.juego-card-drag-handle {
+    color: var(--muted-text);
+    cursor: grab;
+    font-size: 1.1rem;
+    padding: 0.3rem;
+}
+
+.juego-card-num-badge {
+    min-width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--deep-blue);
+    color: var(--golden-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.juego-card-content {
+    flex: 1;
+}
+
+.juego-card-title {
+    font-weight: 700;
+    color: var(--deep-blue);
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+}
+
+.juego-card-clue {
+    font-size: 0.86rem;
+    color: var(--dark-text-secondary);
+    line-height: 1.4;
+}
+
+.juego-card-actions {
+    display: flex;
+    gap: 0.3rem;
+}
+
+.juego-move-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border-subtle);
+    background: var(--cream);
+    color: var(--deep-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.juego-move-btn:hover {
+    background: var(--deep-blue);
+    color: var(--golden);
+    border-color: var(--golden);
+}
+
+.juego-move-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Barra de botones de acción del juego */
+.juego-actions-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.9rem;
+    margin-top: 1.8rem;
+}
+
+.juego-btn-primary {
+    padding: 0.8rem 1.8rem;
+    border-radius: var(--radius-btn);
+    background: linear-gradient(135deg, var(--golden), #b3862b);
+    color: var(--deep-blue-dark);
+    border: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-golden);
+    transition: all 0.25s ease;
+}
+
+.juego-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(201, 157, 59, 0.4);
+}
+
+.juego-btn-secondary {
+    padding: 0.8rem 1.6rem;
+    border-radius: var(--radius-btn);
+    background: var(--pure-white);
+    color: var(--deep-blue);
+    border: 1px solid var(--border-subtle);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.25s ease;
+}
+
+.juego-btn-secondary:hover {
+    background: var(--cream);
+    border-color: var(--golden);
+}
+
+/* Modal / Banner de Victoria */
+.juego-victory-card {
+    display: none;
+    background: linear-gradient(135deg, #0f4c3a, #166534);
+    color: var(--pure-white);
+    padding: 2rem;
+    border-radius: var(--radius-card);
+    text-align: center;
+    border: 2px solid var(--golden);
+    box-shadow: var(--shadow-lg);
+    margin-top: 1.5rem;
+    animation: fadeIn 0.4s ease;
+}
+
+.juego-victory-card h3 {
+    font-size: 1.8rem;
+    color: var(--golden-light);
+    margin-bottom: 0.5rem;
+}
+
+.juego-victory-card p {
+    font-size: 1.05rem;
+    max-width: 600px;
+    margin: 0 auto 1.2rem;
+}
+
+/* ==========================================================================
+   D) MAPA DEL TIEMPO (ZOOM POR DÉCADAS)
+   ========================================================================== */
+.mapa-tiempo-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* Barra selectora de décadas */
+.decadas-selector-bar {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.6rem;
+    padding: 0.6rem;
+    background: var(--cream);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-subtle);
+    margin-bottom: 1.8rem;
+    scrollbar-width: thin;
+}
+
+.decadas-selector-bar::-webkit-scrollbar {
+    height: 6px;
+}
+
+.decadas-selector-bar::-webkit-scrollbar-thumb {
+    background: var(--golden);
+    border-radius: 4px;
+}
+
+.decada-chip-btn {
+    flex: 1;
+    min-width: 130px;
+    padding: 0.75rem 0.9rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+    background: var(--pure-white);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    align-items: center;
+}
+
+.decada-chip-btn:hover {
+    border-color: var(--golden);
+    background: var(--golden-soft);
+}
+
+.decada-chip-btn.active {
+    background: linear-gradient(135deg, var(--deep-blue), #163e6e);
+    color: var(--pure-white);
+    border-color: var(--golden);
+    box-shadow: var(--shadow-sm);
+}
+
+.decada-chip-year {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--deep-blue);
+}
+
+.decada-chip-btn.active .decada-chip-year {
+    color: var(--golden-light);
+}
+
+.decada-chip-label {
+    font-size: 0.75rem;
+    color: var(--muted-text);
+    white-space: nowrap;
+}
+
+.decada-chip-btn.active .decada-chip-label {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* Contenedor de eventos filtrados de la década */
+.mapa-events-display {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+.mapa-event-card {
+    background: var(--pure-white);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-subtle);
+    border-left: 6px solid var(--era-color, var(--golden));
+    padding: 1.8rem 2rem;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mapa-event-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.mapa-event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.mapa-event-year {
+    background: var(--era-color, var(--golden));
+    color: var(--pure-white);
+    padding: 0.35rem 1rem;
+    border-radius: 2rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.mapa-event-title {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    color: var(--deep-blue);
+    font-size: 1.45rem;
+    margin: 0;
+}
+
+.mapa-event-body {
+    color: var(--dark-text-secondary);
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+.mapa-event-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.2rem;
+}
+
+.mapa-tag-item {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    background: var(--cream);
+    color: var(--deep-blue);
+    border: 1px solid var(--border-subtle);
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (MÓVILES Y TABLETS)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .historia-wrapper {
+        padding: 0 0.4rem 2.5rem;
+    }
+
+    /* Encabezado y Hero */
+    .historia-hero {
+        padding: 1.6rem 1.1rem 1.4rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .historia-badge {
+        font-size: 0.75rem;
+        padding: 0.35rem 1rem;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.7rem;
+    }
+
+    .historia-title {
+        font-size: 1.45rem;
+        line-height: 1.3;
+        margin-bottom: 0.5rem;
+    }
+
+    .historia-subtitle {
+        font-size: 0.92rem;
+        line-height: 1.55;
+    }
+
+    /* Pestañas de Navegación */
+    .historia-tabs-nav {
+        border-radius: var(--radius-card, 1.2rem);
+        gap: 0.45rem;
+        padding: 0.45rem;
+        margin-bottom: 1.8rem;
+        justify-content: center;
+        align-items: stretch;
+    }
+
+    .historia-tab-btn {
+        flex: 1 1 calc(50% - 0.45rem);
+        min-width: 130px;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        white-space: normal;
+        min-height: 48px;
+        padding: 0.65rem 0.75rem;
+        font-size: 0.84rem;
+        line-height: 1.25;
+        border-radius: var(--radius-md, 1rem);
+    }
+
+    .historia-tab-btn i {
+        font-size: 0.92rem;
+        flex-shrink: 0;
+    }
+
+    /* Controles de Línea de Tiempo */
+    .historia-timeline-controls {
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.8rem 1rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .timeline-info-text {
+        text-align: center;
+        width: 100%;
+        font-size: 0.84rem;
+        line-height: 1.45;
+    }
+
+    .timeline-toggle-all-btns {
+        width: 100%;
+        justify-content: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .timeline-action-btn {
+        min-height: 40px;
+        padding: 0.45rem 1rem;
+        font-size: 0.82rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+    }
+
+    /* Línea de Tiempo */
+    .historia-timeline-container {
+        padding-left: 0.4rem;
+        margin-left: 0;
+    }
+
+    .historia-timeline-container::before {
+        left: 16px;
+        width: 3px;
+    }
+
+    .timeline-node {
+        padding-left: 2.1rem;
+        margin-bottom: 1.1rem;
+    }
+
+    .timeline-node-bullet {
+        left: 8px;
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+        top: 17px;
+    }
+
+    .timeline-card {
+        border-radius: var(--radius-md, 1rem);
+    }
+
+    .timeline-card-header {
+        padding: 0.95rem 1.1rem;
+        gap: 0.75rem;
+    }
+
+    .timeline-year-tag {
+        font-size: 0.74rem;
+        padding: 0.2rem 0.65rem;
+    }
+
+    .timeline-card-title {
+        font-size: 1rem;
+        line-height: 1.35;
+    }
+
+    .timeline-header-toggle {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        font-size: 0.82rem;
+    }
+
+    .timeline-card-body {
+        padding: 0 1.1rem;
+    }
+
+    .timeline-node.expanded .timeline-card-body {
+        padding: 0 1.1rem 1.2rem;
+    }
+
+    .timeline-narrative-text {
+        font-size: 0.92rem;
+        line-height: 1.65;
+        margin-top: 0.85rem;
+    }
+
+    .timeline-quote-box {
+        padding: 0.85rem 1rem;
+        font-size: 0.86rem;
+        margin-top: 0.9rem;
+    }
+
+    .timeline-significance-tag {
+        font-size: 0.78rem;
+        padding: 0.3rem 0.75rem;
+    }
+
+    /* Carrusel */
+    .carousel-slide {
+        padding: 1.4rem 1.1rem;
+    }
+
+    .carousel-slide-top {
+        gap: 0.6rem;
+        margin-bottom: 0.9rem;
+    }
+
+    .carousel-event-badge {
+        font-size: 0.78rem;
+        padding: 0.35rem 0.85rem;
+    }
+
+    .carousel-slide-counter {
+        font-size: 0.78rem;
+        padding: 0.3rem 0.65rem;
+    }
+
+    .carousel-slide-title {
+        font-size: 1.3rem;
+        line-height: 1.3;
+        margin-bottom: 0.75rem;
+    }
+
+    .carousel-slide-content {
+        font-size: 0.92rem;
+        line-height: 1.65;
+        margin-bottom: 1rem;
+    }
+
+    .carousel-slide-quote {
+        padding: 0.85rem 1rem;
+        font-size: 0.86rem;
+    }
+
+    .carousel-nav-controls {
+        padding: 0 0.2rem;
+        margin-top: 1.1rem;
+    }
+
+    .carousel-arrow-btn {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        font-size: 0.95rem;
+    }
+
+    .carousel-swipe-hint {
+        font-size: 0.76rem;
+        line-height: 1.4;
+    }
+
+    /* Juego "Ordena la Historia" */
+    .juego-instruction-card {
+        padding: 1.2rem 1.1rem;
+        text-align: center;
+        margin-bottom: 1.3rem;
+    }
+
+    .juego-instruction-card h3 {
+        font-size: 1.15rem;
+        justify-content: center;
+        margin-bottom: 0.4rem;
+    }
+
+    .juego-instruction-card p {
+        font-size: 0.88rem;
+        line-height: 1.55;
+        text-align: center;
+    }
+
+    .juego-stats-bar {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        gap: 0.6rem;
+        margin-top: 0.9rem;
+        padding-top: 0.85rem;
+    }
+
+    .juego-stat-item {
+        justify-content: center;
+        text-align: center;
+        font-size: 0.84rem;
+    }
+
+    .juego-card-item {
+        padding: 0.85rem 0.9rem;
+        gap: 0.65rem;
+    }
+
+    .juego-card-drag-handle {
+        font-size: 1rem;
+        padding: 0.2rem;
+    }
+
+    .juego-card-num-badge {
+        min-width: 28px;
+        height: 28px;
+        font-size: 0.78rem;
+    }
+
+    .juego-card-title {
+        font-size: 0.92rem;
+    }
+
+    .juego-card-clue {
+        font-size: 0.82rem;
+        line-height: 1.35;
+    }
+
+    .juego-move-btn {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        font-size: 0.82rem;
+    }
+
+    .juego-actions-bar {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.65rem;
+        margin-top: 1.3rem;
+    }
+
+    .juego-btn-primary,
+    .juego-btn-secondary {
+        width: 100%;
+        justify-content: center;
+        min-height: 46px;
+        padding: 0.75rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    .juego-victory-card {
+        padding: 1.4rem 1.1rem;
+        margin-top: 1.2rem;
+    }
+
+    .juego-victory-card h3 {
+        font-size: 1.25rem;
+        line-height: 1.3;
+    }
+
+    .juego-victory-card p {
+        font-size: 0.9rem;
+        line-height: 1.55;
+    }
+
+    /* Mapa del Tiempo (Décadas) */
+    .decadas-selector-bar {
+        padding: 0.4rem;
+        gap: 0.4rem;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 1.3rem;
+    }
+
+    .decada-chip-btn {
+        min-width: 105px;
+        padding: 0.6rem 0.6rem;
+    }
+
+    .decada-chip-year {
+        font-size: 0.86rem;
+    }
+
+    .decada-chip-label {
+        font-size: 0.72rem;
+    }
+
+    .mapa-event-card {
+        padding: 1.3rem 1.1rem;
+    }
+
+    .mapa-event-header {
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .mapa-event-year {
+        font-size: 0.78rem;
+        padding: 0.3rem 0.8rem;
+    }
+
+    .mapa-event-title {
+        font-size: 1.2rem;
+        line-height: 1.3;
+    }
+
+    .mapa-event-body {
+        font-size: 0.92rem;
+        line-height: 1.65;
+    }
+
+    .mapa-tag-item {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.65rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .historia-tabs-nav {
+        gap: 0.4rem;
+        padding: 0.4rem;
+    }
+
+    .historia-tab-btn {
+        flex: 1 1 100%;
+        width: 100%;
+        font-size: 0.88rem;
+        padding: 0.75rem 0.9rem;
+        min-height: 46px;
+    }
+
+    .juego-card-item {
+        flex-wrap: wrap;
+        align-items: flex-start;
+        position: relative;
+    }
+
+    .juego-card-content {
+        width: calc(100% - 90px);
+    }
+
+    .juego-card-actions {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 0.4rem;
+        padding-top: 0.4rem;
+        border-top: 1px dashed var(--border-subtle);
+    }
+}

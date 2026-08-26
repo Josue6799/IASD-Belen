@@ -1,0 +1,1048 @@
+/* ==========================================================================
+   SECCIÓN: TEOLOGÍA AVANZADA ADVENTISTA (PÁGINAS DEDICADAS)
+   IASD Belén · Arquitectura Visual Académica, Colorida y 100% Responsiva
+   ========================================================================== */
+
+/* ==================== ÍNDICE PRINCIPAL (#teologia_avanzada) ==================== */
+#teologia_avanzada {
+    padding-bottom: 4rem;
+}
+
+.teologia-index-hero {
+    background: radial-gradient(circle at top right, rgba(201, 165, 59, 0.18), transparent 50%),
+                linear-gradient(135deg, #091a30 0%, #0d274c 50%, #061324 100%);
+    border-radius: 1.5rem;
+    padding: 3.5rem 2rem 3rem;
+    color: #ffffff;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 16px 40px -10px rgba(6, 19, 36, 0.45), 0 0 0 1px rgba(201, 165, 59, 0.25);
+}
+
+.teologia-index-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #c9a53b, #f5d77f, #c9a53b);
+}
+
+.teologia-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    background: rgba(201, 165, 59, 0.18);
+    border: 1px solid rgba(201, 165, 59, 0.45);
+    color: #f7df8f;
+    padding: 0.4rem 1.25rem;
+    border-radius: 2rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    backdrop-filter: blur(8px);
+}
+
+.teologia-hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.1rem);
+    font-weight: 800;
+    line-height: 1.15;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+}
+
+.teologia-hero-title span {
+    background: linear-gradient(135deg, #ffffff 30%, #e2be5a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.teologia-hero-subtitle {
+    font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+    color: #cbd5e1;
+    max-width: 820px;
+    margin: 0 auto 1.8rem;
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+.teologia-index-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.8rem;
+    margin-bottom: 3rem;
+}
+
+/* Tarjeta individual en el índice */
+.teologia-topic-card {
+    background: #ffffff;
+    border-radius: 1.4rem;
+    border: 1px solid #e2e8f0;
+    padding: 2rem 1.8rem 1.8rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 4px 20px -2px rgba(11, 43, 79, 0.06);
+}
+
+.teologia-topic-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: var(--topic-gradient, linear-gradient(90deg, #0b2b4f, #1e3a8a));
+    transition: height 0.3s ease;
+}
+
+.teologia-topic-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 36px -6px rgba(11, 43, 79, 0.16);
+    border-color: rgba(201, 165, 59, 0.4);
+}
+
+.teologia-topic-card:hover::before {
+    height: 7px;
+}
+
+.teologia-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+}
+
+.teologia-topic-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #ffffff;
+    box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.teologia-topic-card:hover .teologia-topic-icon {
+    transform: scale(1.08) rotate(3deg);
+}
+
+.teologia-topic-num {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #94a3b8;
+    background: #f1f5f9;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.teologia-topic-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0b2b4f;
+    margin: 0 0 0.6rem 0;
+    line-height: 1.25;
+}
+
+.teologia-topic-card p {
+    font-size: 0.92rem;
+    color: #64748b;
+    line-height: 1.55;
+    margin: 0 0 1.2rem 0;
+    flex-grow: 1;
+}
+
+.teologia-topic-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.4rem;
+}
+
+.teologia-topic-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.65rem;
+    border-radius: 1rem;
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.teologia-topic-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.75rem 1.1rem;
+    border-radius: 0.85rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #0b2b4f;
+    font-size: 0.88rem;
+    font-weight: 700;
+    transition: all 0.25s ease;
+}
+
+.teologia-topic-card:hover .teologia-topic-btn {
+    background: #0b2b4f;
+    color: #ffffff;
+    border-color: #0b2b4f;
+}
+
+/* Tarjeta especial destacada: Profecías */
+.teologia-topic-card.featured-card {
+    background: linear-gradient(145deg, #091a30 0%, #0d274c 100%);
+    border: 2px solid #c9a53b;
+    box-shadow: 0 10px 30px -5px rgba(9, 26, 48, 0.45);
+}
+
+.teologia-topic-card.featured-card h3 {
+    color: #ffffff;
+}
+
+.teologia-topic-card.featured-card p {
+    color: #cbd5e1;
+}
+
+.teologia-topic-card.featured-card .teologia-topic-num {
+    background: rgba(201, 165, 59, 0.25);
+    color: #f7df8f;
+}
+
+.teologia-topic-card.featured-card .teologia-topic-tag {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(201, 165, 59, 0.35);
+    color: #f7df8f;
+}
+
+.teologia-topic-card.featured-card .teologia-topic-btn {
+    background: linear-gradient(90deg, #c9a53b, #d4af37);
+    color: #091a30;
+    border-color: #c9a53b;
+}
+
+.teologia-topic-card.featured-card:hover .teologia-topic-btn {
+    background: #ffffff;
+    color: #091a30;
+}
+
+/* ==================== ESTILOS DE PÁGINAS DEDICADAS ==================== */
+.teologia-page-wrapper {
+    padding-bottom: 4rem;
+    color: #1e293b;
+}
+
+/* Barra superior con botón volver */
+.teologia-back-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.teologia-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #0b2b4f;
+    padding: 0.55rem 1.25rem;
+    border-radius: 2rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s ease;
+}
+
+.teologia-back-btn:hover {
+    background: #0b2b4f;
+    color: #ffffff;
+    border-color: #0b2b4f;
+    transform: translateX(-3px);
+}
+
+.teologia-breadcrumb {
+    font-size: 0.84rem;
+    color: #64748b;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.teologia-breadcrumb a {
+    color: #0b2b4f;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.teologia-breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+/* Hero temático para cada página */
+.teologia-theme-hero {
+    border-radius: 1.5rem;
+    padding: 3.2rem 2rem 2.8rem;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2.2rem;
+    box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+.teologia-theme-hero .hero-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.teologia-theme-hero .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 1.1rem;
+    border-radius: 2rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    backdrop-filter: blur(8px);
+}
+
+.teologia-theme-hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.9rem, 3.8vw, 2.9rem);
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 0.8rem;
+}
+
+.teologia-theme-hero p {
+    font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+    line-height: 1.6;
+    opacity: 0.92;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Paletas temáticas para los Heroes */
+.hero-santuario {
+    background: radial-gradient(circle at top right, rgba(201, 165, 59, 0.3), transparent 60%),
+                linear-gradient(135deg, #091a30 0%, #1e3a8a 100%);
+    border: 2px solid rgba(201, 165, 59, 0.4);
+}
+.hero-santuario .hero-badge {
+    background: rgba(201, 165, 59, 0.2);
+    border: 1px solid #c9a53b;
+    color: #f7df8f;
+}
+
+.hero-inmortalidad {
+    background: radial-gradient(circle at top right, rgba(20, 184, 166, 0.3), transparent 60%),
+                linear-gradient(135deg, #0f172a 0%, #0369a1 50%, #0d9488 100%);
+    border: 1px solid rgba(20, 184, 166, 0.4);
+}
+.hero-inmortalidad .hero-badge {
+    background: rgba(20, 184, 166, 0.2);
+    border: 1px solid #14b8a6;
+    color: #99f6e4;
+}
+
+.hero-sabado {
+    background: radial-gradient(circle at top right, rgba(201, 165, 59, 0.3), transparent 60%),
+                linear-gradient(135deg, #064e3b 0%, #047857 50%, #0b2b4f 100%);
+    border: 1px solid rgba(201, 165, 59, 0.4);
+}
+.hero-sabado .hero-badge {
+    background: rgba(201, 165, 59, 0.25);
+    border: 1px solid #c9a53b;
+    color: #f7df8f;
+}
+
+.hero-conflicto {
+    background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.3), transparent 60%),
+                linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #312e81 100%);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+}
+.hero-conflicto .hero-badge {
+    background: rgba(139, 92, 246, 0.25);
+    border: 1px solid #a78bfa;
+    color: #ddd6fe;
+}
+
+.hero-ley {
+    background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.3), transparent 60%),
+                linear-gradient(135deg, #091a30 0%, #78350f 50%, #b45309 100%);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+}
+.hero-ley .hero-badge {
+    background: rgba(245, 158, 11, 0.25);
+    border: 1px solid #f59e0b;
+    color: #fef3c7;
+}
+
+.hero-trinidad {
+    background: radial-gradient(circle at top right, rgba(236, 72, 153, 0.25), transparent 60%),
+                linear-gradient(135deg, #1e293b 0%, #831843 50%, #1e3a8a 100%);
+    border: 1px solid rgba(236, 72, 153, 0.35);
+}
+.hero-trinidad .hero-badge {
+    background: rgba(236, 72, 153, 0.2);
+    border: 1px solid #f472b6;
+    color: #fbcfe8;
+}
+
+.hero-profecia {
+    background: radial-gradient(circle at top left, rgba(201, 165, 59, 0.25), transparent 50%),
+                radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.2), transparent 50%),
+                linear-gradient(145deg, #050d18 0%, #091a30 50%, #030810 100%);
+    border: 2px solid #c9a53b;
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7);
+}
+.hero-profecia .hero-badge {
+    background: linear-gradient(90deg, #c9a53b, #f5d77f);
+    color: #050d18;
+    font-weight: 900;
+}
+
+/* Contenido Principal de cada página */
+.teologia-content-card {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    border: 1px solid #e2e8f0;
+    padding: 2.5rem;
+    margin-bottom: 2.2rem;
+    box-shadow: 0 6px 24px -4px rgba(11, 43, 79, 0.07);
+}
+
+.teologia-media-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 2.2rem;
+    align-items: center;
+    margin-bottom: 2.2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.teologia-img-wrapper {
+    position: relative;
+    border-radius: 1.2rem;
+    overflow: hidden;
+    box-shadow: 0 12px 28px -4px rgba(11, 43, 79, 0.18);
+    border: 2px solid rgba(201, 165, 59, 0.35);
+    background: #091a30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.teologia-img-wrapper img {
+    width: 100%;
+    height: auto;
+    max-height: 330px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.teologia-img-wrapper:hover img {
+    transform: scale(1.03);
+}
+
+.teologia-img-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0.6rem 1rem;
+    background: rgba(9, 26, 48, 0.88);
+    backdrop-filter: blur(6px);
+    color: #e2e8f0;
+    font-size: 0.78rem;
+    text-align: center;
+    font-weight: 500;
+    border-top: 1px solid rgba(201, 165, 59, 0.3);
+}
+
+.teologia-lead-text {
+    font-size: 1.1rem;
+    line-height: 1.75;
+    color: #1e293b;
+    margin-bottom: 1.6rem;
+}
+
+.teologia-subheading {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #0b2b4f;
+    margin: 2rem 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.teologia-subheading i {
+    color: #c9a53b;
+}
+
+/* Grilla de Puntos Clave */
+.teologia-puntos-clave {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 1.2rem;
+    margin: 1.4rem 0 2rem;
+}
+
+.teologia-punto-item {
+    background: #f8fafc;
+    border-radius: 1rem;
+    padding: 1.3rem 1.4rem;
+    border-left: 4px solid #0b2b4f;
+    border-top: 1px solid #edf2f7;
+    border-right: 1px solid #edf2f7;
+    border-bottom: 1px solid #edf2f7;
+    transition: transform 0.2s ease;
+}
+
+.teologia-punto-item:hover {
+    transform: translateY(-2px);
+}
+
+.teologia-punto-item.gold-border {
+    border-left-color: #c9a53b;
+    background: #fffdf7;
+}
+
+.teologia-punto-item.green-border {
+    border-left-color: #10b981;
+    background: #f0fdf4;
+}
+
+.teologia-punto-item.purple-border {
+    border-left-color: #8b5cf6;
+    background: #faf5ff;
+}
+
+.teologia-punto-item h4 {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0b2b4f;
+    margin: 0 0 0.4rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.teologia-punto-item p {
+    font-size: 0.9rem;
+    color: #475569;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Cajas de Pasajes Bíblicos con Exégesis */
+.teologia-versiculos-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    margin: 1.8rem 0 2.2rem;
+}
+
+.teologia-box-biblico {
+    background: linear-gradient(145deg, #f0f7ff 0%, #e6f0fa 100%);
+    border-radius: 1.2rem;
+    padding: 1.5rem 1.8rem;
+    border: 1px solid #bfdbfe;
+    position: relative;
+}
+
+.teologia-box-biblico .box-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.teologia-box-biblico .box-title {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #1e3a8a;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.teologia-box-biblico .pasaje-referencia {
+    font-weight: 800;
+    color: #0b2b4f;
+    font-size: 0.96rem;
+    background: #ffffff;
+    padding: 0.2rem 0.75rem;
+    border-radius: 1rem;
+    border: 1px solid #cbd5e1;
+}
+
+.teologia-box-biblico .texto-biblico {
+    font-style: italic;
+    font-size: 0.98rem;
+    line-height: 1.65;
+    color: #1e293b;
+    margin-bottom: 0.9rem;
+}
+
+.teologia-box-biblico .exegesis-box {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 0.7rem;
+    padding: 0.85rem 1rem;
+    font-size: 0.86rem;
+    color: #334155;
+    line-height: 1.55;
+    border-left: 3px solid #2563eb;
+}
+
+/* Aplicación Práctica */
+.teologia-aplicacion-card {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-radius: 1.2rem;
+    padding: 1.5rem 1.8rem;
+    border: 1px solid #bbf7d0;
+    margin: 2rem 0;
+}
+
+.teologia-aplicacion-card h4 {
+    color: #166534;
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin: 0 0 0.6rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.teologia-aplicacion-card p {
+    font-size: 0.92rem;
+    color: #14532d;
+    margin: 0;
+    line-height: 1.65;
+}
+
+/* Preguntas Frecuentes (FAQ) */
+.teologia-faq-box {
+    margin-top: 2rem;
+    background: #f8fafc;
+    border-radius: 1.2rem;
+    border: 1px solid #e2e8f0;
+    padding: 1.5rem 1.8rem;
+}
+
+.teologia-faq-box h4 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0b2b4f;
+    margin: 0 0 1.2rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.teologia-faq-item {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0.9rem 0;
+}
+
+.teologia-faq-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.teologia-faq-q {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: #1e293b;
+    margin-bottom: 0.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.teologia-faq-q i {
+    color: #c9a53b;
+    font-size: 0.85rem;
+}
+
+.teologia-faq-a {
+    font-size: 0.88rem;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Navegación Inferior entre temas */
+.teologia-bottom-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-top: 1.8rem;
+    margin-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.teologia-nav-pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.65rem 1.4rem;
+    border-radius: 2rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+}
+
+.teologia-nav-pill-btn.primary {
+    background: #0b2b4f;
+    color: #ffffff;
+    border: 1px solid #0b2b4f;
+}
+
+.teologia-nav-pill-btn.primary:hover {
+    background: #1e3a8a;
+    transform: translateY(-2px);
+}
+
+.teologia-nav-pill-btn.gold {
+    background: linear-gradient(90deg, #c9a53b, #d4af37);
+    color: #091a30;
+    border: 1px solid #c9a53b;
+}
+
+.teologia-nav-pill-btn.gold:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   PÁGINA DEDICADA ESPECIAL: #profecia (DANIEL Y APOCALIPSIS)
+   Atmósfera: Noche Profética, Manuscrito Sagrado, Oro Imperial
+   ========================================================================== */
+#profecia .teologia-content-card {
+    background: radial-gradient(circle at 10% 20%, rgba(201, 165, 59, 0.1), transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(37, 99, 235, 0.12), transparent 45%),
+                linear-gradient(145deg, #071324 0%, #0b213e 50%, #050d18 100%);
+    border: 2px solid #c9a53b;
+    color: #ffffff;
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.65);
+}
+
+#profecia .teologia-lead-text {
+    color: #e2e8f0;
+}
+
+#profecia .teologia-subheading {
+    color: #ffffff;
+}
+
+#profecia .teologia-subheading i {
+    color: #f5d77f;
+}
+
+.profecia-intro-box {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(201, 165, 59, 0.35);
+    border-radius: 1.2rem;
+    padding: 1.6rem 2rem;
+    margin-bottom: 2.2rem;
+}
+
+.profecia-intro-box h4 {
+    color: #f7df8f;
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin: 0 0 0.6rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.profecia-intro-box p {
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: #e2e8f0;
+    margin: 0;
+}
+
+/* Timeline Profética */
+.profecia-timeline {
+    position: relative;
+    margin: 2.5rem 0 2.2rem;
+    padding-left: 2.2rem;
+}
+
+.profecia-timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 12px;
+    width: 3px;
+    background: linear-gradient(180deg, #c9a53b 0%, #3b82f6 50%, #c9a53b 100%);
+    border-radius: 2px;
+}
+
+.timeline-node {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.timeline-node:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -2.2rem;
+    top: 4px;
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    background: #0b213e;
+    border: 3px solid #c9a53b;
+    box-shadow: 0 0 12px rgba(201, 165, 59, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: #f7df8f;
+}
+
+.timeline-content-card {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 1.1rem;
+    padding: 1.4rem 1.7rem;
+    backdrop-filter: blur(10px);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.timeline-content-card:hover {
+    border-color: rgba(201, 165, 59, 0.7);
+    transform: translateX(4px);
+}
+
+.timeline-date-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, #c9a53b, #d4af37);
+    color: #071324;
+    font-weight: 800;
+    font-size: 0.82rem;
+    padding: 0.25rem 0.85rem;
+    border-radius: 1rem;
+    margin-bottom: 0.6rem;
+}
+
+.timeline-content-card h4 {
+    color: #ffffff;
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
+}
+
+.timeline-content-card p {
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0 0 0.8rem 0;
+}
+
+.timeline-scripture {
+    background: rgba(0, 0, 0, 0.4);
+    border-left: 3px solid #c9a53b;
+    padding: 0.65rem 1rem;
+    border-radius: 0 0.6rem 0.6rem 0;
+    font-size: 0.84rem;
+    color: #f7df8f;
+    font-style: italic;
+}
+
+/* Cuadrícula de Subtemas Proféticos */
+.profecia-subcards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.profecia-subcard {
+    background: rgba(15, 30, 56, 0.85);
+    border: 1px solid rgba(201, 165, 59, 0.35);
+    border-radius: 1.2rem;
+    padding: 1.5rem 1.6rem;
+    backdrop-filter: blur(6px);
+    transition: transform 0.25s ease;
+}
+
+.profecia-subcard:hover {
+    transform: translateY(-3px);
+    border-color: rgba(201, 165, 59, 0.7);
+}
+
+.profecia-subcard h4 {
+    color: #f7df8f;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 0 0 0.6rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.profecia-subcard p {
+    font-size: 0.88rem;
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin: 0;
+}
+
+#profecia .teologia-box-biblico {
+    background: rgba(15, 30, 56, 0.9);
+    border-color: rgba(201, 165, 59, 0.4);
+}
+
+#profecia .teologia-box-biblico .box-title {
+    color: #f7df8f;
+}
+
+#profecia .teologia-box-biblico .pasaje-referencia {
+    background: #091a30;
+    color: #f7df8f;
+    border-color: rgba(201, 165, 59, 0.4);
+}
+
+#profecia .teologia-box-biblico .texto-biblico {
+    color: #e2e8f0;
+}
+
+#profecia .teologia-box-biblico .exegesis-box {
+    background: rgba(5, 13, 24, 0.75);
+    color: #cbd5e1;
+    border-left-color: #c9a53b;
+}
+
+#profecia .teologia-aplicacion-card {
+    background: rgba(22, 101, 52, 0.25);
+    border-color: rgba(34, 197, 94, 0.4);
+}
+
+#profecia .teologia-aplicacion-card h4 {
+    color: #86efac;
+}
+
+#profecia .teologia-aplicacion-card p {
+    color: #dcfce7;
+}
+
+#profecia .teologia-faq-box {
+    background: rgba(15, 23, 42, 0.8);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+#profecia .teologia-faq-box h4 {
+    color: #f7df8f;
+}
+
+#profecia .teologia-faq-item {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+#profecia .teologia-faq-q {
+    color: #ffffff;
+}
+
+#profecia .teologia-faq-a {
+    color: #cbd5e1;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 900px) {
+    .teologia-media-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .teologia-content-card {
+        padding: 1.8rem 1.4rem;
+    }
+
+    .teologia-index-hero,
+    .teologia-theme-hero {
+        padding: 2.5rem 1.4rem 2rem;
+        border-radius: 1.2rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .teologia-index-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .teologia-hero-title {
+        font-size: 1.7rem;
+    }
+
+    .teologia-puntos-clave {
+        grid-template-columns: 1fr;
+    }
+
+    .profecia-subcards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profecia-timeline {
+        padding-left: 1.6rem;
+    }
+
+    .timeline-dot {
+        left: -1.6rem;
+        width: 22px;
+        height: 22px;
+    }
+
+    .teologia-back-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

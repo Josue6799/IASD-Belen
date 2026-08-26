@@ -1,0 +1,3968 @@
+/* ========================================
+   LMS - SISTEMA DE EVALUACIÓN Y CURSOS (SUPABASE OPTIMIZED & OFFLINE-FIRST)
+   IASD Belén · Iglesia Adventista del Séptimo Día
+   ======================================== */
+
+// ===== ESTADO GLOBAL DE DATOS =====
+let DB_EXAMENES = [];
+let nextExamId = 200;
+
+const DB_EXAMENES_DEFAULT = [
+    {
+        id: '101',
+        curso: 'Obra Misionera',
+        titulo: 'Examen Módulo 1: Introducción a la Obra Misionera',
+        fecha: '01/02/2026',
+        fechaFinal: '31/12/2026',
+        preguntas: [
+            {
+                tipo: 'multiple',
+                texto: '¿Cuál es la Gran Comisión encomendada por Jesús en Mateo 28:19-20?',
+                opciones: [
+                    'Ir y hacer discípulos a todas las naciones',
+                    'Construir grandes templos solamente',
+                    'Esperar en silencio sin predicar',
+                    'Guardar la verdad solo para nosotros'
+                ],
+                correcta: 'A',
+                explicacion: 'Jesús comisionó a sus discípulos a ir por todo el mundo predicando el evangelio y bautizando.'
+            },
+            {
+                tipo: 'vf',
+                texto: 'El evangelismo personal incluye mostrar compasión y simpatía sincera por las personas.',
+                correcta: 'Verdadero',
+                explicacion: 'El método de Cristo es el único que da verdadero éxito en llegar a las personas.'
+            },
+            {
+                tipo: 'corta',
+                texto: 'Mencione brevemente dos métodos prácticos para compartir el evangelio en su comunidad.',
+                correcta: 'Estudios bíblicos en hogares, proyectos de servicio comunitario o testimonio personal.',
+                explicacion: 'Criterio: El alumno debe mencionar métodos prácticos de evangelismo.'
+            }
+        ],
+        preguntasBanco: [],
+        cantidadPreguntas: 3,
+        activo: true
+    },
+    {
+        id: '102',
+        curso: 'Profecía',
+        titulo: 'Examen Módulo 1: Principios Proféticos de Daniel y Apocalipsis',
+        fecha: '01/02/2026',
+        fechaFinal: '31/12/2026',
+        preguntas: [
+            {
+                tipo: 'multiple',
+                texto: '¿Qué representa el principio profético día por año (Números 14:34, Ezequiel 4:6)?',
+                opciones: [
+                    'Un día profético equivale a un año literal',
+                    'Un día equivale a 1000 años',
+                    'Las profecías no tienen tiempo preciso',
+                    'Un año equivale a un mes profético'
+                ],
+                correcta: 'A',
+                explicacion: 'En la interpretación profética historicista, cada día profético simboliza un año solar literal.'
+            },
+            {
+                tipo: 'vf',
+                texto: 'El primer mensaje del ángel en Apocalipsis 14 anuncia que la hora de su juicio ha llegado.',
+                correcta: 'Verdadero',
+                explicacion: 'Apocalipsis 14:7 llama a temer a Dios y darle gloria porque la hora de su juicio ha llegado.'
+            }
+        ],
+        preguntasBanco: [],
+        cantidadPreguntas: 2,
+        activo: true
+    }
+];
+
+function generarNuevoId() {
+    let maxId = 0;
+    DB_EXAMENES.forEach(ex => {
+        if (ex.id && !isNaN(parseInt(ex.id, 10))) {
+            const val = parseInt(ex.id, 10);
+            if (val > maxId) maxId = val;
+        }
+    });
+    if (maxId >= nextExamId) nextExamId = maxId + 1;
+    return String(nextExamId++);
+}
+
+let EXAMENES_REALIZADOS = [];
+
+// ===== DATOS DE CURSOS Y PLAN DE ESTUDIOS =====
+const CURSOS_DATA_DEFAULT = {
+    'Obra Misionera': {
+        icono: '🕊️',
+        descripcion: 'Aprende a compartir tu fe y llevar el mensaje de esperanza a otros.',
+        temas: ['Introducción a la Obra Misionera', 'El llamado de Dios', 'Preparación espiritual', 'Métodos de evangelismo', 'Testimonio personal'],
+        ayudas: '📖 Material de estudio: El evangelismo de Elena G. de White'
+    },
+    'Profecía': {
+        icono: '📖',
+        descripcion: 'Estudia las profecías bíblicas y su cumplimiento en la historia.',
+        temas: ['Introducción a la Profecía', 'Daniel y el tiempo del fin', 'Apocalipsis y el conflicto cósmico', 'Las 70 semanas y los 2300 días', 'El mensaje de los tres ángeles'],
+        ayudas: '📖 Material de estudio: El conflicto de los siglos'
+    },
+    'Predica': {
+        icono: '🎤',
+        descripcion: 'Desarrolla tus habilidades de oratoria y comunicación efectiva.',
+        temas: ['Introducción a la Predicación', 'La estructura del sermón', 'El arte de contar historias', 'Uso de ilustraciones', 'La llamada al altar'],
+        ayudas: '📖 Material de estudio: La oratoria sagrada'
+    },
+    'Aventureros': {
+        icono: '<img src="https://res.cloudinary.com/onjg5kf6/image/upload/v1787335398/aventureros_houqik.webp" alt="Aventureros" style="width: 50px; height: auto; object-fit: contain;">',
+        descripcion: 'Actividades, valores y aprendizaje para los más pequeños.',
+        temas: ['Especialidad de nudos', 'Cuidado de la naturaleza', 'Valores cristianos', 'Juegos y dinámicas', 'Manualidades bíblicas'],
+        ayudas: '📖 Material de estudio: Manual del Aventurero.'
+    },
+    'Conquistadores': {
+        icono: '<img src="https://res.cloudinary.com/onjg5kf6/image/upload/v1787335398/conquistadores_depipb.jpg" alt="Conquistadores" style="width: 50px; height: auto; object-fit: contain;">',
+        descripcion: 'Campismo, especialidades y servicio para jóvenes de 10 a 15 años.',
+        temas: ['Clase de liderazgo', 'Campamento de verano', 'Especialidad de primeros auxilios', 'Proyecto de servicio comunitario', 'Historia del club'],
+        ayudas: '📖 Material de estudio: Manual del Conquistador.'
+    },
+    'Guías Mayores': {
+        icono: '<img src="https://res.cloudinary.com/onjg5kf6/image/upload/v1787335398/guias_pa0ybt.png" alt="Guías Mayores" style="width: 50px; height: auto; object-fit: contain;">',
+        descripcion: 'Liderazgo espiritual y desarrollo personal para jóvenes de 16 años en adelante.',
+        temas: ['Técnicas de campamento avanzadas', 'Liderazgo juvenil', 'Consejería espiritual', 'Proyectos de impacto social', 'Preparación para el liderazgo en la iglesia'],
+        ayudas: '📖 Material de estudio: Manual del Guía Mayor.'
+    }
+};
+
+const PLAN_ESTUDIOS_DEFAULT = {
+    'Obra Misionera': {
+        temas: ['1. Introducción a la Obra Misionera', '2. El llamado divino y preparación espiritual', '3. Métodos prácticos de evangelismo personal', '4. Testimonio eficaz y estudio bíblico en hogares'],
+        ayudas: [
+            { titulo: 'El Evangelismo - Elena G. de White', tipo: 'libro', url: 'https://egwwritings.org/', descripcion: 'Lectura fundamental sobre el método adventista de evangelizar.' },
+            { titulo: 'Video: Cómo dar estudios bíblicos', tipo: 'video', url: 'https://www.youtube.com/', descripcion: 'Guía práctica para impartir fe en la comunidad.' }
+        ]
+    },
+    'Profecía': {
+        temas: ['1. Principios de interpretación profética', '2. El libro de Daniel y las 70 semanas', '3. Apocalipsis: El conflicto cósmico', '4. El mensaje de los Tres Ángeles'],
+        ayudas: [
+            { titulo: 'El Conflicto de los Siglos', tipo: 'pdf', url: 'https://egwwritings.org/', descripcion: 'Compendio histórico de las profecías bíblicas.' },
+            { titulo: 'Línea de tiempo de los 2300 días', tipo: 'enlace', url: '#', descripcion: 'Gráfico explicativo de Daniel 8:14.' }
+        ]
+    },
+    'Predica': {
+        temas: ['1. Homilética y estructura del sermón', '2. Hermenéutica y exégesis bíblica', '3. El uso de ilustraciones y el llamado', '4. Comunicación corporal y tono de voz'],
+        ayudas: [
+            { titulo: 'Manual del Orador Sagrado', tipo: 'libro', url: '#', descripcion: 'Técnicas de preparación de sermones expositivos.' },
+            { titulo: 'Audio: Ejemplo de Sermón Expositivo', tipo: 'audio', url: '#', descripcion: 'Demostración práctica de sermón.' }
+        ]
+    },
+    'Aventureros': {
+        temas: ['1. Especialidad de nudos y amarras', '2. Cuidado de la naturaleza y creación', '3. Ley y Voto del Aventurero', '4. Arte campestre y manualidades'],
+        ayudas: [
+            { titulo: 'Manual Administrativo de Aventureros', tipo: 'pdf', url: '#', descripcion: 'Guía oficial para consejeros y líderes.' }
+        ]
+    },
+    'Conquistadores': {
+        temas: ['1. Clases progresivas y requisitos', '2. Primeros auxilios y vendajes', '3. Orientación con brújula y mapa', '4. Historia de la iglesia e hitos'],
+        ayudas: [
+            { titulo: 'Manual del Conquistador', tipo: 'libro', url: '#', descripcion: 'Requisitos de especialidades y marchas.' }
+        ]
+    },
+    'Guías Mayores': {
+        temas: ['1. Liderazgo juvenil cristiano', '2. Técnicas de campamento avanzadas', '3. Psicología del adolescente y consejería', '4. Proyectos comunitarios e impacto'],
+        ayudas: [
+            { titulo: 'Manual de Guía Mayor', tipo: 'pdf', url: '#', descripcion: 'Tarjeta de investidura y currículum de liderazgo.' }
+        ]
+    }
+};
+
+// LOGROS Y DEFINICIONES
+const LOGROS_DEFINICIONES = [
+    { id: 'primer_paso', titulo: '🌱 Primer Paso', descripcion: 'Inscribirse en tu primer curso espiritual.', icono: '🌱', categoria: 'Inscripción', evaluar: (identidad, misCursos, realizados) => misCursos.length >= 1 },
+    { id: 'estudiante_constante', titulo: '📚 Estudiante Constante', descripcion: 'Estar inscrito en 3 o más cursos simultáneamente.', icono: '📚', categoria: 'Inscripción', evaluar: (identidad, misCursos, realizados) => misCursos.length >= 3 },
+    { id: 'maestro_doctrina', titulo: '🎓 Maestro de la Fe', descripcion: 'Inscribirse en los 6 cursos del programa educativo.', icono: '🎓', categoria: 'Inscripción', evaluar: (identidad, misCursos, realizados) => misCursos.length >= 6 },
+    { id: 'primer_examen', titulo: '✍️ Valentía Bíblica', descripcion: 'Rendir y entregar tu primer examen en el LMS.', icono: '✍️', categoria: 'Evaluación', evaluar: (identidad, misCursos, realizados) => realizados.length >= 1 },
+    { id: 'mente_brillante', titulo: '⚡ Mente Brillante', descripcion: 'Obtener un 5.0 perfecto en cualquier examen.', icono: '⚡', categoria: 'Excelencia', evaluar: (identidad, misCursos, realizados) => realizados.some(r => r.calificacion === 5.0) },
+    { id: 'misionero_fiel', titulo: '🕊️ Misionero Fiel', descripcion: 'Aprobar un examen del curso Obra Misionera (nota ≥ 4.0).', icono: '🕊️', categoria: 'Cursos', evaluar: (identidad, misCursos, realizados) => realizados.some(r => r.curso === 'Obra Misionera' && r.calificacion >= 4.0) },
+    { id: 'profeta_sabio', titulo: '📖 Profeta Sabio', descripcion: 'Aprobar un examen del curso Profecía (nota ≥ 4.0).', icono: '📖', categoria: 'Cursos', evaluar: (identidad, misCursos, realizados) => realizados.some(r => r.curso === 'Profecía' && r.calificacion >= 4.0) },
+    { id: 'orador_celestial', titulo: '🎤 Orador Celestial', descripcion: 'Aprobar un examen del curso Prédica (nota ≥ 4.0).', icono: '🎤', categoria: 'Cursos', evaluar: (identidad, misCursos, realizados) => realizados.some(r => (r.curso === 'Prédica' || r.curso === 'Predica') && r.calificacion >= 4.0) },
+    { id: 'aventurero_ejemplar', titulo: '🌟 Aventurero Ejemplar', descripcion: 'Aprobar un examen del club de Aventureros (nota ≥ 4.0).', icono: '🌟', categoria: 'Clubes', evaluar: (identidad, misCursos, realizados) => realizados.some(r => r.curso === 'Aventureros' && r.calificacion >= 4.0) },
+    { id: 'conquistador_victorioso', titulo: '🧭 Conquistador Victorioso', descripcion: 'Aprobar un examen del club de Conquistadores (nota ≥ 4.0).', icono: '🧭', categoria: 'Clubes', evaluar: (identidad, misCursos, realizados) => realizados.some(r => r.curso === 'Conquistadores' && r.calificacion >= 4.0) },
+    { id: 'guia_lider', titulo: '👑 Guía Mayor Líder', descripcion: 'Aprobar un examen del club de Guías Mayores (nota ≥ 4.0).', icono: '👑', categoria: 'Clubes', evaluar: (identidad, misCursos, realizados) => realizados.some(r => r.curso === 'Guías Mayores' && r.calificacion >= 4.0) },
+    {
+        id: 'gran_promedio', titulo: '🏆 Excelencia Académica', descripcion: 'Mantener un promedio general igual o superior a 4.5.', icono: '🏆', categoria: 'Excelencia', evaluar: (identidad, misCursos, realizados) => {
+            const califs = realizados.map(r => r.calificacion).filter(c => typeof c === 'number' && !isNaN(c));
+            if (califs.length === 0) return false;
+            return (califs.reduce((a, b) => a + b, 0) / califs.length) >= 4.5;
+        }
+    }
+];
+
+// VARIABLES DE CONTROL Y MODALES
+let modoAdminActivo = false;
+let sesionGestionPinsLMSActiva = false;
+let editandoExamenIndex = -1;
+let examenActualParaRendir = null;
+const modalesAbiertos = new Set();
+
+// ===== CONTROL SCROLL Y MODALES =====
+function mostrarElementoModal(el) {
+    if (!el) return;
+    el.classList.add('active');
+    el.style.display = 'flex';
+    el.style.visibility = 'visible';
+    el.style.opacity = '1';
+    el.style.zIndex = '100050';
+}
+
+function ocultarElementoModal(el) {
+    if (!el) return;
+    el.classList.remove('active');
+    el.style.display = 'none';
+    el.style.visibility = 'hidden';
+    el.style.opacity = '0';
+}
+
+function bloquearScroll(idModal) {
+    if (idModal) modalesAbiertos.add(idModal);
+    document.body.style.overflow = 'hidden';
+    const dashboard = document.getElementById('dashboardEvaluacion');
+    if (dashboard && dashboard.style.display !== 'none') {
+        dashboard.style.overflow = 'hidden';
+    }
+}
+
+function desbloquearScroll(idModal) {
+    if (idModal) modalesAbiertos.delete(idModal);
+    const modalesOverlay = document.querySelectorAll('.modal-overlay');
+    let hayVisibles = false;
+    modalesOverlay.forEach(m => {
+        if (m.classList.contains('active')) hayVisibles = true;
+        const styleDisplay = m.style.display || window.getComputedStyle(m).display;
+        const visibility = m.style.visibility || window.getComputedStyle(m).visibility;
+        if ((styleDisplay === 'flex' || styleDisplay === 'block') && visibility !== 'hidden') {
+            hayVisibles = true;
+        }
+    });
+
+    if (modalesAbiertos.size === 0 && !hayVisibles) {
+        const dashboard = document.getElementById('dashboardEvaluacion');
+        if (dashboard && dashboard.style.display !== 'none') {
+            document.body.style.overflow = 'hidden';
+            dashboard.style.overflow = 'auto';
+        } else {
+            document.body.style.overflow = '';
+        }
+    }
+}
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay').forEach(m => {
+            ocultarElementoModal(m);
+        });
+        modalesAbiertos.clear();
+        const dashboard = document.getElementById('dashboardEvaluacion');
+        if (dashboard && dashboard.style.display !== 'none') {
+            document.body.style.overflow = 'hidden';
+            dashboard.style.overflow = 'auto';
+        } else {
+            document.body.style.overflow = '';
+        }
+    }
+});
+
+// ===== OFFLINE-FIRST Y CAPA SUPABASE =====
+function enqueueOfflinePending(op) {
+    let pendientes = [];
+    try {
+        pendientes = JSON.parse(localStorage.getItem('pendientesSincronizacion')) || [];
+    } catch (e) { }
+    pendientes.push(op);
+    localStorage.setItem('pendientesSincronizacion', JSON.stringify(pendientes));
+}
+
+async function sincronizarOfflinePending() {
+    if (!navigator.onLine || !window.supabaseClient) return;
+    let pendientes = [];
+    try {
+        pendientes = JSON.parse(localStorage.getItem('pendientesSincronizacion')) || [];
+    } catch (e) { }
+    if (!Array.isArray(pendientes) || pendientes.length === 0) return;
+
+    const noProcesados = [];
+    for (const item of pendientes) {
+        try {
+            if (item.type === 'alumnos_identidades_upsert') {
+                await window.supabaseClient.from('alumnos_identidades').upsert([item.payload], { onConflict: 'documento' });
+            } else if (item.type === 'examenes_upsert') {
+                await window.supabaseClient.from('examenes').upsert([item.payload], { onConflict: 'id' });
+            } else if (item.type === 'examenes_delete') {
+                await window.supabaseClient.from('examenes').delete().eq('id', item.payload.id);
+            } else if (item.type === 'examenes_realizados_upsert') {
+                await window.supabaseClient.from('examenes_realizados').upsert([item.payload], { onConflict: 'id' });
+            } else if (item.type === 'inscripciones_cursos_upsert') {
+                await window.supabaseClient.from('inscripciones_cursos').upsert([item.payload], { onConflict: 'alumno_documento,id_curso' });
+            } else if (item.type === 'inscripciones_cursos_delete') {
+                await window.supabaseClient.from('inscripciones_cursos').delete().match(item.payload);
+            } else if (item.type === 'plan_estudios_upsert') {
+                await window.supabaseClient.from('plan_estudios').upsert([item.payload], { onConflict: 'id' });
+            } else if (item.type === 'logros_alumnos_upsert') {
+                await window.supabaseClient.from('logros_alumnos').upsert([item.payload], { onConflict: 'id' });
+            } else if (item.type === 'notificaciones_lms_upsert') {
+                await window.supabaseClient.from('notificaciones_lms').upsert([item.payload], { onConflict: 'id' });
+            } else if (item.alumnoNombre && item.curso) { // fallback legacy pending item
+                await window.supabaseClient.from('examenes_realizados').upsert([{
+                    id: String(item.id || Date.now()),
+                    exam_id: String(item.examId || ''),
+                    curso: item.curso || '',
+                    titulo: item.titulo || '',
+                    fecha: item.fecha || '',
+                    alumno_nombre: item.alumnoNombre || '',
+                    alumno_documento: String(item.alumnoDocumento || '').trim(),
+                    alumno_whatsapp: String(item.alumnoWhatsapp || '').trim(),
+                    alumno_grupo: item.alumnoGrupo || 'General',
+                    respuestas: item.respuestas || [],
+                    calificacion: item.calificacion,
+                    nota: item.nota || 'Pendiente',
+                    fecha_realizacion: item.fechaRealizacion || new Date().toISOString()
+                }], { onConflict: 'id' });
+            }
+        } catch (err) {
+            console.warn('[LMS Offline Sync] Falló elemento al sincronizar:', err);
+            noProcesados.push(item);
+        }
+    }
+    localStorage.setItem('pendientesSincronizacion', JSON.stringify(noProcesados));
+}
+
+// SINCRONIZACIÓN EN SEGUNDO PLANO DESDE SUPABASE
+async function syncAllFromSupabase() {
+    if (!window.supabaseClient || !navigator.onLine) return;
+
+    // 1. Cursos
+    try {
+        const { data: dataCursos, error: errCursos } = await window.supabaseClient.from('cursos').select('id, nombre, icono, descripcion');
+        if (!errCursos && Array.isArray(dataCursos) && dataCursos.length > 0) {
+            const liveCursos = obtenerCursosData();
+            dataCursos.forEach(c => {
+                if (c && (c.nombre || c.id)) {
+                    const k = c.nombre || c.id;
+                    liveCursos[k] = {
+                        icono: c.icono || '📖',
+                        descripcion: c.descripcion || '',
+                        temas: c.temas || liveCursos[k]?.temas || [],
+                        ayudas: c.ayudas || liveCursos[k]?.ayudas || ''
+                    };
+                }
+            });
+            guardarCursosData(liveCursos);
+        }
+    } catch (e) { }
+
+    // 2. Plan de estudios
+    try {
+        const { data: dataPlan, error: errPlan } = await window.supabaseClient.from('plan_estudios').select('id, curso, temas, ayudas');
+        if (!errPlan && Array.isArray(dataPlan) && dataPlan.length > 0) {
+            const livePlan = obtenerPlanEstudios();
+            dataPlan.forEach(p => {
+                const k = p.curso || p.id;
+                if (k) {
+                    livePlan[k] = {
+                        temas: Array.isArray(p.temas) ? p.temas : [],
+                        ayudas: Array.isArray(p.ayudas) ? p.ayudas : []
+                    };
+                }
+            });
+            guardarPlanEstudios(livePlan);
+        }
+    } catch (e) { }
+
+    // 3. Exámenes
+    try {
+        const { data: dataEx, error: errEx } = await window.supabaseClient.from('examenes').select('id, id_curso, titulo, descripcion, duracion_min, preguntas, preguntas_banco, cantidad_preguntas, cantidadpreguntas, fecha, fecha_final, activo');
+        if (!errEx && Array.isArray(dataEx) && dataEx.length > 0) {
+            DB_EXAMENES = dataEx.map(item => ({
+                id: String(item.id),
+                curso: item.id_curso || item.curso || 'Obra Misionera',
+                titulo: item.titulo || '',
+                descripcion: item.descripcion || '',
+                duracion_min: item.duracion_min || 30,
+                fecha: item.fecha || '',
+                fechaFinal: item.fecha_final || item.fechaFinal || '',
+                preguntas: item.preguntas || [],
+                preguntasBanco: item.preguntas_banco || item.preguntas || [],
+                cantidadPreguntas: item.cantidad_preguntas || item.cantidadpreguntas || (item.preguntas ? item.preguntas.length : 0),
+                activo: item.activo !== false
+            }));
+            guardarExamenesEnStorage();
+        }
+    } catch (e) { }
+
+    // 4. Exámenes Realizados
+    try {
+        const { data: dataReal, error: errReal } = await window.supabaseClient.from('examenes_realizados').select('id, exam_id, curso, titulo, fecha, alumno_nombre, alumno_documento, alumno_whatsapp, alumno_grupo, respuestas, calificacion, nota, fecha_realizacion');
+        if (!errReal && Array.isArray(dataReal)) {
+            EXAMENES_REALIZADOS = dataReal.map(r => ({
+                id: r.id,
+                examId: r.exam_id,
+                curso: r.curso,
+                titulo: r.titulo,
+                fecha: r.fecha,
+                alumnoNombre: r.alumno_nombre,
+                alumnoDocumento: r.alumno_documento,
+                alumnoWhatsapp: r.alumno_whatsapp,
+                alumnoGrupo: r.alumno_grupo,
+                respuestas: r.respuestas || [],
+                calificacion: r.calificacion,
+                nota: r.nota,
+                fechaRealizacion: r.fecha_realizacion
+            }));
+            guardarExamenesRealizados();
+        }
+    } catch (e) { }
+
+    // 5. Alumnos Identidades
+    try {
+        const { data: dataAlum, error: errAlum } = await window.supabaseClient.from('alumnos_identidades').select('documento, nombre, whatsapp, grupo, pin, fecha_registro, fechaRegistro, fecharegistro');
+        if (!errAlum && Array.isArray(dataAlum) && dataAlum.length > 0) {
+            const list = dataAlum.map(a => ({
+                id: String(a.documento).trim(),
+                documento: String(a.documento).trim(),
+                nombre: a.nombre || '',
+                whatsapp: a.whatsapp || '',
+                grupo: a.grupo || 'General',
+                pin: a.pin ? String(a.pin).trim() : '',
+                fecha_registro: a.fecha_registro || a.fechaRegistro || a.fecharegistro || new Date().toISOString()
+            }));
+            guardarListaAlumnosIdentidades(list);
+        }
+    } catch (e) { }
+
+    // 6. Inscripciones de Cursos del alumno actual
+    try {
+        const ident = obtenerIdentidadAlumno();
+        if (ident && ident.documento) {
+            const doc = String(ident.documento).trim();
+            const { data: dataInsc, error: errInsc } = await window.supabaseClient.from('inscripciones_cursos').select('id_curso, curso_id').eq('alumno_documento', doc);
+            if (!errInsc && Array.isArray(dataInsc)) {
+                const cursosRemotos = dataInsc.map(i => i.id_curso || i.curso_id).filter(Boolean);
+                if (cursosRemotos.length > 0) {
+                    const locales = obtenerMisCursos();
+                    const combinados = Array.from(new Set([...locales, ...cursosRemotos]));
+                    guardarMisCursos(combinados);
+                }
+            }
+        }
+    } catch (e) { }
+
+    // 7. Notificaciones LMS
+    try {
+        const { data: dataNotif, error: errNotif } = await window.supabaseClient.from('notificaciones_lms').select('id, alumno_documento, titulo, cuerpo, fecha, leido').order('fecha', { ascending: false }).limit(50);
+        if (!errNotif && Array.isArray(dataNotif)) {
+            let locales = JSON.parse(localStorage.getItem('notificacionesLMS')) || [];
+            const idsLocales = new Set(locales.map(n => String(n.id)));
+            dataNotif.forEach(n => {
+                if (!idsLocales.has(String(n.id))) {
+                    locales.push({
+                        id: n.id,
+                        documento: n.alumno_documento ? String(n.alumno_documento).trim().toLowerCase() : null,
+                        titulo: n.titulo,
+                        cuerpo: n.cuerpo,
+                        fecha: n.fecha,
+                        leido: Boolean(n.leido)
+                    });
+                }
+            });
+            localStorage.setItem('notificacionesLMS', JSON.stringify(locales));
+            actualizarBadgesNotificaciones();
+        }
+    } catch (e) { }
+}
+
+// ===== ALUMNOS Y IDENTIDADES =====
+function obtenerListaAlumnosIdentidades() {
+    try {
+        return JSON.parse(localStorage.getItem('lms_alumnos_identidades')) || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function guardarListaAlumnosIdentidades(lista) {
+    const cleanList = Array.isArray(lista) ? lista : [];
+    localStorage.setItem('lms_alumnos_identidades', JSON.stringify(cleanList));
+}
+
+function generarPinUnicoLMS() {
+    const lista = obtenerListaAlumnosIdentidades();
+    const pinsExistentes = new Set(lista.map(a => a && a.pin ? String(a.pin).trim() : ''));
+    let pin;
+    let contador = 0;
+    do {
+        pin = String(Math.floor(1000 + Math.random() * 9000));
+        contador++;
+        if (contador > 9000) break;
+    } while (pinsExistentes.has(pin));
+    return pin;
+}
+
+function obtenerOGenerarPinAlumno(nombre, documento, grupo = 'General', whatsapp = '') {
+    try {
+        let lista = obtenerListaAlumnosIdentidades();
+        const docClean = String(documento).trim();
+        const nomClean = String(nombre).trim();
+        const wspClean = String(whatsapp || '').trim();
+
+        let alumno = lista.find(a => a && String(a.documento).trim().toLowerCase() === docClean.toLowerCase());
+        let esNuevoPin = false;
+
+        if (!alumno) {
+            const nuevoPin = generarPinUnicoLMS();
+            alumno = {
+                id: docClean,
+                documento: docClean,
+                nombre: nomClean,
+                whatsapp: wspClean,
+                grupo: grupo || 'General',
+                pin: nuevoPin,
+                fecha_registro: new Date().toISOString()
+            };
+            lista.push(alumno);
+            guardarListaAlumnosIdentidades(lista);
+            esNuevoPin = true;
+        } else {
+            if (!alumno.pin) {
+                alumno.pin = generarPinUnicoLMS();
+                esNuevoPin = true;
+            }
+            if (nomClean && nomClean !== alumno.nombre) alumno.nombre = nomClean;
+            if (wspClean && wspClean !== alumno.whatsapp) alumno.whatsapp = wspClean;
+            guardarListaAlumnosIdentidades(lista);
+        }
+
+        guardarIdentidadAlumno(alumno.nombre, alumno.documento, alumno.grupo, alumno.pin, alumno.whatsapp);
+
+        // Guardar en Supabase
+        const payloadSupabase = {
+            documento: alumno.documento,
+            nombre: alumno.nombre,
+            whatsapp: alumno.whatsapp || alumno.documento,
+            grupo: alumno.grupo || 'General',
+            pin: String(alumno.pin).trim(),
+            fecha_registro: alumno.fecha_registro || new Date().toISOString()
+        };
+
+        if (window.supabaseClient) {
+            window.supabaseClient
+                .from('alumnos_identidades')
+                .upsert([payloadSupabase], { onConflict: 'documento' })
+                .catch(err => {
+                    console.warn('[LMS Supabase] Error guardando alumno identidad, guardando offline:', err);
+                    enqueueOfflinePending({ type: 'alumnos_identidades_upsert', payload: payloadSupabase });
+                });
+        } else {
+            enqueueOfflinePending({ type: 'alumnos_identidades_upsert', payload: payloadSupabase });
+        }
+
+        if (esNuevoPin) {
+            agregarNotificacionPersonalLMS(
+                alumno.documento,
+                '¡Tu PIN de acceso ha sido creado!',
+                `Hola ${alumno.nombre}, tu PIN de 4 dígitos para acceder a tus resultados es: ${alumno.pin}. Guárdalo en un lugar seguro.`
+            );
+        }
+
+        try {
+            window.dispatchEvent(new CustomEvent('pinGenerado', { detail: alumno }));
+        } catch (e) { }
+
+        return { alumno, esNuevoPin };
+    } catch (err) {
+        console.error('[LMS] Error en obtenerOGenerarPinAlumno:', err);
+        const pinFallback = String(Math.floor(1000 + Math.random() * 9000));
+        const alumnoFallback = {
+            id: String(documento).trim(),
+            documento: String(documento).trim(),
+            nombre: String(nombre).trim(),
+            whatsapp: String(whatsapp || '').trim(),
+            grupo: grupo || 'General',
+            pin: pinFallback,
+            fecha_registro: new Date().toISOString()
+        };
+        return { alumno: alumnoFallback, esNuevoPin: true };
+    }
+}
+
+function obtenerIdentidadAlumno() {
+    try {
+        return JSON.parse(localStorage.getItem('alumnoIdentidad')) || null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function guardarIdentidadAlumno(nombre, documento, grupo = 'General', pin = '', whatsapp = '') {
+    let lista = obtenerListaAlumnosIdentidades();
+    const docClean = String(documento).trim();
+    let alum = lista.find(a => a && String(a.documento).trim().toLowerCase() === docClean.toLowerCase());
+    const pinFinal = pin || (alum ? alum.pin : '');
+    const wspFinal = whatsapp || (alum ? alum.whatsapp : '') || '';
+    const grupoFinal = grupo || (alum ? alum.grupo : 'General') || 'General';
+
+    const identidad = {
+        documento: docClean,
+        nombre: String(nombre).trim(),
+        whatsapp: wspFinal,
+        grupo: grupoFinal,
+        pin: String(pinFinal).trim(),
+        fecha_registro: (alum && alum.fecha_registro) ? alum.fecha_registro : new Date().toISOString()
+    };
+
+    localStorage.setItem('alumnoIdentidad', JSON.stringify(identidad));
+    return identidad;
+}
+
+function examenYaRealizado(curso, tituloExamen) {
+    const identidad = obtenerIdentidadAlumno();
+    if (!identidad || !identidad.nombre) return false;
+
+    cargarExamenesRealizados();
+    return EXAMENES_REALIZADOS.some(ex =>
+        ex.curso === curso &&
+        ex.titulo === tituloExamen &&
+        ((ex.alumnoNombre && ex.alumnoNombre.toLowerCase() === identidad.nombre.toLowerCase()) ||
+         (ex.alumnoDocumento && String(ex.alumnoDocumento).trim().toLowerCase() === String(identidad.documento).trim().toLowerCase()))
+    );
+}
+
+// ===== PERSISTENCIA DE DATOS Y CURSOS =====
+function cargarExamenesDesdeStorage() {
+    try {
+        const data = JSON.parse(localStorage.getItem('db_examenes'));
+        if (data && Array.isArray(data) && data.length > 0) {
+            DB_EXAMENES = data.filter(ex => ex && ex.titulo);
+            DB_EXAMENES.forEach(ex => { if (!ex.id) ex.id = generarNuevoId(); });
+            return;
+        }
+    } catch (e) { }
+    DB_EXAMENES = JSON.parse(JSON.stringify(DB_EXAMENES_DEFAULT));
+    guardarExamenesEnStorage();
+}
+
+function guardarExamenesEnStorage() {
+    localStorage.setItem('db_examenes', JSON.stringify(DB_EXAMENES));
+}
+
+function cargarExamenesRealizados() {
+    try {
+        EXAMENES_REALIZADOS = JSON.parse(localStorage.getItem('examenesRealizados')) || [];
+    } catch (e) {
+        EXAMENES_REALIZADOS = [];
+    }
+}
+
+function guardarExamenesRealizados() {
+    localStorage.setItem('examenesRealizados', JSON.stringify(EXAMENES_REALIZADOS));
+}
+
+function obtenerMisCursos() {
+    try {
+        const raw = JSON.parse(localStorage.getItem('misCursos')) || [];
+        if (!Array.isArray(raw)) return [];
+        const cleanList = [];
+        const seen = new Set();
+        raw.forEach(item => {
+            let name = '';
+            if (typeof item === 'string') name = item.trim();
+            else if (item && typeof item === 'object') name = (item.id_curso || item.curso_id || item.curso || item.nombre || '').trim();
+            if (name && !seen.has(name)) {
+                seen.add(name);
+                cleanList.push(name);
+            }
+        });
+        return cleanList;
+    } catch (e) {
+        return [];
+    }
+}
+
+function guardarMisCursos(cursos) {
+    const cleanList = Array.isArray(cursos)
+        ? Array.from(new Set(cursos.filter(Boolean).map(c => typeof c === 'string' ? c.trim() : String(c.id_curso || c.curso_id || c.curso || c.nombre || '').trim()).filter(Boolean)))
+        : [];
+    localStorage.setItem('misCursos', JSON.stringify(cleanList));
+}
+
+function inscribirCurso(curso) {
+    try {
+        const cClean = String(curso || '').trim();
+        if (!cClean) return false;
+        let cursos = obtenerMisCursos();
+        if (!cursos.includes(cClean)) {
+            if (cursos.length >= 6) {
+                mostrarToast('⚠️ Máximo 6 cursos permitidos simultáneamente', 'warning');
+                return false;
+            }
+            cursos.push(cClean);
+            guardarMisCursos(cursos);
+
+            // Sincronizar a Supabase
+            const identidad = obtenerIdentidadAlumno();
+            const doc = identidad && identidad.documento ? String(identidad.documento).trim() : 'alumno_local';
+            const payload = {
+                alumno_documento: doc,
+                id_curso: cClean,
+                curso_id: cClean,
+                progreso: 0,
+                estado: 'en_proceso',
+                fecha_inscripcion: new Date().toISOString()
+            };
+
+            if (window.supabaseClient) {
+                window.supabaseClient
+                    .from('inscripciones_cursos')
+                    .upsert([payload], { onConflict: 'alumno_documento,id_curso' })
+                    .catch(err => {
+                        console.warn('[LMS Supabase] Error guardando inscripción, encolando offline:', err);
+                        enqueueOfflinePending({ type: 'inscripciones_cursos_upsert', payload });
+                    });
+            } else {
+                enqueueOfflinePending({ type: 'inscripciones_cursos_upsert', payload });
+            }
+
+            try {
+                evaluarYGuardarLogros(obtenerIdentidadAlumno());
+            } catch (eLogros) { }
+            return true;
+        }
+        return false;
+    } catch (err) {
+        console.error('[LMS] Error en inscribirCurso:', err);
+        return false;
+    }
+}
+
+function desinscribirCurso(curso) {
+    try {
+        const cClean = String(curso || '').trim();
+        if (!cClean) return false;
+        let cursos = obtenerMisCursos();
+        cursos = cursos.filter(c => c !== cClean);
+        guardarMisCursos(cursos);
+
+        const identidad = obtenerIdentidadAlumno();
+        const doc = identidad && identidad.documento ? String(identidad.documento).trim() : 'alumno_local';
+
+        if (window.supabaseClient) {
+            window.supabaseClient
+                .from('inscripciones_cursos')
+                .delete()
+                .match({ alumno_documento: doc, id_curso: cClean })
+                .catch(err => {
+                    enqueueOfflinePending({ type: 'inscripciones_cursos_delete', payload: { alumno_documento: doc, id_curso: cClean } });
+                });
+        } else {
+            enqueueOfflinePending({ type: 'inscripciones_cursos_delete', payload: { alumno_documento: doc, id_curso: cClean } });
+        }
+        return true;
+    } catch (err) {
+        console.error('[LMS] Error en desinscribirCurso:', err);
+        return false;
+    }
+}
+
+function obtenerPlanEstudios() {
+    try {
+        const data = JSON.parse(localStorage.getItem('plan_estudios'));
+        if (data && typeof data === 'object' && Object.keys(data).length > 0) return data;
+    } catch (e) { }
+    return PLAN_ESTUDIOS_DEFAULT;
+}
+
+function guardarPlanEstudios(planData) {
+    localStorage.setItem('plan_estudios', JSON.stringify(planData));
+}
+
+function obtenerCursosData() {
+    try {
+        const data = JSON.parse(localStorage.getItem('cursos'));
+        if (data && typeof data === 'object' && Object.keys(data).length > 0) return data;
+    } catch (e) { }
+    return CURSOS_DATA_DEFAULT;
+}
+
+function guardarCursosData(cursosObj) {
+    localStorage.setItem('cursos', JSON.stringify(cursosObj));
+}
+
+// Proxy dinámico para CURSOS_DATA
+const CURSOS_DATA = new Proxy(CURSOS_DATA_DEFAULT, {
+    get(target, prop) {
+        if (prop === Symbol.iterator || prop === 'then') return undefined;
+        const liveData = obtenerCursosData();
+        if (prop in liveData) return liveData[prop];
+        return target[prop];
+    },
+    ownKeys() {
+        return Object.keys(obtenerCursosData());
+    },
+    getOwnPropertyDescriptor(target, prop) {
+        const liveData = obtenerCursosData();
+        if (prop in liveData) {
+            return { enumerable: true, configurable: true, value: liveData[prop] };
+        }
+        return Object.getOwnPropertyDescriptor(target, prop);
+    }
+});
+
+// ===== NOTIFICACIONES TOAST Y MODAL GENÉRICO =====
+function mostrarToast(mensaje, tipo = 'info') {
+    const existe = document.getElementById('lmsToast');
+    if (existe) existe.remove();
+
+    const toast = document.createElement('div');
+    toast.id = 'lmsToast';
+    let bgColor = '#1a3a4a';
+    if (tipo === 'success') bgColor = '#2e7d32';
+    if (tipo === 'warning') bgColor = '#f57c00';
+    if (tipo === 'error') bgColor = '#c62828';
+
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: ${bgColor};
+        color: white;
+        padding: 0.8rem 1.6rem;
+        border-radius: 2rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 600;
+        z-index: 100090;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        animation: fadeInUp 0.3s ease forwards;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    `;
+    toast.innerHTML = mensaje;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'fadeOut 0.3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function mostrarModalGenerico(titulo, mensaje, botones = [], permitirCerrar = true) {
+    cerrarModalGenerico();
+    bloquearScroll('modalGenerico');
+
+    const modal = document.createElement('div');
+    modal.id = 'modalGenerico';
+    modal.className = 'modal-overlay';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.75);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 100050; animation: fadeIn 0.3s ease; backdrop-filter: blur(5px);
+    `;
+
+    const botonesHTML = botones.map((btn, index) => {
+        const esPrimario = index === 0;
+        return `
+            <button class="btn-modal-${index}" style="
+                padding: 0.8rem 1.6rem; border-radius: 2rem; font-weight: 700; font-size: 0.9rem;
+                cursor: pointer; transition: all 0.3s ease; font-family: 'Inter', sans-serif; border: none;
+                ${esPrimario ? `background: linear-gradient(135deg, #d4a038 0%, #c9a53b 100%); color: #1a3a4a; box-shadow: 0 4px 15px rgba(212, 160, 56, 0.3);`
+                : `background: transparent; border: 2px solid #c9a53b; color: #c9a53b;`}
+                ${botones.length === 1 ? 'width: 100%;' : 'flex: 1; max-width: 180px;'}
+            ">${btn.texto}</button>
+        `;
+    }).join('');
+
+    modal.innerHTML = `
+        <div class="modal-card" style="
+            background: #ffffff; border-radius: 1.5rem; padding: 2rem 1.8rem; max-width: 440px; width: 90%;
+            text-align: center; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4); animation: slideUp 0.3s ease;
+            position: relative; border: 2px solid rgba(201, 165, 59, 0.3);
+        ">
+            ${permitirCerrar ? `
+                <button data-csp-click="cerrarModalGenerico()" style="
+                    position: absolute; top: 1rem; right: 1rem; background: transparent;
+                    border: none; font-size: 1.4rem; color: #888; cursor: pointer;
+                ">&times;</button>
+            ` : ''}
+            <h3 style="color: #1a3a4a; font-size: 1.3rem; font-weight: 700; margin: 0 0 0.8rem 0; font-family: 'Inter', sans-serif;">${titulo}</h3>
+            <div style="color: #5a6474; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.5rem; font-family: 'Inter', sans-serif;">${mensaje}</div>
+            ${botones.length > 0 ? `<div style="display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;">${botonesHTML}</div>` : ''}
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    mostrarElementoModal(modal);
+
+    botones.forEach((btn, index) => {
+        const btnElement = modal.querySelector(`.btn-modal-${index}`);
+        if (btnElement && btn.callback) {
+            btnElement.addEventListener('click', () => {
+                cerrarModalGenerico();
+                btn.callback();
+            });
+        }
+    });
+
+    if (permitirCerrar) {
+        modal.addEventListener('click', (e) => { if (e.target === modal) cerrarModalGenerico(); });
+    }
+}
+
+function cerrarModalGenerico() {
+    const modal = document.getElementById('modalGenerico');
+    if (modal) {
+        ocultarElementoModal(modal);
+        modal.remove();
+    }
+    desbloquearScroll('modalGenerico');
+}
+
+function mostrarModalBienvenida(curso) {
+    cerrarModalBienvenida();
+    bloquearScroll('modalBienvenida');
+
+    const modal = document.createElement('div');
+    modal.id = 'modalBienvenida';
+    modal.className = 'modal-overlay';
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.75); display: flex; align-items: center; justify-content: center;
+        z-index: 100050; animation: fadeIn 0.3s ease; backdrop-filter: blur(5px);
+    `;
+
+    modal.innerHTML = `
+        <div class="modal-card" style="
+            background: #ffffff; border-radius: 1.5rem; padding: 2.2rem 1.8rem; max-width: 440px; width: 90%;
+            text-align: center; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4); animation: slideUp 0.3s ease;
+            position: relative; border: 2px solid var(--golden);
+        ">
+            <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">🎉</div>
+            <h3 style="color: #1a3a4a; font-size: 1.4rem; font-weight: 800; margin: 0 0 0.8rem 0; font-family: 'Inter', sans-serif;">¡Bienvenido al Curso!</h3>
+            <p style="color: #5a6474; font-size: 0.98rem; line-height: 1.5; margin-bottom: 1.6rem; font-family: 'Inter', sans-serif;">
+                ✅ ¡Bienvenido a <strong>${curso}</strong>! Estás listo para comenzar tu aprendizaje y fortalecer tu fe.
+            </p>
+            <button data-csp-click="cerrarModalBienvenida()" class="btn btn-golden" style="
+                width: 100%; padding: 0.85rem; border-radius: 2rem; font-weight: 700; font-size: 0.95rem;
+                cursor: pointer; font-family: 'Inter', sans-serif; border: none;
+                background: linear-gradient(135deg, #d4a038 0%, #c9a53b 100%); color: #1a3a4a;
+                box-shadow: 0 4px 15px rgba(212, 160, 56, 0.3);
+            ">
+                <i class="fas fa-check-circle"></i> Entendido
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    mostrarElementoModal(modal);
+}
+
+function cerrarModalBienvenida() {
+    const modal = document.getElementById('modalBienvenida');
+    if (modal) {
+        ocultarElementoModal(modal);
+        modal.remove();
+    }
+    desbloquearScroll('modalBienvenida');
+}
+
+// ===== BOTÓN FLOTANTE MODO ADMIN =====
+function asegurarBotonFlotanteAdmin() {
+    const dashboard = document.getElementById('dashboardEvaluacion');
+    if (!dashboard) return;
+
+    let btnAdmin = document.getElementById('btnAdminLMS');
+    if (!btnAdmin) {
+        btnAdmin = document.createElement('button');
+        btnAdmin.id = 'btnAdminLMS';
+        btnAdmin.setAttribute('data-csp-click', 'abrirModalAdmin()');
+        btnAdmin.innerHTML = '<i class="fas fa-cog"></i> Modo Administrador';
+        document.body.appendChild(btnAdmin);
+
+        btnAdmin.addEventListener('click', function (e) {
+            if (e) e.stopPropagation();
+            abrirModalAdmin();
+        });
+    }
+
+    btnAdmin.style.cssText = `
+        position: fixed; bottom: 2rem; right: 2rem; background: #2e7d32; color: white;
+        padding: 0.75rem 1.4rem; border-radius: 2rem; border: none; font-family: 'Inter', sans-serif;
+        font-weight: 700; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 15px rgba(46,125,50,0.4);
+        transition: all 0.3s ease; z-index: 10000; display: flex; align-items: center; gap: 0.6rem;
+    `;
+    btnAdmin.onmouseover = function () {
+        this.style.transform = 'translateY(-3px) scale(1.05)';
+        this.style.boxShadow = '0 8px 25px rgba(46,125,50,0.6)';
+    };
+    btnAdmin.onmouseout = function () {
+        this.style.transform = 'translateY(0) scale(1)';
+        this.style.boxShadow = '0 4px 15px rgba(46,125,50,0.4)';
+    };
+
+    const isVisible = dashboard.style.display !== 'none' && !modoAdminActivo;
+    btnAdmin.style.display = isVisible ? 'flex' : 'none';
+}
+
+// ===== NAVEGACIÓN =====
+function abrirModalEvaluacion() {
+    const modal = document.getElementById('modalEvaluacion');
+    if (modal) {
+        bloquearScroll('modalEvaluacion');
+        mostrarElementoModal(modal);
+        const pwdInput = document.getElementById('inputPasswordEvaluacion');
+        if (pwdInput) pwdInput.value = '';
+        const errDiv = document.getElementById('errorPasswordEvaluacion');
+        if (errDiv) errDiv.style.display = 'none';
+        setTimeout(() => { if (pwdInput) pwdInput.focus(); }, 300);
+    }
+}
+
+function verificarPasswordEvaluacion() {
+    const pwdInput = document.getElementById('inputPasswordEvaluacion');
+    const password = pwdInput ? pwdInput.value.trim() : '';
+    if (password === 'eval2026') {
+        cerrarModalEvaluacion();
+        abrirDashboard();
+    } else {
+        const errorDiv = document.getElementById('errorPasswordEvaluacion');
+        if (errorDiv) errorDiv.style.display = 'block';
+        if (pwdInput) {
+            pwdInput.value = '';
+            pwdInput.focus();
+        }
+    }
+}
+
+function cerrarModalEvaluacion() {
+    const modal = document.getElementById('modalEvaluacion');
+    if (modal) {
+        ocultarElementoModal(modal);
+        const pwdInput = document.getElementById('inputPasswordEvaluacion');
+        if (pwdInput) pwdInput.value = '';
+        const errDiv = document.getElementById('errorPasswordEvaluacion');
+        if (errDiv) errDiv.style.display = 'none';
+    }
+    desbloquearScroll('modalEvaluacion');
+}
+
+function abrirDashboard() {
+    cargarExamenesDesdeStorage();
+    cargarExamenesRealizados();
+    sincronizarOfflinePending();
+    syncAllFromSupabase();
+
+    const dashboard = document.getElementById('dashboardEvaluacion');
+    if (dashboard) {
+        dashboard.style.display = 'block';
+        dashboard.style.overflow = 'auto';
+        document.body.style.overflow = 'hidden';
+    }
+
+    asegurarBotonFlotanteAdmin();
+    actualizarBadgesNotificaciones();
+    cambiarPestalla('principal');
+}
+
+function cerrarDashboard() {
+    const dashboard = document.getElementById('dashboardEvaluacion');
+    if (dashboard) {
+        dashboard.style.display = 'none';
+    }
+    document.body.style.overflow = '';
+    asegurarBotonFlotanteAdmin();
+    cerrarSesionAdmin();
+}
+
+function cambiarPestalla(tab) {
+    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+    const target = document.getElementById('contenido' + tab.charAt(0).toUpperCase() + tab.slice(1));
+    if (target) target.style.display = 'block';
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--muted-text)';
+    });
+    const activeBtn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+    if (activeBtn) {
+        activeBtn.style.background = 'var(--golden)';
+        activeBtn.style.color = 'var(--deep-blue)';
+    }
+
+    if (tab === 'principal') renderizarPrincipal();
+    if (tab === 'cursos') renderizarCursos();
+    if (tab === 'revision') renderizarRevision();
+    if (tab === 'logros') renderizarLogros();
+    if (tab === 'grupo') renderizarGrupo();
+}
+
+// ===== PESTAÑA 1: PRINCIPAL =====
+function renderizarPrincipal() {
+    const container = document.getElementById('contenidoExamenes');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const misCursos = Array.from(new Set(obtenerMisCursos()));
+    const identidad = obtenerIdentidadAlumno();
+    cargarExamenesRealizados();
+
+    if (misCursos.length === 0) {
+        container.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; padding: 3rem 2rem; text-align: center;">
+                <div style="font-size: 3.5rem;">📚</div>
+                <h3 style="color: var(--deep-blue); font-size: 1.2rem; margin: 0; font-family: 'Inter', sans-serif;">No estás inscrito en ningún curso</h3>
+                <p style="color: var(--muted-text); font-size: 0.9rem; margin: 0; font-family: 'Inter', sans-serif;">Explora el catálogo de cursos e inscríbete para poder rendir exámenes.</p>
+                <button data-csp-click="cambiarPestalla('cursos')" class="btn btn-golden" style="margin-top: 0.5rem; padding: 0.7rem 1.8rem; border-radius: 2rem; border: none; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; background: var(--golden); color: var(--deep-blue);">
+                    <i class="fas fa-arrow-right"></i> Ver Catálogo de Cursos
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    let cursosHTML = '';
+
+    misCursos.forEach(curso => {
+        const examenesCurso = DB_EXAMENES.filter(ex => ex.curso === curso && ex.activo !== false);
+        const data = CURSOS_DATA[curso] || { icono: '📚' };
+
+        let examenesHTML = '';
+        if (examenesCurso.length === 0) {
+            examenesHTML = `
+                <div style="padding: 0.6rem 0; color: var(--muted-text); font-size: 0.85rem; font-style: italic;">
+                    🔒 No hay exámenes publicados para este curso actualmente.
+                </div>
+            `;
+        } else {
+            examenesHTML = examenesCurso.map((examen) => {
+                const yaRealizado = identidad ? examenYaRealizado(curso, examen.titulo) : false;
+
+                if (yaRealizado) {
+                    return `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid rgba(0,0,0,0.04); flex-wrap: wrap; gap: 0.5rem;">
+                            <span style="color: var(--dark-text); font-size: 0.9rem; font-weight: 500;">
+                                <i class="fas fa-file-alt" style="color: var(--golden); margin-right: 0.5rem;"></i>
+                                ${examen.titulo}
+                            </span>
+                            <button disabled style="background: #e8f5e9; color: #2e7d32; padding: 0.35rem 1rem; border: 1px solid #c8e6c9; border-radius: 2rem; font-weight: 600; cursor: not-allowed; font-size: 0.8rem; display: flex; align-items: center; gap: 0.4rem;">
+                                <i class="fas fa-check-circle"></i> Realizado
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid rgba(0,0,0,0.04); flex-wrap: wrap; gap: 0.5rem;">
+                            <span style="color: var(--dark-text); font-size: 0.9rem; font-weight: 500;">
+                                <i class="fas fa-file-alt" style="color: var(--golden); margin-right: 0.5rem;"></i>
+                                ${examen.titulo}
+                                ${examen.fechaFinal ? `<br><small style="color: #888; font-size: 0.75rem;"><i class="far fa-clock"></i> Límite: ${examen.fechaFinal}</small>` : ''}
+                            </span>
+                            <button data-csp-click="confirmarInicioExamen('${examen.id}')" 
+                                style="background: var(--golden); color: var(--deep-blue); padding: 0.4rem 1.2rem; border: none; border-radius: 2rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.8rem; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.4rem;"
+                                data-csp-mouseover="this.style.transform='scale(1.05)';"
+                                data-csp-mouseout="this.style.transform='scale(1)';">
+                                <i class="fas fa-play"></i> Tomar Examen
+                            </button>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        cursosHTML += `
+            <div style="background: var(--pure-white); border-radius: 1.2rem; padding: 1.3rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-left: 4px solid var(--golden); margin-bottom: 1.2rem;">
+                <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem;">
+                    <div style="display: flex; justify-content: center; align-items: center; min-width: 50px;">${data.icono}</div>
+                    <div>
+                        <h3 style="color: var(--deep-blue); margin: 0; font-size: 1.1rem; font-family: 'Inter', sans-serif;">${curso}</h3>
+                        <span style="color: var(--muted-text); font-size: 0.8rem;">${examenesCurso.length} examen(es) disponible(s)</span>
+                    </div>
+                </div>
+                <div>${examenesHTML}</div>
+            </div>
+        `;
+    });
+
+    const bannerPinHTML = `
+        <div style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); color: white; padding: 1.2rem; border-radius: 1.2rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 15px rgba(26,58,74,0.15);">
+            <div style="display: flex; align-items: center; gap: 0.9rem;">
+                <div style="font-size: 1.8rem; background: rgba(255,255,255,0.12); width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--golden);">🔑</div>
+                <div>
+                    <h4 style="margin: 0; color: white; font-family: 'Inter', sans-serif; font-size: 1.05rem;">Tu PIN de Acceso a Resultados</h4>
+                    <p style="margin: 0.2rem 0 0 0; font-size: 0.82rem; opacity: 0.9; font-family: 'Inter', sans-serif;">
+                        ${identidad && identidad.pin ? `Tu PIN actual es: <strong style="color:var(--golden); font-size:0.95rem; font-family:monospace;">${identidad.pin}</strong> (Consúltalo en notificaciones).` : 'Genera tu PIN de 4 dígitos para consultar la revisión de tus exámenes.'}
+                    </p>
+                </div>
+            </div>
+            <button data-csp-click="abrirModalGenerarPinLMS()" class="btn btn-golden" style="padding: 0.6rem 1.4rem; border-radius: 2rem; border: none; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.85rem; min-height: 44px; display: inline-flex; align-items: center; gap: 0.4rem; background: var(--golden); color: var(--deep-blue);">
+                <i class="fas fa-key"></i> Obtener / Generar mi PIN
+            </button>
+        </div>
+    `;
+
+    container.innerHTML = bannerPinHTML + cursosHTML;
+}
+
+// ===== PESTAÑA 2: CURSOS =====
+function renderizarCursos() {
+    const container = document.getElementById('contenidoCursosDinamico');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const misCursos = Array.from(new Set(obtenerMisCursos()));
+    const planEstudios = obtenerPlanEstudios();
+    const cursosData = obtenerCursosData();
+    const cursosNombres = Array.from(new Set(Object.keys(cursosData)));
+
+    let cursosHTML = `
+        <h2 style="color: var(--deep-blue); font-size: 1.5rem; margin-bottom: 1rem; font-family: 'Inter', sans-serif;">Catálogo de Cursos y Recursos</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem;">
+    `;
+
+    cursosNombres.forEach(nombre => {
+        const data = cursosData[nombre] || { icono: '📖', descripcion: '' };
+        const inscrito = misCursos.includes(nombre);
+        const plan = planEstudios[nombre] || { temas: [], ayudas: [] };
+        const nombreEscapado = nombre.replace(/'/g, "\\'");
+
+        const ayudasHTML = (plan.ayudas || []).map(a => {
+            let iconType = '📄';
+            if (a.tipo === 'video') iconType = '🎬';
+            if (a.tipo === 'libro') iconType = '📚';
+            if (a.tipo === 'audio') iconType = '🎧';
+            if (a.tipo === 'enlace') iconType = '🔗';
+            return `
+                <div style="font-size: 0.82rem; margin-top: 0.4rem; padding: 0.4rem 0.6rem; background: #fafaf9; border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <span>${iconType} <strong>${a.titulo}</strong></span>
+                    <a href="${a.url || '#'}" target="_blank" rel="noopener" style="color: var(--deep-blue); font-weight: 700; text-decoration: none; font-size: 0.78rem;">Abrir ↗</a>
+                </div>
+            `;
+        }).join('');
+
+        cursosHTML += `
+            <div style="background: var(--pure-white); padding: 1.5rem; border-radius: 1.5rem; box-shadow: var(--shadow-sm); border-left: 4px solid ${inscrito ? 'var(--golden)' : '#ccc'}; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem;">
+                        <div style="min-width: 50px; display: flex; justify-content: center;">${data.icono}</div>
+                        <div>
+                            <h3 style="color: var(--deep-blue); margin: 0; font-size: 1.1rem; font-family: 'Inter', sans-serif;">${nombre}</h3>
+                            <span style="font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.6rem; border-radius: 1rem; background: ${inscrito ? '#e8f5e9' : '#f5f5f5'}; color: ${inscrito ? '#2e7d32' : '#777'};">
+                                ${inscrito ? '✓ Inscrito' : 'Disponible'}
+                            </span>
+                        </div>
+                    </div>
+                    <p style="color: var(--dark-text); font-size: 0.88rem; line-height: 1.4; margin-bottom: 0.8rem; font-family: 'Inter', sans-serif;">${data.descripcion}</p>
+                    
+                    ${plan.ayudas && plan.ayudas.length > 0 ? `
+                        <details style="margin-bottom: 0.8rem; font-size: 0.82rem; color: var(--deep-blue);">
+                            <summary style="cursor: pointer; font-weight: 700; outline: none;">🗂️ Recursos y Materiales (${plan.ayudas.length})</summary>
+                            <div style="margin-top: 0.4rem;">${ayudasHTML}</div>
+                        </details>
+                    ` : ''}
+                </div>
+                <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.8rem;">
+                    <button data-csp-click="verPlanEstudios('${nombreEscapado}')" class="btn btn-golden btn-sm" style="flex: 1; padding: 0.5rem 0.8rem; border-radius: 0.8rem; font-size: 0.8rem; border: none; cursor: pointer; font-weight: 600; font-family: 'Inter', sans-serif;">
+                        <i class="fas fa-book-open"></i> Ver Plan
+                    </button>
+                    ${inscrito ? `
+                        <button data-csp-click="desinscribirCursoConfirm('${nombreEscapado}')" 
+                            style="background: #c62828; color: white; padding: 0.5rem 1rem; border-radius: 0.8rem; border: none; cursor: pointer; font-weight: 600; font-size: 0.8rem; font-family: 'Inter', sans-serif; flex: 1; transition: all 0.3s ease;"
+                            data-csp-mouseover="this.style.background='#b71c1c';"
+                            data-csp-mouseout="this.style.background='#c62828';">
+                            <i class="fas fa-trash-alt"></i> Desinscribir
+                        </button>
+                    ` : `
+                        <button data-csp-click="confirmarInscripcionDirecta('${nombreEscapado}')" 
+                            style="background: var(--deep-blue); color: white; padding: 0.5rem 1rem; border-radius: 0.8rem; border: none; cursor: pointer; font-weight: 600; font-size: 0.8rem; font-family: 'Inter', sans-serif; flex: 1; transition: all 0.3s ease;"
+                            data-csp-mouseover="this.style.background='#132734';"
+                            data-csp-mouseout="this.style.background='var(--deep-blue)';">
+                            <i class="fas fa-plus-circle"></i> Inscribirme
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    });
+
+    cursosHTML += `</div>`;
+    container.innerHTML = cursosHTML;
+}
+
+function desinscribirCursoConfirm(curso) {
+    mostrarModalGenerico(
+        '⚠️ Confirmar desinscripción',
+        `¿Estás seguro de desinscribirte de "<strong>${curso}</strong>"?<br><br><small style="color: #888;">Perderás el acceso a sus exámenes.</small>`,
+        [
+            {
+                texto: '✓ Sí, desinscribir',
+                callback: () => {
+                    desinscribirCurso(curso);
+                    renderizarPrincipal();
+                    renderizarCursos();
+                    renderizarRevision();
+                    renderizarLogros();
+                    mostrarToast(`🗑️ Te has desinscrito de ${curso}`, 'info');
+                }
+            },
+            { texto: 'Cancelar', callback: () => { } }
+        ]
+    );
+}
+
+function confirmarInscripcionDirecta(curso) {
+    mostrarModalGenerico(
+        '📚 Confirmar Inscripción',
+        `¿Estás seguro de inscribirte en el curso "<strong>${curso}</strong>"?`,
+        [
+            {
+                texto: '✓ Sí, inscribirme',
+                callback: () => {
+                    if (inscribirCurso(curso)) {
+                        renderizarPrincipal();
+                        renderizarCursos();
+                        renderizarRevision();
+                        renderizarLogros();
+                        mostrarModalBienvenida(curso);
+                    } else {
+                        mostrarToast('⚠️ Ya estás inscrito en este curso o has alcanzado el límite.', 'warning');
+                    }
+                }
+            },
+            { texto: 'Cancelar', callback: () => { } }
+        ]
+    );
+}
+
+function verPlanEstudios(curso) {
+    bloquearScroll('modalPlanEstudios');
+    const planEstudios = obtenerPlanEstudios();
+    const data = planEstudios[curso] || { temas: CURSOS_DATA[curso]?.temas || [], ayudas: [] };
+
+    const modal = document.getElementById('modalPlanEstudios');
+    const body = document.getElementById('modalPlanBody');
+    const titulo = document.getElementById('modalPlanTitulo');
+
+    if (titulo) titulo.innerHTML = `<i class="fas fa-book-open" style="color: var(--golden);"></i> Plan de Estudios: ${curso}`;
+    if (body) {
+        const temasHTML = (data.temas || []).map((t) => `
+            <div style="background: #fafaf9; padding: 0.7rem 1rem; border-radius: 0.8rem; margin-bottom: 0.5rem; border-left: 3px solid var(--golden); font-size: 0.9rem;">
+                <strong style="color: var(--deep-blue);">${t}</strong>
+            </div>
+        `).join('');
+
+        const ayudasHTML = (data.ayudas || []).map(a => {
+            let icon = '📄';
+            if (a.tipo === 'video') icon = '🎬';
+            if (a.tipo === 'libro') icon = '📚';
+            if (a.tipo === 'audio') icon = '🎧';
+            if (a.tipo === 'enlace') icon = '🔗';
+
+            return `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 0.7rem 1rem; border-radius: 0.8rem; margin-bottom: 0.5rem; border: 1px solid #e8e3d8;">
+                    <div>
+                        <span style="font-size: 1.1rem; margin-right: 0.4rem;">${icon}</span>
+                        <strong style="color: var(--deep-blue); font-size: 0.9rem;">${a.titulo}</strong>
+                        ${a.descripcion ? `<p style="margin: 0; font-size: 0.78rem; color: #777;">${a.descripcion}</p>` : ''}
+                    </div>
+                    <a href="${a.url || '#'}" target="_blank" rel="noopener" class="btn btn-golden btn-sm" style="padding: 0.3rem 0.8rem; border-radius: 0.6rem; font-size: 0.78rem; text-decoration: none;">Abrir ↗</a>
+                </div>
+            `;
+        }).join('');
+
+        body.innerHTML = `
+            <h4 style="color: var(--deep-blue); margin-bottom: 0.6rem; font-family: 'Inter', sans-serif;">📚 Temas del Curso:</h4>
+            ${temasHTML.length > 0 ? temasHTML : '<p style="color:#888;">Aún no se han configurado temas para este curso.</p>'}
+
+            <h4 style="color: var(--deep-blue); margin: 1.2rem 0 0.6rem 0; font-family: 'Inter', sans-serif;">🗂️ Ayudas y Recursos Didácticos:</h4>
+            ${ayudasHTML.length > 0 ? ayudasHTML : '<p style="color:#888;">Aún no se han configurado recursos para este curso.</p>'}
+        `;
+    }
+
+    if (modal) {
+        mostrarElementoModal(modal);
+    }
+}
+
+function cerrarModalPlanEstudios() {
+    const modal = document.getElementById('modalPlanEstudios');
+    if (modal) {
+        ocultarElementoModal(modal);
+    }
+    desbloquearScroll('modalPlanEstudios');
+}
+
+// ===== FLUJO DE TOMAR Y RENDIR EXAMEN =====
+function confirmarInicioExamen(examId) {
+    const examen = DB_EXAMENES.find(ex => String(ex.id) === String(examId));
+    if (!examen) {
+        mostrarModalGenerico('Error', 'No se encontró el examen seleccionado.');
+        return;
+    }
+
+    if (examenYaRealizado(examen.curso, examen.titulo)) {
+        mostrarModalGenerico('Examen ya realizado', `Ya has completado el examen "<strong>${examen.titulo}</strong>".`);
+        return;
+    }
+
+    examenActualParaRendir = examen;
+
+    mostrarModalGenerico(
+        '📝 Confirmar inicio de examen',
+        `¿Deseas iniciar el examen "<strong>${examen.titulo}</strong>" del curso <strong>${examen.curso}</strong>?`,
+        [
+            {
+                texto: '<i class="fas fa-play"></i> Sí, iniciar',
+                callback: () => iniciarFlujoIdentidad()
+            },
+            {
+                texto: 'Cancelar',
+                callback: () => { examenActualParaRendir = null; }
+            }
+        ]
+    );
+}
+
+function iniciarFlujoIdentidad() {
+    bloquearScroll('modalIdentidadAlumno');
+    const identidadExistente = obtenerIdentidadAlumno();
+
+    let modal = document.getElementById('modalIdentidadAlumno');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalIdentidadAlumno';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; padding: 2rem; max-width: 440px; width: 95%; box-shadow: 0 25px 60px rgba(0,0,0,0.3); border: 2px solid var(--golden);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.6rem;">
+                    <h3 style="color: #1a3a4a; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-user-lock" style="color:#c9a53b;"></i> Identificación del Alumno</h3>
+                    <button type="button" data-csp-click="cancelarIdentidad()" style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; line-height:1;">&times;</button>
+                </div>
+                <p style="font-size:0.85rem; color:#5a6474; margin-bottom:1rem; font-family:'Inter',sans-serif;">
+                    Ingresa tu PIN de 4 dígitos y tu nombre completo tal como lo registraste para comenzar el examen.
+                </p>
+
+                <div id="errorIdentidadRendir" style="display:none; background:#ffebee; color:#c62828; padding:0.75rem; border-radius:0.8rem; border:1px solid #ffcdd2; font-size:0.84rem; font-family:'Inter',sans-serif; margin-bottom:1rem; text-align:left;"></div>
+
+                <div style="margin-bottom: 0.9rem; text-align: left;">
+                    <label style="font-weight: 700; font-size: 0.85rem; color: #1a3a4a; font-family: 'Inter', sans-serif;">🔑 PIN de 4 dígitos *</label>
+                    <input type="text" id="inputPinAlumnoRendir" maxlength="4" placeholder="Ej: 4829" 
+                        data-csp-keyup="if(event.key==='Enter') verificarIdentidadYRendir()"
+                        style="width: 100%; padding: 0.75rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 1.1rem; font-weight: 800; letter-spacing: 3px; text-align: center; box-sizing: border-box; font-family: 'Inter', sans-serif; min-height: 44px;">
+                </div>
+                
+                <div style="margin-bottom: 1.2rem; text-align: left;">
+                    <label style="font-weight: 700; font-size: 0.85rem; color: #1a3a4a; font-family: 'Inter', sans-serif;">👤 Nombre Completo *</label>
+                    <input type="text" id="inputNombreAlumnoRendir" placeholder="Ej: Juan Pérez" 
+                        data-csp-keyup="if(event.key==='Enter') verificarIdentidadYRendir()"
+                        style="width: 100%; padding: 0.75rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.95rem; box-sizing: border-box; font-family: 'Inter', sans-serif; min-height: 44px;">
+                </div>
+
+                <div style="display: flex; gap: 0.8rem; margin-bottom: 1rem;">
+                    <button data-csp-click="verificarIdentidadYRendir()" class="btn btn-golden" style="flex:1; border:none; padding:0.75rem; border-radius:2rem; font-weight:700; background: var(--golden); color: var(--deep-blue); cursor: pointer; font-family: 'Inter', sans-serif; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                        <i class="fas fa-check-circle"></i> Verificar y Rendir
+                    </button>
+                    <button data-csp-click="cancelarIdentidad()" class="btn btn-outline" style="flex:1; padding:0.75rem; border-radius:2rem; background: transparent; border: 2px solid var(--deep-blue); color: var(--deep-blue); cursor: pointer; font-weight: 700; font-family: 'Inter', sans-serif; min-height: 44px;">
+                        Cancelar
+                    </button>
+                </div>
+
+                <div style="text-align: center; font-size: 0.82rem; font-family: 'Inter', sans-serif; color: #5a6474; border-top: 1px dashed #e8e3d8; padding-top: 0.8rem;">
+                    ¿No tienes un PIN asignado? 
+                    <a href="javascript:void(0)" data-csp-click="redirigirGenerarPinDesdeIdentidad()" style="color: var(--deep-blue); font-weight: 700; text-decoration: underline;">
+                        Genera tu PIN aquí
+                    </a>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    const errDiv = document.getElementById('errorIdentidadRendir');
+    if (errDiv) errDiv.style.display = 'none';
+
+    if (identidadExistente) {
+        document.getElementById('inputPinAlumnoRendir').value = identidadExistente.pin || '';
+        document.getElementById('inputNombreAlumnoRendir').value = identidadExistente.nombre || '';
+    }
+
+    mostrarElementoModal(modal);
+}
+
+function cancelarIdentidad() {
+    const modal = document.getElementById('modalIdentidadAlumno');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalIdentidadAlumno');
+    examenActualParaRendir = null;
+}
+
+function redirigirGenerarPinDesdeIdentidad() {
+    cancelarIdentidad();
+    abrirModalGenerarPinLMS();
+}
+
+function verificarIdentidadYRendir() {
+    const pinInput = document.getElementById('inputPinAlumnoRendir');
+    const nombreInput = document.getElementById('inputNombreAlumnoRendir');
+    const errorDiv = document.getElementById('errorIdentidadRendir');
+
+    const pin = pinInput ? pinInput.value.trim() : '';
+    const nombre = nombreInput ? nombreInput.value.trim() : '';
+
+    if (errorDiv) errorDiv.style.display = 'none';
+
+    if (!pin || !nombre) {
+        if (errorDiv) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = '⚠️ Ingresa tanto tu <strong>PIN de 4 dígitos</strong> como tu <strong>Nombre Completo</strong>.';
+        }
+        return;
+    }
+
+    const listaAlumnos = obtenerListaAlumnosIdentidades();
+    const alumnoEncontrado = listaAlumnos.find(a => String(a.pin).trim() === pin);
+
+    if (!alumnoEncontrado) {
+        if (errorDiv) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = '⚠️ PIN no válido. Genera un PIN desde la pestaña Principal o verifica que lo hayas ingresado correctamente. <br><br><a href="javascript:void(0)" data-csp-click="redirigirGenerarPinDesdeIdentidad()" style="color:#c62828; font-weight:700; text-decoration:underline;">Generar mi PIN de acceso</a>';
+        }
+        if (pinInput) {
+            pinInput.value = '';
+            pinInput.focus();
+        }
+        return;
+    }
+
+    const nomClean = nombre.toLowerCase().replace(/\s+/g, ' ').trim();
+    const alumNomClean = String(alumnoEncontrado.nombre).toLowerCase().replace(/\s+/g, ' ').trim();
+
+    if (nomClean !== alumNomClean) {
+        if (errorDiv) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = '⚠️ El nombre no coincide con el PIN ingresado. Verifica tus datos.';
+        }
+        if (pinInput) {
+            pinInput.value = '';
+            pinInput.focus();
+        }
+        if (nombreInput) {
+            nombreInput.value = '';
+        }
+        return;
+    }
+
+    guardarIdentidadAlumno(alumnoEncontrado.nombre, alumnoEncontrado.documento, alumnoEncontrado.grupo, alumnoEncontrado.pin);
+
+    const modal = document.getElementById('modalIdentidadAlumno');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalIdentidadAlumno');
+
+    if (examenActualParaRendir) {
+        rendirExamen(examenActualParaRendir.curso, examenActualParaRendir);
+        examenActualParaRendir = null;
+    }
+}
+
+function rendirExamen(curso, examen) {
+    bloquearScroll('modalRendirExamen');
+    const identidad = obtenerIdentidadAlumno();
+
+    let preguntasRendir = [];
+    if (examen.preguntasBanco && examen.preguntasBanco.length > 0) {
+        const banco = [...examen.preguntasBanco];
+        banco.sort(() => 0.5 - Math.random());
+        const cant = examen.cantidadPreguntas || banco.length;
+        preguntasRendir = banco.slice(0, cant);
+    } else {
+        preguntasRendir = examen.preguntas || [];
+    }
+
+    examen._preguntasGeneradas = preguntasRendir;
+
+    let modal = document.getElementById('modalRendirExamen');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalRendirExamen';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 750px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.2rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="tituloExamenRendir" style="color: #c9a53b; margin: 0; font-size: 1.2rem; font-family: 'Inter', sans-serif;"></h3>
+                    <button data-csp-click="cerrarModalRendirExamen()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                </div>
+                <div class="modal-body" id="bodyExamenRendir" style="padding: 1.8rem;"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    document.getElementById('tituloExamenRendir').innerHTML = `<i class="fas fa-pencil-alt" style="color: #c9a53b;"></i> ${examen.titulo}`;
+
+    let preguntasHTML = '';
+    if (preguntasRendir.length > 0) {
+        preguntasHTML = preguntasRendir.map((pregunta, idx) => {
+            const num = idx + 1;
+            if (pregunta.tipo === 'multiple' || pregunta.tipo === 'opcion_multiple') {
+                const opcionesHTML = (pregunta.opciones || []).map((op, opIdx) => {
+                    const letra = String.fromCharCode(65 + opIdx);
+                    return `
+                        <label style="display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem 1rem; margin-bottom: 0.4rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; cursor: pointer; background: #fafaf9; font-family: 'Inter', sans-serif;">
+                            <input type="radio" name="pregunta_${idx}" value="${letra}" style="accent-color: #c9a53b; width: 18px; height: 18px;">
+                            <span style="font-weight: 700; color: #1a3a4a;">${letra}.</span>
+                            <span style="font-size: 0.92rem; color: #5a6474;">${op}</span>
+                        </label>
+                    `;
+                }).join('');
+
+                return `
+                    <div style="background: #ffffff; padding: 1.2rem; border-radius: 1rem; margin-bottom: 1.2rem; border: 1px solid #e8e3d8;">
+                        <p style="font-weight: 700; color: #1a3a4a; margin-bottom: 1rem; font-size: 1rem; font-family: 'Inter', sans-serif;">
+                            <span style="background: #1a3a4a; color: #c9a53b; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; margin-right: 0.5rem;">${num}</span>
+                            ${pregunta.texto}
+                        </p>
+                        ${opcionesHTML}
+                    </div>
+                `;
+            } else if (pregunta.tipo === 'vf' || pregunta.tipo === 'verdadero_falso') {
+                return `
+                    <div style="background: #ffffff; padding: 1.2rem; border-radius: 1rem; margin-bottom: 1.2rem; border: 1px solid #e8e3d8;">
+                        <p style="font-weight: 700; color: #1a3a4a; margin-bottom: 1rem; font-size: 1rem; font-family: 'Inter', sans-serif;">
+                            <span style="background: #1a3a4a; color: #c9a53b; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; margin-right: 0.5rem;">${num}</span>
+                            ${pregunta.texto}
+                        </p>
+                        <div style="display: flex; gap: 0.8rem;">
+                            <label style="flex: 1; display: flex; align-items: center; gap: 0.6rem; padding: 0.8rem 1rem; border: 2px solid #c8e6c9; background: #f1f8e9; border-radius: 0.8rem; cursor: pointer; color: #2e7d32; font-weight: 600; font-family: 'Inter', sans-serif;">
+                                <input type="radio" name="pregunta_${idx}" value="Verdadero"> Verdadero
+                            </label>
+                            <label style="flex: 1; display: flex; align-items: center; gap: 0.6rem; padding: 0.8rem 1rem; border: 2px solid #ffcdd2; background: #ffebee; border-radius: 0.8rem; cursor: pointer; color: #c62828; font-weight: 600; font-family: 'Inter', sans-serif;">
+                                <input type="radio" name="pregunta_${idx}" value="Falso"> Falso
+                            </label>
+                        </div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div style="background: #ffffff; padding: 1.2rem; border-radius: 1rem; margin-bottom: 1.2rem; border: 1px solid #e8e3d8;">
+                        <p style="font-weight: 700; color: #1a3a4a; margin-bottom: 0.8rem; font-size: 1rem; font-family: 'Inter', sans-serif;">
+                            <span style="background: #1a3a4a; color: #c9a53b; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; margin-right: 0.5rem;">${num}</span>
+                            ${pregunta.texto}
+                        </p>
+                        <textarea id="respuesta_${idx}" rows="3" placeholder="Escribe tu respuesta detallada aquí..." 
+                            style="width: 100%; padding: 0.8rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box;"></textarea>
+                    </div>
+                `;
+            }
+        }).join('');
+    } else {
+        preguntasHTML = '<p style="text-align: center; color: #777;">No hay preguntas configuradas.</p>';
+    }
+
+    document.getElementById('bodyExamenRendir').innerHTML = `
+        <div style="margin-bottom: 1rem; padding: 0.8rem 1.2rem; background: var(--cream); border-left: 4px solid var(--golden); border-radius: 0.8rem; font-size: 0.88rem; color: var(--deep-blue); font-family: 'Inter', sans-serif;">
+            👤 Alumno: <strong>${identidad?.nombre || ''}</strong> | Doc: <strong>${identidad?.documento || ''}</strong> | Grupo: <strong>${identidad?.grupo || 'Belén'}</strong>
+        </div>
+        <form id="formExamenActual">
+            ${preguntasHTML}
+        </form>
+        <button data-csp-click="finalizarExamen('${curso}', '${examen.id}')" 
+            style="width: 100%; margin-top: 1rem; background: linear-gradient(135deg, #d4a038 0%, #c9a53b 100%); color: #1a3a4a; padding: 1rem; border: none; border-radius: 1rem; font-weight: 700; font-size: 1rem; cursor: pointer; font-family: 'Inter', sans-serif;">
+            <i class="fas fa-paper-plane"></i> Finalizar y Entregar Examen
+        </button>
+    `;
+
+    mostrarElementoModal(modal);
+}
+
+function cerrarModalRendirExamen() {
+    const modal = document.getElementById('modalRendirExamen');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalRendirExamen');
+}
+
+function finalizarExamen(curso, examId) {
+    const examen = DB_EXAMENES.find(ex => String(ex.id) === String(examId));
+    if (!examen) return;
+
+    const identidad = obtenerIdentidadAlumno();
+    if (!identidad || !identidad.nombre) {
+        mostrarModalGenerico('Error', 'No se ha detectado la identidad del alumno.');
+        return;
+    }
+
+    mostrarModalGenerico(
+        'Confirmar entrega',
+        '¿Estás seguro de entregar tu examen? Una vez enviado no podrás modificar tus respuestas.',
+        [
+            {
+                texto: '✓ Sí, entregar',
+                callback: () => procesarEntregaExamen(curso, examen, identidad)
+            },
+            { texto: 'Cancelar', callback: () => { } }
+        ]
+    );
+}
+
+function procesarEntregaExamen(curso, examen, identidad) {
+    const preguntasUSadas = examen._preguntasGeneradas || examen.preguntas || [];
+    let respuestas = [];
+    let correctasObjetivas = 0;
+    let totalObjetivas = 0;
+    let tieneRespuestaCorta = false;
+
+    preguntasUSadas.forEach((p, idx) => {
+        let respAlumno = '';
+        if (p.tipo === 'multiple' || p.tipo === 'opcion_multiple' || p.tipo === 'vf' || p.tipo === 'verdadero_falso') {
+            totalObjetivas++;
+            const radios = document.getElementsByName(`pregunta_${idx}`);
+            for (let r of radios) { if (r.checked) respAlumno = r.value; }
+            const esCorrecta = respAlumno.toLowerCase().trim() === (p.correcta || '').toLowerCase().trim();
+            if (esCorrecta) correctasObjetivas++;
+
+            respuestas.push({
+                preguntaIndex: idx,
+                texto: p.texto,
+                tipo: p.tipo,
+                respuestaAlumno: respAlumno,
+                correcta: p.correcta,
+                esCorrecta: esCorrecta,
+                explicacion: p.explicacion || 'Revisa el texto bíblico y los conceptos clave del módulo.'
+            });
+        } else {
+            tieneRespuestaCorta = true;
+            const inputShort = document.getElementById(`respuesta_${idx}`);
+            if (inputShort) respAlumno = inputShort.value.trim();
+
+            respuestas.push({
+                preguntaIndex: idx,
+                texto: p.texto,
+                tipo: 'respuesta_corta',
+                respuestaAlumno: respAlumno,
+                correcta: p.correcta || 'Criterio conceptual',
+                notaAsignada: null,
+                explicacion: p.explicacion || 'El instructor evaluará tu respuesta basada en el material.'
+            });
+        }
+    });
+
+    let notaFinal = null;
+    let estadoNota = 'Pendiente';
+
+    if (!tieneRespuestaCorta && totalObjetivas > 0) {
+        const score = 1.0 + (correctasObjetivas / totalObjetivas) * 4.0;
+        notaFinal = parseFloat(score.toFixed(1));
+        estadoNota = notaFinal >= 4.0 ? 'Aprobado' : 'Reprobado';
+    }
+
+    const nuevoIntento = {
+        id: Date.now(),
+        examId: String(examen.id),
+        curso: curso,
+        titulo: examen.titulo,
+        fecha: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+        alumnoNombre: identidad.nombre,
+        alumnoDocumento: identidad.documento || identidad.whatsapp,
+        alumnoWhatsapp: identidad.whatsapp || identidad.documento,
+        alumnoGrupo: identidad.grupo || 'Belén',
+        respuestas: respuestas,
+        calificacion: notaFinal,
+        nota: estadoNota,
+        fechaRealizacion: new Date().toISOString()
+    };
+
+    cerrarModalRendirExamen();
+
+    // Guardado local inmediato
+    EXAMENES_REALIZADOS.push(nuevoIntento);
+    guardarExamenesRealizados();
+    evaluarYGuardarLogros(identidad);
+    agregarNotificacionInterna(`Examen entregado: ${examen.titulo}`, `Tus respuestas han sido procesadas.`);
+
+    // Sincronización a Supabase
+    const payloadSupabase = {
+        id: String(nuevoIntento.id),
+        exam_id: String(nuevoIntento.examId),
+        curso: nuevoIntento.curso,
+        titulo: nuevoIntento.titulo,
+        fecha: nuevoIntento.fecha,
+        alumno_nombre: nuevoIntento.alumnoNombre,
+        alumno_documento: String(nuevoIntento.alumnoDocumento).trim(),
+        alumno_whatsapp: String(nuevoIntento.alumnoWhatsapp).trim(),
+        alumno_grupo: nuevoIntento.alumnoGrupo,
+        respuestas: nuevoIntento.respuestas,
+        calificacion: nuevoIntento.calificacion,
+        nota: nuevoIntento.nota,
+        fecha_realizacion: nuevoIntento.fechaRealizacion
+    };
+
+    if (window.supabaseClient) {
+        window.supabaseClient
+            .from('examenes_realizados')
+            .upsert([payloadSupabase], { onConflict: 'id' })
+            .then(({ error }) => {
+                if (error) {
+                    enqueueOfflinePending({ type: 'examenes_realizados_upsert', payload: payloadSupabase });
+                }
+            })
+            .catch(() => {
+                enqueueOfflinePending({ type: 'examenes_realizados_upsert', payload: payloadSupabase });
+            });
+    } else {
+        enqueueOfflinePending({ type: 'examenes_realizados_upsert', payload: payloadSupabase });
+    }
+
+    mostrarToast('✅ Examen entregado con éxito', 'success');
+    mostrarModalRetroalimentacion(nuevoIntento);
+
+    renderizarPrincipal();
+    renderizarRevision();
+    renderizarLogros();
+}
+
+function mostrarModalRetroalimentacion(intento) {
+    bloquearScroll('modalRetroalimentacion');
+    let modal = document.getElementById('modalRetroalimentacion');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalRetroalimentacion';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 650px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.2rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: #c9a53b; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-graduation-cap"></i> Retroalimentación del Examen</h3>
+                    <button data-csp-click="cerrarModalRetroalimentacion()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                </div>
+                <div class="modal-body" id="bodyRetroalimentacion" style="padding: 1.8rem;"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    const itemsHTML = (intento.respuestas || []).map((r, i) => `
+        <div style="background: #fafaf9; padding: 1rem; border-radius: 0.8rem; margin-bottom: 0.8rem; border-left: 4px solid ${r.esCorrecta === true ? '#2e7d32' : r.esCorrecta === false ? '#c62828' : 'var(--golden)'}; font-size: 0.88rem; font-family: 'Inter', sans-serif;">
+            <strong style="color: var(--deep-blue); display: block; margin-bottom: 0.3rem;">${i + 1}. ${r.texto}</strong>
+            <div><strong>Tu respuesta:</strong> ${r.respuestaAlumno || '(Vacío)'} ${r.esCorrecta === true ? '✅' : r.esCorrecta === false ? '❌' : '⏳'}</div>
+            <div style="color: #555; margin-top: 0.2rem;"><strong>Respuesta Correcta:</strong> ${r.correcta}</div>
+            <div style="margin-top: 0.4rem; background: #fff; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #e0e0e0; color: #1a3a4a; font-style: italic;">
+                💡 <strong>Explicación:</strong> ${r.explicacion}
+            </div>
+        </div>
+    `).join('');
+
+    document.getElementById('bodyRetroalimentacion').innerHTML = `
+        <div style="text-align: center; margin-bottom: 1rem;">
+            <h3 style="color: var(--deep-blue); margin: 0; font-family: 'Inter', sans-serif;">${intento.titulo}</h3>
+            <span style="background: ${intento.calificacion >= 4 ? '#2e7d32' : intento.calificacion !== null ? '#c62828' : '#f57c00'}; color: white; padding: 0.3rem 1rem; border-radius: 1rem; font-weight: 700; font-size: 0.9rem; display: inline-block; margin-top: 0.4rem;">
+                ${intento.calificacion !== null ? `Nota: ${intento.calificacion.toFixed(1)} (${intento.nota})` : 'Calificación Pendiente'}
+            </span>
+        </div>
+        <div>${itemsHTML}</div>
+        <button data-csp-click="cerrarModalRetroalimentacion()" class="btn btn-golden" style="width: 100%; margin-top: 1rem; padding: 0.8rem; border-radius: 1rem; font-weight: 700; font-family: 'Inter', sans-serif;">
+            Entendido, Cerrar
+        </button>
+    `;
+
+    mostrarElementoModal(modal);
+}
+
+function cerrarModalRetroalimentacion() {
+    const modal = document.getElementById('modalRetroalimentacion');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalRetroalimentacion');
+}
+
+// ===== PESTAÑA 3: REVISIÓN Y BUSCADOR POR PIN =====
+function renderizarRevision() {
+    const container = document.getElementById('contenidoResultados');
+    if (!container) return;
+
+    const identidad = obtenerIdentidadAlumno();
+    cargarExamenesRealizados();
+
+    const pinGuardado = identidad ? (identidad.pin || '') : '';
+
+    container.innerHTML = `
+        <div id="statsRevisionContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); color: white; padding: 1.2rem; border-radius: 1.2rem; text-align: center;">
+                <span style="font-size: 0.8rem; opacity: 0.9; display: block; font-family: 'Inter', sans-serif;">PROMEDIO GENERAL</span>
+                <span id="statPromedioGeneral" style="font-size: 2.2rem; font-weight: 800; color: var(--golden); font-family: 'Inter', sans-serif;">0.0</span>
+            </div>
+            <div style="background: #e8f5e9; color: #2e7d32; padding: 1.2rem; border-radius: 1.2rem; text-align: center; border: 1px solid #c8e6c9;">
+                <span style="font-size: 0.8rem; display: block; font-family: 'Inter', sans-serif;">APROBADOS</span>
+                <span id="statAprobados" style="font-size: 2.2rem; font-weight: 800; font-family: 'Inter', sans-serif;">0</span>
+            </div>
+            <div style="background: #ffebee; color: #c62828; padding: 1.2rem; border-radius: 1.2rem; text-align: center; border: 1px solid #ffcdd2;">
+                <span style="font-size: 0.8rem; display: block; font-family: 'Inter', sans-serif;">REPROBADOS</span>
+                <span id="statReprobados" style="font-size: 2.2rem; font-weight: 800; font-family: 'Inter', sans-serif;">0</span>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1.2rem; background: var(--cream); padding: 1.4rem; border-radius: 1rem; border-left: 4px solid var(--golden); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+            <h4 style="margin: 0 0 0.8rem 0; color: var(--deep-blue); font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-lock" style="color: var(--golden);"></i> Consulta de Resultados por PIN de 4 Dígitos
+            </h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: flex-end;">
+                <div style="flex: 2; min-width: 200px;">
+                    <label style="font-weight: 700; color: var(--deep-blue); font-size: 0.85rem; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">
+                        🔑 Ingresa tu PIN de 4 dígitos *
+                    </label>
+                    <input type="text" id="inputPinRevision" maxlength="4" placeholder="Ej: 4829" 
+                        value="${pinGuardado}"
+                        data-csp-keyup="if(event.key==='Enter') buscarResultadosPorPin()"
+                        style="width: 100%; padding: 0.7rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 800; letter-spacing: 3px; text-align: center; background: white; box-sizing: border-box; min-height: 44px;">
+                </div>
+                <div style="flex: 1; min-width: 170px;">
+                    <label style="font-weight: 700; color: var(--deep-blue); font-size: 0.85rem; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">
+                        📚 Curso:
+                    </label>
+                    <select id="selectCursoRevision" data-csp-change="buscarResultadosPorPin()" style="width: 100%; padding: 0.7rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.88rem; background: white; min-height: 44px;">
+                        <option value="todos">Todos los cursos</option>
+                        ${Object.keys(CURSOS_DATA).map(c => `<option value="${c}">${c}</option>`).join('')}
+                    </select>
+                </div>
+                <div>
+                    <button data-csp-click="buscarResultadosPorPin()" class="btn btn-golden" style="padding: 0.7rem 1.4rem; border-radius: 0.8rem; border: none; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.88rem; min-height: 44px; background: var(--golden); color: var(--deep-blue); display: inline-flex; align-items: center; gap: 0.4rem;">
+                        <i class="fas fa-search"></i> Consultar Resultados
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tablaRevisionContainer" style="overflow-x: auto;"></div>
+    `;
+
+    buscarResultadosPorPin();
+}
+
+function buscarResultadosPorPin() {
+    const pinInput = document.getElementById('inputPinRevision');
+    const cursoSelect = document.getElementById('selectCursoRevision');
+    const tableContainer = document.getElementById('tablaRevisionContainer');
+    if (!tableContainer) return;
+
+    const pinVal = pinInput ? pinInput.value.trim() : '';
+    const cursoFiltro = cursoSelect ? cursoSelect.value : 'todos';
+
+    if (!pinVal) {
+        tableContainer.innerHTML = `
+            <div style="text-align: center; color: var(--muted-text); padding: 2.5rem 1rem; font-family: 'Inter', sans-serif; background: #fafaf9; border-radius: 1rem; border: 2px dashed #e8e3d8;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔑</div>
+                <h4 style="margin: 0 0 0.3rem 0; color: #1a3a4a;">Ingresa tu PIN de 4 dígitos</h4>
+                <p style="margin: 0; font-size: 0.85rem;">Si aún no tienes un PIN, puedes obtenerlo fácilmente en la pestaña <strong>Principal</strong> haciendo clic en "Obtener / Generar mi PIN".</p>
+            </div>
+        `;
+        actualizarStatsRevision([]);
+        return;
+    }
+
+    const listaAlumnos = obtenerListaAlumnosIdentidades();
+    const alumnoEncontrado = listaAlumnos.find(a => String(a.pin) === String(pinVal));
+
+    if (!alumnoEncontrado) {
+        tableContainer.innerHTML = `
+            <div style="text-align: center; color: #c62828; padding: 2rem 1rem; font-family: 'Inter', sans-serif; background: #ffebee; border-radius: 1rem; border: 1px solid #ffcdd2;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⚠️</div>
+                <h4 style="margin: 0 0 0.4rem 0;">PIN no válido</h4>
+                <p style="margin: 0; font-size: 0.88rem;">Verifica que tu PIN de 4 dígitos sea correcto o genera uno nuevo desde la pestaña <strong>Principal</strong>.</p>
+            </div>
+        `;
+        actualizarStatsRevision([]);
+        return;
+    }
+
+    cargarExamenesRealizados();
+
+    let filtrados = EXAMENES_REALIZADOS.filter(ex =>
+        (ex.alumnoDocumento && String(ex.alumnoDocumento).trim().toLowerCase() === String(alumnoEncontrado.documento).trim().toLowerCase()) ||
+        (ex.alumnoNombre && ex.alumnoNombre.toLowerCase().includes(alumnoEncontrado.nombre.toLowerCase()))
+    );
+
+    if (cursoFiltro && cursoFiltro !== 'todos') {
+        filtrados = filtrados.filter(ex => ex.curso === cursoFiltro);
+    }
+
+    actualizarStatsRevision(filtrados);
+
+    if (filtrados.length === 0) {
+        tableContainer.innerHTML = `
+            <div style="text-align: center; color: var(--muted-text); padding: 2.5rem 1rem; font-family: 'Inter', sans-serif;">
+                <p style="margin: 0; font-style: italic;">Hola <strong>${alumnoEncontrado.nombre}</strong> (PIN: <strong>${alumnoEncontrado.pin}</strong>). Aún no se han registrado exámenes evaluados para tu usuario en el curso seleccionado.</p>
+            </div>
+        `;
+        return;
+    }
+
+    tableContainer.innerHTML = `
+        <div style="margin-bottom: 0.8rem; font-size: 0.88rem; color: #1a3a4a; font-family: 'Inter', sans-serif;">
+            👤 Resultados para: <strong>${alumnoEncontrado.nombre}</strong> (Doc: <strong>${alumnoEncontrado.documento}</strong>) | PIN: <strong style="color:var(--golden); background:#1a3a4a; padding:0.1rem 0.5rem; border-radius:0.5rem;">${alumnoEncontrado.pin}</strong>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: 'Inter', sans-serif; font-size: 0.88rem;">
+            <thead>
+                <tr style="background: var(--deep-blue); color: white;">
+                    <th style="padding: 0.8rem 1rem; border-radius: 0.6rem 0 0 0.6rem;">Alumno</th>
+                    <th style="padding: 0.8rem 1rem;">Curso</th>
+                    <th style="padding: 0.8rem 1rem;">Examen</th>
+                    <th style="padding: 0.8rem 1rem;">Fecha</th>
+                    <th style="padding: 0.8rem 1rem;">Calificación</th>
+                    <th style="padding: 0.8rem 1rem; border-radius: 0 0.6rem 0.6rem 0;">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${filtrados.map((ex, idx) => `
+                    <tr style="border-bottom: 1px solid #e8e3d8; ${idx % 2 === 0 ? 'background: #fafaf9;' : 'background: white;'}">
+                        <td style="padding: 0.8rem 1rem; font-weight: 600; color: #1a3a4a;">
+                            ${ex.alumnoNombre}
+                            ${ex.alumnoDocumento ? `<br><small style="color: #888; font-weight: 400;">Doc: ${ex.alumnoDocumento}</small>` : ''}
+                        </td>
+                        <td style="padding: 0.8rem 1rem;">${ex.curso}</td>
+                        <td style="padding: 0.8rem 1rem;">${ex.titulo}</td>
+                        <td style="padding: 0.8rem 1rem;">${ex.fecha}</td>
+                        <td style="padding: 0.8rem 1rem; font-weight: 700; color: ${ex.calificacion >= 4 ? '#2e7d32' : ex.calificacion !== null ? '#c62828' : '#f57c00'};">
+                            ${ex.calificacion !== null && ex.calificacion !== undefined ? (typeof ex.calificacion === 'number' ? ex.calificacion.toFixed(1) : ex.calificacion) : 'Pendiente'}
+                        </td>
+                        <td style="padding: 0.8rem 1rem;">
+                            <span style="padding: 0.25rem 0.7rem; border-radius: 1rem; font-size: 0.78rem; font-weight: 700; background: ${ex.calificacion >= 4 ? '#e8f5e9' : ex.calificacion !== null ? '#ffebee' : '#fff3e0'}; color: ${ex.calificacion >= 4 ? '#2e7d32' : ex.calificacion !== null ? '#c62828' : '#e65100'};">
+                                ${ex.nota || (ex.calificacion >= 4 ? 'Aprobado' : 'Pendiente')}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function actualizarStatsRevision(historial) {
+    const califs = (historial || []).map(e => e.calificacion).filter(c => typeof c === 'number' && !isNaN(c));
+    const promGeneral = califs.length > 0 ? (califs.reduce((a, b) => a + b, 0) / califs.length).toFixed(1) : '0.0';
+    const aprobados = califs.filter(c => c >= 4.0).length;
+    const reprobados = califs.filter(c => c < 4.0).length;
+
+    const elProm = document.getElementById('statPromedioGeneral');
+    const elAprob = document.getElementById('statAprobados');
+    const elReprob = document.getElementById('statReprobados');
+
+    if (elProm) elProm.innerText = promGeneral;
+    if (elAprob) elAprob.innerText = aprobados;
+    if (elReprob) elReprob.innerText = reprobados;
+}
+
+// ===== PESTAÑA 4: LOGROS =====
+function renderizarLogros() {
+    const container = document.getElementById('contenidoLogrosDinamico');
+    if (!container) return;
+
+    const identidad = obtenerIdentidadAlumno();
+    const misCursos = obtenerMisCursos();
+    cargarExamenesRealizados();
+
+    let realizados = EXAMENES_REALIZADOS;
+    if (identidad && identidad.documento) {
+        realizados = realizados.filter(r =>
+            (r.alumnoDocumento && String(r.alumnoDocumento).trim().toLowerCase() === String(identidad.documento).trim().toLowerCase()) ||
+            (r.alumnoNombre && r.alumnoNombre.toLowerCase() === identidad.nombre.toLowerCase())
+        );
+    }
+
+    let logrosHTML = `
+        <div style="margin-bottom: 1.5rem; text-align: center;">
+            <h3 style="color: var(--deep-blue); margin: 0; font-family: 'Inter', sans-serif;">Insignias de Reconocimiento Espiritual</h3>
+            <p style="color: var(--muted-text); font-size: 0.9rem; font-family: 'Inter', sans-serif;">Completa cursos y evaluaciones para desbloquear logros y certificados.</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.2rem;">
+    `;
+
+    LOGROS_DEFINICIONES.forEach(logro => {
+        const desbloqueado = logro.evaluar(identidad, misCursos, realizados);
+        logrosHTML += `
+            <div style="background: ${desbloqueado ? '#ffffff' : '#f5f5f5'}; padding: 1.2rem; border-radius: 1.2rem; border: 2px solid ${desbloqueado ? 'var(--golden)' : '#e0e0e0'}; opacity: ${desbloqueado ? '1' : '0.65'}; transition: all 0.3s ease; text-align: center;">
+                <div style="font-size: 2.8rem; margin-bottom: 0.4rem;">${logro.icono}</div>
+                <h4 style="color: var(--deep-blue); margin: 0 0 0.3rem 0; font-size: 1rem; font-family: 'Inter', sans-serif;">${logro.titulo}</h4>
+                <p style="color: #666; font-size: 0.8rem; line-height: 1.4; margin-bottom: 0.6rem; font-family: 'Inter', sans-serif;">${logro.descripcion}</p>
+                <span style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.8rem; border-radius: 1rem; background: ${desbloqueado ? '#e8f5e9' : '#eeeeee'}; color: ${desbloqueado ? '#2e7d32' : '#888'};">
+                    ${desbloqueado ? '✓ Desbloqueado' : '🔒 Bloqueado'}
+                </span>
+            </div>
+        `;
+    });
+
+    logrosHTML += `</div>`;
+    container.innerHTML = logrosHTML;
+}
+
+function evaluarYGuardarLogros(identidad) {
+    if (!identidad) return;
+    const misCursos = obtenerMisCursos();
+    cargarExamenesRealizados();
+
+    const realizados = EXAMENES_REALIZADOS.filter(r =>
+        (r.alumnoDocumento && String(r.alumnoDocumento).trim().toLowerCase() === String(identidad.documento).trim().toLowerCase()) ||
+        (r.alumnoNombre && r.alumnoNombre.toLowerCase() === identidad.nombre.toLowerCase())
+    );
+
+    LOGROS_DEFINICIONES.forEach(l => {
+        if (l.evaluar(identidad, misCursos, realizados)) {
+            let desbloqueados = [];
+            try { desbloqueados = JSON.parse(localStorage.getItem('logrosDesbloqueados')) || []; } catch (e) { }
+            if (!desbloqueados.includes(l.id)) {
+                desbloqueados.push(l.id);
+                localStorage.setItem('logrosDesbloqueados', JSON.stringify(desbloqueados));
+                mostrarToast(`🏆 ¡Nuevo Logro Desbloqueado!: ${l.titulo}`, 'success');
+
+                // Sincronizar logro a Supabase
+                const doc = String(identidad.documento || 'alumno_local').trim();
+                const payload = {
+                    id: `${doc}_${l.id}`,
+                    alumno_documento: doc,
+                    logro_id: l.id,
+                    fecha_desbloqueo: new Date().toISOString()
+                };
+                if (window.supabaseClient) {
+                    window.supabaseClient
+                        .from('logros_alumnos')
+                        .upsert([payload], { onConflict: 'id' })
+                        .catch(() => {
+                            enqueueOfflinePending({ type: 'logros_alumnos_upsert', payload });
+                        });
+                } else {
+                    enqueueOfflinePending({ type: 'logros_alumnos_upsert', payload });
+                }
+            }
+        }
+    });
+}
+
+function generarCertificadoPDF(nombreAlumno, curso, promedio) {
+    mostrarModalGenerico('📜 Certificado de Excelencia', `Certificado expedido a <strong>${nombreAlumno}</strong> por haber culminado exitosamente el curso <strong>${curso}</strong> con una calificación sobresaliente de <strong>${promedio}</strong>.<br><br>⛪ <em>Iglesia Adventista del Séptimo Día - Barrio Belén</em>`);
+}
+
+// ===== PESTAÑA 5: GRUPO =====
+function renderizarGrupo() {
+    const container = document.getElementById('contenidoGrupoDinamico');
+    if (!container) return;
+
+    const identidad = obtenerIdentidadAlumno();
+
+    container.innerHTML = `
+        <div style="background: var(--cream); padding: 1.5rem; border-radius: 1.2rem; border-left: 4px solid var(--golden); margin-bottom: 1.5rem;">
+            <h3 style="color: var(--deep-blue); margin: 0 0 0.5rem 0; font-family: 'Inter', sans-serif;">👥 Clase y Grupo de Estudio Belén</h3>
+            <p style="color: var(--muted-text); font-size: 0.9rem; margin: 0; font-family: 'Inter', sans-serif;">
+                Estás registrado como alumno de la <strong>${identidad?.grupo || 'Clase Belén'}</strong>.
+            </p>
+        </div>
+        <div style="text-align: center; padding: 2rem; color: #777; font-family: 'Inter', sans-serif;">
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">📖</div>
+            <p style="margin: 0; font-size: 0.95rem;">"Así que la fe es por el oír, y el oír, por la palabra de Dios." — Romanos 10:17</p>
+        </div>
+    `;
+}
+
+// ===== NOTIFICACIONES INTERNAS Y PERSONALES =====
+function agregarNotificacionInterna(titulo, cuerpo) {
+    let notifs = [];
+    try { notifs = JSON.parse(localStorage.getItem('notificacionesLMS')) || []; } catch (e) { }
+    const fechaHora = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    const nuevaNotif = { id: Date.now(), documento: null, titulo, cuerpo, fecha: fechaHora, leido: false };
+    notifs.unshift(nuevaNotif);
+    localStorage.setItem('notificacionesLMS', JSON.stringify(notifs));
+    actualizarBadgesNotificaciones();
+
+    // Sincronizar Supabase
+    const payload = {
+        id: String(nuevaNotif.id),
+        alumno_documento: null,
+        titulo: nuevaNotif.titulo,
+        cuerpo: nuevaNotif.cuerpo,
+        fecha: nuevaNotif.fecha,
+        leido: false
+    };
+    if (window.supabaseClient) {
+        window.supabaseClient.from('notificaciones_lms').upsert([payload], { onConflict: 'id' }).catch(() => {
+            enqueueOfflinePending({ type: 'notificaciones_lms_upsert', payload });
+        });
+    } else {
+        enqueueOfflinePending({ type: 'notificaciones_lms_upsert', payload });
+    }
+}
+
+function agregarNotificacionPersonalLMS(documento, titulo, cuerpo) {
+    let notifs = [];
+    try { notifs = JSON.parse(localStorage.getItem('notificacionesLMS')) || []; } catch (e) { }
+    const fechaHora = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    const docClean = documento ? String(documento).trim().toLowerCase() : null;
+    const nuevaNotif = {
+        id: Date.now(),
+        documento: docClean,
+        titulo,
+        cuerpo,
+        fecha: fechaHora,
+        leido: false
+    };
+    notifs.unshift(nuevaNotif);
+    localStorage.setItem('notificacionesLMS', JSON.stringify(notifs));
+    actualizarBadgesNotificaciones();
+
+    const payload = {
+        id: String(nuevaNotif.id),
+        alumno_documento: docClean,
+        titulo: nuevaNotif.titulo,
+        cuerpo: nuevaNotif.cuerpo,
+        fecha: nuevaNotif.fecha,
+        leido: false
+    };
+    if (window.supabaseClient) {
+        window.supabaseClient.from('notificaciones_lms').upsert([payload], { onConflict: 'id' }).catch(() => {
+            enqueueOfflinePending({ type: 'notificaciones_lms_upsert', payload });
+        });
+    } else {
+        enqueueOfflinePending({ type: 'notificaciones_lms_upsert', payload });
+    }
+}
+
+function actualizarBadgesNotificaciones() {
+    let notifs = [];
+    try { notifs = JSON.parse(localStorage.getItem('notificacionesLMS')) || []; } catch (e) { }
+    const identidad = obtenerIdentidadAlumno();
+    const docClean = identidad && identidad.documento ? String(identidad.documento).trim().toLowerCase() : '';
+
+    const noLeidas = notifs.filter(n => {
+        if (n.leido) return false;
+        if (!n.documento) return true;
+        return docClean && n.documento === docClean;
+    }).length;
+
+    const badge = document.getElementById('badgeNotificacionesCount');
+    if (badge) {
+        if (noLeidas > 0) {
+            badge.innerText = noLeidas;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+function abrirModalNotificacionesLMS() {
+    bloquearScroll('modalNotificacionesLMS');
+    let notifs = [];
+    try { notifs = JSON.parse(localStorage.getItem('notificacionesLMS')) || []; } catch (e) { }
+
+    const identidad = obtenerIdentidadAlumno();
+    const docClean = identidad && identidad.documento ? String(identidad.documento).trim().toLowerCase() : '';
+
+    notifs.forEach(n => {
+        if (!n.documento || (docClean && n.documento === docClean)) {
+            n.leido = true;
+        }
+    });
+    localStorage.setItem('notificacionesLMS', JSON.stringify(notifs));
+    actualizarBadgesNotificaciones();
+
+    let modal = document.getElementById('modalNotificacionesLMS');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalNotificacionesLMS';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 520px; width: 95%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.2rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: #c9a53b; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-bell"></i> Notificaciones del LMS</h3>
+                    <button data-csp-click="cerrarModalNotificacionesLMS()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                </div>
+                <div class="modal-body" id="bodyNotificacionesLMS" style="padding: 1.5rem;"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    let notifsVisibles = notifs.filter(n => {
+        if (!n.documento) return true;
+        return docClean && n.documento === docClean;
+    });
+
+    const itemsHTML = notifsVisibles.map(n => `
+        <div style="background: ${n.documento ? '#fffdf5' : '#fafaf9'}; padding: 0.9rem; border-radius: 0.8rem; margin-bottom: 0.6rem; border-left: 4px solid ${n.documento ? 'var(--golden)' : 'var(--deep-blue)'}; font-family: 'Inter', sans-serif; box-shadow: 0 1px 4px rgba(0,0,0,0.03);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
+                <strong style="color: var(--deep-blue); font-size: 0.9rem;">
+                    ${n.documento ? '🔒 ' : ''}${n.titulo}
+                </strong>
+                <small style="color: #888; font-size: 0.75rem;">${n.fecha}</small>
+            </div>
+            <p style="margin: 0; font-size: 0.84rem; color: #555;">${n.cuerpo}</p>
+        </div>
+    `).join('');
+
+    document.getElementById('bodyNotificacionesLMS').innerHTML = itemsHTML.length > 0 ? itemsHTML : '<p style="text-align: center; color: #777; font-family: \'Inter\', sans-serif;">No tienes notificaciones recientes.</p>';
+    mostrarElementoModal(modal);
+}
+
+function cerrarModalNotificacionesLMS() {
+    const modal = document.getElementById('modalNotificacionesLMS');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalNotificacionesLMS');
+}
+
+// LISTENERS DE EVENTOS ONLINE/OFFLINE
+window.addEventListener('online', () => {
+    const badge = document.getElementById('lmsStatusBadge');
+    if (badge) { badge.style.background = '#2e7d32'; badge.innerHTML = '🟢 En Línea'; }
+    sincronizarOfflinePending();
+    syncAllFromSupabase();
+});
+
+window.addEventListener('offline', () => {
+    const badge = document.getElementById('lmsStatusBadge');
+    if (badge) { badge.style.background = '#f57c00'; badge.innerHTML = '📡 Modo Offline'; }
+});
+
+// ===== PANEL DE ADMINISTRACIÓN DEL LMS =====
+function verificarAccesoSeccion(seccion, callback) {
+    if (typeof callback === 'function') callback();
+}
+
+function abrirModalAdmin() {
+    if (modoAdminActivo) {
+        mostrarPanelAdmin();
+        return;
+    }
+
+    bloquearScroll('modalAdminPassword');
+
+    let modalAdminPassword = document.getElementById('modalAdminPassword');
+    if (!modalAdminPassword) {
+        modalAdminPassword = document.createElement('div');
+        modalAdminPassword.id = 'modalAdminPassword';
+        modalAdminPassword.className = 'modal-overlay';
+        modalAdminPassword.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px); animation: fadeIn 0.3s ease;
+        `;
+        modalAdminPassword.innerHTML = `
+            <div class="modal-card" style="
+                background: white; border-radius: 1.5rem; padding: 2rem; max-width: 400px; width: 90%;
+                text-align: center; box-shadow: 0 25px 60px rgba(0,0,0,0.3); border: 2px solid var(--golden);
+                animation: slideUp 0.3s ease;
+            ">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔐</div>
+                <h3 style="color: #1a3a4a; font-size: 1.3rem; margin-bottom: 0.5rem; font-family: 'Inter', sans-serif; font-weight: 700;">Modo Administrador LMS</h3>
+                <p style="color: #5a6474; margin-bottom: 1.2rem; font-size: 0.88rem; font-family: 'Inter', sans-serif;">Ingresa la contraseña para acceder al panel de gestión.</p>
+                <input type="password" id="inputPasswordAdmin" placeholder="Contraseña admin..." style="
+                    width: 100%; padding: 0.8rem 1rem; border: 2px solid #e8e3d8; border-radius: 1rem;
+                    font-size: 0.95rem; margin-bottom: 0.8rem; box-sizing: border-box; font-family: 'Inter', sans-serif;
+                " data-csp-keyup="if(event.key==='Enter') verificarPasswordAdmin()">
+                <div id="errorPasswordAdmin" style="
+                    color: #dc2626; font-size: 0.85rem; display: none; margin-bottom: 0.8rem; font-weight: 600;
+                    background: #fee2e2; padding: 0.5rem; border-radius: 0.5rem; font-family: 'Inter', sans-serif;
+                ">❌ Contraseña incorrecta. Inténtalo de nuevo.</div>
+                <div style="display: flex; gap: 0.8rem; justify-content: center;">
+                    <button data-csp-click="verificarPasswordAdmin()" class="btn btn-golden" style="
+                        flex:1; border: none; padding: 0.75rem; border-radius: 2rem; font-weight: 700;
+                        background: var(--golden); color: var(--deep-blue); cursor: pointer; font-family: 'Inter', sans-serif;
+                        transition: all 0.3s ease;
+                    ">Ingresar</button>
+                    <button data-csp-click="cerrarModalAdminPassword()" class="btn btn-outline" style="
+                        flex:1; padding: 0.75rem; border-radius: 2rem; background: transparent;
+                        border: 2px solid var(--deep-blue); color: var(--deep-blue); cursor: pointer;
+                        font-weight: 700; font-family: 'Inter', sans-serif; transition: all 0.3s ease;
+                    ">Salir</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalAdminPassword);
+    }
+
+    const pwdInput = document.getElementById('inputPasswordAdmin');
+    if (pwdInput) pwdInput.value = '';
+    const errDiv = document.getElementById('errorPasswordAdmin');
+    if (errDiv) errDiv.style.display = 'none';
+
+    mostrarElementoModal(modalAdminPassword);
+    setTimeout(() => { if (pwdInput) pwdInput.focus(); }, 200);
+}
+
+function cerrarModalAdminPassword() {
+    const modal = document.getElementById('modalAdminPassword');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalAdminPassword');
+}
+
+function verificarPasswordAdmin() {
+    const pwdInput = document.getElementById('inputPasswordAdmin');
+    const pwd = pwdInput ? pwdInput.value.trim().toLowerCase() : '';
+    const validPwds = ['admin2026', 'admin2026!', 'lmsadmin2026', 'lmsadmin2026!', 'pinadmin2026', 'pinadmin2026!', 'belen2026', 'belen2026!'];
+    if (validPwds.includes(pwd)) {
+        cerrarModalAdminPassword();
+        modoAdminActivo = true;
+        mostrarPanelAdmin();
+        mostrarToast('🔓 Modo Administrador Activado', 'success');
+    } else {
+        const errorDiv = document.getElementById('errorPasswordAdmin');
+        if (errorDiv) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = '❌ Contraseña incorrecta';
+        }
+        if (pwdInput) {
+            pwdInput.value = '';
+            pwdInput.focus();
+        }
+    }
+}
+
+function mostrarPanelAdmin() {
+    const dashboard = document.getElementById('dashboardEvaluacion');
+    if (!dashboard) return;
+
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.style.display = 'none');
+    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+
+    let panelAdmin = document.getElementById('panelAdmin');
+    if (!panelAdmin) {
+        panelAdmin = document.createElement('div');
+        panelAdmin.id = 'panelAdmin';
+        panelAdmin.style.cssText = `display: block; padding: 1rem 0; animation: fadeIn 0.3s ease;`;
+        const footerQuote = document.getElementById('lmsFooterQuote');
+        if (footerQuote) {
+            dashboard.insertBefore(panelAdmin, footerQuote);
+        } else {
+            dashboard.appendChild(panelAdmin);
+        }
+    }
+
+    panelAdmin.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.8rem;">
+            <h2 style="color: var(--deep-blue); font-size: 1.6rem; margin: 0; display: flex; align-items: center; gap: 0.6rem; font-family: 'Inter', sans-serif;">
+                <i class="fas fa-cog" style="color: var(--golden);"></i> Panel de Administración LMS
+            </h2>
+            <button id="btnCerrarSesionAdmin" data-csp-click="cerrarSesionAdmin()" style="
+                background: #c62828; color: white; padding: 0.6rem 1.4rem; border-radius: 2rem;
+                border: none; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.3s ease;
+            " data-csp-mouseover="this.style.background='#b71c1c';" data-csp-mouseout="this.style.background='#c62828';">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión Admin
+            </button>
+        </div>
+
+        <div id="adminCardContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-bottom: 2rem;">
+            <div class="admin-card" data-csp-click="abrirModalCrearExamen()" style="
+                background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; border: 2px solid var(--golden);
+                cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.8rem; text-align: center; transition: all 0.3s ease;
+            " data-csp-mouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.1)';" data-csp-mouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <div style="font-size: 2.5rem;">📝</div>
+                <h4 style="color: var(--deep-blue); margin: 0; font-family: 'Inter', sans-serif;">Crear Nuevo Examen</h4>
+                <p style="color: var(--muted-text); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">Preguntas dinámicas o bancos aleatorios</p>
+            </div>
+
+            <div class="admin-card" data-csp-click="abrirGestionPinsLMS()" style="
+                background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; border: 2px solid var(--golden);
+                cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.8rem; text-align: center; transition: all 0.3s ease;
+            " data-csp-mouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.1)';" data-csp-mouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <div style="font-size: 2.5rem;">🔐</div>
+                <h4 style="color: var(--deep-blue); margin: 0; font-family: 'Inter', sans-serif;">Gestión de PINs</h4>
+                <p style="color: var(--muted-text); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">Administra y regenera PINs de alumnos</p>
+            </div>
+
+            <div class="admin-card" data-csp-click="abrirModalEditarExamenes()" style="
+                background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; border: 2px solid var(--golden);
+                cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.8rem; text-align: center; transition: all 0.3s ease;
+            " data-csp-mouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.1)';" data-csp-mouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <div style="font-size: 2.5rem;">✏️</div>
+                <h4 style="color: var(--deep-blue); margin: 0; font-family: 'Inter', sans-serif;">Editar / Eliminar Exámenes</h4>
+                <p style="color: var(--muted-text); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">Modifica o elimina exámenes existentes</p>
+            </div>
+
+            <div class="admin-card" data-csp-click="abrirModalGestionarResultados()" style="
+                background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; border: 2px solid var(--golden);
+                cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.8rem; text-align: center; transition: all 0.3s ease;
+            " data-csp-mouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.1)';" data-csp-mouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <div style="font-size: 2.5rem;">📊</div>
+                <h4 style="color: var(--deep-blue); margin: 0; font-family: 'Inter', sans-serif;">Gestionar Resultados</h4>
+                <p style="color: var(--muted-text); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">Califica entregas y revisa exámenes</p>
+            </div>
+
+            <div class="admin-card" data-csp-click="abrirModalGestionarPlanEstudios()" style="
+                background: var(--pure-white); padding: 1.8rem; border-radius: 1.5rem; border: 2px solid var(--golden);
+                cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 0.8rem; text-align: center; transition: all 0.3s ease;
+            " data-csp-mouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(0,0,0,0.1)';" data-csp-mouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <div style="font-size: 2.5rem;">📚</div>
+                <h4 style="color: var(--deep-blue); margin: 0; font-family: 'Inter', sans-serif;">Plan de Estudios y Ayudas</h4>
+                <p style="color: var(--muted-text); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">Agrega/Edita temas y materiales</p>
+            </div>
+        </div>
+    `;
+
+    panelAdmin.style.display = 'block';
+    asegurarBotonFlotanteAdmin();
+}
+
+function cerrarSesionAdmin() {
+    modoAdminActivo = false;
+    const panelAdmin = document.getElementById('panelAdmin');
+    if (panelAdmin) panelAdmin.style.display = 'none';
+
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.style.display = 'flex');
+    asegurarBotonFlotanteAdmin();
+    cambiarPestalla('principal');
+}
+
+// ===== GESTIÓN DE PLAN DE ESTUDIOS =====
+function abrirModalGestionarPlanEstudios() {
+    bloquearScroll('modalGestionarPlanEstudios');
+    let modal = document.getElementById('modalGestionarPlanEstudios');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalGestionarPlanEstudios';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 680px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.2rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: #c9a53b; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-book"></i> Gestionar Plan de Estudios y Ayudas</h3>
+                    <button data-csp-click="cerrarModalGestionarPlanEstudios()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                </div>
+                <div class="modal-body" style="padding: 1.8rem;">
+                    <div style="margin-bottom: 1.2rem;">
+                        <label style="font-weight: 700; color: #1a3a4a; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">Seleccionar Curso:</label>
+                        <select id="selectCursoPlanAdmin" data-csp-change="cargarEdicionPlanEstudios(this.value)" style="width: 100%; padding: 0.7rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.95rem; background: white; font-family: 'Inter', sans-serif;">
+                            ${Object.keys(CURSOS_DATA).map(c => `<option value="${c}">${c}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div id="bodyGestionarPlanContenido"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelector('#selectCursoPlanAdmin').addEventListener('change', function () {
+            cargarEdicionPlanEstudios(this.value);
+        });
+    }
+
+    const sel = document.getElementById('selectCursoPlanAdmin');
+    if (sel) {
+        sel.value = 'Obra Misionera';
+        cargarEdicionPlanEstudios('Obra Misionera');
+    }
+    mostrarElementoModal(modal);
+}
+
+function cerrarModalGestionarPlanEstudios() {
+    const modal = document.getElementById('modalGestionarPlanEstudios');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalGestionarPlanEstudios');
+}
+
+function cargarEdicionPlanEstudios(curso) {
+    const container = document.getElementById('bodyGestionarPlanContenido');
+    if (!container) return;
+
+    const planEstudios = obtenerPlanEstudios();
+    const data = planEstudios[curso] || { temas: [], ayudas: [] };
+    const cursoEscapado = String(curso).replace(/'/g, "\\'");
+
+    const temasHTML = (data.temas || []).map((t, idx) => `
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #fafaf9; padding: 0.6rem 0.8rem; border-radius: 0.6rem; margin-bottom: 0.4rem; font-family: 'Inter', sans-serif;">
+            <span style="font-size: 0.88rem; color: #1a3a4a;">${t}</span>
+            <div>
+                <button type="button" data-csp-click="editarTemaPlan('${cursoEscapado}', ${idx})" style="background: var(--golden); color: #1a3a4a; border: none; border-radius: 0.4rem; padding: 0.2rem 0.6rem; font-size: 0.75rem; cursor: pointer; font-weight: 700; font-family: 'Inter', sans-serif;">✏️ Editar</button>
+                <button type="button" data-csp-click="eliminarTemaPlan('${cursoEscapado}', ${idx})" style="background: #c62828; color: white; border: none; border-radius: 0.4rem; padding: 0.2rem 0.6rem; font-size: 0.75rem; cursor: pointer; font-weight: 700; font-family: 'Inter', sans-serif;">🗑️ Eliminar</button>
+            </div>
+        </div>
+    `).join('');
+
+    const ayudasHTML = (data.ayudas || []).map((a, idx) => `
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #fafaf9; padding: 0.6rem 0.8rem; border-radius: 0.6rem; margin-bottom: 0.4rem; font-family: 'Inter', sans-serif;">
+            <div>
+                <strong style="font-size: 0.88rem; color: #1a3a4a;">${a.titulo}</strong> (${a.tipo})
+                ${a.descripcion ? `<br><small style="color: #777;">${a.descripcion}</small>` : ''}
+            </div>
+            <button type="button" data-csp-click="eliminarAyudaPlan('${cursoEscapado}', ${idx})" style="background: #c62828; color: white; border: none; border-radius: 0.4rem; padding: 0.2rem 0.6rem; font-size: 0.75rem; cursor: pointer; font-weight: 700; font-family: 'Inter', sans-serif;">🗑️ Eliminar</button>
+        </div>
+    `).join('');
+
+    container.innerHTML = `
+        <div style="margin-bottom: 1.5rem; background: #fdfbf7; padding: 1rem; border-radius: 0.8rem; border: 1px solid #e8e3d8;">
+            <h4 style="color: var(--deep-blue); margin: 0 0 0.6rem 0; font-family: 'Inter', sans-serif;">📚 Temas del Curso:</h4>
+            ${temasHTML.length > 0 ? temasHTML : '<p style="color:#888; font-size:0.85rem;">No hay temas configurados.</p>'}
+            <button type="button" data-csp-click="agregarTemaPlan('${cursoEscapado}')" style="margin-top: 0.6rem; background: var(--golden); color: #1a3a4a; border: none; border-radius: 0.6rem; padding: 0.4rem 0.9rem; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif;">+ Agregar Tema</button>
+        </div>
+
+        <div style="background: #fdfbf7; padding: 1rem; border-radius: 0.8rem; border: 1px solid #e8e3d8;">
+            <h4 style="color: var(--deep-blue); margin: 0 0 0.6rem 0; font-family: 'Inter', sans-serif;">🗂️ Materiales y Ayudas:</h4>
+            ${ayudasHTML.length > 0 ? ayudasHTML : '<p style="color:#888; font-size:0.85rem;">No hay recursos agregados.</p>'}
+            <button type="button" data-csp-click="agregarAyudaPlan('${cursoEscapado}')" style="margin-top: 0.6rem; background: var(--golden); color: #1a3a4a; border: none; border-radius: 0.6rem; padding: 0.4rem 0.9rem; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif;">+ Agregar Recurso</button>
+        </div>
+    `;
+}
+
+function guardarPlanEstudiosYSincronizar(curso, plan) {
+    guardarPlanEstudios(plan);
+    const dataCurso = plan[curso] || { temas: [], ayudas: [] };
+    const payload = {
+        id: String(curso),
+        curso: String(curso),
+        temas: dataCurso.temas || [],
+        ayudas: dataCurso.ayudas || [],
+        actualizado_en: new Date().toISOString()
+    };
+
+    if (window.supabaseClient) {
+        window.supabaseClient
+            .from('plan_estudios')
+            .upsert([payload], { onConflict: 'id' })
+            .catch(() => {
+                enqueueOfflinePending({ type: 'plan_estudios_upsert', payload });
+            });
+    } else {
+        enqueueOfflinePending({ type: 'plan_estudios_upsert', payload });
+    }
+}
+
+function agregarTemaPlan(curso) {
+    const htmlMensaje = `
+        <div style="text-align: left; margin-bottom: 1rem;">
+            <label style="display:block; font-size: 0.85rem; font-weight: 600; color: #1a3a4a; margin-bottom: 0.4rem;">Nuevo tema para ${curso}:</label>
+            <input type="text" id="inputNuevoTemaPlan" placeholder="Ej: 5. Estrategias de predicación" style="width: 100%; padding: 0.75rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.9rem; font-family: 'Inter', sans-serif; box-sizing: border-box;">
+        </div>
+    `;
+    mostrarModalGenerico('➕ Agregar Tema al Plan', htmlMensaje, [
+        {
+            texto: 'Guardar Tema',
+            esPrimario: true,
+            callback: () => {
+                const input = document.getElementById('inputNuevoTemaPlan');
+                const nuevo = input ? input.value.trim() : '';
+                if (nuevo) {
+                    const plan = obtenerPlanEstudios();
+                    if (!plan[curso]) plan[curso] = { temas: [], ayudas: [] };
+                    if (!plan[curso].temas) plan[curso].temas = [];
+                    plan[curso].temas.push(nuevo);
+                    guardarPlanEstudiosYSincronizar(curso, plan);
+                    cargarEdicionPlanEstudios(curso);
+                    mostrarToast('✅ Tema agregado exitosamente', 'success');
+                }
+            }
+        },
+        { texto: 'Cancelar', callback: () => { } }
+    ]);
+    setTimeout(() => {
+        const inp = document.getElementById('inputNuevoTemaPlan');
+        if (inp) inp.focus();
+    }, 150);
+}
+
+function editarTemaPlan(curso, idx) {
+    const plan = obtenerPlanEstudios();
+    const actual = (plan[curso]?.temas && plan[curso].temas[idx]) || '';
+    const safeActual = actual.replace(/"/g, '&quot;');
+    const htmlMensaje = `
+        <div style="text-align: left; margin-bottom: 1rem;">
+            <label style="display:block; font-size: 0.85rem; font-weight: 600; color: #1a3a4a; margin-bottom: 0.4rem;">Editar tema (${curso}):</label>
+            <input type="text" id="inputEditarTemaPlan" value="${safeActual}" style="width: 100%; padding: 0.75rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.9rem; font-family: 'Inter', sans-serif; box-sizing: border-box;">
+        </div>
+    `;
+    mostrarModalGenerico('✏️ Editar Tema', htmlMensaje, [
+        {
+            texto: 'Actualizar Tema',
+            esPrimario: true,
+            callback: () => {
+                const input = document.getElementById('inputEditarTemaPlan');
+                const ed = input ? input.value.trim() : '';
+                if (ed) {
+                    const currentPlan = obtenerPlanEstudios();
+                    if (!currentPlan[curso]) currentPlan[curso] = { temas: [], ayudas: [] };
+                    if (!currentPlan[curso].temas) currentPlan[curso].temas = [];
+                    currentPlan[curso].temas[idx] = ed;
+                    guardarPlanEstudiosYSincronizar(curso, currentPlan);
+                    cargarEdicionPlanEstudios(curso);
+                    mostrarToast('✏️ Tema actualizado', 'success');
+                }
+            }
+        },
+        { texto: 'Cancelar', callback: () => { } }
+    ]);
+    setTimeout(() => {
+        const inp = document.getElementById('inputEditarTemaPlan');
+        if (inp) { inp.focus(); inp.select(); }
+    }, 150);
+}
+
+function eliminarTemaPlan(curso, idx) {
+    mostrarModalGenerico('Confirmar eliminación', '¿Eliminar este tema del plan de estudios?', [
+        {
+            texto: 'Sí, eliminar', callback: () => {
+                const plan = obtenerPlanEstudios();
+                if (plan[curso] && plan[curso].temas) {
+                    plan[curso].temas.splice(idx, 1);
+                    guardarPlanEstudiosYSincronizar(curso, plan);
+                    cargarEdicionPlanEstudios(curso);
+                    mostrarToast('🗑️ Tema eliminado', 'info');
+                }
+            }
+        },
+        { texto: 'Cancelar', callback: () => { } }
+    ]);
+}
+
+function agregarAyudaPlan(curso) {
+    const htmlMensaje = `
+        <div style="text-align: left; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.7rem;">
+            <div>
+                <label style="display:block; font-size: 0.82rem; font-weight: 600; color: #1a3a4a; margin-bottom: 0.3rem;">Título del recurso:</label>
+                <input type="text" id="inputAyudaTitulo" placeholder="Ej: Libro de Lectura, Video explicativo" style="width: 100%; padding: 0.7rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.88rem; font-family: 'Inter', sans-serif; box-sizing: border-box;">
+            </div>
+            <div>
+                <label style="display:block; font-size: 0.82rem; font-weight: 600; color: #1a3a4a; margin-bottom: 0.3rem;">Tipo de recurso:</label>
+                <select id="selectAyudaTipo" style="width: 100%; padding: 0.7rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.88rem; font-family: 'Inter', sans-serif; background: white; box-sizing: border-box;">
+                    <option value="pdf">📄 Documento PDF</option>
+                    <option value="libro">📖 Libro / Lectura</option>
+                    <option value="video">🎥 Video</option>
+                    <option value="audio">🎧 Audio</option>
+                    <option value="enlace">🔗 Enlace Web</option>
+                </select>
+            </div>
+            <div>
+                <label style="display:block; font-size: 0.82rem; font-weight: 600; color: #1a3a4a; margin-bottom: 0.3rem;">URL o enlace (opcional):</label>
+                <input type="text" id="inputAyudaUrl" placeholder="https://... o #" value="#" style="width: 100%; padding: 0.7rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.88rem; font-family: 'Inter', sans-serif; box-sizing: border-box;">
+            </div>
+        </div>
+    `;
+    mostrarModalGenerico('➕ Agregar Recurso de Ayuda', htmlMensaje, [
+        {
+            texto: 'Guardar Recurso',
+            esPrimario: true,
+            callback: () => {
+                const tituloInp = document.getElementById('inputAyudaTitulo');
+                const tipoInp = document.getElementById('selectAyudaTipo');
+                const urlInp = document.getElementById('inputAyudaUrl');
+                const titulo = tituloInp ? tituloInp.value.trim() : '';
+                if (!titulo) return;
+                const tipo = (tipoInp ? tipoInp.value.trim() : '') || 'pdf';
+                const url = (urlInp ? urlInp.value.trim() : '') || '#';
+
+                const plan = obtenerPlanEstudios();
+                if (!plan[curso]) plan[curso] = { temas: [], ayudas: [] };
+                if (!plan[curso].ayudas) plan[curso].ayudas = [];
+                plan[curso].ayudas.push({
+                    titulo: titulo,
+                    url: url,
+                    tipo: tipo,
+                    descripcion: 'Recurso adicional de estudio'
+                });
+                guardarPlanEstudiosYSincronizar(curso, plan);
+                cargarEdicionPlanEstudios(curso);
+                mostrarToast('✅ Recurso agregado', 'success');
+            }
+        },
+        { texto: 'Cancelar', callback: () => { } }
+    ]);
+    setTimeout(() => {
+        const inp = document.getElementById('inputAyudaTitulo');
+        if (inp) inp.focus();
+    }, 150);
+}
+
+function eliminarAyudaPlan(curso, idx) {
+    mostrarModalGenerico('Confirmar eliminación', '¿Eliminar este recurso de ayuda?', [
+        {
+            texto: 'Sí, eliminar', callback: () => {
+                const plan = obtenerPlanEstudios();
+                if (plan[curso] && plan[curso].ayudas) {
+                    plan[curso].ayudas.splice(idx, 1);
+                    guardarPlanEstudiosYSincronizar(curso, plan);
+                    cargarEdicionPlanEstudios(curso);
+                    mostrarToast('🗑️ Recurso eliminado', 'info');
+                }
+            }
+        },
+        { texto: 'Cancelar', callback: () => { } }
+    ]);
+}
+
+// ===== EDITAR Y ELIMINAR EXÁMENES (ADMIN) =====
+function abrirModalEditarExamenes() {
+    bloquearScroll('modalEditarExamenes');
+    let modal = document.getElementById('modalEditarExamenes');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalEditarExamenes';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 600px; width: 95%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.3rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: #c9a53b; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-edit"></i> Editar o Eliminar Exámenes</h3>
+                    <button data-csp-click="cerrarModalEditarExamenes()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                </div>
+                <div class="modal-body" style="padding: 1.8rem;">
+                    <div style="margin-bottom: 1rem;">
+                        <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">Seleccionar Curso</label>
+                        <select id="selectCursoEditar" data-csp-change="cargarExamenesParaEditar(this.value)" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.95rem; background: white;">
+                            <option value="">-- Selecciona un curso --</option>
+                            ${Object.keys(CURSOS_DATA).map(c => `<option value="${c}">${c}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div id="listaExamenesEditar"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelector('#selectCursoEditar').addEventListener('change', function () {
+            cargarExamenesParaEditar(this.value);
+        });
+    }
+
+    document.getElementById('selectCursoEditar').value = '';
+    document.getElementById('listaExamenesEditar').innerHTML = '';
+    mostrarElementoModal(modal);
+}
+
+function cerrarModalEditarExamenes() {
+    const modal = document.getElementById('modalEditarExamenes');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalEditarExamenes');
+}
+
+function cargarExamenesParaEditar(curso) {
+    const container = document.getElementById('listaExamenesEditar');
+    if (!container) return;
+
+    if (!curso) {
+        container.innerHTML = '<p style="color: var(--muted-text); text-align: center; padding: 1rem; font-family: \'Inter\', sans-serif;">Selecciona un curso para ver sus exámenes.</p>';
+        return;
+    }
+
+    const list = DB_EXAMENES.filter(ex => ex.curso === curso);
+    if (list.length === 0) {
+        container.innerHTML = `<p style="color: var(--muted-text); text-align: center; padding: 1rem; font-family: 'Inter', sans-serif;">No hay exámenes creados para <strong>${curso}</strong></p>`;
+        return;
+    }
+
+    container.innerHTML = `
+        <h4 style="color: var(--deep-blue); margin-bottom: 0.8rem; border-bottom: 2px solid var(--golden); padding-bottom: 0.3rem; font-family: 'Inter', sans-serif;">Exámenes de ${curso}</h4>
+        ${list.map(ex => `
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.8rem 0; border-bottom: 1px solid #f0f0f0; font-family: 'Inter', sans-serif;">
+                <div style="flex: 1; min-width: 140px;">
+                    <strong style="color: var(--deep-blue); font-size: 0.95rem; display: block;">${ex.titulo}</strong>
+                    <span style="color: var(--muted-text); font-size: 0.78rem;">Fecha: ${ex.fecha || 'Sin fecha'}</span>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button data-csp-click="editarExamenDirecto('${ex.id}')" style="background: var(--golden); color: var(--deep-blue); padding: 0.4rem 0.9rem; border: none; border-radius: 0.8rem; font-weight: 700; cursor: pointer; font-size: 0.8rem; font-family: 'Inter', sans-serif;"><i class="fas fa-pen"></i> Editar</button>
+                    <button data-csp-click="eliminarExamenDirecto('${ex.id}')" style="background: #c62828; color: white; padding: 0.4rem 0.9rem; border: none; border-radius: 0.8rem; font-weight: 700; cursor: pointer; font-size: 0.8rem; font-family: 'Inter', sans-serif;"><i class="fas fa-trash-alt"></i> Eliminar</button>
+                </div>
+            </div>
+        `).join('')}
+    `;
+}
+
+function editarExamenDirecto(examId) {
+    const examen = DB_EXAMENES.find(ex => String(ex.id) === String(examId));
+    if (!examen) return;
+    cerrarModalEditarExamenes();
+    abrirModalCrearExamenForm(examen);
+}
+
+function eliminarExamenDirecto(examId) {
+    const examen = DB_EXAMENES.find(ex => String(ex.id) === String(examId));
+    if (!examen) return;
+
+    mostrarModalGenerico(
+        '🗑️ Confirmar eliminación',
+        `¿Estás seguro de eliminar el examen "<strong>${examen.titulo}</strong>"? Esta acción no se puede deshacer.`,
+        [
+            {
+                texto: '✓ Sí, eliminar',
+                callback: () => {
+                    const idStr = String(examId);
+                    DB_EXAMENES = DB_EXAMENES.filter(ex => String(ex.id) !== idStr);
+                    guardarExamenesEnStorage();
+
+                    if (window.supabaseClient) {
+                        window.supabaseClient.from('examenes').delete().eq('id', idStr).catch(() => {
+                            enqueueOfflinePending({ type: 'examenes_delete', payload: { id: idStr } });
+                        });
+                    } else {
+                        enqueueOfflinePending({ type: 'examenes_delete', payload: { id: idStr } });
+                    }
+
+                    cargarExamenesParaEditar(examen.curso);
+                    renderizarPrincipal();
+                    renderizarRevision();
+                    mostrarToast('🗑️ Examen eliminado correctamente', 'info');
+                }
+            },
+            { texto: 'Cancelar', callback: () => { } }
+        ]
+    );
+}
+
+// ===== CREAR / EDITAR FORMULARIO DE EXAMEN =====
+function abrirModalCrearExamen() {
+    editandoExamenIndex = -1;
+    abrirModalCrearExamenForm(null);
+}
+
+function abrirModalCrearExamenForm(examenObj) {
+    bloquearScroll('modalCrearExamenForm');
+    let modal = document.getElementById('modalCrearExamenForm');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalCrearExamenForm';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 680px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.3rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="modalCrearFormTitulo" style="color: #c9a53b; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-plus-circle"></i> Crear Examen</h3>
+                    <button data-csp-click="cerrarModalCrearExamenForm()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                </div>
+                <div class="modal-body" style="padding: 1.8rem;">
+                    <form id="formCrearExamenAdmin">
+                        <input type="hidden" id="formExamId" value="">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                            <div>
+                                <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">Curso *</label>
+                                <select id="formExamCurso" required style="width: 100%; padding: 0.7rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; background: white;">
+                                    ${Object.keys(CURSOS_DATA).map(c => `<option value="${c}">${c}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">Título del Examen *</label>
+                                <input type="text" id="formExamTitulo" required placeholder="Ej: Examen Módulo 1" style="width: 100%; padding: 0.7rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.9rem; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                            <div>
+                                <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">Fecha Publicación</label>
+                                <input type="text" id="formExamFecha" placeholder="DD/MM/AAAA" style="width: 100%; padding: 0.7rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.9rem; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                            </div>
+                            <div>
+                                <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">Fecha Límite</label>
+                                <input type="text" id="formExamFechaFinal" placeholder="DD/MM/AAAA" style="width: 100%; padding: 0.7rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.9rem; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+                            </div>
+                        </div>
+
+                        <h4 style="color: var(--deep-blue); margin-bottom: 0.8rem; border-bottom: 2px solid var(--golden); padding-bottom: 0.3rem; display: flex; justify-content: space-between; align-items: center; font-family: 'Inter', sans-serif;">
+                            <span>Preguntas del Examen</span>
+                            <button type="button" data-csp-click="agregarPreguntaDinamicaForm()" style="background: var(--golden); color: var(--deep-blue); padding: 0.3rem 0.8rem; border: none; border-radius: 0.8rem; font-weight: 700; cursor: pointer; font-size: 0.8rem; font-family: 'Inter', sans-serif;">
+                                + Agregar Pregunta
+                            </button>
+                        </h4>
+
+                        <div id="contenedorPreguntasDinamicas" style="margin-bottom: 1.5rem;"></div>
+
+                        <button type="button" data-csp-click="guardarExamenCompletoAdmin()" style="width: 100%; background: linear-gradient(135deg, #d4a038 0%, #c9a53b 100%); color: #1a3a4a; padding: 0.9rem; border: none; border-radius: 1rem; font-weight: 700; font-size: 1rem; cursor: pointer; font-family: 'Inter', sans-serif;">
+                            💾 Guardar Examen en Base de Datos
+                        </button>
+                    </form>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    const titleEl = document.getElementById('modalCrearFormTitulo');
+    const idInput = document.getElementById('formExamId');
+    const cursoSelect = document.getElementById('formExamCurso');
+    const tituloInput = document.getElementById('formExamTitulo');
+    const fechaInput = document.getElementById('formExamFecha');
+    const fechaFinalInput = document.getElementById('formExamFechaFinal');
+    const preguntasContainer = document.getElementById('contenedorPreguntasDinamicas');
+
+    preguntasContainer.innerHTML = '';
+
+    if (examenObj) {
+        if (titleEl) titleEl.innerHTML = `<i class="fas fa-edit"></i> Editar Examen`;
+        if (idInput) idInput.value = examenObj.id;
+        if (cursoSelect) cursoSelect.value = examenObj.curso;
+        if (tituloInput) tituloInput.value = examenObj.titulo;
+        if (fechaInput) fechaInput.value = examenObj.fecha || '';
+        if (fechaFinalInput) fechaFinalInput.value = examenObj.fechaFinal || '';
+
+        const pList = examenObj.preguntasBanco || examenObj.preguntas || [];
+        if (pList.length > 0) {
+            pList.forEach(p => agregarPreguntaDinamicaForm(p));
+        } else {
+            agregarPreguntaDinamicaForm();
+        }
+    } else {
+        if (titleEl) titleEl.innerHTML = `<i class="fas fa-plus-circle"></i> Crear Examen`;
+        if (idInput) idInput.value = '';
+        if (tituloInput) tituloInput.value = '';
+        if (fechaInput) fechaInput.value = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        if (fechaFinalInput) fechaFinalInput.value = '';
+
+        agregarPreguntaDinamicaForm();
+    }
+
+    mostrarElementoModal(modal);
+}
+
+function cerrarModalCrearExamenForm() {
+    const modal = document.getElementById('modalCrearExamenForm');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalCrearExamenForm');
+}
+
+function agregarPreguntaDinamicaForm(preguntaObj = null) {
+    const container = document.getElementById('contenedorPreguntasDinamicas');
+    if (!container) return;
+
+    const index = container.children.length;
+    const item = document.createElement('div');
+    item.className = 'item-pregunta-admin';
+    item.style.cssText = `background: #fafaf9; padding: 1rem; border-radius: 0.8rem; border: 1px solid #e8e3d8; margin-bottom: 0.8rem; position: relative; font-family: 'Inter', sans-serif;`;
+
+    const tipo = preguntaObj ? preguntaObj.tipo : 'multiple';
+    const texto = preguntaObj ? preguntaObj.texto : '';
+    const correcta = preguntaObj ? preguntaObj.correcta : 'A';
+    const explicacion = preguntaObj ? preguntaObj.explicacion : '';
+    const opciones = preguntaObj && preguntaObj.opciones ? preguntaObj.opciones : ['', '', '', ''];
+
+    item.innerHTML = `
+        <button type="button" data-csp-click="this.parentElement.remove()" style="position: absolute; top: 0.6rem; right: 0.6rem; background: #c62828; color: white; border: none; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 0.8rem;">&times;</button>
+        <div style="display: grid; grid-template-columns: 1fr 150px; gap: 0.8rem; margin-bottom: 0.6rem;">
+            <div>
+                <label style="font-weight: 600; font-size: 0.8rem; color: #1a3a4a;">Pregunta ${index + 1}</label>
+                <input type="text" class="input-preg-texto" value="${texto}" placeholder="Enunciado de la pregunta..." style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 0.5rem; font-size: 0.88rem; box-sizing: border-box; font-family: 'Inter', sans-serif;">
+            </div>
+            <div>
+                <label style="font-weight: 600; font-size: 0.8rem; color: #1a3a4a;">Tipo</label>
+                <select class="select-preg-tipo" data-csp-change="cambiarTipoPreguntaAdmin(this)" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 0.5rem; font-size: 0.88rem; background: white; font-family: 'Inter', sans-serif;">
+                    <option value="multiple" ${tipo === 'multiple' || tipo === 'opcion_multiple' ? 'selected' : ''}>Opción Múltiple</option>
+                    <option value="vf" ${tipo === 'vf' || tipo === 'verdadero_falso' ? 'selected' : ''}>Verdadero / Falso</option>
+                    <option value="corta" ${tipo === 'corta' || tipo === 'respuesta_corta' ? 'selected' : ''}>Respuesta Corta</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="bloque-opciones-admin" style="display: ${tipo === 'multiple' || tipo === 'opcion_multiple' ? 'block' : 'none'};">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <input type="text" class="opcion-a" placeholder="Opción A" value="${opciones[0] || ''}" style="padding: 0.4rem; border: 1px solid #ccc; border-radius: 0.4rem; font-size: 0.85rem;">
+                <input type="text" class="opcion-b" placeholder="Opción B" value="${opciones[1] || ''}" style="padding: 0.4rem; border: 1px solid #ccc; border-radius: 0.4rem; font-size: 0.85rem;">
+                <input type="text" class="opcion-c" placeholder="Opción C" value="${opciones[2] || ''}" style="padding: 0.4rem; border: 1px solid #ccc; border-radius: 0.4rem; font-size: 0.85rem;">
+                <input type="text" class="opcion-d" placeholder="Opción D" value="${opciones[3] || ''}" style="padding: 0.4rem; border: 1px solid #ccc; border-radius: 0.4rem; font-size: 0.85rem;">
+            </div>
+            <div>
+                <label style="font-weight: 600; font-size: 0.78rem; color: #1a3a4a;">Correcta:</label>
+                <select class="correcta-multiple" style="padding: 0.3rem 0.6rem; border: 1px solid #ccc; border-radius: 0.4rem; font-size: 0.85rem; background: white;">
+                    <option value="A" ${correcta === 'A' ? 'selected' : ''}>A</option>
+                    <option value="B" ${correcta === 'B' ? 'selected' : ''}>B</option>
+                    <option value="C" ${correcta === 'C' ? 'selected' : ''}>C</option>
+                    <option value="D" ${correcta === 'D' ? 'selected' : ''}>D</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="bloque-vf-admin" style="display: ${tipo === 'vf' || tipo === 'verdadero_falso' ? 'block' : 'none'};">
+            <label style="font-weight: 600; font-size: 0.78rem; color: #1a3a4a;">Correcta:</label>
+            <select class="correcta-vf" style="padding: 0.3rem 0.6rem; border: 1px solid #ccc; border-radius: 0.4rem; font-size: 0.85rem; background: white;">
+                <option value="Verdadero" ${correcta === 'Verdadero' ? 'selected' : ''}>Verdadero</option>
+                <option value="Falso" ${correcta === 'Falso' ? 'selected' : ''}>Falso</option>
+            </select>
+        </div>
+
+        <div class="bloque-corta-admin" style="display: ${tipo === 'corta' || tipo === 'respuesta_corta' ? 'block' : 'none'};">
+            <label style="font-weight: 600; font-size: 0.78rem; color: #1a3a4a;">Respuesta Criterio:</label>
+            <input type="text" class="correcta-corta" placeholder="Criterio de evaluación..." value="${correcta}" style="width: 100%; padding: 0.4rem; border: 1px solid #ccc; border-radius: 0.4rem; font-size: 0.85rem; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-top: 0.5rem;">
+            <label style="font-weight: 600; font-size: 0.78rem; color: #1a3a4a;">Explicación / Retroalimentación:</label>
+            <input type="text" class="input-preg-explicacion" value="${explicacion}" placeholder="Ej: Juan 8:12 - Jesús nos llama a ser luz..." style="width: 100%; padding: 0.4rem; border: 1px solid #ccc; border-radius: 0.4rem; font-size: 0.85rem; box-sizing: border-box;">
+        </div>
+    `;
+
+    container.appendChild(item);
+}
+
+function cambiarTipoPreguntaAdmin(selectEl) {
+    const parent = selectEl.closest('.item-pregunta-admin');
+    if (!parent) return;
+    const val = selectEl.value;
+    parent.querySelector('.bloque-opciones-admin').style.display = val === 'multiple' ? 'block' : 'none';
+    parent.querySelector('.bloque-vf-admin').style.display = val === 'vf' ? 'block' : 'none';
+    parent.querySelector('.bloque-corta-admin').style.display = val === 'corta' ? 'block' : 'none';
+}
+
+function guardarExamenCompletoAdmin() {
+    const idVal = document.getElementById('formExamId').value;
+    const curso = document.getElementById('formExamCurso').value;
+    const titulo = document.getElementById('formExamTitulo').value.trim();
+    const fecha = document.getElementById('formExamFecha').value.trim();
+    const fechaFinal = document.getElementById('formExamFechaFinal').value.trim();
+
+    if (!titulo) {
+        mostrarModalGenerico('Error', 'El examen debe tener un título.');
+        return;
+    }
+
+    const items = document.querySelectorAll('.item-pregunta-admin');
+    if (items.length === 0) {
+        mostrarModalGenerico('Error', 'Agrega al menos una pregunta.');
+        return;
+    }
+
+    let preguntas = [];
+    items.forEach(it => {
+        const txt = it.querySelector('.input-preg-texto').value.trim();
+        const tipo = it.querySelector('.select-preg-tipo').value;
+        const explicacion = it.querySelector('.input-preg-explicacion').value.trim();
+        if (!txt) return;
+
+        if (tipo === 'multiple') {
+            const opA = it.querySelector('.opcion-a').value.trim();
+            const opB = it.querySelector('.opcion-b').value.trim();
+            const opC = it.querySelector('.opcion-c').value.trim();
+            const opD = it.querySelector('.opcion-d').value.trim();
+            const corr = it.querySelector('.correcta-multiple').value;
+            preguntas.push({ tipo: 'multiple', texto: txt, opciones: [opA, opB, opC, opD], correcta: corr, explicacion });
+        } else if (tipo === 'vf') {
+            const corr = it.querySelector('.correcta-vf').value;
+            preguntas.push({ tipo: 'vf', texto: txt, correcta: corr, explicacion });
+        } else {
+            const corr = it.querySelector('.correcta-corta').value.trim();
+            preguntas.push({ tipo: 'corta', texto: txt, correcta: corr || 'Respuesta conceptual', explicacion });
+        }
+    });
+
+    let targetExamen;
+
+    if (idVal) {
+        const targetId = String(idVal);
+        const idx = DB_EXAMENES.findIndex(ex => String(ex.id) === targetId);
+        if (idx !== -1) {
+            DB_EXAMENES[idx].curso = curso;
+            DB_EXAMENES[idx].titulo = titulo;
+            DB_EXAMENES[idx].fecha = fecha;
+            DB_EXAMENES[idx].fechaFinal = fechaFinal;
+            DB_EXAMENES[idx].preguntas = preguntas;
+            DB_EXAMENES[idx].preguntasBanco = preguntas;
+            DB_EXAMENES[idx].cantidadPreguntas = preguntas.length;
+            DB_EXAMENES[idx].cantidadpreguntas = preguntas.length;
+            targetExamen = DB_EXAMENES[idx];
+        }
+    } else {
+        targetExamen = {
+            id: generarNuevoId(),
+            curso: curso,
+            titulo: titulo,
+            fecha: fecha || new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+            fechaFinal: fechaFinal,
+            preguntas: preguntas,
+            preguntasBanco: preguntas,
+            cantidadPreguntas: preguntas.length,
+            cantidadpreguntas: preguntas.length,
+            nota: 'Pendiente',
+            calificacion: null,
+            activo: true
+        };
+        DB_EXAMENES.push(targetExamen);
+        agregarNotificacionInterna(`Nuevo Examen Publicado: ${titulo}`, `Curso: ${curso}. ¡Ya puedes rendirlo!`);
+    }
+
+    guardarExamenesEnStorage();
+
+    // Sincronización a Supabase
+    if (targetExamen) {
+        const payloadSupabase = {
+            id: String(targetExamen.id),
+            id_curso: targetExamen.curso,
+            titulo: targetExamen.titulo,
+            descripcion: targetExamen.descripcion || '',
+            duracion_min: targetExamen.duracion_min || 30,
+            preguntas: targetExamen.preguntas || [],
+            preguntas_banco: targetExamen.preguntasBanco || targetExamen.preguntas || [],
+            cantidad_preguntas: targetExamen.cantidadPreguntas || 0,
+            cantidadpreguntas: targetExamen.cantidadPreguntas || 0,
+            fecha: targetExamen.fecha || '',
+            fecha_final: targetExamen.fechaFinal || '',
+            activo: true
+        };
+
+        if (window.supabaseClient) {
+            window.supabaseClient
+                .from('examenes')
+                .upsert([payloadSupabase], { onConflict: 'id' })
+                .catch(err => {
+                    enqueueOfflinePending({ type: 'examenes_upsert', payload: payloadSupabase });
+                });
+        } else {
+            enqueueOfflinePending({ type: 'examenes_upsert', payload: payloadSupabase });
+        }
+    }
+
+    cerrarModalCrearExamenForm();
+    mostrarToast('💾 Examen guardado exitosamente', 'success');
+
+    renderizarPrincipal();
+    renderizarRevision();
+}
+
+// ===== GESTIONAR RESULTADOS DE ALUMNOS (ADMIN) =====
+function abrirModalGestionarResultados() {
+    bloquearScroll('modalGestionarResultados');
+    let modal = document.getElementById('modalGestionarResultados');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalGestionarResultados';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 680px; width: 95%; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.3rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: #c9a53b; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-chart-line"></i> Gestionar Resultados de Alumnos</h3>
+                    <button data-csp-click="cerrarModalGestionarResultados()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                </div>
+                <div class="modal-body" style="padding: 1.8rem;">
+                    <div style="margin-bottom: 1rem;">
+                        <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; display: block; margin-bottom: 0.3rem; font-family: 'Inter', sans-serif;">Seleccionar Curso</label>
+                        <select id="selectCursoResultadosAdmin" data-csp-change="cargarEntregasResultadosAdmin(this.value)" style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.95rem; background: white;">
+                            <option value="todos">Todos los Cursos</option>
+                            ${Object.keys(CURSOS_DATA).map(c => `<option value="${c}">${c}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div id="listaEntregasResultadosAdmin"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelector('#selectCursoResultadosAdmin').addEventListener('change', function () {
+            cargarEntregasResultadosAdmin(this.value);
+        });
+    }
+
+    document.getElementById('selectCursoResultadosAdmin').value = 'todos';
+    cargarEntregasResultadosAdmin('todos');
+    mostrarElementoModal(modal);
+}
+
+function cerrarModalGestionarResultados() {
+    const modal = document.getElementById('modalGestionarResultados');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalGestionarResultados');
+}
+
+function cargarEntregasResultadosAdmin(curso) {
+    const container = document.getElementById('listaEntregasResultadosAdmin');
+    if (!container) return;
+
+    cargarExamenesRealizados();
+
+    let list = EXAMENES_REALIZADOS;
+    if (curso && curso !== 'todos') {
+        list = list.filter(ex => ex.curso === curso);
+    }
+
+    if (list.length === 0) {
+        container.innerHTML = `<p style="color: var(--muted-text); text-align: center; padding: 1.5rem; font-family: 'Inter', sans-serif;">No hay exámenes entregados por alumnos aún.</p>`;
+        return;
+    }
+
+    container.innerHTML = `
+        <h4 style="color: var(--deep-blue); margin-bottom: 0.8rem; border-bottom: 2px solid var(--golden); padding-bottom: 0.3rem; font-family: 'Inter', sans-serif;">Entregas de Alumnos</h4>
+        ${list.map((ex, idx) => `
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.8rem 0; border-bottom: 1px solid #f0f0f0; font-family: 'Inter', sans-serif;">
+                <div style="flex: 1; min-width: 160px;">
+                    <strong style="color: var(--deep-blue); font-size: 0.95rem; display: block;">${ex.alumnoNombre}</strong>
+                    <span style="color: var(--muted-text); font-size: 0.78rem; display: block;">Doc: ${ex.alumnoDocumento || ex.alumnoWhatsapp || 'S/D'} | Curso: <strong>${ex.curso}</strong></span>
+                    <span style="color: #777; font-size: 0.75rem;">${ex.titulo} (${ex.fecha})</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.8rem;">
+                    <span style="background: ${ex.calificacion !== null ? '#2e7d32' : '#f57c00'}; color: white; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 700;">
+                        ${ex.calificacion !== null ? (typeof ex.calificacion === 'number' ? ex.calificacion.toFixed(1) : ex.calificacion) : 'Pendiente'}
+                    </span>
+                    <button data-csp-click="verExamenResultadoAdmin(${idx})" 
+                        style="background: var(--golden); color: var(--deep-blue); padding: 0.4rem 0.9rem; border: none; border-radius: 0.8rem; font-weight: 700; cursor: pointer; font-size: 0.8rem; font-family: 'Inter', sans-serif;">
+                        🔍 Ver Examen
+                    </button>
+                </div>
+            </div>
+        `).join('')}
+    `;
+}
+
+function verExamenResultadoAdmin(intentoIndex) {
+    bloquearScroll('modalVerExamenResultadoAdmin');
+    cargarExamenesRealizados();
+    const intento = EXAMENES_REALIZADOS[intentoIndex];
+    if (!intento) return;
+
+    let modal = document.getElementById('modalVerExamenResultadoAdmin');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalVerExamenResultadoAdmin';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 750px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.5);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.2rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="tituloVerExamenAdmin" style="color: #c9a53b; margin: 0; font-size: 1.1rem; font-family: 'Inter', sans-serif;"></h3>
+                    <button data-csp-click="cerrarModalVerExamenResultadoAdmin()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                </div>
+                <div class="modal-body" id="bodyVerExamenAdmin" style="padding: 1.8rem;"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    document.getElementById('tituloVerExamenAdmin').innerHTML = `<i class="fas fa-search"></i> Revisión: ${intento.titulo}`;
+
+    let preguntasHTML = '';
+    if (intento.respuestas && intento.respuestas.length > 0) {
+        preguntasHTML = intento.respuestas.map((r, i) => {
+            const num = i + 1;
+            return `
+                <div style="background: #fafaf9; padding: 1.2rem; border-radius: 1rem; margin-bottom: 1rem; border: 1px solid #e8e3d8; font-family: 'Inter', sans-serif;">
+                    <p style="font-weight: 700; color: #1a3a4a; margin-bottom: 0.6rem;">${num}. ${r.texto}</p>
+                    <div style="font-size: 0.9rem; margin-bottom: 0.4rem;">
+                        <strong>Respuesta Alumno:</strong> 
+                        <span style="color: ${r.esCorrecta === true ? '#2e7d32' : r.esCorrecta === false ? '#c62828' : '#1a3a4a'}; font-weight: 600;">
+                            ${r.respuestaAlumno || '(Sin respuesta)'}
+                        </span>
+                        ${r.esCorrecta === true ? ' <span style="color:#2e7d32;">✓ (Correcta)</span>' : r.esCorrecta === false ? ' <span style="color:#c62828;">✗ (Incorrecta)</span>' : ''}
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--muted-text);">
+                        <strong>Respuesta / Criterio Correcto:</strong> ${r.correcta || 'N/A'}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } else {
+        preguntasHTML = '<p style="color: #777; font-family: \'Inter\', sans-serif;">No se registraron detalles de preguntas en esta entrega.</p>';
+    }
+
+    document.getElementById('bodyVerExamenAdmin').innerHTML = `
+        <div style="background: var(--cream); padding: 1rem; border-radius: 0.8rem; border-left: 4px solid var(--golden); margin-bottom: 1.2rem; font-size: 0.9rem; font-family: 'Inter', sans-serif;">
+            <strong>Alumno:</strong> ${intento.alumnoNombre} | <strong>Doc:</strong> ${intento.alumnoDocumento || 'S/D'}<br>
+            <strong>Curso:</strong> ${intento.curso} | <strong>Fecha:</strong> ${intento.fecha}
+        </div>
+
+        <div>${preguntasHTML}</div>
+
+        <div style="margin-top: 1.5rem; background: #f5f5f5; padding: 1.2rem; border-radius: 1rem; text-align: center; font-family: 'Inter', sans-serif;">
+            <label style="font-weight: 700; color: var(--deep-blue); display: block; margin-bottom: 0.5rem;">
+                Calificación Final Examen (1.0 - 5.0):
+            </label>
+            <input type="number" id="inputCalificacionFinalAdmin" step="0.1" min="1" max="5" 
+                value="${intento.calificacion !== null && intento.calificacion !== undefined ? intento.calificacion : ''}"
+                style="width: 100px; padding: 0.5rem; border: 2px solid var(--golden); border-radius: 0.8rem; font-size: 1.1rem; text-align: center; font-weight: 700; font-family: 'Inter', sans-serif;">
+            <br>
+            <button data-csp-click="guardarCalificacionFinalAdmin(${intentoIndex})" 
+                style="margin-top: 1rem; background: var(--golden); color: var(--deep-blue); padding: 0.8rem 1.8rem; border: none; border-radius: 2rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif;">
+                💾 Guardar Calificación del Alumno
+            </button>
+        </div>
+    `;
+
+    mostrarElementoModal(modal);
+}
+
+function cerrarModalVerExamenResultadoAdmin() {
+    const modal = document.getElementById('modalVerExamenResultadoAdmin');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalVerExamenResultadoAdmin');
+}
+
+function guardarCalificacionFinalAdmin(intentoIndex) {
+    const inputCal = document.getElementById('inputCalificacionFinalAdmin');
+    if (!inputCal) return;
+
+    const val = parseFloat(inputCal.value);
+    if (isNaN(val) || val < 1.0 || val > 5.0) {
+        mostrarModalGenerico('Nota inválida', 'Ingresa una calificación válida entre 1.0 y 5.0');
+        return;
+    }
+
+    cargarExamenesRealizados();
+    if (intentoIndex >= EXAMENES_REALIZADOS.length) return;
+
+    const intento = EXAMENES_REALIZADOS[intentoIndex];
+    intento.calificacion = parseFloat(val.toFixed(1));
+    intento.nota = val >= 4.0 ? 'Aprobado' : 'Reprobado';
+
+    guardarExamenesRealizados();
+    cerrarModalVerExamenResultadoAdmin();
+    cargarEntregasResultadosAdmin(document.getElementById('selectCursoResultadosAdmin')?.value || 'todos');
+
+    // Sincronización Supabase
+    const payloadSupabase = {
+        id: String(intento.id),
+        exam_id: String(intento.examId || ''),
+        curso: intento.curso,
+        titulo: intento.titulo,
+        fecha: intento.fecha,
+        alumno_nombre: intento.alumnoNombre,
+        alumno_documento: String(intento.alumnoDocumento).trim(),
+        alumno_whatsapp: String(intento.alumnoWhatsapp).trim(),
+        alumno_grupo: intento.alumnoGrupo,
+        respuestas: intento.respuestas,
+        calificacion: intento.calificacion,
+        nota: intento.nota,
+        fecha_realizacion: intento.fechaRealizacion || new Date().toISOString()
+    };
+
+    if (window.supabaseClient) {
+        window.supabaseClient
+            .from('examenes_realizados')
+            .upsert([payloadSupabase], { onConflict: 'id' })
+            .catch(() => {
+                enqueueOfflinePending({ type: 'examenes_realizados_upsert', payload: payloadSupabase });
+            });
+    } else {
+        enqueueOfflinePending({ type: 'examenes_realizados_upsert', payload: payloadSupabase });
+    }
+
+    agregarNotificacionPersonalLMS(intento.alumnoDocumento, `Examen Calificado: ${intento.titulo}`, `Tu calificación ha sido actualizada: ${val.toFixed(1)} (${intento.nota}).`);
+    evaluarYGuardarLogros({ nombre: intento.alumnoNombre, documento: intento.alumnoDocumento });
+
+    renderizarRevision();
+    renderizarLogros();
+    mostrarToast(`✅ Calificación ${val.toFixed(1)} guardada exitosamente`, 'success');
+}
+
+// ===== MODAL GENERAR PIN ALUMNO =====
+function abrirModalGenerarPinLMS() {
+    bloquearScroll('modalGenerarPinLMS');
+    const identidadExistente = obtenerIdentidadAlumno();
+
+    let modal = document.getElementById('modalGenerarPinLMS');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalGenerarPinLMS';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; padding: 2rem; max-width: 440px; width: 95%; box-shadow: 0 25px 60px rgba(0,0,0,0.3); border: 2px solid var(--golden);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.6rem;">
+                    <h3 style="color: #1a3a4a; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-key" style="color:#c9a53b;"></i> Obtener / Generar PIN de Acceso</h3>
+                    <button type="button" data-csp-click="cerrarModalGenerarPinLMS()" style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; line-height:1;">&times;</button>
+                </div>
+                <p style="font-size:0.85rem; color:#5a6474; margin-bottom:1.2rem; font-family:'Inter',sans-serif;">
+                    Ingresa tu nombre y documento. Si ya tienes un PIN asignado, el sistema te lo recordará. Si eres nuevo, se creará un PIN único de 4 dígitos.
+                </p>
+                <div style="margin-bottom: 0.9rem; text-align: left;">
+                    <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; font-family: 'Inter', sans-serif;">Nombre Completo *</label>
+                    <input type="text" id="inputNombreGenerarPin" placeholder="Ej: Juan Pérez" style="width: 100%; padding: 0.75rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.9rem; box-sizing: border-box; font-family: 'Inter', sans-serif; min-height:44px;">
+                </div>
+                <div style="margin-bottom: 0.9rem; text-align: left;">
+                    <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; font-family: 'Inter', sans-serif;">Documento de Identidad *</label>
+                    <input type="text" id="inputDocGenerarPin" placeholder="Ej: 1098765432" style="width: 100%; padding: 0.75rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.9rem; box-sizing: border-box; font-family: 'Inter', sans-serif; min-height:44px;">
+                </div>
+                <div style="margin-bottom: 1.2rem; text-align: left;">
+                    <label style="font-weight: 600; font-size: 0.85rem; color: #1a3a4a; font-family: 'Inter', sans-serif;">WhatsApp (Opcional)</label>
+                    <input type="tel" id="inputWspGenerarPin" placeholder="Ej: 3001234567" style="width: 100%; padding: 0.75rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.9rem; box-sizing: border-box; font-family: 'Inter', sans-serif; min-height:44px;">
+                </div>
+                <div style="display: flex; gap: 0.8rem;">
+                    <button data-csp-click="procesarGenerarPinLMS()" class="btn btn-golden" style="flex:1; border:none; padding:0.75rem; border-radius:2rem; font-weight:700; background: var(--golden); color: var(--deep-blue); cursor: pointer; font-family: 'Inter', sans-serif; min-height:44px;">
+                        <i class="fas fa-check-circle"></i> Procesar PIN
+                    </button>
+                    <button data-csp-click="cerrarModalGenerarPinLMS()" class="btn btn-outline" style="flex:1; padding:0.75rem; border-radius:2rem; background: transparent; border: 2px solid var(--deep-blue); color: var(--deep-blue); cursor: pointer; font-weight: 700; font-family: 'Inter', sans-serif; min-height:44px;">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    if (identidadExistente) {
+        document.getElementById('inputNombreGenerarPin').value = identidadExistente.nombre || '';
+        document.getElementById('inputDocGenerarPin').value = identidadExistente.documento || '';
+        const wspEl = document.getElementById('inputWspGenerarPin');
+        if (wspEl) wspEl.value = identidadExistente.whatsapp || '';
+    }
+
+    mostrarElementoModal(modal);
+}
+
+function cerrarModalGenerarPinLMS() {
+    const modal = document.getElementById('modalGenerarPinLMS');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalGenerarPinLMS');
+}
+
+function procesarGenerarPinLMS() {
+    const nombre = document.getElementById('inputNombreGenerarPin').value.trim();
+    const documento = document.getElementById('inputDocGenerarPin').value.trim();
+    const wspInput = document.getElementById('inputWspGenerarPin');
+    const whatsapp = wspInput ? wspInput.value.trim() : '';
+
+    if (!nombre || !documento) {
+        mostrarModalGenerico('Campos Incompletos', 'Ingresa tu nombre y documento de identidad.');
+        return;
+    }
+
+    const { alumno, esNuevoPin } = obtenerOGenerarPinAlumno(nombre, documento, 'General', whatsapp);
+    cerrarModalGenerarPinLMS();
+
+    if (esNuevoPin) {
+        mostrarModalGenerico(
+            '🔑 ¡Tu PIN de Acceso ha sido creado!',
+            `Hola <strong>${alumno.nombre}</strong>, tu PIN único de 4 dígitos para acceder a tus resultados es:<br><br>
+            <div style="font-size: 2.2rem; font-weight: 900; color: #1a3a4a; background: #fff3e0; padding: 0.8rem; border-radius: 1rem; text-align: center; border: 2px solid #c9a53b; letter-spacing: 4px; font-family: monospace;">${alumno.pin}</div><br>
+            Guárdalo en un lugar seguro. También puedes consultarlo en cualquier momento en tus <strong>Notificaciones</strong>.`
+        );
+    } else {
+        mostrarModalGenerico(
+            '🔑 Consulta de PIN Existente',
+            `Hola <strong>${alumno.nombre}</strong>, ya tienes un PIN asignado previamente:<br><br>
+            <div style="font-size: 2.2rem; font-weight: 900; color: #1a3a4a; background: #e8f5e9; padding: 0.8rem; border-radius: 1rem; text-align: center; border: 2px solid #2e7d32; letter-spacing: 4px; font-family: monospace;">${alumno.pin}</div><br>
+            Puedes usar este PIN en la pestaña <strong>Revisión</strong> para consultar tus calificaciones o ver tus <strong>Notificaciones</strong>.`
+        );
+    }
+
+    renderizarPrincipal();
+}
+
+// ===== GESTIÓN DE PINS EN EL ADMIN LMS =====
+function abrirSolicitudGestionPinsLMS() {
+    if (sesionGestionPinsLMSActiva) {
+        abrirGestionPinsLMS();
+    } else {
+        abrirModalPasswordGestionPinsLMS();
+    }
+}
+
+function abrirModalPasswordGestionPinsLMS() {
+    bloquearScroll('modalPasswordGestionPinsLMS');
+    let modal = document.getElementById('modalPasswordGestionPinsLMS');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalPasswordGestionPinsLMS';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; padding: 2rem; max-width: 420px; width: 95%; box-shadow: 0 25px 60px rgba(0,0,0,0.4); border: 2px solid var(--golden);">
+                <h3 style="color: #1a3a4a; margin-top: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-key" style="color: var(--golden);"></i> Contraseña de Gestión de PINs</h3>
+                <p style="font-size: 0.85rem; color: #5a6474; margin-bottom: 1.2rem; font-family: 'Inter', sans-serif;">
+                    Ingresa la contraseña especial de administración de PINs para continuar.
+                </p>
+                <div style="margin-bottom: 1rem;">
+                    <input type="password" id="inputPasswordGestionPins" placeholder="Contraseña de PINs" 
+                        data-csp-keyup="if(event.key==='Enter') verificarPasswordGestionPinsLMS()"
+                        style="width: 100%; padding: 0.75rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-size: 0.95rem; box-sizing: border-box; font-family: 'Inter', sans-serif; min-height:44px;">
+                    <div id="errorPasswordGestionPins" style="color: #c62828; font-size: 0.8rem; margin-top: 0.4rem; display: none; font-family: 'Inter', sans-serif;"></div>
+                </div>
+                <div style="display: flex; gap: 0.8rem;">
+                    <button data-csp-click="verificarPasswordGestionPinsLMS()" class="btn btn-golden" style="flex:1; border:none; padding:0.75rem; border-radius:2rem; font-weight:700; background: var(--golden); color: var(--deep-blue); cursor: pointer; font-family: 'Inter', sans-serif; min-height:44px;">Acceder</button>
+                    <button data-csp-click="cerrarModalPasswordGestionPinsLMS()" class="btn btn-outline" style="flex:1; padding:0.75rem; border-radius:2rem; background: transparent; border: 2px solid var(--deep-blue); color: var(--deep-blue); cursor: pointer; font-weight: 700; font-family: 'Inter', sans-serif; min-height:44px;">Cancelar</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    const inputPwd = document.getElementById('inputPasswordGestionPins');
+    if (inputPwd) inputPwd.value = '';
+    const errDiv = document.getElementById('errorPasswordGestionPins');
+    if (errDiv) errDiv.style.display = 'none';
+
+    mostrarElementoModal(modal);
+    setTimeout(() => { if (inputPwd) inputPwd.focus(); }, 200);
+}
+
+function cerrarModalPasswordGestionPinsLMS() {
+    const modal = document.getElementById('modalPasswordGestionPinsLMS');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalPasswordGestionPinsLMS');
+}
+
+function verificarPasswordGestionPinsLMS() {
+    const inputPwd = document.getElementById('inputPasswordGestionPins');
+    const pwd = inputPwd ? inputPwd.value.trim().toLowerCase() : '';
+    const validPwds = ['pinadmin2026!', 'pinadmin2026', 'admin2026', 'admin2026!', 'lmsadmin2026', 'lmsadmin2026!'];
+
+    if (validPwds.includes(pwd)) {
+        cerrarModalPasswordGestionPinsLMS();
+        sesionGestionPinsLMSActiva = true;
+        abrirGestionPinsLMS();
+        mostrarToast('🔓 Acceso a Gestión de PINs Autorizado', 'success');
+    } else {
+        const errDiv = document.getElementById('errorPasswordGestionPins');
+        if (errDiv) {
+            errDiv.style.display = 'block';
+            errDiv.innerText = '❌ Contraseña incorrecta (requiere: pinadmin2026!)';
+        }
+        if (inputPwd) {
+            inputPwd.value = '';
+            inputPwd.focus();
+        }
+    }
+}
+
+function abrirGestionPinsLMS() {
+    bloquearScroll('modalGestionPinsLMS');
+    let modal = document.getElementById('modalGestionPinsLMS');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modalGestionPinsLMS';
+        modal.className = 'modal-overlay';
+        modal.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;
+            z-index: 100050; backdrop-filter: blur(5px);
+        `;
+        modal.innerHTML = `
+            <div class="modal-card" style="background: white; border-radius: 1.5rem; max-width: 850px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.4);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); padding: 1.2rem 2rem; position: sticky; top: 0; z-index: 10; border-radius: 1.5rem 1.5rem 0 0; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="color: #c9a53b; margin: 0; font-family: 'Inter', sans-serif;"><i class="fas fa-users-cog"></i> Administración de PINs e Identidades</h3>
+                    <button data-csp-click="cerrarGestionPinsLMS()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                </div>
+                <div class="modal-body" style="padding: 1.8rem;">
+                    <div style="display: flex; gap: 0.8rem; margin-bottom: 1.2rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <input type="text" id="inputBuscarPinsAdmin" data-csp-input="renderizarTablaPinsAdmin()" placeholder="🔍 Buscar por nombre o documento..." 
+                                style="width: 100%; padding: 0.7rem 1rem; border: 2px solid #e8e3d8; border-radius: 0.8rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box; min-height: 44px;">
+                        </div>
+                        <div style="font-size: 0.85rem; color: #5a6474; font-family: 'Inter', sans-serif;">
+                            Clave Admin de PINs: <strong style="color:#1a3a4a;">pinadmin2026!</strong>
+                        </div>
+                    </div>
+                    <div id="tablaPinsAdminContainer" style="overflow-x: auto;"></div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        modal.querySelector('#inputBuscarPinsAdmin').addEventListener('input', renderizarTablaPinsAdmin);
+    }
+
+    renderizarTablaPinsAdmin();
+    mostrarElementoModal(modal);
+}
+
+function cerrarGestionPinsLMS() {
+    const modal = document.getElementById('modalGestionPinsLMS');
+    if (modal) ocultarElementoModal(modal);
+    desbloquearScroll('modalGestionPinsLMS');
+}
+
+function renderizarTablaPinsAdmin() {
+    const container = document.getElementById('tablaPinsAdminContainer');
+    if (!container) return;
+
+    const queryInput = document.getElementById('inputBuscarPinsAdmin');
+    const query = queryInput ? queryInput.value.trim().toLowerCase() : '';
+
+    let lista = obtenerListaAlumnosIdentidades();
+
+    if (query) {
+        lista = lista.filter(a =>
+            (a.nombre && a.nombre.toLowerCase().includes(query)) ||
+            (a.documento && a.documento.toLowerCase().includes(query))
+        );
+    }
+
+    if (lista.length === 0) {
+        const msj = query ? 'No se encontraron alumnos con los términos ingresados.' : 'No hay identidades o PINs de alumnos registrados aún.';
+        container.innerHTML = `<p style="text-align:center; color:#5a6474; padding:2rem 1rem; font-family:'Inter',sans-serif;">${msj}</p>`;
+        return;
+    }
+
+    let html = `
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: 'Inter', sans-serif; font-size: 0.88rem; min-width: 650px;">
+            <thead>
+                <tr style="background: var(--deep-blue); color: white;">
+                    <th style="padding: 0.8rem 1rem; border-radius: 0.6rem 0 0 0.6rem;">Alumno / Grupo</th>
+                    <th style="padding: 0.8rem 1rem;">Documento</th>
+                    <th style="padding: 0.8rem 1rem;">PIN Actual</th>
+                    <th style="padding: 0.8rem 1rem; text-align: center; border-radius: 0 0.6rem 0.6rem 0;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    lista.forEach((a, idx) => {
+        const bgRow = idx % 2 === 0 ? '#ffffff' : '#fafaf9';
+        html += `
+            <tr style="background: ${bgRow}; border-bottom: 1px solid #e8e3d8;">
+                <td style="padding: 0.8rem 1rem; font-weight: 600; color: #1a3a4a;">
+                    ${a.nombre}
+                    <div style="font-size: 0.75rem; color: #757575; font-weight: 400;">🏫 ${a.grupo || 'Clase Belén'}</div>
+                </td>
+                <td style="padding: 0.8rem 1rem; font-weight: 600; color: #5a6474;">${a.documento}</td>
+                <td style="padding: 0.8rem 1rem;">
+                    <span style="background: #1a3a4a; color: var(--golden); padding: 0.3rem 0.8rem; border-radius: 1rem; font-weight: 900; font-size: 0.95rem; font-family: monospace; letter-spacing: 2px;">
+                        ${a.pin || 'Sin PIN'}
+                    </span>
+                </td>
+                <td style="padding: 0.8rem 1rem; text-align: center; white-space: nowrap;">
+                    <button data-csp-click="regenerarPinAlumnoAdmin('${a.documento}')" style="background: #e65100; color: white; border: none; padding: 0.45rem 0.85rem; border-radius: 1.5rem; font-weight: 600; cursor: pointer; font-size: 0.8rem; margin-right: 0.4rem; min-height: 44px; display: inline-flex; align-items: center; gap: 0.3rem;">
+                        <i class="fas fa-sync-alt"></i> Regenerar PIN
+                    </button>
+                    <button data-csp-click="eliminarPinAlumnoAdmin('${a.documento}')" style="background: #c62828; color: white; border: none; padding: 0.45rem 0.75rem; border-radius: 1.5rem; font-weight: 600; cursor: pointer; font-size: 0.8rem; min-height: 44px; display: inline-flex; align-items: center; gap: 0.3rem;">
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+function regenerarPinAlumnoAdmin(documento) {
+    let lista = obtenerListaAlumnosIdentidades();
+    const idx = lista.findIndex(a => String(a.documento).trim().toLowerCase() === String(documento).trim().toLowerCase());
+
+    if (idx !== -1) {
+        const nuevoPin = generarPinUnicoLMS();
+        lista[idx].pin = nuevoPin;
+        guardarListaAlumnosIdentidades(lista);
+
+        const identidadActiva = obtenerIdentidadAlumno();
+        if (identidadActiva && String(identidadActiva.documento).trim().toLowerCase() === String(documento).trim().toLowerCase()) {
+            guardarIdentidadAlumno(identidadActiva.nombre, identidadActiva.documento, identidadActiva.grupo, nuevoPin);
+        }
+
+        // Sincronizar Supabase
+        const payloadSupabase = {
+            documento: lista[idx].documento,
+            nombre: lista[idx].nombre,
+            whatsapp: lista[idx].whatsapp || lista[idx].documento,
+            grupo: lista[idx].grupo || 'General',
+            pin: String(nuevoPin).trim(),
+            fecha_registro: lista[idx].fecha_registro || new Date().toISOString()
+        };
+
+        if (window.supabaseClient) {
+            window.supabaseClient
+                .from('alumnos_identidades')
+                .upsert([payloadSupabase], { onConflict: 'documento' })
+                .catch(() => {
+                    enqueueOfflinePending({ type: 'alumnos_identidades_upsert', payload: payloadSupabase });
+                });
+        } else {
+            enqueueOfflinePending({ type: 'alumnos_identidades_upsert', payload: payloadSupabase });
+        }
+
+        agregarNotificacionPersonalLMS(
+            documento,
+            '🔄 Tu PIN de acceso ha sido actualizado',
+            `Hola ${lista[idx].nombre}, tu nuevo PIN de 4 dígitos generado por el administrador es: ${nuevoPin}.`
+        );
+
+        mostrarToast(`🔄 Nuevo PIN generado para ${lista[idx].nombre}: ${nuevoPin}`, 'success');
+        renderizarTablaPinsAdmin();
+    }
+}
+
+function eliminarPinAlumnoAdmin(documento) {
+    let lista = obtenerListaAlumnosIdentidades();
+    const idx = lista.findIndex(a => String(a.documento).trim().toLowerCase() === String(documento).trim().toLowerCase());
+
+    if (idx === -1) return;
+    const alumno = lista[idx];
+
+    mostrarModalGenerico(
+        '🗑️ Eliminar PIN de Alumno',
+        `¿Deseas eliminar el PIN del alumno <strong>${alumno.nombre}</strong> (Doc: ${alumno.documento})? El campo PIN quedará vacío y el alumno podrá generar uno nuevo en su próxima identificación.`,
+        [
+            {
+                texto: '<i class="fas fa-trash"></i> Sí, eliminar PIN',
+                callback: () => {
+                    lista[idx].pin = '';
+                    guardarListaAlumnosIdentidades(lista);
+
+                    const identidadActiva = obtenerIdentidadAlumno();
+                    if (identidadActiva && String(identidadActiva.documento).trim().toLowerCase() === String(documento).trim().toLowerCase()) {
+                        guardarIdentidadAlumno(identidadActiva.nombre, identidadActiva.documento, identidadActiva.grupo, '');
+                    }
+
+                    const payloadSupabase = {
+                        documento: alumno.documento,
+                        nombre: alumno.nombre,
+                        whatsapp: alumno.whatsapp || alumno.documento,
+                        grupo: alumno.grupo || 'General',
+                        pin: '',
+                        fecha_registro: alumno.fecha_registro || new Date().toISOString()
+                    };
+
+                    if (window.supabaseClient) {
+                        window.supabaseClient
+                            .from('alumnos_identidades')
+                            .upsert([payloadSupabase], { onConflict: 'documento' })
+                            .catch(() => {
+                                enqueueOfflinePending({ type: 'alumnos_identidades_upsert', payload: payloadSupabase });
+                            });
+                    } else {
+                        enqueueOfflinePending({ type: 'alumnos_identidades_upsert', payload: payloadSupabase });
+                    }
+
+                    mostrarToast('🗑️ PIN de alumno eliminado correctamente', 'warning');
+                    renderizarTablaPinsAdmin();
+                }
+            },
+            {
+                texto: 'Cancelar',
+                callback: () => { }
+            }
+        ]
+    );
+}
+
+// LISTENERS DE INICIALIZACIÓN
+document.addEventListener('DOMContentLoaded', function () {
+    const passwordInput = document.getElementById('inputPasswordEvaluacion');
+    if (passwordInput) {
+        passwordInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') verificarPasswordEvaluacion();
+        });
+    }
+
+    cargarExamenesDesdeStorage();
+    cargarExamenesRealizados();
+    asegurarBotonFlotanteAdmin();
+    actualizarBadgesNotificaciones();
+    sincronizarOfflinePending();
+    syncAllFromSupabase();
+});
+
+// ===== EXPORTACIONES GLOBALES DEFINITIVAS =====
+window.abrirModalEvaluacion = abrirModalEvaluacion;
+window.verificarPasswordEvaluacion = verificarPasswordEvaluacion;
+window.cerrarModalEvaluacion = cerrarModalEvaluacion;
+window.abrirDashboard = abrirDashboard;
+window.cerrarDashboard = cerrarDashboard;
+window.cambiarPestalla = cambiarPestalla;
+window.renderizarPrincipal = renderizarPrincipal;
+window.renderizarCursos = renderizarCursos;
+window.renderizarRevision = renderizarRevision;
+window.renderizarLogros = renderizarLogros;
+window.renderizarGrupo = renderizarGrupo;
+window.verPlanEstudios = verPlanEstudios;
+window.cerrarModalPlanEstudios = cerrarModalPlanEstudios;
+window.desinscribirCursoConfirm = desinscribirCursoConfirm;
+window.confirmarInscripcionDirecta = confirmarInscripcionDirecta;
+window.confirmarInicioExamen = confirmarInicioExamen;
+window.iniciarFlujoIdentidad = iniciarFlujoIdentidad;
+window.cancelarIdentidad = cancelarIdentidad;
+window.verificarIdentidadYRendir = verificarIdentidadYRendir;
+window.rendirExamen = rendirExamen;
+window.cerrarModalRendirExamen = cerrarModalRendirExamen;
+window.finalizarExamen = finalizarExamen;
+window.procesarEntregaExamen = procesarEntregaExamen;
+window.mostrarModalRetroalimentacion = mostrarModalRetroalimentacion;
+window.cerrarModalRetroalimentacion = cerrarModalRetroalimentacion;
+window.obtenerPlanEstudios = obtenerPlanEstudios;
+window.guardarPlanEstudios = guardarPlanEstudios;
+window.obtenerCursosData = obtenerCursosData;
+window.guardarCursosData = guardarCursosData;
+window.CURSOS_DATA = CURSOS_DATA;
+window.obtenerIdentidadAlumno = obtenerIdentidadAlumno;
+window.guardarIdentidadAlumno = guardarIdentidadAlumno;
+window.obtenerListaAlumnosIdentidades = obtenerListaAlumnosIdentidades;
+window.guardarListaAlumnosIdentidades = guardarListaAlumnosIdentidades;
+window.obtenerOGenerarPinAlumno = obtenerOGenerarPinAlumno;
+window.abrirModalGenerarPinLMS = abrirModalGenerarPinLMS;
+window.cerrarModalGenerarPinLMS = cerrarModalGenerarPinLMS;
+window.procesarGenerarPinLMS = procesarGenerarPinLMS;
+window.buscarResultadosPorPin = buscarResultadosPorPin;
+window.abrirSolicitudGestionPinsLMS = abrirSolicitudGestionPinsLMS;
+window.abrirModalPasswordGestionPinsLMS = abrirModalPasswordGestionPinsLMS;
+window.cerrarModalPasswordGestionPinsLMS = cerrarModalPasswordGestionPinsLMS;
+window.verificarPasswordGestionPinsLMS = verificarPasswordGestionPinsLMS;
+window.abrirGestionPinsLMS = abrirGestionPinsLMS;
+window.cerrarGestionPinsLMS = cerrarGestionPinsLMS;
+window.renderizarTablaPinsAdmin = renderizarTablaPinsAdmin;
+window.regenerarPinAlumnoAdmin = regenerarPinAlumnoAdmin;
+window.eliminarPinAlumnoAdmin = eliminarPinAlumnoAdmin;
+window.agregarNotificacionPersonalLMS = agregarNotificacionPersonalLMS;
+window.mostrarModalBienvenida = mostrarModalBienvenida;
+window.cerrarModalBienvenida = cerrarModalBienvenida;
+window.mostrarModalGenerico = mostrarModalGenerico;
+window.cerrarModalGenerico = cerrarModalGenerico;
+window.generarCertificadoPDF = generarCertificadoPDF;
+window.abrirModalNotificacionesLMS = abrirModalNotificacionesLMS;
+window.cerrarModalNotificacionesLMS = cerrarModalNotificacionesLMS;
+window.abrirModalAdmin = abrirModalAdmin;
+window.cerrarModalAdminPassword = cerrarModalAdminPassword;
+window.verificarPasswordAdmin = verificarPasswordAdmin;
+window.mostrarPanelAdmin = mostrarPanelAdmin;
+window.cerrarSesionAdmin = cerrarSesionAdmin;
+window.abrirModalCrearExamen = abrirModalCrearExamen;
+window.abrirModalCrearExamenForm = abrirModalCrearExamenForm;
+window.cerrarModalCrearExamenForm = cerrarModalCrearExamenForm;
+window.agregarPreguntaDinamicaForm = agregarPreguntaDinamicaForm;
+window.cambiarTipoPreguntaAdmin = cambiarTipoPreguntaAdmin;
+window.guardarExamenCompletoAdmin = guardarExamenCompletoAdmin;
+window.abrirModalEditarExamenes = abrirModalEditarExamenes;
+window.cerrarModalEditarExamenes = cerrarModalEditarExamenes;
+window.cargarExamenesParaEditar = cargarExamenesParaEditar;
+window.editarExamenDirecto = editarExamenDirecto;
+window.eliminarExamenDirecto = eliminarExamenDirecto;
+window.abrirModalGestionarResultados = abrirModalGestionarResultados;
+window.cerrarModalGestionarResultados = cerrarModalGestionarResultados;
+window.cargarEntregasResultadosAdmin = cargarEntregasResultadosAdmin;
+window.verExamenResultadoAdmin = verExamenResultadoAdmin;
+window.cerrarModalVerExamenResultadoAdmin = cerrarModalVerExamenResultadoAdmin;
+window.guardarCalificacionFinalAdmin = guardarCalificacionFinalAdmin;
+window.abrirModalGestionarPlanEstudios = abrirModalGestionarPlanEstudios;
+window.cerrarModalGestionarPlanEstudios = cerrarModalGestionarPlanEstudios;
+window.cargarEdicionPlanEstudios = cargarEdicionPlanEstudios;
+window.agregarTemaPlan = agregarTemaPlan;
+window.editarTemaPlan = editarTemaPlan;
+window.eliminarTemaPlan = eliminarTemaPlan;
+window.agregarAyudaPlan = agregarAyudaPlan;
+window.eliminarAyudaPlan = eliminarAyudaPlan;
+window.asegurarBotonFlotanteAdmin = asegurarBotonFlotanteAdmin;
+window.sincronizarOfflinePending = sincronizarOfflinePending;
+window.syncAllFromSupabase = syncAllFromSupabase;
