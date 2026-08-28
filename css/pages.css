@@ -7303,3 +7303,382 @@ mark.resaltado-creencia,
     }
 }
 
+/* ========================================================
+   PÁGINA: DEVOCIONAL DIARIO (MARANATA - 31 CAPÍTULOS)
+   ======================================================== */
+.devocional-page-wrapper {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3.5rem;
+}
+
+.devocional-hero-card {
+    background: linear-gradient(135deg, var(--deep-blue-dark, #07192d) 0%, var(--deep-blue, #0b2b4f) 100%);
+    border-radius: 2rem;
+    padding: 2.5rem 2rem;
+    color: #ffffff;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--golden-border, rgba(201, 157, 59, 0.3));
+}
+
+.devocional-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(201, 157, 59, 0.2);
+    color: var(--golden-light, #dfb75c);
+    border: 1px solid rgba(201, 157, 59, 0.4);
+    padding: 0.4rem 1.2rem;
+    border-radius: 2rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    text-transform: uppercase;
+}
+
+.devocional-hero-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+    color: #ffffff;
+    margin-bottom: 0.6rem;
+    font-family: var(--font-heading, 'Playfair Display', serif);
+}
+
+.devocional-hero-subtitle {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.05rem;
+    max-width: 780px;
+    line-height: 1.6;
+}
+
+.devocional-layout-grid {
+    display: grid;
+    grid-template-columns: 1.45fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+@media (max-width: 960px) {
+    .devocional-layout-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Columna Reproductor */
+.devocional-player-column {
+    position: sticky;
+    top: 90px;
+}
+
+.devocional-video-card {
+    background: var(--cream-card, #ffffff);
+    border-radius: 1.6rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-md, 0 14px 36px rgba(11, 43, 79, 0.09));
+    border: 1px solid var(--border-subtle, #e8e3d8);
+    transition: var(--transition, all 0.28s ease);
+}
+
+body.tema-oscuro .devocional-video-card {
+    background: var(--cream-card, #152033);
+    border-color: var(--border-subtle, #25354e);
+}
+
+.devocional-iframe-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    background: #000000;
+}
+
+.devocional-iframe-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.devocional-video-info {
+    padding: 1.5rem;
+}
+
+.devocional-current-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(201, 157, 59, 0.15);
+    color: var(--golden, #c99d3b);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.25rem 0.8rem;
+    border-radius: 1rem;
+    margin-bottom: 0.6rem;
+}
+
+.devocional-video-info h3 {
+    font-size: 1.35rem;
+    color: var(--deep-blue, #0b2b4f);
+    margin-bottom: 0.3rem;
+    font-weight: 700;
+}
+
+body.tema-oscuro .devocional-video-info h3 {
+    color: var(--dark-text, #e2e8f0);
+}
+
+.devocional-video-info p {
+    color: var(--muted-text, #596579);
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+}
+
+.devocional-player-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-subtle, #e8e3d8);
+}
+
+body.tema-oscuro .devocional-player-controls {
+    border-color: var(--border-subtle, #25354e);
+}
+
+.btn-devocional-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--cream, #fbf9f5);
+    color: var(--deep-blue, #0b2b4f);
+    border: 1px solid var(--border-subtle, #e8e3d8);
+    padding: 0.6rem 1.2rem;
+    border-radius: 2rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: var(--font-body, 'Inter', sans-serif);
+}
+
+body.tema-oscuro .btn-devocional-nav {
+    background: var(--cream-dark, #10192a);
+    color: var(--dark-text, #e2e8f0);
+    border-color: var(--border-subtle, #25354e);
+}
+
+.btn-devocional-nav:hover:not(:disabled) {
+    background: var(--golden, #c99d3b);
+    color: #ffffff;
+    border-color: var(--golden, #c99d3b);
+    transform: translateY(-2px);
+}
+
+.btn-devocional-nav:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* Columna Lista Playlist */
+.devocional-playlist-card {
+    background: var(--cream-card, #ffffff);
+    border-radius: 1.6rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md, 0 14px 36px rgba(11, 43, 79, 0.09));
+    border: 1px solid var(--border-subtle, #e8e3d8);
+}
+
+body.tema-oscuro .devocional-playlist-card {
+    background: var(--cream-card, #152033);
+    border-color: var(--border-subtle, #25354e);
+}
+
+.playlist-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border-subtle, #e8e3d8);
+}
+
+body.tema-oscuro .playlist-header-row {
+    border-color: var(--border-subtle, #25354e);
+}
+
+.playlist-header-row h3 {
+    font-size: 1.15rem;
+    color: var(--deep-blue, #0b2b4f);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+body.tema-oscuro .playlist-header-row h3 {
+    color: var(--dark-text, #e2e8f0);
+}
+
+.playlist-count-pill {
+    background: rgba(201, 157, 59, 0.15);
+    color: var(--golden, #c99d3b);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.2rem 0.7rem;
+    border-radius: 1rem;
+}
+
+.playlist-search-box {
+    position: relative;
+    margin-bottom: 1.2rem;
+}
+
+.playlist-search-box input {
+    width: 100%;
+    padding: 0.7rem 1rem 0.7rem 2.4rem;
+    border-radius: 1rem;
+    border: 1.5px solid var(--border-subtle, #e8e3d8);
+    background: var(--cream, #fbf9f5);
+    color: var(--dark-text, #141f2d);
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.25s ease;
+}
+
+body.tema-oscuro .playlist-search-box input {
+    background: var(--cream-dark, #10192a);
+    color: var(--dark-text, #e2e8f0);
+    border-color: var(--border-subtle, #25354e);
+}
+
+.playlist-search-box input:focus {
+    border-color: var(--golden, #c99d3b);
+    background: #ffffff;
+}
+
+body.tema-oscuro .playlist-search-box input:focus {
+    background: #152033;
+}
+
+.playlist-search-box i {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted-text, #596579);
+    font-size: 0.9rem;
+}
+
+.devocionales-items-list {
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 0.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.devocionales-items-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.devocionales-items-list::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 4px;
+}
+
+.devocionales-items-list::-webkit-scrollbar-thumb {
+    background: var(--golden, #c99d3b);
+    border-radius: 4px;
+}
+
+.devocional-item-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border-radius: 1rem;
+    border: 1px solid transparent;
+    background: var(--cream, #fbf9f5);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    font-family: var(--font-body, 'Inter', sans-serif);
+}
+
+body.tema-oscuro .devocional-item-btn {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.devocional-item-btn:hover {
+    background: rgba(201, 157, 59, 0.08);
+    border-color: rgba(201, 157, 59, 0.3);
+    transform: translateX(3px);
+}
+
+.devocional-item-btn.active {
+    background: linear-gradient(135deg, rgba(201, 157, 59, 0.18), rgba(201, 157, 59, 0.06));
+    border-color: var(--golden, #c99d3b);
+    box-shadow: 0 4px 12px rgba(201, 157, 59, 0.15);
+}
+
+.devocional-item-left {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 0;
+}
+
+.devocional-num-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(201, 157, 59, 0.15);
+    color: var(--golden, #c99d3b);
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.devocional-item-btn.active .devocional-num-badge {
+    background: var(--golden, #c99d3b);
+    color: #ffffff;
+}
+
+.devocional-item-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--deep-blue, #0b2b4f);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+body.tema-oscuro .devocional-item-title {
+    color: var(--dark-text, #e2e8f0);
+}
+
+.devocional-item-btn.active .devocional-item-title {
+    color: var(--golden, #c99d3b);
+    font-weight: 700;
+}
+
+.devocional-item-icon {
+    color: var(--muted-text, #596579);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.devocional-item-btn.active .devocional-item-icon {
+    color: var(--golden, #c99d3b);
+}
+

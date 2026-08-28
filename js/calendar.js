@@ -481,3 +481,5 @@ window.addEventListener('datosClubActualizados', function (e) {
         CalendarManager.render(tipo);
     }
 });
+
+window.CalendarManager = CalendarManager;

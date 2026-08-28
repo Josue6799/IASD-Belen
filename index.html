@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="css/estructura.css" />
     <link rel="stylesheet" href="css/quienes-somos.css" />
     <link rel="stylesheet" href="css/clubes.css" />
+    <link rel="stylesheet" href="css/biblioteca.css" />
     <!-- CSP Safe Event Delegator -->
     <script src="js/event-delegator.js"></script>
     <script>
@@ -662,14 +663,14 @@
 
                     <!-- Tarjeta 4: Devocional Diario -->
                     <div class="recurso-card" data-recurso="devocional"
-                        data-csp-click="abrirRecursoEspiritual('devocional')">
+                        data-csp-click="abrirModalDevocional()">
                         <div class="recurso-icon-box">
                             <i class="fas fa-hands-praying"></i>
                         </div>
                         <h3 class="recurso-card-title">Devocional Diario</h3>
                         <p class="recurso-card-desc">Un versículo y reflexión para cada día</p>
                         <span class="recurso-card-action">
-                            Ver Reflexión <i class="fas fa-arrow-right"></i>
+                            Explorar <i class="fas fa-arrow-right"></i>
                         </span>
                     </div>
 
@@ -813,9 +814,9 @@
 
                         <!-- Botones de Acción -->
                         <div class="biblioteca-botones">
-                            <a href="biblioteca.html" class="btn-biblioteca btn-dorado">
+                            <button type="button" data-csp-click="showPage('biblioteca')" class="btn-biblioteca btn-dorado">
                                 <i class="fas fa-book-open"></i> Ver Catálogo Completo
-                            </a>
+                            </button>
                             <button type="button" data-csp-click="abrirModalPrestamo()" class="btn-biblioteca btn-transparente">
                                 <i class="fas fa-hand-holding-heart"></i> Solicitar Préstamo
                             </button>
@@ -2555,6 +2556,48 @@
                         style="background: linear-gradient(135deg, #d4a038 0%, #c9a53b 100%); color: var(--deep-blue, #1a3a4a); border: none; padding: 0.8rem 2.5rem; border-radius: 2rem; font-weight: 700; font-size: 1rem; cursor: pointer; font-family: 'Inter', sans-serif; box-shadow: 0 4px 15px rgba(201,157,59,0.3); transition: all 0.3s ease;">
                         Entendido
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== MODAL DE OPCIONES DE DEVOCIONAL DIARIO ==================== -->
+        <div id="modalDevocionalOpciones" class="modal-overlay" data-csp-click="cerrarModalDevocional()">
+            <div class="modal-container" data-csp-click="event.stopPropagation()">
+                <!-- Botón cerrar -->
+                <button class="modal-close" data-csp-click="cerrarModalDevocional()" aria-label="Cerrar modal">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <div class="devocional-modal-header">
+                    <span class="badge-tag"><i class="fas fa-hands-praying"></i> Matutina Diaria</span>
+                    <h2>Devocional Diario Adventista</h2>
+                    <p>Elige la forma en que deseas disfrutar la reflexión espiritual de hoy:</p>
+                </div>
+
+                <div class="devocional-opciones-grid">
+                    <!-- Opción 1: Leer Devocional -->
+                    <div class="devocional-opcion-card" data-csp-click="abrirDevocionalLecturaExterna()">
+                        <div class="opcion-icon">
+                            <i class="fas fa-book-open-reader"></i>
+                        </div>
+                        <h3>Leer Devocional</h3>
+                        <p>Accede a la lectura y versículo matutino en formato de texto enriquecido en MatutinaAdventista.com</p>
+                        <span class="opcion-btn-label">
+                            Abrir Lectura <i class="fas fa-external-link-alt"></i>
+                        </span>
+                    </div>
+
+                    <!-- Opción 2: Ver Devocional -->
+                    <div class="devocional-opcion-card" data-csp-click="abrirDevocionalVideoPage()">
+                        <div class="opcion-icon">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <h3>Ver Devocional</h3>
+                        <p>Explora la serie en video de 31 capítulos con reproductor interactivo y playlist completa de Maranata.</p>
+                        <span class="opcion-btn-label">
+                            Ver Videos <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -7097,6 +7140,218 @@ para guiarnos por la senda J.A."
         <div id="lunes-oracion" class="page"></div>
         <div id="miercoles-testimonio" class="page"></div>
 
+        <!-- ==================== PÁGINA DEVOCIONAL DIARIO (MARANATA - 31 CAPÍTULOS) ==================== -->
+        <div id="devocional" class="page">
+            <div class="devocional-page-wrapper">
+                <button type="button" class="back-link" data-csp-click="showPage('home')" style="margin-bottom: 1.5rem; background: none; border: none; font-size: 0.95rem; font-weight: 600; color: var(--golden); cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-arrow-left"></i> Volver a la Iglesia Virtual
+                </button>
+
+                <!-- HERO DEVOCIONAL -->
+                <div class="devocional-hero-card">
+                    <span class="devocional-hero-badge"><i class="fas fa-hands-praying"></i> Matutina Diaria & Reflexión</span>
+                    <h1 class="devocional-hero-title">Devocional Diario · Maranata: El Señor viene</h1>
+                    <p class="devocional-hero-subtitle">
+                        Lecturas y reflexiones inspiradas por Elena G. de White. Explora los 31 devocionales del mes y nutre tu comunión personal con Dios día a día.
+                    </p>
+                </div>
+
+                <!-- LAYOUT EN 2 COLUMNAS (REPRODUCTOR + PLAYLIST) -->
+                <div class="devocional-layout-grid">
+                    <!-- Columna Izquierda: Reproductor Principal -->
+                    <div class="devocional-player-column">
+                        <div class="devocional-video-card">
+                            <div class="devocional-iframe-container">
+                                <iframe id="devocionalVideoPlayer" src="https://www.youtube.com/embed/EFGDd5bgspM?rel=0" title="Devocional Diario Maranata" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                            </div>
+                            <div class="devocional-video-info">
+                                <span class="devocional-current-badge" id="devocionalBadgeActual">Día 1 de 31</span>
+                                <h3 id="devocionalTituloActual">#1 - La primera venida de Jesús</h3>
+                                <p><i class="fas fa-feather-alt" style="color: var(--golden); margin-right: 0.3rem;"></i> Elena G. de White · <em>Maranata: El Señor viene</em></p>
+                                
+                                <div class="devocional-player-controls">
+                                    <button type="button" class="btn-devocional-nav" id="btnDevocionalPrev" data-csp-click="cambiarDevocionalRelativo(-1)">
+                                        <i class="fas fa-chevron-left"></i> Anterior
+                                    </button>
+                                    <a href="https://m.egwwritings.org/es/book/1768.2" target="_blank" rel="noopener noreferrer" class="btn-devocional-nav" style="text-decoration: none;">
+                                        <i class="fas fa-book-open"></i> Leer Texto
+                                    </a>
+                                    <button type="button" class="btn-devocional-nav" id="btnDevocionalNext" data-csp-click="cambiarDevocionalRelativo(1)">
+                                        Siguiente <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna Derecha: Lista de los 31 Devocionales -->
+                    <div class="devocional-playlist-column">
+                        <div class="devocional-playlist-card">
+                            <div class="playlist-header-row">
+                                <h3><i class="fas fa-list-check" style="color: var(--golden);"></i> Lista de Devocionales</h3>
+                                <span class="playlist-count-pill">31 Capítulos</span>
+                            </div>
+
+                            <div class="playlist-search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="buscadorDevocional" data-csp-input="filtrarDevocionales()" placeholder="Buscar por número o título..." />
+                            </div>
+
+                            <div class="devocionales-items-list" id="devocionalesItemsContainer">
+                                <!-- Inyectado dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PÁGINA BIBLIOTECA VIRTUAL (SPA) ==================== -->
+        <div id="biblioteca" class="page">
+            <!-- Botón de regreso -->
+            <button type="button" class="back-link" data-csp-click="showPage('home')" style="margin-bottom: 1.5rem; background: none; border: none; font-size: 0.95rem; font-weight: 600; color: var(--golden); cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-arrow-left"></i> Volver a la Iglesia Virtual
+            </button>
+
+            <!-- Héroe / Encabezado -->
+            <header class="biblioteca-hero">
+                <div class="hero-badge"><i class="fas fa-book-reader"></i> Catálogo Completo</div>
+                <h1>Biblioteca Virtual IASD Belén</h1>
+                <div class="linea-dorada"></div>
+                <p>Explora nuestra colección de literatura espiritual, profética y familiar. Puedes solicitar cualquier libro disponible para préstamo presencial en la iglesia.</p>
+
+                <!-- Tarjetas de Estadísticas -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-books"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-num" id="statTotal">56</span>
+                            <span class="stat-label">Libros en Catálogo</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon disponible"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-num" id="statDisponibles">0</span>
+                            <span class="stat-label">Disponibles Ahora</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon prestado"><i class="fas fa-hand-holding-heart"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-num" id="statPrestados">0</span>
+                            <span class="stat-label">En Préstamo</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Botones de Pestañas de la Biblioteca -->
+            <div class="biblioteca-tabs">
+                <button class="tab-btn active" id="tabBtnGeneral" data-csp-click="mostrarBibliotecaGeneral()">📚 Biblioteca General</button>
+                <button class="tab-btn" id="tabBtnEGW" data-csp-click="mostrarBibliotecaEGW()">📖 Biblioteca Elena G. de White</button>
+            </div>
+
+            <!-- SECCIÓN BIBLIOTECA GENERAL -->
+            <div id="seccionBibliotecaGeneral" class="seccion-biblioteca">
+                <!-- Barra de Control: Buscador y Categorías -->
+                <section class="control-panel">
+                    <div class="buscador-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="buscadorBibliotecaPublica" data-csp-input="filtrarBibliotecaPublica()" placeholder="Buscar por título, autor, categoría o número..." />
+                        <button class="btn-clear-search" data-csp-click="limpiarBuscador()" id="btnClearSearch" style="display: none;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <!-- Filtros de Categorías por Pills -->
+                    <div class="categorias-pills" id="contenedorCategoriasPills">
+                        <button class="pill-btn active" data-cat="todas" data-csp-click="filtrarPorCategoria('todas', this)">Todas</button>
+                        <button class="pill-btn" data-cat="Espiritu de profecía" data-csp-click="filtrarPorCategoria('Espiritu de profecía', this)">Espíritu de Profecía</button>
+                        <button class="pill-btn" data-cat="Obra misionera" data-csp-click="filtrarPorCategoria('Obra misionera', this)">Obra Misionera</button>
+                        <button class="pill-btn" data-cat="Doctrinal" data-csp-click="filtrarPorCategoria('Doctrinal', this)">Doctrinal</button>
+                        <button class="pill-btn" data-cat="Juvenil" data-csp-click="filtrarPorCategoria('Juvenil', this)">Juvenil</button>
+                        <button class="pill-btn" data-cat="Salud" data-csp-click="filtrarPorCategoria('Salud', this)">Salud</button>
+                        <button class="pill-btn" data-cat="Familia" data-csp-click="filtrarPorCategoria('Familia', this)">Familia</button>
+                        <button class="pill-btn" data-cat="Otros" data-csp-click="filtrarPorCategoria('Otros', this)">Otros</button>
+                    </div>
+                </section>
+
+                <!-- Vista de Libros en Grid / Tarjetas Elegantes -->
+                <section class="libros-section">
+                    <div class="libros-grid" id="gridLibrosContainer">
+                        <!-- Tarjetas cargadas dinámicamente -->
+                    </div>
+                </section>
+
+                <!-- Formulario de Solicitud -->
+                <section class="formulario-card" id="pedir-libro">
+                    <div class="form-header">
+                        <div class="form-icon"><i class="fas fa-hand-holding-box"></i></div>
+                        <div>
+                            <h2>Solicita tu libro en préstamo</h2>
+                            <p>Completa el formulario para reservar tu ejemplar. Tienes un plazo de 14 días para disfrutar la lectura.</p>
+                        </div>
+                    </div>
+
+                    <form id="formSolicitud" data-csp-submit="enviarSolicitud(event)">
+                        <div class="formulario-grid">
+                            <div class="form-group">
+                                <label for="solicitanteNombre"><i class="fas fa-user"></i> Nombre completo *</label>
+                                <input type="text" id="solicitanteNombre" placeholder="Ej: Juan Pérez" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="solicitanteWhatsapp"><i class="fab fa-whatsapp"></i> WhatsApp (Opcional)</label>
+                                <input type="tel" id="solicitanteWhatsapp" placeholder="Ej: 300 123 4567" />
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="solicitanteEmail"><i class="fas fa-envelope"></i> Correo electrónico (Opcional)</label>
+                                <input type="email" id="solicitanteEmail" placeholder="Ej: juan@email.com" />
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="solicitanteLibro"><i class="fas fa-book-open"></i> Título del libro deseado *</label>
+                                <input type="text" id="solicitanteLibro" placeholder="Ej: El conflicto de los siglos" required />
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-enviar-solicitud">
+                                <i class="fas fa-paper-plane"></i> Confirmar Solicitud de Préstamo
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+
+            <!-- SECCIÓN BIBLIOTECA ELENA G. DE WHITE -->
+            <div id="seccionBibliotecaEGW" class="seccion-biblioteca" style="display: none;">
+                <!-- Encabezado de la sección EGW -->
+                <div class="egw-header-card">
+                    <div class="egw-badge"><i class="fas fa-book-open"></i> Obras Completas</div>
+                    <h2>📖 Biblioteca Elena G. de White</h2>
+                    <p>Accede a las obras completas de la mensajera del Señor</p>
+                </div>
+
+                <!-- Buscador EGW -->
+                <section class="egw-control-panel">
+                    <div class="buscador-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="buscadorEGW" data-csp-input="filtrarBibliotecaEGW()" placeholder="Buscar por título o autor..." />
+                        <button class="btn-clear-search" data-csp-click="limpiarBuscadorEGW()" id="btnClearSearchEGW" style="display: none;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Grid de Libros EGW -->
+                <section class="egw-libros-section">
+                    <div class="egw-grid" id="gridLibrosEGWContainer">
+                        <!-- Tarjetas cargadas dinámicamente -->
+                    </div>
+                </section>
+            </div>
+        </div>
+
         <!-- ==================== MODAL AGREGAR EVENTO ==================== -->
         <div id="modalEvento" class="modal-backdrop">
             <div class="modal-card">
@@ -7120,11 +7375,11 @@ para guiarnos por la senda J.A."
         </div>
 
         <!-- ==================== MODAL DE PRÉSTAMO DE LIBROS ==================== -->
-        <div id="modalPrestamo" class="modal-overlay">
-            <div class="modal-card">
+        <div id="modalPrestamo" class="modal-overlay" data-csp-click="cerrarModalPrestamo(event)">
+            <div class="modal-card" data-csp-click="event.stopPropagation()">
                 <div class="modal-header">
                     <h3><i class="fas fa-book" style="color:var(--golden);"></i> Solicitar libro</h3>
-                    <button data-csp-click="cerrarModalPrestamo()" class="modal-close" aria-label="Cerrar">
+                    <button type="button" data-csp-click="cerrarModalPrestamo()" class="modal-close" aria-label="Cerrar">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -7157,18 +7412,20 @@ para guiarnos por la senda J.A."
             </div>
         </div>
 
-        <!-- ==================== MODAL DE CONFIRMACIÓN ==================== -->
-        <div id="modalConfirmacion" class="modal-overlay">
-            <div class="modal-card" style="text-align: center; max-width: 450px;">
-                <div style="font-size: 4rem; margin-bottom: 0.5rem;">📖</div>
-                <h3 style="color:var(--deep-blue); font-size:1.5rem; margin-bottom:1rem;">¡Solicitud recibida!</h3>
-                <p style="color:var(--dark-text); line-height:1.7;">
-                    Hemos recibido tu petición. Recuerda que el libro estará disponible para ti, y cuentas con
-                    <strong style="color:var(--golden);">14 días calendario</strong> para devolverlo en perfectas
-                    condiciones.
+        <!-- ==================== MODAL DE CONFIRMACIÓN DE PRÉSTAMO ==================== -->
+        <div id="modalConfirmacion" class="modal-overlay" data-csp-click="cerrarModalConfirmacion(event)">
+            <div class="modal-card" style="text-align: center; max-width: 460px; position: relative;" data-csp-click="event.stopPropagation()">
+                <button type="button" data-csp-click="cerrarModalConfirmacion()" class="modal-close" aria-label="Cerrar">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div style="font-size: 3.5rem; margin-bottom: 0.5rem; line-height: 1;">📖</div>
+                <h3 style="color:var(--deep-blue); font-size:1.5rem; margin-bottom:1rem; font-weight:700;">¡Solicitud Registrada!</h3>
+                <p style="color:var(--dark-text); line-height:1.7; font-size:0.95rem; margin-bottom:1.5rem;">
+                    Hemos recibido tu petición en el sistema. Recuerda que cuentas con
+                    <strong style="color:var(--golden); font-weight:700;">14 días calendario</strong> para disfrutar tu lectura y devolverlo a la biblioteca de la iglesia.
                     ¡Cuídalo, aprovéchalo y que Dios te bendiga a través de la lectura!
                 </p>
-                <button data-csp-click="cerrarModalConfirmacion()" class="btn btn-primary" style="margin-top:1.5rem;">
+                <button type="button" data-csp-click="cerrarModalConfirmacion()" class="btn btn-primary" style="width:100%; border-radius:2.4rem; padding:0.85rem 2rem; font-weight:700;">
                     Entendido, ¡gracias!
                 </button>
             </div>
@@ -7890,6 +8147,7 @@ para guiarnos por la senda J.A."
     <script src="js/historia.js"></script>
     <script src="js/estructura.js"></script>
     <script src="js/quienes-somos.js"></script>
+    <script src="js/biblioteca.js"></script>
 
 </body>
 

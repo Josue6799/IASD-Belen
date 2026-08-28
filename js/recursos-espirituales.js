@@ -332,6 +332,14 @@
             return;
         }
 
+        // Si es el Devocional Diario, abrir modal selector con las opciones (Leer y Ver)
+        if (id === 'devocional') {
+            if (typeof window.abrirModalDevocional === 'function') {
+                window.abrirModalDevocional();
+                return;
+            }
+        }
+
         // Si es una página interna SPA (Salud o Plan Lectura)
         if (config.page) {
             if (typeof window.showPage === 'function') {
@@ -340,7 +348,7 @@
             return;
         }
 
-        // Si se abre directo en una nueva pestaña (Folleto o Devocional)
+        // Si se abre directo en una nueva pestaña (Folleto)
         if (!config.modal) {
             window.open(config.url, '_blank');
             return;

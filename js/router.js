@@ -17,6 +17,7 @@ const PAGINAS = {
     historia: { titulo: 'Historia de la IASD', nivel: 1 },
     estructura: { titulo: 'Estructura Organizacional', nivel: 1 },
     cronograma: { titulo: 'Cronograma de la Iglesia', nivel: 1 },
+    biblioteca: { titulo: 'Biblioteca Virtual', nivel: 1 },
 
     // Secciones de clubes (públicas pero con contenido restringido)
     clubes: { titulo: 'Clubes de la Iglesia', nivel: 1 },
@@ -25,7 +26,7 @@ const PAGINAS = {
     guias: { titulo: 'Guías Mayores', nivel: 2 },
 
     // Secciones para miembros (nivel 2 - Miembro)
-    calendario: { titulo: 'Calendario de Eventos', nivel: 2 },
+    calendario: { titulo: 'Calendario de Eventos', nivel: 1 },
     culto: { titulo: 'Culto Divino', nivel: 2 },
     canto: { titulo: 'Canto y Alabanza', nivel: 2 },
     'escuela-sabatica': { titulo: 'Escuela Sabática', nivel: 2 },
@@ -42,7 +43,8 @@ const PAGINAS = {
     conflicto: { titulo: 'La Gran Controversia | Teología Avanzada', nivel: 1 },
     ley: { titulo: 'La Ley de Dios | Teología Avanzada', nivel: 1 },
     trinidad: { titulo: 'La Trinidad | Teología Avanzada', nivel: 1 },
-    profecia: { titulo: 'Profecías de Daniel y Apocalipsis | Teología Avanzada', nivel: 1 }
+    profecia: { titulo: 'Profecías de Daniel y Apocalipsis | Teología Avanzada', nivel: 1 },
+    devocional: { titulo: 'Devocional Diario', nivel: 1 }
 };
 
 // Estado para controlar la página activa actualmente
@@ -79,6 +81,11 @@ function triggerPageProgressBar() {
 }
 
 function showPage(pageId) {
+    // Normalizar nombres equivalentes para la biblioteca SPA
+    if (pageId === 'biblioteca.html') {
+        pageId = 'biblioteca';
+    }
+
     // Prevenir apertura de URLs externas a través de showPage
     if (pageId && (pageId.startsWith('http://') || pageId.startsWith('https://'))) {
         window.open(pageId, '_blank');
@@ -218,6 +225,16 @@ function _afterShowPage(pageId) {
     // Inicializar o refrescar doctrinas al navegar a 'doctrinas'
     if (pageId === 'doctrinas' && typeof DoctrinasManager !== 'undefined') {
         DoctrinasManager.init();
+    }
+
+    // Inicializar o refrescar biblioteca al navegar a 'biblioteca'
+    if (pageId === 'biblioteca' && typeof window.renderBiblioteca === 'function') {
+        window.renderBiblioteca();
+    }
+
+    // Inicializar reproductor y lista de devocionales al navegar a 'devocional'
+    if (pageId === 'devocional' && typeof window.inicializarDevocional === 'function') {
+        window.inicializarDevocional();
     }
 
     // Disparar evento de cambio de página

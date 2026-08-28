@@ -440,12 +440,27 @@ document.addEventListener('click', function (event) {
     if (modalConfirmacion && event.target === modalConfirmacion) {
         cerrarModalConfirmacionContacto(event);
     }
+    const modalDevocional = document.getElementById('modalDevocionalOpciones');
+    if (modalDevocional && event.target === modalDevocional) {
+        cerrarModalDevocional();
+    }
+    const modalPrestamo = document.getElementById('modalPrestamo');
+    if (modalPrestamo && event.target === modalPrestamo) {
+        cerrarModalPrestamo();
+    }
+    const modalConf = document.getElementById('modalConfirmacion');
+    if (modalConf && event.target === modalConf) {
+        cerrarModalConfirmacion();
+    }
 });
 
 document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
         cerrarModal();
         cerrarModalConfirmacionContacto();
+        cerrarModalDevocional();
+        cerrarModalPrestamo();
+        cerrarModalConfirmacion();
     }
 });
 
@@ -1160,12 +1175,15 @@ function abrirModalPrestamo() {
     }
 }
 
-function cerrarModalPrestamo() {
+function cerrarModalPrestamo(event) {
+    if (event && event.target && event.target !== document.getElementById('modalPrestamo') && !event.target.classList.contains('modal-overlay') && !event.target.closest('.modal-close')) {
+        return;
+    }
     const modal = document.getElementById('modalPrestamo');
     if (modal) {
         modal.classList.remove('active');
-        document.body.style.overflow = '';
     }
+    document.body.style.overflow = '';
 }
 
 function abrirModalConfirmacion() {
@@ -1176,65 +1194,271 @@ function abrirModalConfirmacion() {
     }
 }
 
-function cerrarModalConfirmacion() {
+function cerrarModalConfirmacion(event) {
+    if (event && event.target && event.target !== document.getElementById('modalConfirmacion') && !event.target.classList.contains('modal-overlay') && !event.target.closest('.modal-close') && !event.target.classList.contains('btn-popup-close')) {
+        return;
+    }
     const modal = document.getElementById('modalConfirmacion');
     if (modal) {
         modal.classList.remove('active');
-        document.body.style.overflow = '';
     }
+    document.body.style.overflow = '';
 }
 
 function enviarSolicitud(event) {
-    event.preventDefault();
+    if (typeof window.enviarSolicitud === 'function' && window.enviarSolicitud !== enviarSolicitud) {
+        return window.enviarSolicitud(event);
+    }
+    if (event && event.preventDefault) event.preventDefault();
 
-    const nombreInput = document.getElementById('inputNombreSolicitante');
-    const telefonoInput = document.getElementById('inputTelefonoSolicitante');
-    const emailInput = document.getElementById('inputEmailSolicitante');
-    const libroInput = document.getElementById('inputTituloLibroPrestamo');
+    const formTarget = event && event.target && event.target.tagName === 'FORM' ? event.target : null;
+    const inputNombreSol = document.getElementById('solicitanteNombre');
+    const inputNombreModal = document.getElementById('inputNombreSolicitante');
+    const inputTelSol = document.getElementById('solicitanteWhatsapp');
+    const inputTelModal = document.getElementById('inputTelefonoSolicitante');
+    const inputEmailSol = document.getElementById('solicitanteEmail');
+    const inputEmailModal = document.getElementById('inputEmailSolicitante');
+    const inputLibroSol = document.getElementById('solicitanteLibro');
+    const inputLibroModal = document.getElementById('inputTituloLibroPrestamo');
 
-    const nombre = nombreInput ? nombreInput.value.trim() : '';
-    const telefono = telefonoInput ? telefonoInput.value.trim() : '';
-    const email = emailInput ? emailInput.value.trim() : '';
-    const libro = libroInput ? libroInput.value.trim() : '';
+    let nombre = '';
+    let tel = '';
+    let email = '';
+    let libro = '';
+
+    if (formTarget && formTarget.id === 'formPrestamo') {
+        nombre = inputNombreModal ? inputNombreModal.value.trim() : '';
+        tel = inputTelModal ? inputTelModal.value.trim() : '';
+        email = inputEmailModal ? inputEmailModal.value.trim() : '';
+        libro = inputLibroModal ? inputLibroModal.value.trim() : '';
+    } else if (formTarget && formTarget.id === 'formSolicitud') {
+        nombre = inputNombreSol ? inputNombreSol.value.trim() : '';
+        tel = inputTelSol ? inputTelSol.value.trim() : '';
+        email = inputEmailSol ? inputEmailSol.value.trim() : '';
+        libro = inputLibroSol ? inputLibroSol.value.trim() : '';
+    } else {
+        nombre = (inputNombreModal && inputNombreModal.value.trim()) || (inputNombreSol && inputNombreSol.value.trim()) || '';
+        tel = (inputTelModal && inputTelModal.value.trim()) || (inputTelSol && inputTelSol.value.trim()) || '';
+        email = (inputEmailModal && inputEmailModal.value.trim()) || (inputEmailSol && inputEmailSol.value.trim()) || '';
+        libro = (inputLibroModal && inputLibroModal.value.trim()) || (inputLibroSol && inputLibroSol.value.trim()) || '';
+    }
 
     if (!nombre || !libro) {
-        alert('⚠️ Por favor ingresa tu nombre completo y el título del libro.');
+        alert('⚠️ Por favor completa tu nombre completo y el título del libro deseado.');
         return;
     }
 
-    // Guardar el pedido en localStorage con la clave libros_pedidos
-    try {
-        const pedidos = StorageHelper.get('libros_pedidos', []);
-        pedidos.push({
-            id: Date.now(),
-            libroId: 0,
-            solicitante: nombre,
-            telefono: telefono || 'No especificado',
-            email: email || 'No especificado',
-            fecha: new Date().toISOString(),
-            estado: 'Pendiente',
-            tituloLibro: libro
-        });
-        StorageHelper.set('libros_pedidos', pedidos);
+    const nuevoPedido = {
+        id: String(Date.now()),
+        libroId: 0,
+        libro_id: '0',
+        solicitante: nombre,
+        telefono: tel || 'No especificado',
+        email: email || 'No especificado',
+        fecha: new Date().toISOString(),
+        estado: 'Pendiente',
+        tituloLibro: libro,
+        titulo_libro: libro
+    };
 
-        // Notificar cambios para sincronizar con el panel del administrador
+    try {
+        let pedidos = [];
+        if (typeof StorageHelper !== 'undefined') {
+            pedidos = StorageHelper.get('libros_pedidos', []);
+            pedidos.push(nuevoPedido);
+            StorageHelper.set('libros_pedidos', pedidos);
+        } else {
+            pedidos = JSON.parse(localStorage.getItem('libros_pedidos') || '[]');
+            pedidos.push(nuevoPedido);
+            localStorage.setItem('libros_pedidos', JSON.stringify(pedidos));
+        }
+
         window.dispatchEvent(new CustomEvent('datosBibliotecaActualizados'));
         window.dispatchEvent(new Event('datosBibliotecaActualizados'));
     } catch (e) {
         console.error('❌ Error al guardar el pedido de libro:', e);
     }
 
-    // Limpiar campos del formulario
-    if (nombreInput) nombreInput.value = '';
-    if (telefonoInput) telefonoInput.value = '';
-    if (emailInput) emailInput.value = '';
-    if (libroInput) libroInput.value = '';
+    ['solicitanteNombre', 'inputNombreSolicitante', 'solicitanteWhatsapp', 'inputTelefonoSolicitante', 'solicitanteEmail', 'inputEmailSolicitante', 'solicitanteLibro', 'inputTituloLibroPrestamo'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
 
     cerrarModalPrestamo();
 
     setTimeout(() => {
         abrirModalConfirmacion();
-    }, 300);
+    }, 150);
+}
+
+// ========================================
+// DEVOCIONAL DIARIO (MARANATA - 31 CAPÍTULOS)
+// ========================================
+
+const DEVOCIONALES_LISTA = [
+    { num: 1, titulo: "La primera venida de Jesús", videoId: "EFGDd5bgspM" },
+    { num: 2, titulo: "La lección de Belén", videoId: "XKmTsuVAAt8" },
+    { num: 3, titulo: "Cuando Jesús nació", videoId: "YatfWqp59KQ" },
+    { num: 4, titulo: "La esperanza de la segunda venida", videoId: "3PVvakjnySY" },
+    { num: 5, titulo: "El sentido de las escrituras", videoId: "nMyjRylryc8" },
+    { num: 6, titulo: "La fe de los reformadores", videoId: "aP__qnlj4I8" },
+    { num: 7, titulo: "La clave de la historia", videoId: "iRqp5Ctt0Cs" },
+    { num: 8, titulo: "Desilusiones semejantes", videoId: "AoPHq5-RBBM" },
+    { num: 9, titulo: "Hombres humildes proclaman el mensaje", videoId: "3sxJGsPyJeU" },
+    { num: 10, titulo: "La verdad triunfará", videoId: "91xOPqhmG38" },
+    { num: 11, titulo: "Apresuremos el regreso del Señor", videoId: "z-9d47EtEco" },
+    { num: 12, titulo: "Las últimas amonestaciones del tercer ángel", videoId: "_WPsfPWyjrY" },
+    { num: 13, titulo: "Reinará para siempre", videoId: "kP0XvxH3rb8" },
+    { num: 14, titulo: "La profecía de Elías", videoId: "-3dHnFS9ojI" },
+    { num: 15, titulo: "Jesús, el centro de todo", videoId: "RbomKRiba0w" },
+    { num: 16, titulo: "El campo es el mundo", videoId: "Db5FcAH9wPM" },
+    { num: 17, titulo: "Los juicios de Dios sobre la Tierra", videoId: "myqxZBP8HlI" },
+    { num: 18, titulo: "Un camino mejor y más noble", videoId: "c4jpIE1_wKU" },
+    { num: 19, titulo: "Cuando suene el fuerte clamor", videoId: "-2bPwNrCNhs" },
+    { num: 20, titulo: "Los fieles no fallarán", videoId: "XdM8rpD6isA" },
+    { num: 21, titulo: "Requiere trabajo ganar una sola alma", videoId: "4z_1rIk3vvE" },
+    { num: 22, titulo: "Estudiemos Daniel y Apocalipsis", videoId: "wHmldfH3zrY" },
+    { num: 23, titulo: "Intolerancia y persecución", videoId: "uc0fC4aj8bY" },
+    { num: 24, titulo: "La iglesia no caerá", videoId: "qejYmfV2Y14" },
+    { num: 25, titulo: "El falso reavivamiento", videoId: "mgC_NRoniu0" },
+    { num: 26, titulo: "Una demora presuntuosa y negligente", videoId: "oBekV4OyhCc" },
+    { num: 27, titulo: "Un cielo por ganar", videoId: "ci0cK-nosOM" },
+    { num: 28, titulo: "Se bendice a los que velan", videoId: "OvEP59LnDPA" },
+    { num: 29, titulo: "Dificultades por todas partes", videoId: "WOHQIx8pkIM" },
+    { num: 30, titulo: "Se intercede en favor de las almas", videoId: "6XzDXjV7_FU" },
+    { num: 31, titulo: "¿Lloraremos o nos regocijaremos?", videoId: "Of2f_7HslAo" }
+];
+
+const YOUTUBE_PLAYLIST_ID = 'PLrr_XJlhUGIQrQTtzOPbxLIcdjQfODhH5';
+let devocionalActualNum = 1;
+
+function abrirModalDevocional() {
+    const modal = document.getElementById('modalDevocionalOpciones');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = '';
+    }
+}
+
+function cerrarModalDevocional() {
+    const modal = document.getElementById('modalDevocionalOpciones');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+function abrirDevocionalLecturaExterna() {
+    cerrarModalDevocional();
+    window.open('https://matutinaadventista.com', '_blank');
+}
+
+function abrirDevocionalVideoPage() {
+    cerrarModalDevocional();
+    if (typeof window.showPage === 'function') {
+        window.showPage('devocional');
+    }
+}
+
+function seleccionarDevocional(num, autoPlay = true) {
+    const n = parseInt(num, 10);
+    if (isNaN(n) || n < 1 || n > 31) return;
+    devocionalActualNum = n;
+
+    const dev = DEVOCIONALES_LISTA.find(d => d.num === n) || DEVOCIONALES_LISTA[0];
+    const iframe = document.getElementById('devocionalVideoPlayer');
+    const tituloEl = document.getElementById('devocionalTituloActual');
+    const badgeEl = document.getElementById('devocionalBadgeActual');
+    const btnPrev = document.getElementById('btnDevocionalPrev');
+    const btnNext = document.getElementById('btnDevocionalNext');
+
+    if (iframe && dev) {
+        const videoId = dev.videoId || 'EFGDd5bgspM';
+        const autoplayParam = autoPlay ? 'autoplay=1' : 'autoplay=0';
+        iframe.src = `https://www.youtube.com/embed/${videoId}?${autoplayParam}&rel=0`;
+    }
+
+    if (tituloEl) {
+        tituloEl.textContent = `#${dev.num} - ${dev.titulo}`;
+    }
+    if (badgeEl) {
+        badgeEl.textContent = `Día ${dev.num} de 31`;
+    }
+
+    if (btnPrev) btnPrev.disabled = n <= 1;
+    if (btnNext) btnNext.disabled = n >= 31;
+
+    // Actualizar clase activa en la lista
+    document.querySelectorAll('.devocional-item-btn').forEach(btn => {
+        const itemNum = parseInt(btn.getAttribute('data-dev-num'), 10);
+        if (itemNum === n) {
+            btn.classList.add('active');
+            const icon = btn.querySelector('.devocional-item-icon');
+            if (icon) icon.className = 'fas fa-volume-high devocional-item-icon';
+            try {
+                btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } catch (e) {}
+        } else {
+            btn.classList.remove('active');
+            const icon = btn.querySelector('.devocional-item-icon');
+            if (icon) icon.className = 'fas fa-play-circle devocional-item-icon';
+        }
+    });
+}
+
+function cambiarDevocionalRelativo(delta) {
+    const nuevo = devocionalActualNum + delta;
+    if (nuevo >= 1 && nuevo <= 31) {
+        seleccionarDevocional(nuevo, true);
+    }
+}
+
+function renderizarListaDevocionales(filtro = '') {
+    const container = document.getElementById('devocionalesItemsContainer');
+    if (!container) return;
+
+    const query = (filtro || '').toLowerCase().trim();
+    let lista = DEVOCIONALES_LISTA;
+    if (query) {
+        const cleanQueryNum = query.replace(/^#/, '');
+        lista = DEVOCIONALES_LISTA.filter(d => {
+            return d.titulo.toLowerCase().includes(query) || String(d.num) === cleanQueryNum || String(d.num).includes(cleanQueryNum);
+        });
+    }
+
+    if (lista.length === 0) {
+        container.innerHTML = `
+            <div style="text-align:center; padding: 2rem 1rem; color: var(--muted-text);">
+                <i class="fas fa-search" style="font-size: 1.5rem; margin-bottom: 0.5rem; display:block;"></i>
+                No se encontraron devocionales que coincidan.
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = lista.map(d => {
+        const isActive = d.num === devocionalActualNum;
+        return `
+            <button type="button" class="devocional-item-btn ${isActive ? 'active' : ''}" data-dev-num="${d.num}" data-csp-click="seleccionarDevocional(${d.num})">
+                <div class="devocional-item-left">
+                    <span class="devocional-num-badge">${d.num}</span>
+                    <span class="devocional-item-title">${d.titulo}</span>
+                </div>
+                <i class="fas ${isActive ? 'fa-volume-high' : 'fa-play-circle'} devocional-item-icon"></i>
+            </button>
+        `;
+    }).join('');
+}
+
+function filtrarDevocionales() {
+    const input = document.getElementById('buscadorDevocional');
+    const query = input ? input.value : '';
+    renderizarListaDevocionales(query);
+}
+
+function inicializarDevocional() {
+    renderizarListaDevocionales();
+    seleccionarDevocional(devocionalActualNum, false);
 }
 
 // ========================================
@@ -1265,20 +1489,30 @@ window.cerrarModalConfirmacion = cerrarModalConfirmacion;
 window.abrirModalConfirmacionContacto = abrirModalConfirmacionContacto;
 window.cerrarModalConfirmacionContacto = cerrarModalConfirmacionContacto;
 window.enviarSolicitud = enviarSolicitud;
+window.abrirModalDevocional = abrirModalDevocional;
+window.cerrarModalDevocional = cerrarModalDevocional;
+window.abrirDevocionalLecturaExterna = abrirDevocionalLecturaExterna;
+window.abrirDevocionalVideoPage = abrirDevocionalVideoPage;
+window.seleccionarDevocional = seleccionarDevocional;
+window.cambiarDevocionalRelativo = cambiarDevocionalRelativo;
+window.renderizarListaDevocionales = renderizarListaDevocionales;
+window.filtrarDevocionales = filtrarDevocionales;
+window.inicializarDevocional = inicializarDevocional;
+window.DEVOCIONALES_LISTA = DEVOCIONALES_LISTA;
 
 /* ========================================
    SISTEMA DE DESBLOQUEO DE CALENDARIOS Y ENCUESTA
-   Contraseña requerida: eval2026
+   Contraseña requerida: cal2026
    ======================================== */
 const LLAVE_SESSION_DESBLOQUEADO = 'calendariosDesbloqueados';
-const PASSWORD_CORRECTA_CANDADO = 'eval2026';
+const PASSWORD_CORRECTA_CANDADO = 'cal2026';
 
 function estaDesbloqueadoCandado() {
     return sessionStorage.getItem(LLAVE_SESSION_DESBLOQUEADO) === 'true';
 }
 
 function obtenerSeccionesRestringidas() {
-    return document.querySelectorAll('.calendario-wrapper, .calendario-club');
+    return document.querySelectorAll('.calendario-club');
 }
 
 function aplicarEstadoBloqueoCandado() {

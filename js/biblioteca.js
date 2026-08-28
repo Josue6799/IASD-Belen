@@ -353,18 +353,28 @@
     };
 
     window.solicitarLibroDirecto = function (titulo) {
-        window.mostrarBibliotecaGeneral();
-        const inputLibro = document.getElementById('solicitanteLibro');
+        if (typeof window.showPage === 'function') {
+            const pagActiva = document.querySelector('.page.active');
+            if (!pagActiva || pagActiva.id !== 'biblioteca') {
+                window.showPage('biblioteca');
+            }
+        }
+        if (typeof window.mostrarBibliotecaGeneral === 'function') {
+            window.mostrarBibliotecaGeneral();
+        }
+        const inputLibro = document.getElementById('solicitanteLibro') || document.getElementById('inputTituloLibroPrestamo');
         if (inputLibro) {
-            inputLibro.value = titulo;
+            inputLibro.value = titulo || '';
         }
         const formSec = document.getElementById('pedir-libro');
         if (formSec) {
-            formSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => {
+                formSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
         }
-        const nombreInput = document.getElementById('solicitanteNombre');
+        const nombreInput = document.getElementById('solicitanteNombre') || document.getElementById('inputNombreSolicitante');
         if (nombreInput) {
-            setTimeout(() => nombreInput.focus(), 500);
+            setTimeout(() => nombreInput.focus(), 450);
         }
     };
 
@@ -372,30 +382,56 @@
     window.enviarSolicitud = function (event) {
         if (event && event.preventDefault) event.preventDefault();
 
-        const nombreInput = document.getElementById('solicitanteNombre');
-        const telInput = document.getElementById('solicitanteWhatsapp');
-        const emailInput = document.getElementById('solicitanteEmail');
-        const libroInput = document.getElementById('solicitanteLibro');
+        // Buscar campos del formulario de la biblioteca o del modal
+        const formTarget = event && event.target && event.target.tagName === 'FORM' ? event.target : null;
+        const inputNombreSol = document.getElementById('solicitanteNombre');
+        const inputNombreModal = document.getElementById('inputNombreSolicitante');
+        const inputTelSol = document.getElementById('solicitanteWhatsapp');
+        const inputTelModal = document.getElementById('inputTelefonoSolicitante');
+        const inputEmailSol = document.getElementById('solicitanteEmail');
+        const inputEmailModal = document.getElementById('inputEmailSolicitante');
+        const inputLibroSol = document.getElementById('solicitanteLibro');
+        const inputLibroModal = document.getElementById('inputTituloLibroPrestamo');
 
-        const nombre = nombreInput ? nombreInput.value.trim() : '';
-        const tel = telInput ? telInput.value.trim() : '';
-        const email = emailInput ? emailInput.value.trim() : '';
-        const libro = libroInput ? libroInput.value.trim() : '';
+        let nombre = '';
+        let tel = '';
+        let email = '';
+        let libro = '';
+
+        if (formTarget && formTarget.id === 'formPrestamo') {
+            nombre = inputNombreModal ? inputNombreModal.value.trim() : '';
+            tel = inputTelModal ? inputTelModal.value.trim() : '';
+            email = inputEmailModal ? inputEmailModal.value.trim() : '';
+            libro = inputLibroModal ? inputLibroModal.value.trim() : '';
+        } else if (formTarget && formTarget.id === 'formSolicitud') {
+            nombre = inputNombreSol ? inputNombreSol.value.trim() : '';
+            tel = inputTelSol ? inputTelSol.value.trim() : '';
+            email = inputEmailSol ? inputEmailSol.value.trim() : '';
+            libro = inputLibroSol ? inputLibroSol.value.trim() : '';
+        } else {
+            // Si no se identificó por formTarget, tomar los campos que tengan contenido
+            nombre = (inputNombreModal && inputNombreModal.value.trim()) || (inputNombreSol && inputNombreSol.value.trim()) || '';
+            tel = (inputTelModal && inputTelModal.value.trim()) || (inputTelSol && inputTelSol.value.trim()) || '';
+            email = (inputEmailModal && inputEmailModal.value.trim()) || (inputEmailSol && inputEmailSol.value.trim()) || '';
+            libro = (inputLibroModal && inputLibroModal.value.trim()) || (inputLibroSol && inputLibroSol.value.trim()) || '';
+        }
 
         if (!nombre || !libro) {
-            alert('⚠️ Por favor completa tu nombre y el título del libro.');
+            alert('⚠️ Por favor completa tu nombre completo y el título del libro deseado.');
             return;
         }
 
         const nuevoPedido = {
-            id: Date.now(),
+            id: String(Date.now()),
             libroId: 0,
+            libro_id: '0',
             solicitante: nombre,
             telefono: tel || 'No especificado',
             email: email || 'No especificado',
             fecha: new Date().toISOString(),
             estado: 'Pendiente',
-            tituloLibro: libro
+            tituloLibro: libro,
+            titulo_libro: libro
         };
 
         try {
@@ -413,6 +449,23 @@
             // Sincronizar con Supabase si está disponible
             if (window.SupabaseSync && typeof window.SupabaseSync.upsert === 'function') {
                 window.SupabaseSync.upsert(STORAGE_PEDIDOS, 'pedidos_libros', nuevoPedido);
+            } else if (window.supabaseClient) {
+                const transformer = (window.TABLE_TRANSFORMERS && window.TABLE_TRANSFORMERS.pedidos_libros) ? window.TABLE_TRANSFORMERS.pedidos_libros.toDb : null;
+                const dbRow = transformer ? transformer(nuevoPedido) : {
+                    id: nuevoPedido.id,
+                    libro_id: '0',
+                    solicitante: nuevoPedido.solicitante,
+                    telefono: nuevoPedido.telefono,
+                    email: nuevoPedido.email,
+                    fecha: nuevoPedido.fecha,
+                    estado: nuevoPedido.estado,
+                    titulo_libro: nuevoPedido.tituloLibro
+                };
+                window.supabaseClient.from('pedidos_libros').insert([dbRow]).then(res => {
+                    console.log('📦 Pedido sincronizado con Supabase:', res);
+                }).catch(err => {
+                    console.warn('⚠️ Error al enviar a Supabase:', err);
+                });
             }
 
             window.dispatchEvent(new CustomEvent('datosBibliotecaActualizados'));
@@ -421,26 +474,68 @@
             console.error('Error guardando solicitud de libro:', e);
         }
 
-        // Limpiar formulario
-        if (nombreInput) nombreInput.value = '';
-        if (telInput) telInput.value = '';
-        if (emailInput) emailInput.value = '';
-        if (libroInput) libroInput.value = '';
+        // Limpiar campos de ambos formularios
+        ['solicitanteNombre', 'inputNombreSolicitante', 'solicitanteWhatsapp', 'inputTelefonoSolicitante', 'solicitanteEmail', 'inputEmailSolicitante', 'solicitanteLibro', 'inputTituloLibroPrestamo'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+
+        if (typeof window.cerrarModalPrestamo === 'function') {
+            window.cerrarModalPrestamo();
+        }
 
         // Abrir popup de confirmación
-        window.abrirModalConfirmacion();
+        if (typeof window.abrirModalConfirmacion === 'function') {
+            window.abrirModalConfirmacion();
+        }
+    };
+
+    window.abrirModalPrestamo = function () {
+        const modal = document.getElementById('modalPrestamo');
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            const inputs = modal.querySelectorAll('input');
+            inputs.forEach(input => input.value = '');
+            setTimeout(() => {
+                const primerInput = modal.querySelector('input');
+                if (primerInput) primerInput.focus();
+            }, 300);
+        }
+    };
+
+    window.cerrarModalPrestamo = function (event) {
+        if (event && event.target && event.target !== document.getElementById('modalPrestamo') && !event.target.classList.contains('modal-overlay') && !event.target.closest('.modal-close')) {
+            return;
+        }
+        const modal = document.getElementById('modalPrestamo');
+        if (modal) {
+            modal.classList.remove('active');
+        }
+        document.body.style.overflow = '';
     };
 
     window.abrirModalConfirmacion = function () {
         const modal = document.getElementById('modalConfirmacion');
-        if (modal) modal.classList.add('active');
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
     };
 
     window.cerrarModalConfirmacion = function (event) {
-        if (event && event.target && event.target !== document.getElementById('modalConfirmacion')) return;
+        if (event && event.target && event.target !== document.getElementById('modalConfirmacion') && !event.target.classList.contains('modal-overlay') && !event.target.closest('.modal-close') && !event.target.classList.contains('btn-popup-close')) {
+            return;
+        }
         const modal = document.getElementById('modalConfirmacion');
-        if (modal) modal.classList.remove('active');
+        if (modal) {
+            modal.classList.remove('active');
+        }
+        document.body.style.overflow = '';
     };
+
+    // Exportar función para enrutador SPA y eventos
+    window.renderBiblioteca = renderBiblioteca;
 
     // Inicializar al cargar el DOM
     document.addEventListener('DOMContentLoaded', function () {

@@ -1322,8 +1322,15 @@
     border-radius: 1rem;
     font-family: 'Inter', sans-serif;
     font-size: 0.95rem;
+    color: var(--dark-text, #141f2d);
+    -webkit-text-fill-color: var(--dark-text, #141f2d);
     transition: all 0.3s ease;
     background: #faf8f5;
+}
+
+.form-group input::placeholder {
+    color: var(--muted-text, #718096);
+    opacity: 0.75;
 }
 
 .form-group input:focus {
@@ -1331,6 +1338,7 @@
     outline: none;
     box-shadow: 0 0 0 4px rgba(201, 157, 59, 0.15);
     background: white;
+    color: var(--dark-text, #141f2d);
 }
 
 .btn-enviar {
@@ -6939,6 +6947,153 @@ body.tema-oscuro .fab-item-tema .fab-icon-wrap {
     #visitantes div[style*="grid-template-columns: 1fr 1fr;"] {
         grid-template-columns: 1fr 1fr !important;
         gap: 1.2rem !important;
+    }
+}
+
+/* ========================================================
+   MODAL DE DEVOCIONAL DIARIO (OPCIONES LEER Y VER)
+   ======================================================== */
+#modalDevocionalOpciones .modal-container {
+    max-width: 680px;
+    padding: 2.2rem;
+    border-radius: 2rem;
+    border: 1px solid var(--golden-border, rgba(201, 157, 59, 0.3));
+    background: var(--cream-card, #ffffff);
+    box-shadow: var(--shadow-lg, 0 20px 60px rgba(0, 0, 0, 0.3));
+}
+
+body.tema-oscuro #modalDevocionalOpciones .modal-container {
+    background: var(--cream-card, #152033);
+}
+
+.devocional-modal-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.devocional-modal-header .badge-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(201, 157, 59, 0.12);
+    color: var(--golden, #c99d3b);
+    padding: 0.35rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    text-transform: uppercase;
+}
+
+.devocional-modal-header h2 {
+    color: var(--deep-blue, #0b2b4f);
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+body.tema-oscuro .devocional-modal-header h2 {
+    color: var(--dark-text, #e2e8f0);
+}
+
+.devocional-modal-header p {
+    color: var(--muted-text, #596579);
+    font-size: 0.95rem;
+}
+
+.devocional-opciones-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.devocional-opcion-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(248, 246, 240, 0.95));
+    border: 2px solid var(--border-subtle, #e8e3d8);
+    border-radius: 1.5rem;
+    padding: 2rem 1.4rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+body.tema-oscuro .devocional-opcion-card {
+    background: linear-gradient(145deg, rgba(21, 32, 51, 0.95), rgba(16, 25, 42, 0.98));
+    border-color: var(--border-subtle, #25354e);
+}
+
+.devocional-opcion-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--golden, #c99d3b);
+    box-shadow: 0 12px 30px rgba(201, 157, 59, 0.25);
+}
+
+.devocional-opcion-card .opcion-icon {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: rgba(201, 157, 59, 0.12);
+    color: var(--golden, #c99d3b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.devocional-opcion-card:hover .opcion-icon {
+    background: var(--golden, #c99d3b);
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.devocional-opcion-card h3 {
+    font-size: 1.25rem;
+    color: var(--deep-blue, #0b2b4f);
+    margin-bottom: 0.4rem;
+}
+
+body.tema-oscuro .devocional-opcion-card h3 {
+    color: var(--dark-text, #e2e8f0);
+}
+
+.devocional-opcion-card p {
+    font-size: 0.88rem;
+    color: var(--muted-text, #596579);
+    line-height: 1.5;
+    margin-bottom: 1.2rem;
+}
+
+.devocional-opcion-card .opcion-btn-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--golden, #c99d3b);
+    transition: gap 0.2s ease;
+}
+
+.devocional-opcion-card:hover .opcion-btn-label {
+    gap: 0.7rem;
+    color: var(--deep-blue, #0b2b4f);
+}
+
+body.tema-oscuro .devocional-opcion-card:hover .opcion-btn-label {
+    color: var(--golden-light, #eed080);
+}
+
+@media (max-width: 600px) {
+    .devocional-opciones-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
 }
 
