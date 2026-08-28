@@ -87,6 +87,39 @@ function initTransmisionesRealtime() {
         return 'https://res.cloudinary.com/onjg5kf6/image/upload/v1787333423/Logo_adventista_jum3od.png';
     }
 
+    // Formateador visual de fechas para transmisiones (ej: "27 de agosto de 2026")
+    function formatearFechaTransmision(fechaStr) {
+        if (!fechaStr) return '';
+        try {
+            const str = String(fechaStr).trim();
+            const dateMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (dateMatch) {
+                const anio = parseInt(dateMatch[1], 10);
+                const mesIdx = parseInt(dateMatch[2], 10) - 1;
+                const dia = parseInt(dateMatch[3], 10);
+                const meses = [
+                    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+                    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+                ];
+                if (mesIdx >= 0 && mesIdx < 12) {
+                    return `${dia} de ${meses[mesIdx]} de ${anio}`;
+                }
+            }
+            const d = new Date(fechaStr);
+            if (!isNaN(d.getTime())) {
+                return d.toLocaleDateString('es-ES', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+        } catch (e) {
+            console.warn('[Transmisiones] Error al formatear fecha:', e);
+        }
+        return String(fechaStr);
+    }
+
+
     // Normalización de objeto leyendo únicamente columnas reales de Supabase:
     // id, titulo, url_video, fecha, activa, url, activo, tipo
     function normalizarTransmision(t) {
@@ -251,7 +284,7 @@ function initTransmisionesRealtime() {
 
         titulo.innerHTML = `<i class="fas fa-broadcast-tower" style="color:#c9a53b;"></i> Transmisiones En Vivo`;
 
-        const transmisiones = obtenerTransmisiones().filter(t => t.activo === true || t.activa === true);
+        const transmisiones = obtenerTransmisiones();
 
         let html = `<div class="envivo-grid-categorias">`;
 
@@ -293,7 +326,7 @@ function initTransmisionesRealtime() {
         </div>
         `;
 
-        const transmisiones = obtenerTransmisiones().filter(t => t.categoria === categoriaNombre && (t.activo === true || t.activa === true));
+        const transmisiones = obtenerTransmisiones().filter(t => t.categoria === categoriaNombre);
 
         if (transmisiones.length === 0) {
             body.innerHTML = `
@@ -311,7 +344,7 @@ function initTransmisionesRealtime() {
 
         transmisiones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-        const videoDestacado = transmisiones.find(t => String(t.id) === String(videoActivoEnVivoId)) || transmisiones[0];
+        const videoDestacado = transmisiones.find(t => String(t.id) === String(videoActivoEnVivoId)) || transmisiones.find(t => t.activo === true || t.activa === true) || transmisiones[0];
         videoActivoEnVivoId = String(videoDestacado.id);
 
         const plat = (videoDestacado.tipo || videoDestacado.plataforma || 'youtube').toLowerCase();
@@ -341,7 +374,7 @@ function initTransmisionesRealtime() {
                 </div>
             </div>
             <p style="margin:0 0 1rem; color:#5a6474; font-size:0.88rem;">
-                <i class="far fa-calendar-alt"></i> ${videoDestacado.fecha || ''} ${videoDestacado.descripcion ? '· ' + videoDestacado.descripcion : ''}
+                <i class="far fa-calendar-alt"></i> ${formatearFechaTransmision(videoDestacado.fecha)} ${videoDestacado.descripcion ? '· ' + videoDestacado.descripcion : ''}
             </p>
 
             <div class="envivo-player-container">
@@ -378,7 +411,7 @@ function initTransmisionesRealtime() {
                     <div class="envivo-video-info">
                         <div>
                             <div class="envivo-video-title">${t.titulo}</div>
-                            <div class="envivo-video-fecha"><i class="far fa-calendar-alt"></i> ${t.fecha || ''}</div>
+                            <div class="envivo-video-fecha"><i class="far fa-calendar-alt"></i> ${formatearFechaTransmision(t.fecha)}</div>
                         </div>
                         <button data-csp-click="conmutarVideo('${t.id}', '${categoriaNombre}')" class="btn-ver-video">
                             <i class="fas fa-play"></i> Ver Transmisión
@@ -465,7 +498,7 @@ function initTransmisionesRealtime() {
 
                 <div>
                     <label style="display:block; font-weight:600; font-size:0.85rem; color:#1a3a4a; margin-bottom:0.3rem;">Fecha de transmisión *</label>
-                    <input type="date" id="transFecha" value="${transEdit ? (transEdit.fecha || fechaHoy) : fechaHoy}" required style="width:100%; padding:0.65rem; border-radius:0.6rem; border:1px solid #cbd5e1; font-family:Inter,sans-serif;">
+                    <input type="date" id="transFecha" value="${transEdit ? (String(transEdit.fecha || '').split('T')[0].split(' ')[0] || fechaHoy) : fechaHoy}" required style="width:100%; padding:0.65rem; border-radius:0.6rem; border:1px solid #cbd5e1; font-family:Inter,sans-serif;">
                 </div>
 
                 <div>
@@ -566,7 +599,7 @@ function initTransmisionesRealtime() {
             <tr style="border-bottom:1px solid #e2e8f0;">
                 <td style="padding:0.65rem 0.8rem; font-weight:600; color:#1a3a4a; font-size:0.85rem;">${t.categoria || 'General'}</td>
                 <td style="padding:0.65rem 0.8rem; font-weight:700; color:#2c5f7c; font-size:0.88rem;">${t.titulo || 'Sin título'}</td>
-                <td style="padding:0.65rem 0.8rem; font-size:0.85rem; color:#475569;">${t.fecha || '-'}</td>
+                <td style="padding:0.65rem 0.8rem; font-size:0.85rem; color:#475569;">${formatearFechaTransmision(t.fecha) || '-'}</td>
                 <td style="padding:0.65rem 0.8rem;">
                     <span class="envivo-plat-badge envivo-plat-${plat}" style="position:static; font-size:0.65rem;">
                         <i class="fab fa-${plat}"></i> ${plat}
@@ -805,6 +838,8 @@ function initTransmisionesRealtime() {
     window.sincronizarTransmisionesConSupabase = sincronizarTransmisionesConSupabase;
     window.obtenerYouTubeId = obtenerYouTubeId;
     window.obtenerFacebookEmbedUrl = obtenerFacebookEmbedUrl;
+    window.formatearFechaTransmision = formatearFechaTransmision;
+    window.formatearFecha = formatearFechaTransmision;
     window.abrirModalGestionarTransmisiones = abrirModalGestionarTransmisiones;
     window.cerrarModalGestionarTransmisiones = cerrarModalGestionarTransmisiones;
     window.renderizarAdminTransmisiones = renderizarAdminTransmisiones;

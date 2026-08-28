@@ -7090,11 +7090,107 @@ body.tema-oscuro .devocional-opcion-card:hover .opcion-btn-label {
     color: var(--golden-light, #eed080);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+    #modalDevocionalOpciones .modal-container {
+        width: 92%;
+        max-width: 540px;
+        padding: 1.8rem 1.4rem;
+        margin: auto;
+        max-height: 90vh;
+        overflow-y: auto;
+        border-radius: 1.6rem;
+    }
+
+    .devocional-modal-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .devocional-modal-header h2 {
+        font-size: 1.45rem;
+    }
+
+    .devocional-modal-header p {
+        font-size: 0.9rem;
+    }
+
     .devocional-opciones-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
+
+    .devocional-opcion-card {
+        padding: 1.6rem 1.2rem;
+        border-radius: 1.3rem;
+    }
+
+    .devocional-opcion-card .opcion-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 1.5rem;
+        margin-bottom: 0.9rem;
+    }
+
+    .devocional-opcion-card h3 {
+        font-size: 1.15rem;
+    }
+
+    .devocional-opcion-card p {
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+    }
 }
+
+@media (max-width: 480px) {
+    #modalDevocionalOpciones .modal-container {
+        width: 95%;
+        padding: 1.4rem 1rem;
+        border-radius: 1.3rem;
+        max-height: 92vh;
+    }
+
+    .devocional-modal-header {
+        margin-bottom: 1.2rem;
+    }
+
+    .devocional-modal-header .badge-tag {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.8rem;
+    }
+
+    .devocional-modal-header h2 {
+        font-size: 1.25rem;
+        line-height: 1.3;
+    }
+
+    .devocional-modal-header p {
+        font-size: 0.82rem;
+    }
+
+    .devocional-opcion-card {
+        padding: 1.3rem 0.9rem;
+        border-radius: 1.1rem;
+    }
+
+    .devocional-opcion-card .opcion-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.3rem;
+        margin-bottom: 0.7rem;
+    }
+
+    .devocional-opcion-card h3 {
+        font-size: 1.05rem;
+    }
+
+    .devocional-opcion-card p {
+        font-size: 0.8rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .devocional-opcion-card .opcion-btn-label {
+        font-size: 0.82rem;
+    }
+}
+
 
 
