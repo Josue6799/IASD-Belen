@@ -16,12 +16,12 @@ const CreenciasManager = {
     // Metadatos de categorías para sincronización y visualización
     categorias: {
         todas: { nombre: 'Todas las Creencias', count: 28, range: '1-28', color: 'var(--golden)', icon: 'fa-th-large' },
-        dios: { nombre: 'Dios', count: 6, range: '1-6', color: '#1976d2', icon: 'fa-sun' },
-        hombre: { nombre: 'El Hombre', count: 1, range: '7', color: '#2e7d32', icon: 'fa-user' },
-        salvacion: { nombre: 'La Salvación', count: 4, range: '8-11', color: '#c99d3b', icon: 'fa-heart' },
-        iglesia: { nombre: 'La Iglesia', count: 7, range: '12-18', color: '#7b1fa2', icon: 'fa-church' },
-        vida: { nombre: 'La Vida Cristiana', count: 5, range: '19-23', color: '#0284c7', icon: 'fa-seedling' },
-        final: { nombre: 'Acontecimientos Finales', count: 5, range: '24-28', color: '#c62828', icon: 'fa-hourglass-end' }
+        dios: { nombre: 'Dios', count: 5, range: '1-5', color: '#1565c0', icon: 'fa-sun' },
+        hombre: { nombre: 'El Hombre', count: 2, range: '6-7', color: '#2e7d32', icon: 'fa-user' },
+        salvacion: { nombre: 'La Salvación', count: 3, range: '8-10', color: '#c99d3b', icon: 'fa-heart' },
+        iglesia: { nombre: 'La Iglesia', count: 8, range: '11-18', color: '#7b1fa2', icon: 'fa-church' },
+        vida: { nombre: 'La Vida Cristiana', count: 4, range: '19-22', color: '#0284c7', icon: 'fa-seedling' },
+        final: { nombre: 'Acontecimientos Finales', count: 6, range: '23-28', color: '#c62828', icon: 'fa-hourglass-end' }
     },
 
     init() {
@@ -694,12 +694,12 @@ const CreenciasManager = {
         { id: 3, label: 'Dios el Padre', weight: 1.1, cat: 'dios' },
         { id: 4, label: 'Jesucristo (Hijo)', weight: 1.45, cat: 'dios' },
         { id: 5, label: 'Espíritu Santo', weight: 1.25, cat: 'dios' },
-        { id: 6, label: 'La Creación', weight: 1.3, cat: 'dios' },
+        { id: 6, label: 'La Creación', weight: 1.3, cat: 'hombre' },
         { id: 7, label: 'Naturaleza del Hombre', weight: 1.05, cat: 'hombre' },
         { id: 8, label: 'El Gran Conflicto', weight: 1.4, cat: 'salvacion' },
         { id: 9, label: 'Vida y Muerte de Cristo', weight: 1.35, cat: 'salvacion' },
         { id: 10, label: 'Experiencia de Salvación', weight: 1.2, cat: 'salvacion' },
-        { id: 11, label: 'Crecimiento en Cristo', weight: 1.1, cat: 'salvacion' },
+        { id: 11, label: 'Crecimiento en Cristo', weight: 1.1, cat: 'iglesia' },
         { id: 12, label: 'La Iglesia de Dios', weight: 1.25, cat: 'iglesia' },
         { id: 13, label: 'Remanente y Misión', weight: 1.35, cat: 'iglesia' },
         { id: 14, label: 'Unidad del Cuerpo', weight: 1.05, cat: 'iglesia' },
@@ -711,7 +711,7 @@ const CreenciasManager = {
         { id: 20, label: 'El Sábado', weight: 1.5, cat: 'vida' },
         { id: 21, label: 'Mayordomía Cristiana', weight: 1.1, cat: 'vida' },
         { id: 22, label: 'Conducta Cristiana', weight: 1.15, cat: 'vida' },
-        { id: 23, label: 'Matrimonio y Hogar', weight: 1.15, cat: 'vida' },
+        { id: 23, label: 'Matrimonio y Hogar', weight: 1.15, cat: 'final' },
         { id: 24, label: 'Santuario Celestial', weight: 1.4, cat: 'final' },
         { id: 25, label: 'Segunda Venida de Cristo', weight: 1.5, cat: 'final' },
         { id: 26, label: 'Muerte y Resurrección', weight: 1.25, cat: 'final' },

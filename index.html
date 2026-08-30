@@ -2772,22 +2772,22 @@
                     <i class="fas fa-th-large"></i> Todas (28)
                 </button>
                 <button class="creencias-mobile-chip cat-dios" data-cat="dios" data-csp-click="CreenciasManager.setCategory('dios')">
-                    <i class="fas fa-sun"></i> Dios (1-6)
+                    <i class="fas fa-sun"></i> Dios (1-5)
                 </button>
                 <button class="creencias-mobile-chip cat-hombre" data-cat="hombre" data-csp-click="CreenciasManager.setCategory('hombre')">
-                    <i class="fas fa-user"></i> El Hombre (7)
+                    <i class="fas fa-user"></i> El Hombre (6-7)
                 </button>
                 <button class="creencias-mobile-chip cat-salvacion" data-cat="salvacion" data-csp-click="CreenciasManager.setCategory('salvacion')">
-                    <i class="fas fa-heart"></i> La Salvación (8-11)
+                    <i class="fas fa-heart"></i> La Salvación (8-10)
                 </button>
                 <button class="creencias-mobile-chip cat-iglesia" data-cat="iglesia" data-csp-click="CreenciasManager.setCategory('iglesia')">
-                    <i class="fas fa-church"></i> La Iglesia (12-18)
+                    <i class="fas fa-church"></i> La Iglesia (11-18)
                 </button>
                 <button class="creencias-mobile-chip cat-vida" data-cat="vida" data-csp-click="CreenciasManager.setCategory('vida')">
-                    <i class="fas fa-seedling"></i> Vida Cristiana (19-23)
+                    <i class="fas fa-seedling"></i> Vida Cristiana (19-22)
                 </button>
                 <button class="creencias-mobile-chip cat-final" data-cat="final" data-csp-click="CreenciasManager.setCategory('final')">
-                    <i class="fas fa-hourglass-end"></i> Eventos Finales (24-28)
+                    <i class="fas fa-hourglass-end"></i> Eventos Finales (23-28)
                 </button>
             </nav>
 
@@ -2800,11 +2800,10 @@
                     aria-label="Buscar creencias adventistas"
                     aria-autocomplete="list"
                     aria-controls="searchCreenciasAutocomplete">
-                <button type="button" id="clearSearchCreenciasBtn" class="clear-search-creencias" aria-label="Limpiar búsqueda" style="display: none;" data-csp-click="CreenciasManager.clearSearch()">
+                <button type="button" id="clearSearchCreenciasBtn" class="search-clear-btn" data-csp-click="CreenciasManager.clearSearch()" style="display: none;" title="Limpiar búsqueda" aria-label="Limpiar búsqueda">
                     <i class="fas fa-times"></i>
                 </button>
-                <!-- Desplegable de Autocompletado -->
-                <div class="search-autocomplete-dropdown" id="searchCreenciasAutocomplete" role="listbox" style="display: none;"></div>
+                <div class="search-autocomplete-box" id="searchCreenciasAutocomplete" style="display: none;" role="listbox"></div>
             </div>
 
             <!-- ☁️ MAPA CONCEPTUAL Y NUBE DE PALABRAS DOCTRINALES -->
@@ -2824,96 +2823,8 @@
                 </div>
             </div>
 
-            <!-- CONTENEDOR PRINCIPAL: BARRA LATERAL STICKY + ÁREA DE CONTENIDO -->
+            <!-- CONTENEDOR PRINCIPAL DE LAS 28 CREENCIAS (CENTRADO) -->
             <div class="creencias-layout-wrapper">
-
-                <!-- 1. BARRA LATERAL STICKY (DESKTOP) -->
-                <aside class="creencias-sidebar-sticky" id="creenciasSidebar" aria-label="Navegación de doctrinas">
-                    <div class="creencias-sidebar-header">
-                        <div class="sidebar-header-icon"><i class="fas fa-compass"></i></div>
-                        <div>
-                            <h4 class="sidebar-title">Explorador Doctrinal</h4>
-                            <span class="sidebar-subtitle">6 Pilares Temáticos</span>
-                        </div>
-                    </div>
-
-                    <div class="creencias-sidebar-nav">
-                        <button type="button" class="sidebar-nav-item active" data-cat="todas" data-csp-click="CreenciasManager.setCategory('todas')">
-                            <span class="sidebar-item-left">
-                                <i class="fas fa-th-large item-icon"></i>
-                                <span class="item-name">Todas las Creencias</span>
-                            </span>
-                            <span class="sidebar-badge">28</span>
-                        </button>
-
-                        <button type="button" class="sidebar-nav-item cat-dios" data-cat="dios" data-csp-click="CreenciasManager.setCategory('dios')">
-                            <span class="sidebar-item-left">
-                                <i class="fas fa-sun item-icon"></i>
-                                <span class="item-name">1. Dios</span>
-                            </span>
-                            <span class="sidebar-range">1-6</span>
-                        </button>
-
-                        <button type="button" class="sidebar-nav-item cat-hombre" data-cat="hombre" data-csp-click="CreenciasManager.setCategory('hombre')">
-                            <span class="sidebar-item-left">
-                                <i class="fas fa-user item-icon"></i>
-                                <span class="item-name">2. El Hombre</span>
-                            </span>
-                            <span class="sidebar-range">7</span>
-                        </button>
-
-                        <button type="button" class="sidebar-nav-item cat-salvacion" data-cat="salvacion" data-csp-click="CreenciasManager.setCategory('salvacion')">
-                            <span class="sidebar-item-left">
-                                <i class="fas fa-heart item-icon"></i>
-                                <span class="item-name">3. La Salvación</span>
-                            </span>
-                            <span class="sidebar-range">8-11</span>
-                        </button>
-
-                        <button type="button" class="sidebar-nav-item cat-iglesia" data-cat="iglesia" data-csp-click="CreenciasManager.setCategory('iglesia')">
-                            <span class="sidebar-item-left">
-                                <i class="fas fa-church item-icon"></i>
-                                <span class="item-name">4. La Iglesia</span>
-                            </span>
-                            <span class="sidebar-range">12-18</span>
-                        </button>
-
-                        <button type="button" class="sidebar-nav-item cat-vida" data-cat="vida" data-csp-click="CreenciasManager.setCategory('vida')">
-                            <span class="sidebar-item-left">
-                                <i class="fas fa-seedling item-icon"></i>
-                                <span class="item-name">5. La Vida Cristiana</span>
-                            </span>
-                            <span class="sidebar-range">19-23</span>
-                        </button>
-
-                        <button type="button" class="sidebar-nav-item cat-final" data-cat="final" data-csp-click="CreenciasManager.setCategory('final')">
-                            <span class="sidebar-item-left">
-                                <i class="fas fa-hourglass-end item-icon"></i>
-                                <span class="item-name">6. Acontecimientos Finales</span>
-                            </span>
-                            <span class="sidebar-range">24-28</span>
-                        </button>
-                    </div>
-
-                    <!-- Mini Widget de Navegación Secuencial en Sidebar -->
-                    <div class="sidebar-story-widget">
-                        <div class="sidebar-story-header">
-                            <i class="fas fa-book-reader"></i>
-                            <span>Navegación Guiada</span>
-                        </div>
-                        <div class="sidebar-story-counter" id="sidebarStoryCounter">Creencia 1 de 28</div>
-                        <div class="sidebar-story-btns">
-                            <button type="button" class="sidebar-btn-story" data-csp-click="CreenciasManager.anteriorCreencia()" title="Creencia Anterior">
-                                <i class="fas fa-chevron-left"></i> Ant.
-                            </button>
-                            <button type="button" class="sidebar-btn-story" data-csp-click="CreenciasManager.siguienteCreencia()" title="Siguiente Creencia">
-                                Sig. <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                </aside>
-
-                <!-- 2. ÁREA DE CONTENIDO PRINCIPAL -->
                 <div class="creencias-main-content">
 
                     <!-- Pestañas (Tabs) de Categoría Superiores -->
@@ -2923,22 +2834,22 @@
                                 <i class="fas fa-th-large"></i> Todas (28)
                             </button>
                             <button type="button" class="creencia-tab-btn cat-dios" data-cat="dios" data-csp-click="CreenciasManager.setCategory('dios')">
-                                <i class="fas fa-sun"></i> Dios (6)
+                                <i class="fas fa-sun"></i> Dios (5)
                             </button>
                             <button type="button" class="creencia-tab-btn cat-hombre" data-cat="hombre" data-csp-click="CreenciasManager.setCategory('hombre')">
-                                <i class="fas fa-user"></i> El Hombre (1)
+                                <i class="fas fa-user"></i> El Hombre (2)
                             </button>
                             <button type="button" class="creencia-tab-btn cat-salvacion" data-cat="salvacion" data-csp-click="CreenciasManager.setCategory('salvacion')">
-                                <i class="fas fa-heart"></i> La Salvación (4)
+                                <i class="fas fa-heart"></i> La Salvación (3)
                             </button>
                             <button type="button" class="creencia-tab-btn cat-iglesia" data-cat="iglesia" data-csp-click="CreenciasManager.setCategory('iglesia')">
-                                <i class="fas fa-church"></i> La Iglesia (7)
+                                <i class="fas fa-church"></i> La Iglesia (8)
                             </button>
                             <button type="button" class="creencia-tab-btn cat-vida" data-cat="vida" data-csp-click="CreenciasManager.setCategory('vida')">
-                                <i class="fas fa-seedling"></i> La Vida Cristiana (5)
+                                <i class="fas fa-seedling"></i> La Vida Cristiana (4)
                             </button>
                             <button type="button" class="creencia-tab-btn cat-final" data-cat="final" data-csp-click="CreenciasManager.setCategory('final')">
-                                <i class="fas fa-hourglass-end"></i> Acontecimientos Finales (5)
+                                <i class="fas fa-hourglass-end"></i> Acontecimientos Finales (6)
                             </button>
                         </div>
                     </div>
@@ -3204,13 +3115,13 @@
                 </div>
 
                 <!-- 6 -->
-                <div class="creencia-item-card creencia-categoria-dios" data-categoria="dios" data-id="6" id="creencia-card-6" data-csp-click="flipCarta(6)">
+                <div class="creencia-item-card creencia-categoria-hombre" data-categoria="hombre" data-id="6" id="creencia-card-6" data-csp-click="flipCarta(6)">
                     <div class="card-inner">
                         <!-- CARA FRONTAL -->
                         <div class="card-front">
                             <div class="creencia-card-top">
                                 <span class="creencia-num-badge">Creencia 6</span>
-                                <span class="creencia-category-tag"><i class="fas fa-sun"></i> Dios</span>
+                                <span class="creencia-category-tag"><i class="fas fa-user"></i> El Hombre</span>
                             </div>
                             <div class="card-front-content">
                                 <div class="creencia-front-icon">
@@ -3225,7 +3136,7 @@
                         <!-- CARA TRASERA -->
                         <div class="card-back">
                             <div class="card-back-header">
-                                <span class="creencia-num-badge">Creencia 6 · Dios</span>
+                                <span class="creencia-num-badge">Creencia 6 · El Hombre</span>
                                 <button type="button" class="btn-flip-close" data-csp-click="event.stopPropagation(); flipCarta(6)" title="Girar al frente" aria-label="Girar al frente">
                                     <i class="fas fa-rotate-left"></i>
                                 </button>
@@ -3439,13 +3350,13 @@
                 </div>
 
                 <!-- 11 -->
-                <div class="creencia-item-card creencia-categoria-salvacion" data-categoria="salvacion" data-id="11" id="creencia-card-11" data-csp-click="flipCarta(11)">
+                <div class="creencia-item-card creencia-categoria-iglesia" data-categoria="iglesia" data-id="11" id="creencia-card-11" data-csp-click="flipCarta(11)">
                     <div class="card-inner">
                         <!-- CARA FRONTAL -->
                         <div class="card-front">
                             <div class="creencia-card-top">
                                 <span class="creencia-num-badge">Creencia 11</span>
-                                <span class="creencia-category-tag"><i class="fas fa-cross"></i> La Salvación</span>
+                                <span class="creencia-category-tag"><i class="fas fa-church"></i> La Iglesia</span>
                             </div>
                             <div class="card-front-content">
                                 <div class="creencia-front-icon">
@@ -3460,7 +3371,7 @@
                         <!-- CARA TRASERA -->
                         <div class="card-back">
                             <div class="card-back-header">
-                                <span class="creencia-num-badge">Creencia 11 · Salvación</span>
+                                <span class="creencia-num-badge">Creencia 11 · La Iglesia</span>
                                 <button type="button" class="btn-flip-close" data-csp-click="event.stopPropagation(); flipCarta(11)" title="Girar al frente" aria-label="Girar al frente">
                                     <i class="fas fa-rotate-left"></i>
                                 </button>
@@ -4003,13 +3914,13 @@
                 </div>
 
                 <!-- 23 -->
-                <div class="creencia-item-card creencia-categoria-vida" data-categoria="vida" data-id="23" id="creencia-card-23" data-csp-click="flipCarta(23)">
+                <div class="creencia-item-card creencia-categoria-final" data-categoria="final" data-id="23" id="creencia-card-23" data-csp-click="flipCarta(23)">
                     <div class="card-inner">
                         <!-- CARA FRONTAL -->
                         <div class="card-front">
                             <div class="creencia-card-top">
                                 <span class="creencia-num-badge">Creencia 23</span>
-                                <span class="creencia-category-tag"><i class="fas fa-heart"></i> La Vida Cristiana</span>
+                                <span class="creencia-category-tag"><i class="fas fa-hourglass-end"></i> Acontecimientos Finales</span>
                             </div>
                             <div class="card-front-content">
                                 <div class="creencia-front-icon">
@@ -4024,7 +3935,7 @@
                         <!-- CARA TRASERA -->
                         <div class="card-back">
                             <div class="card-back-header">
-                                <span class="creencia-num-badge">Creencia 23 · Vida Cristiana</span>
+                                <span class="creencia-num-badge">Creencia 23 · Acontecimientos Finales</span>
                                 <button type="button" class="btn-flip-close" data-csp-click="event.stopPropagation(); flipCarta(23)" title="Girar al frente" aria-label="Girar al frente">
                                     <i class="fas fa-rotate-left"></i>
                                 </button>

@@ -1162,13 +1162,13 @@ mark.resaltado-creencia,
     color: var(--golden-light);
 }
 
-/* 2. CONTENEDOR ESTRUCTURAL (SIDEBAR + MAIN CONTENT) */
+/* 2. CONTENEDOR ESTRUCTURAL DE LAS 28 CREENCIAS (CENTRADO) */
 .creencias-layout-wrapper {
-    display: flex;
-    gap: 2rem;
-    align-items: flex-start;
-    position: relative;
+    display: block;
     width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    position: relative;
 }
 
 /* 3. BARRA LATERAL STICKY (DESKTOP) */
@@ -1382,8 +1382,9 @@ mark.resaltado-creencia,
 
 /* 4. ÁREA DE CONTENIDO PRINCIPAL */
 .creencias-main-content {
-    flex: 1;
-    min-width: 0;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
 }
 
 /* Category Filter Tabs (Pestañas Superiores) */
@@ -1619,23 +1620,22 @@ mark.resaltado-creencia,
     transform: translateY(-2px);
 }
 
-/* Grid de creencias */
+/* Grid de creencias centrado */
 .creencias-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 1.8rem;
     width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    justify-content: center;
 }
 
 /* RESPONSIVE LAYOUT QUERIES */
 @media (max-width: 1024px) {
     .creencias-layout-wrapper {
-        flex-direction: column;
-        gap: 1.2rem;
-    }
-
-    .creencias-sidebar-sticky {
-        display: none; /* Se utiliza la franja sticky horizontal en tablets y móviles */
+        width: 100%;
+        margin: 0 auto;
     }
 
     .creencias-sticky-mobile-nav {
@@ -1646,7 +1646,15 @@ mark.resaltado-creencia,
 @media (max-width: 768px) {
     .creencias-grid {
         grid-template-columns: 1fr;
+        max-width: 440px;
+        margin: 0 auto;
         gap: 1.4rem;
+        justify-items: center;
+    }
+
+    .creencia-item-card {
+        width: 100%;
+        max-width: 440px;
     }
 
     .creencias-story-nav {

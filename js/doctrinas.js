@@ -13,7 +13,7 @@ const DoctrinasManager = {
             id: 1,
             tema: 'dios',
             nombre: 'La Naturaleza de Dios: El Dios Trino',
-            tituloCorto: 'El Dios Trino',
+            tituloCorto: 'El Dios Trino (01 a 05)',
             subtitulo: 'Padre, Hijo y Espíritu Santo: Tres personas coeternas en perfecto amor y unidad de propósito.',
             icono: 'fa-sun',
             badgeTema: 'Divinidad & Creación',
@@ -30,97 +30,105 @@ const DoctrinasManager = {
         },
         {
             id: 2,
+            tema: 'hombre',
+            nombre: 'La Doctrina del Hombre (06 a 07)',
+            tituloCorto: 'La Naturaleza del Hombre (06-07)',
+            subtitulo: 'La Naturaleza del Hombre (06) y El Origen del Pecado (07). Creados a imagen de Dios, caídos y necesitados de redención.',
+            icono: 'fa-user-group',
+            badgeTema: 'Creación & Naturaleza',
+            colorGrad: 'linear-gradient(135deg, #8d4f16 0%, #d97706 100%)',
+            colorGlow: 'rgba(217, 119, 6, 0.35)',
+            colorBadge: '#d97706',
+            resumen: 'El ser humano fue creado a imagen de Dios, pero el pecado entró al mundo por la desobediencia. La muerte es consecuencia del pecado. El hombre necesita redención y salvación.',
+            versiculoLema: 'Génesis 1:26-27',
+            versiculos: [
+                { ref: 'Génesis 1:26-27', texto: 'Entonces dijo Dios: Hagamos al hombre a nuestra imagen, conforme a nuestra semejanza... Y creó Dios al hombre a su imagen.' },
+                { ref: 'Romanos 5:12', texto: 'Por tanto, como el pecado entró en el mundo por un hombre, y por el pecado la muerte, así la muerte pasó a todos los hombres, por cuanto todos pecaron.' },
+                { ref: 'Romanos 6:23', texto: 'Porque la paga del pecado es muerte, mas la dádiva de Dios es vida eterna en Cristo Jesús Señor nuestro.' },
+                { ref: 'Eclesiastés 9:5', texto: 'Porque los que viven saben que han de morir; pero los muertos nada saben, ni tienen más paga; porque su memoria es puesta en olvido.' }
+            ]
+        },
+        {
+            id: 3,
             tema: 'salvacion',
-            nombre: 'La Salvación por Gracia',
-            tituloCorto: 'Salvación por Gracia',
-            subtitulo: 'Don inmerecido de Dios recibido únicamente por la fe en los méritos de Jesucristo, no por obras.',
+            nombre: 'La Doctrina de la Salvación (08 a 10)',
+            tituloCorto: 'La Salvación por Gracia (08-10)',
+            subtitulo: 'La Salvación por Gracia (08), La Fe y la Justificación (09), El Bautismo y la Nueva Vida (10).',
             icono: 'fa-heart',
             badgeTema: 'Redención & Fe',
             colorGrad: 'linear-gradient(135deg, #c99d3b 0%, #8a6416 100%)',
             colorGlow: 'rgba(201, 157, 59, 0.35)',
             colorBadge: '#c99d3b',
-            resumen: 'La salvación es un don gratuito de Dios ofrecido a toda la humanidad mediante Jesucristo. No se gana por méritos propios, sino que se recibe por fe. El pecador arrepentido es justificado por su gracia y transformado por el Espíritu Santo para una vida de obediencia motivada por el amor.',
-            versiculoLema: 'Efesios 2:8-10',
+            resumen: 'La salvación es un regalo de Dios por la fe en Jesucristo. No se obtiene por obras, sino por la gracia. El bautismo es un paso de fe que simboliza la muerte al pecado y la resurrección a una nueva vida.',
+            versiculoLema: 'Efesios 2:8-9',
             versiculos: [
-                { ref: 'Efesios 2:8-10', texto: 'Porque por gracia sois salvos por medio de la fe; y esto no de vosotros, pues es don de Dios; no por obras, para que nadie se gloríe.' },
-                { ref: 'Romanos 3:23-24', texto: 'Por cuanto todos pecaron, y están destituidos de la gloria de Dios, siendo justificados gratuitamente por su gracia, mediante la redención que es en Cristo Jesús.' },
-                { ref: 'Romanos 5:1', texto: 'Justificados, pues, por la fe, tenemos paz para con Dios por medio de nuestro Señor Jesucristo.' }
+                { ref: 'Efesios 2:8-9', texto: 'Porque por gracia sois salvos por medio de la fe; y esto no de vosotros, pues es don de Dios; no por obras, para que nadie se gloríe.' },
+                { ref: 'Romanos 5:1', texto: 'Justificados, pues, por la fe, tenemos paz para con Dios por medio de nuestro Señor Jesucristo.' },
+                { ref: 'Romanos 6:3-4', texto: '¿O no sabéis que todos los que hemos sido bautizados en Cristo Jesús, hemos sido bautizados en su muerte? Porque somos sepultados juntamente con él para muerte por el bautismo...' },
+                { ref: 'Gálatas 2:16', texto: 'Sabiendo que el hombre no es justificado por las obras de la ley, sino por la fe de Jesucristo, nosotros también hemos creído en Jesucristo...' }
             ]
         },
         {
-            id: 3,
+            id: 4,
             tema: 'iglesia',
-            nombre: 'La Iglesia: El Cuerpo de Cristo',
-            tituloCorto: 'El Cuerpo de Cristo',
-            subtitulo: 'Comunidad espiritual viva de creyentes llamada a adorar, nutrir y proclamar el evangelio al mundo.',
+            nombre: 'La Doctrina de la Iglesia (11 a 18)',
+            tituloCorto: 'La Iglesia y sus Ordenanzas (11-18)',
+            subtitulo: 'La Iglesia Remanente (11), El Sábado (12), El Bautismo (13), La Cena del Señor (14), Dones Espirituales (15), Don de Profecía (16), Ley de Dios (17), Mayordomía (18).',
             icono: 'fa-church',
             badgeTema: 'Comunidad & Misión',
             colorGrad: 'linear-gradient(135deg, #5c2d91 0%, #311352 100%)',
             colorGlow: 'rgba(92, 45, 145, 0.35)',
             colorBadge: '#7b1fa2',
-            resumen: 'La iglesia es la comunidad de creyentes que confiesan a Jesús como Señor. Es un organismo espiritual vivo cuyo único líder supremo es Cristo. Existe para proclamar el evangelio eterno, adorar a Dios, servir a la comunidad y preparar a las personas para el pronto regreso de Jesús.',
-            versiculoLema: '1 Pedro 2:9',
+            resumen: 'La iglesia es el cuerpo de Cristo en la tierra. El sábado es el día de reposo establecido en la creación. El bautismo y la cena del Señor son ordenanzas. Los dones espirituales y el don de profecía guían a la iglesia. La ley de Dios refleja su carácter. La mayordomía incluye el diezmo y las ofrendas.',
+            versiculoLema: 'Apocalipsis 12:17',
             versiculos: [
-                { ref: '1 Pedro 2:9', texto: 'Mas vosotros sois linaje escogido, real sacerdocio, nación santa, pueblo adquirido por Dios, para que anunciéis las virtudes de aquel que os llamó de las tinieblas a su luz admirable.' },
-                { ref: 'Mateo 16:18', texto: 'Y yo también te digo, que tú eres Pedro, y sobre esta roca edificaré mi iglesia; y las puertas del Hades no prevalecerán contra ella.' },
-                { ref: 'Efesios 1:22-23', texto: 'Y sometió todas las cosas bajo sus pies, y lo dio por cabeza sobre todas las cosas a la iglesia, la cual es su cuerpo, la plenitud de Aquel que todo lo llena en todo.' }
-            ]
-        },
-        {
-            id: 4,
-            tema: 'sabado',
-            nombre: 'El Sábado: Día de Descanso y Adoración',
-            tituloCorto: 'El Sábado Bíblico',
-            subtitulo: 'Séptimo día establecido en la creación como memorial eterno de descanso, comunión y lealtad a Dios.',
-            icono: 'fa-calendar-check',
-            badgeTema: 'Reposo & Adoración',
-            colorGrad: 'linear-gradient(135deg, #1b5e20 0%, #0d3810 100%)',
-            colorGlow: 'rgba(27, 94, 32, 0.35)',
-            colorBadge: '#2e7d32',
-            resumen: 'El sábado, desde la puesta de sol del viernes hasta la puesta de sol del sábado, fue instituido por el Creador como día de reposo y deleite espiritual. Es un memorial perpetuo del poder creador y redentor de Dios, un símbolo de bendición y santificación para toda la humanidad.',
-            versiculoLema: 'Éxodo 20:8-11',
-            versiculos: [
+                { ref: 'Apocalipsis 12:17', texto: 'Entonces el dragón se llenó de ira contra la mujer; y se fue a hacer guerra contra el resto de la descendencia de ella, los que guardan los mandamientos de Dios y tienen el testimonio de Jesucristo.' },
                 { ref: 'Éxodo 20:8-11', texto: 'Acuérdate del día de reposo para santificarlo. Seis días trabajarás, y harás toda tu obra; mas el séptimo día es reposo para Jehová tu Dios...' },
-                { ref: 'Génesis 2:2-3', texto: 'Y acabó Dios en el día séptimo la obra que hizo; y reposó el día séptimo de toda la obra que hizo. Y bendijo Dios al día séptimo, y lo santificó.' },
-                { ref: 'Marcos 2:27-28', texto: 'El día de reposo fue hecho por causa del hombre, y no el hombre por causa del día de reposo; por tanto, el Hijo del Hombre es Señor aun del día de reposo.' }
+                { ref: '1 Corintios 11:23-26', texto: 'Porque yo recibí del Señor lo que también os he enseñado: Que el Señor Jesús, la noche que fue entregado, tomó pan; y habiendo dado gracias, lo partió...' },
+                { ref: '1 Corintios 12:4-7', texto: 'Ahora bien, hay diversidad de dones, pero el Espíritu es el mismo... Pero a cada uno le es dada la manifestación del Espíritu para provecho.' },
+                { ref: 'Malaquías 3:10', texto: 'Traed todos los diezmos al alfolí y haya alimento en mi casa; y probadme ahora en esto, dice Jehová de los ejércitos...' }
             ]
         },
         {
             id: 5,
+            tema: 'vida',
+            nombre: 'La Doctrina de la Vida Cristiana (19 a 22)',
+            tituloCorto: 'La Vida Cristiana (19-22)',
+            subtitulo: 'La Vida de Santidad (19), La Oración y la Devoción (20), El Servicio Cristiano (21), La Salud y la Temperancia (22).',
+            icono: 'fa-seedling',
+            badgeTema: 'Santidad & Conducta',
+            colorGrad: 'linear-gradient(135deg, #1b5e20 0%, #0d3810 100%)',
+            colorGlow: 'rgba(27, 94, 32, 0.35)',
+            colorBadge: '#2e7d32',
+            resumen: 'La vida cristiana es una vida de santidad, oración y servicio. El Espíritu Santo transforma al creyente. El servicio a los demás es una expresión del amor de Cristo. La salud integral (física, mental y espiritual) es parte del plan de Dios.',
+            versiculoLema: 'Gálatas 5:22-23',
+            versiculos: [
+                { ref: 'Gálatas 5:22-23', texto: 'Mas el fruto del Espíritu es amor, gozo, paz, paciencia, benignidad, bondad, fe, mansedumbre, templanza; contra tales cosas no hay ley.' },
+                { ref: '1 Tesalonicenses 5:17', texto: 'Orad sin cesar.' },
+                { ref: 'Mateo 25:35-40', texto: 'Porque tuve hambre, y me disteis de comer; tuve sed, y me disteis de beber... En cuanto lo hicisteis a uno de estos mis hermanos más pequeños, a mí lo hicisteis.' },
+                { ref: '1 Corintios 6:19-20', texto: '¿O ignoráis que vuestro cuerpo es templo del Espíritu Santo, el cual está en vosotros, el cual tenéis de Dios, y que no sois vuestros? Glorificad, pues, a Dios en vuestro cuerpo...' },
+                { ref: '3 Juan 2', texto: 'Amado, yo deseo que tú seas prosperado en todas las cosas, y que tengas salud, así como prospera tu alma.' }
+            ]
+        },
+        {
+            id: 6,
             tema: 'fin',
-            nombre: 'El Tiempo del Fin: Segunda Venida y Juicio',
-            tituloCorto: 'Segunda Venida & Juicio',
-            subtitulo: 'La bendita esperanza: El regreso visible y glorioso de Jesucristo, la purificación del santuario y la Tierra Nueva.',
+            nombre: 'Acontecimientos Finales (23 a 28)',
+            tituloCorto: 'Acontecimientos Finales (23-28)',
+            subtitulo: 'La Segunda Venida (23), El Milenio (24), El Juicio (25), El Estado de los Muertos (26), La Muerte y la Resurrección (27), La Tierra Nueva (28).',
             icono: 'fa-hourglass-end',
             badgeTema: 'Profecía & Esperanza',
             colorGrad: 'linear-gradient(135deg, #880e4f 0%, #b71c1c 100%)',
             colorGlow: 'rgba(183, 28, 28, 0.35)',
             colorBadge: '#c62828',
-            resumen: 'La historia humana culminará con la venida visible, personal y gloriosa de Cristo en las nubes. Los justos resucitarán y los vivos fieles serán transformados. Tras el juicio y la erradicación final del pecado, Dios establecerá una Tierra Nueva eterna donde reinará la paz y la justicia.',
-            versiculoLema: 'Hechos 1:9-11',
+            resumen: 'Cristo volverá literalmente y visiblemente. Habrá un milenio en el cielo. El juicio final revelará la justicia de Dios. Los muertos duermen hasta la resurrección. La tierra nueva será el hogar eterno de los redimidos.',
+            versiculoLema: 'Juan 14:1-3',
             versiculos: [
-                { ref: 'Hechos 1:9-11', texto: 'Este mismo Jesús, que ha sido tomado de vosotros al cielo, así vendrá como le habéis visto ir al cielo.' },
-                { ref: 'Daniel 8:14', texto: 'Hasta dos mil trescientas tardes y mañanas; luego el santuario será purificado.' },
-                { ref: 'Apocalipsis 21:1-4', texto: 'Vi un cielo nuevo y una tierra nueva... y Dios enjugará toda lágrima de los ojos de ellos; y ya no habrá muerte, ni llanto, ni dolor.' }
-            ]
-        },
-        {
-            id: 6,
-            tema: 'vida',
-            nombre: 'La Vida Cristiana: Principios Bíblicos',
-            tituloCorto: 'La Vida Cristiana',
-            subtitulo: 'Vivir según la voluntad de Dios: Salud integral, pureza moral, mayordomía fiel y amor al prójimo.',
-            icono: 'fa-seedling',
-            badgeTema: 'Conducta & Mayordomía',
-            colorGrad: 'linear-gradient(135deg, #0277bd 0%, #004c8c 100%)',
-            colorGlow: 'rgba(2, 119, 189, 0.35)',
-            colorBadge: '#0284c7',
-            resumen: 'Llamados a reflejar el carácter de Jesús en todo aspecto de la vida diaria: cuidando el cuerpo como templo del Espíritu Santo mediante hábitos saludables, practicando una mayordomía fiel de talentos y recursos, y manifestando el fruto del Espíritu Santo.',
-            versiculoLema: '1 Corintios 10:31',
-            versiculos: [
-                { ref: '1 Corintios 10:31', texto: 'Si, pues, coméis o bebéis, o hacéis otra cosa, hacedlo todo para la gloria de Dios.' },
-                { ref: 'Romanos 12:1', texto: 'Que presentéis vuestros cuerpos en sacrificio vivo, santo, agradable a Dios, que es vuestro culto racional.' },
-                { ref: 'Gálatas 5:22-23', texto: 'Mas el fruto del Espíritu es amor, gozo, paz, paciencia, benignidad, bondad, fe, mansedumbre, templanza.' }
+                { ref: 'Juan 14:1-3', texto: 'No se turbe vuestro corazón; creéis en Dios, creed también en mí... vendré otra vez, y os tomaré a mí mismo, para que donde yo estoy, vosotros también estéis.' },
+                { ref: '1 Tesalonicenses 4:16-17', texto: 'Porque el Señor mismo con voz de mando, con voz de arcángel, y con trompeta de Dios, descenderá del cielo; y los muertos en Cristo resucitarán primero.' },
+                { ref: 'Daniel 7:9-10', texto: 'Estuve mirando hasta que fueron puestos tronos, y se sentó un Anciano de días... el Juez se sentó, y los libros fueron abiertos.' },
+                { ref: 'Apocalipsis 20:1-6', texto: 'Y vi las almas de los decapitados por causa del testimonio de Jesús... y vivieron y reinaron con Cristo mil años.' },
+                { ref: 'Apocalipsis 21:1-5', texto: 'Vi un cielo nuevo y una tierra nueva; porque el primer cielo y la primera tierra pasaron... Enjugará Dios toda lágrima de los ojos de ellos; y ya no habrá muerte, ni llanto, ni dolor.' }
             ]
         }
     ],
@@ -140,64 +148,64 @@ const DoctrinasManager = {
             explicacion: 'La Biblia revela a un solo Dios Trino en tres personas coeternas e iguales en naturaleza y propósito (Mateo 28:19; 2 Corintios 13:14).'
         },
         {
-            pregunta: 'Según Efesios 2:8-9, ¿cómo se obtiene la salvación?',
+            pregunta: 'Según la doctrina del hombre, ¿cuál es el origen y condición del ser humano?',
             doctrinaId: 2,
             opciones: [
+                'Fue creado inmortal por naturaleza y no experimenta la muerte física',
+                'Fue creado a imagen de Dios, pero cayó por el pecado y necesita redención y salvación',
+                'Evolucionó de especies inferiores y no tiene relación con el pecado original',
+                'No necesita salvador porque sus buenas obras anulan cualquier falta'
+            ],
+            correcta: 1,
+            explicacion: 'El hombre fue creado a imagen de Dios (Génesis 1:26-27), pero por la desobediencia el pecado y la muerte entraron al mundo (Romanos 5:12; 6:23).'
+        },
+        {
+            pregunta: 'Según Efesios 2:8-9 y Romanos 5:1, ¿cómo se obtiene la salvación y justificación?',
+            doctrinaId: 3,
+            opciones: [
                 'Por las buenas obras y la acumulación de méritos personales',
-                'Por gracia mediante la fe en Cristo, siendo un don inmerecido de Dios',
+                'Por gracia mediante la fe en Jesucristo, siendo un don inmerecido de Dios',
                 'Exclusivamente por pertenecer a una organización religiosa',
                 'Por cumplir perfectamente la ley sin necesidad de mediador'
             ],
             correcta: 1,
-            explicacion: 'La salvación es un regalo de gracia que se recibe por la fe en Jesús, y no por obras para que nadie se gloríe (Efesios 2:8-10).'
+            explicacion: 'La salvación es un regalo de gracia que se recibe por la fe en Jesús, y no por obras para que nadie se gloríe (Efesios 2:8-9; Gálatas 2:16).'
         },
         {
-            pregunta: '¿Quién es la única cabeza y fundamento supremo de la Iglesia?',
-            doctrinaId: 3,
-            opciones: [
-                'El pastor o el concilio de ancianos de la iglesia local',
-                'El apóstol Pedro como primer obispo de Roma',
-                'Jesucristo, quien dio su vida y la sustenta como su cuerpo vivo',
-                'Una junta directiva humana con autoridad eclesiástica absoluta'
-            ],
-            correcta: 2,
-            explicacion: 'Cristo es la cabeza suprema sobre todas las cosas a la iglesia, la cual es su cuerpo espiritual (Efesios 1:22-23; Colosenses 1:18).'
-        },
-        {
-            pregunta: '¿Cuándo fue instituido el sábado y cuál es su vigencia según la Biblia?',
+            pregunta: '¿Cuáles son pilares fundamentales y ordenanzas bíblicas de la Iglesia de Dios?',
             doctrinaId: 4,
             opciones: [
-                'Fue instituido en el Sinaí únicamente para el pueblo de Israel en el Antiguo Testamento',
-                'Fue instituido en la Creación por Dios y bendecido como memorial eterno para toda la humanidad',
-                'Fue creado por los apóstoles después de la resurrección de Jesús',
-                'Es una festividad ceremonial que fue abolida en la cruz'
+                'El cuerpo de Cristo, el sábado bíblico, el bautismo, la Santa Cena, los dones y la mayordomía',
+                'Tradiciones eclesiásticas creadas en los concilios medievales sin base en las Escrituras',
+                'Un club social con ordenanzas opcionales y sin dones espirituales',
+                'Una jerarquía humana donde el diezmo no tiene propósito espiritual'
             ],
-            correcta: 1,
-            explicacion: 'Dios bendijo y santificó el séptimo día en la Creación como memorial del descanso y pacto perpetuo (Génesis 2:2-3; Éxodo 20:8-11).'
+            correcta: 0,
+            explicacion: 'La iglesia es el cuerpo de Cristo (Apocalipsis 12:17; Éxodo 20:8-11), con ordenanzas bíblicas y guiada por el Espíritu Santo y sus dones.'
         },
         {
-            pregunta: '¿De qué manera regresará Jesucristo en su Segunda Venida?',
+            pregunta: '¿Qué distingue la vida cristiana y el cuidado del cuerpo según las Escrituras?',
             doctrinaId: 5,
             opciones: [
-                'De forma invisible y secreta solo perceptible para unos pocos',
-                'De manera puramente metafórica y espiritual en el corazón de los creyentes',
-                'De manera literal, personal, visible y gloriosa en las nubes del cielo',
-                'Reencarnando en un líder religioso terrenal en los últimos días'
+                'Es una vida de santidad, oración, servicio y cuidado del cuerpo como templo del Espíritu Santo',
+                'Una lista de prohibiciones externas sin transformación del corazón',
+                'Cuidar el cuerpo solo por razones estéticas sin vinculación espiritual',
+                'La fe solo importa en la mente y lo que hagamos con el cuerpo es irrelevante'
             ],
-            correcta: 2,
-            explicacion: 'Hechos 1:11 y Apocalipsis 1:7 enseñan que Jesús volverá de forma personal, visible y todo ojo le verá en las nubes del cielo.'
+            correcta: 0,
+            explicacion: 'La vida cristiana es santidad, oración y servicio, cuidando la salud integral como templo de Dios (Gálatas 5:22-23; 1 Corintios 6:19-20; 3 Juan 2).'
         },
         {
-            pregunta: '¿Por qué el cristiano cuida su salud y presenta su cuerpo en servicio a Dios?',
+            pregunta: '¿Qué enseña la profecía bíblica acerca de los acontecimientos finales?',
             doctrinaId: 6,
             opciones: [
-                'Para ganar la vida eterna a través de estrictas dietas',
-                'Porque nuestro cuerpo es templo del Espíritu Santo y busca glorificar a Dios en todo',
-                'Por imposición cultural de tradiciones humanas sin base bíblica',
-                'Porque lo físico no tiene ninguna relación con la vida espiritual'
+                'Cristo volverá literal y visiblemente, habrá un milenio, juicio y una Tierra Nueva eterna',
+                'El mundo continuará indefinidamente sin intervención divina',
+                'La venida de Jesús fue un evento simbólico que ocurrió en el siglo I',
+                'Los muertos van inmediatamente al cielo o al infierno tras expirar'
             ],
-            correcta: 1,
-            explicacion: '1 Corintios 6:19-20 y 10:31 declaran que nuestro cuerpo es templo del Espíritu Santo y debemos glorificar a Dios en todo lo que hacemos.'
+            correcta: 0,
+            explicacion: 'Jesús regresará visiblemente (Juan 14:1-3; 1 Tesalonicenses 4:16-17), los muertos resucitarán y Dios creará una Tierra Nueva (Apocalipsis 21:1-5).'
         }
     ],
 
@@ -210,12 +218,12 @@ const DoctrinasManager = {
 
     // Estado del Juego de Emparejar (Matching Game)
     matchGamePairs: [
-        { id: 1, nombre: 'La Naturaleza de Dios', versiculo: 'Mateo 28:19', texto: 'Bautizándolos en el nombre del Padre, del Hijo y del Espíritu Santo' },
-        { id: 2, nombre: 'La Salvación por Gracia', versiculo: 'Efesios 2:8-10', texto: 'Por gracia sois salvos por medio de la fe; es don de Dios' },
-        { id: 3, nombre: 'La Iglesia (Cuerpo de Cristo)', versiculo: '1 Pedro 2:9', texto: 'Linaje escogido, real sacerdocio, nación santa' },
-        { id: 4, nombre: 'El Sábado Bíblico', versiculo: 'Éxodo 20:8-11', texto: 'Acuérdate del día de reposo para santificarlo' },
-        { id: 5, nombre: 'Segunda Venida y Juicio', versiculo: 'Hechos 1:9-11', texto: 'Este mismo Jesús vendrá como le habéis visto ir al cielo' },
-        { id: 6, nombre: 'La Vida Cristiana', versiculo: '1 Corintios 10:31', texto: 'Si coméis o bebéis, hacedlo todo para la gloria de Dios' }
+        { id: 1, nombre: '1. La Doctrina de Dios', versiculo: 'Mateo 28:19', texto: 'Bautizándolos en el nombre del Padre, del Hijo y del Espíritu Santo' },
+        { id: 2, nombre: '2. La Doctrina del Hombre', versiculo: 'Génesis 1:26-27', texto: 'Hagamos al hombre a nuestra imagen, conforme a nuestra semejanza' },
+        { id: 3, nombre: '3. La Doctrina de la Salvación', versiculo: 'Efesios 2:8-9', texto: 'Porque por gracia sois salvos por medio de la fe; es don de Dios' },
+        { id: 4, nombre: '4. La Doctrina de la Iglesia', versiculo: 'Apocalipsis 12:17', texto: 'Los que guardan los mandamientos de Dios y tienen el testimonio de Jesús' },
+        { id: 5, nombre: '5. La Vida Cristiana', versiculo: 'Gálatas 5:22-23', texto: 'Mas el fruto del Espíritu es amor, gozo, paz, paciencia, fe, templanza' },
+        { id: 6, nombre: '6. Acontecimientos Finales', versiculo: 'Juan 14:1-3', texto: 'Vendré otra vez, y os tomaré a mí mismo, para que donde yo estoy estéis' }
     ],
     selectedDoctrinaMatch: null,
     selectedVerseMatch: null,

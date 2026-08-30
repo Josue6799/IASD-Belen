@@ -22,7 +22,7 @@
             resumen: 'Guardamos el séptimo día (sábado) de puesta de sol a puesta de sol como día sagrado de reposo, adoración y comunión con el Creador y la familia.',
             versiculo: 'Acuérdate del día de reposo para santificarlo. Seis días trabajarás, y harás toda tu obra; mas el séptimo día es reposo para Jehová tu Dios...',
             referencia: 'Éxodo 20:8-11; Génesis 2:1-3',
-            explicacion: 'Jesús mismo guardó el sábado y enseñó que fue hecho para bendición de la humanidad. Es una señal perpetua de lealtad y amor a Dios.'
+            explicacion: 'Instituido en la Creación y guardado por Jesús, el sábado es señal eterna de amor, lealtad y comunión con Dios.'
         },
         {
             id: 'santuario',
@@ -32,7 +32,7 @@
             resumen: 'Creemos que en el cielo existe un santuario verdadero donde Jesucristo oficia como nuestro Sumo Sacerdote y Abogado mediando su sacrificio perfecto.',
             versiculo: 'Tenemos tal sumo sacerdote, el cual se sentó a la diestra del trono de la Majestad en los cielos, ministro del santuario, y de aquel verdadero tabernáculo...',
             referencia: 'Hebreos 8:1-2; Daniel 8:14',
-            explicacion: 'En 1844, al final del período de los 2.300 días proféticos, Jesús inició la fase final de su ministerio expiatorio y el juicio investigador previo a su regreso.'
+            explicacion: 'Jesús intercede por nosotros en el cielo e inició en 1844 la fase final de su ministerio y juicio previo a su regreso.'
         },
         {
             id: 'muerte',
@@ -42,7 +42,7 @@
             resumen: 'La muerte es un sueño inconsciente hasta la venida de Cristo. Los difuntos no tienen conciencia ni sufren en tormentos eternos.',
             versiculo: 'Porque los que viven saben que han de morir; pero los muertos nada saben, ni tienen más paga; porque su memoria es puesta en olvido.',
             referencia: 'Eclesiastés 9:5; 1 Tesalonicenses 4:16',
-            explicacion: 'Nuestra gloriosa esperanza descansa en la primera resurrección cuando Jesús descienda del cielo y otorgue inmortalidad a los redimidos.'
+            explicacion: 'La muerte es un sueño inconsciente hasta la venida de Cristo, cuando otorgará la inmortalidad a los redimidos.'
         },
         {
             id: 'ley',
@@ -52,7 +52,7 @@
             resumen: 'Los Diez Mandamientos son eternos y vigentes. No guardamos la ley para ganarnos la salvación, sino como fruto gozoso del amor y la fe en Cristo.',
             versiculo: 'Aquí está la paciencia de los santos, los que guardan los mandamientos de Dios y la fe de Jesús.',
             referencia: 'Apocalipsis 14:12; Romanos 3:31',
-            explicacion: 'La gracia nos perdona y el Espíritu Santo escribe los santos preceptos en nuestros corazones para vivir en obediencia.'
+            explicacion: 'Por gracia somos salvos y el Espíritu Santo graba la santa ley en nuestro corazón para vivir en amor y obediencia.'
         },
         {
             id: 'profecia',
@@ -62,7 +62,7 @@
             resumen: 'Uno de los dones del Espíritu Santo es la profecía, manifestado de forma especial en la vida y escritos de Elena G. de White para orientar a la iglesia.',
             versiculo: '...Adora a Dios; porque el testimonio de Jesús es el espíritu de la profecía.',
             referencia: 'Apocalipsis 19:10; Joel 2:28-29',
-            explicacion: 'Sus escritos proveen consuelo, guía y corrección, exaltando siempre a la Biblia como la única e infalible regla de doctrina y conducta.'
+            explicacion: 'Manifestado en los escritos de Elena G. de White, orienta a la iglesia y exalta a la Biblia como única norma de fe.'
         },
         {
             id: 'salud',
@@ -72,7 +72,7 @@
             resumen: 'Nuestro cuerpo y mente son templos consagrados a Dios. Fomentamos una vida pura, alimentación saludable, ejercicio, descanso y abstinencia de drogas y alcohol.',
             versiculo: '¿O ignoráis que vuestro cuerpo es templo del Espíritu Santo, el cual está en vosotros...? Glorificad, pues, a Dios en vuestro cuerpo.',
             referencia: '1 Corintios 6:19-20; 3 Juan 1:2',
-            explicacion: 'Cuidar la salud física y mental nos permite servir mejor a Dios y disfrutar de una calidad de vida plena y abundante.'
+            explicacion: 'Cuidar el cuerpo como templo del Espíritu Santo nos permite honrar a Dios y disfrutar una vida plena y saludable.'
         }
     ];
 
