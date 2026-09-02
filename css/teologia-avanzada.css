@@ -3040,13 +3040,43 @@
     }
 
     .santuario-tour-footer {
-        padding: 0.6rem 0.9rem;
+        position: fixed;
+        bottom: 12px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        padding: 0 10px;
+        background: transparent;
+        border-top: none;
+        pointer-events: none;
+        z-index: 9999;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .santuario-tour-nav-btn {
-        padding: 0.5rem 0.9rem;
-        font-size: 0.82rem;
-        min-height: 44px;
+        pointer-events: auto;
+        min-width: 45px;
+        min-height: 45px;
+        padding: 10px 15px;
+        font-size: 14px;
+        background: rgba(6, 19, 36, 0.88) !important;
+        border: 1px solid rgba(212, 175, 55, 0.7) !important;
+        color: #f7df8f !important;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.75), 0 0 12px rgba(212, 175, 55, 0.3);
+        border-radius: 2rem;
+        user-select: none;
+    }
+
+    .santuario-tour-nav-btn.prev {
+        margin-right: auto;
+    }
+
+    .santuario-tour-nav-btn.next {
+        margin-left: auto;
     }
 
     .santuario-tour-dots {
