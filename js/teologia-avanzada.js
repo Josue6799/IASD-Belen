@@ -221,6 +221,8 @@
                     titulo: "Los Cuernos del Altar",
                     left: 32,
                     top: 30,
+                    leftMobile: 74,
+                    topMobile: 58,
                     material: "Madera de acacia revestida de bronce macizo",
                     simbolismo: "Simbolizan el poder salvador supremo de Cristo y el refugio inquebrantable de gracia para el pecador arrepentido que busca misericordia."
                 },
@@ -621,8 +623,11 @@
         escena.hotspots.forEach(h => {
             const hsDiv = document.createElement('div');
             hsDiv.className = 'santuario-hotspot';
-            hsDiv.style.left = `${h.left}%`;
-            hsDiv.style.top = `${h.top}%`;
+            const isMobile = window.innerWidth <= 768;
+            const leftVal = (isMobile && h.leftMobile !== undefined) ? h.leftMobile : h.left;
+            const topVal = (isMobile && h.topMobile !== undefined) ? h.topMobile : h.top;
+            hsDiv.style.left = `${leftVal}%`;
+            hsDiv.style.top = `${topVal}%`;
             hsDiv.id = `hs_${h.id}`;
             hsDiv.setAttribute('data-csp-click', `mostrarInfoHotspot('${h.id}')`);
             hsDiv.setAttribute('title', h.titulo);
