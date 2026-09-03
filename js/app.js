@@ -2253,6 +2253,418 @@ window.abrirAdmin = function () {
     if (typeof window.abrirModalAdminGeneral === 'function') window.abrirModalAdminGeneral();
 };
 
+/* ==========================================================================
+   MODO PRESENTACIÓN DE DIAPOSITIVAS DE ANUNCIOS (PRESENTAR)
+   ========================================================================== */
+
+let presentacionAnunciosData = [];
+let presentacionIndex = 0;
+let presentacionAutoplayTimer = null;
+let isPresentacionAutoplay = true;
+
+/**
+ * Lee anuncios desde localStorage (anuncios_eventos)
+ */
+function obtenerAnunciosDesdeLocalStorage() {
+    const lista = [];
+    try {
+        const raw = localStorage.getItem('anuncios_eventos');
+        if (!raw) return lista;
+        const data = JSON.parse(raw);
+        if (Array.isArray(data)) {
+            data.forEach(a => {
+                if (!a || a.activo === false) return;
+                let fechaFormateada = '';
+                if (a.fechaInicio || a.fecha_inicio) {
+                    const fStr = a.fechaInicio || a.fecha_inicio;
+                    try {
+                        fechaFormateada = new Date(fStr + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+                    } catch (e) {
+                        fechaFormateada = fStr;
+                    }
+                }
+                const horaStr = a.horaInicio || a.hora_inicio || '';
+                const fechaCompleta = fechaFormateada + (horaStr ? ' · ' + horaStr : '');
+
+                lista.push({
+                    id: String(a.id || Math.random()),
+                    titulo: a.titulo || 'Anuncio',
+                    badge: a.categoria || fechaCompleta || 'Anuncio',
+                    fecha: fechaCompleta,
+                    ubicacion: a.ubicacion || 'Templo Principal',
+                    descripcion: a.contenido ? a.contenido.replace(/\n/g, '<br>') : (a.descripcion || ''),
+                    imagen: a.imagen || a.image || '',
+                    extraHtml: ''
+                });
+            });
+        }
+    } catch (e) {
+        console.warn('⚠️ Error al leer anuncios de localStorage:', e);
+    }
+    return lista;
+}
+
+/**
+ * Clona y recopila anuncios montados en el DOM de la página de Anuncios
+ */
+function clonarAnunciosDelDOM() {
+    const anuncios = [];
+    const titulosVistos = new Set();
+    const container = document.getElementById('anuncios');
+
+    // 1. Recopilar tarjetas estáticas .anuncio-destacado del DOM
+    if (container) {
+        const destacados = container.querySelectorAll('.anuncio-destacado');
+        destacados.forEach((el, idx) => {
+            const imgEl = el.querySelector('img');
+            const badgeEl = el.querySelector('.fecha-badge');
+            const titleEl = el.querySelector('h3');
+            const titulo = titleEl ? titleEl.innerText.trim() : 'Anuncio Especial';
+            const badge = badgeEl ? badgeEl.innerText.trim() : 'Anuncio';
+
+            // Extraer descripción principal
+            const mainParagraphs = [];
+            const directParagraphs = el.querySelectorAll(':scope > p, :scope > div > p');
+            directParagraphs.forEach(p => {
+                const text = p.innerText.trim();
+                if (text && !p.closest('div[style*="border-left"]') && !p.closest('.fecha-badge')) {
+                    mainParagraphs.push(p.innerHTML.trim());
+                }
+            });
+
+            // Extraer bloque de pasos si existe
+            const stepsWrapper = el.querySelector('div[style*="border-left"]');
+            const stepsHtml = stepsWrapper ? stepsWrapper.outerHTML : '';
+
+            // Extraer ubicación si existe
+            let ubicacion = '';
+            const ubNode = Array.from(el.querySelectorAll('p')).find(p => p.innerText.includes('Dónde:'));
+            if (ubNode) {
+                ubicacion = ubNode.innerText.replace('Dónde:', '').trim();
+            } else if (el.innerText.includes('Templo Principal')) {
+                ubicacion = 'Templo Principal';
+            }
+
+            if (titulo && !titulosVistos.has(titulo.toLowerCase())) {
+                titulosVistos.add(titulo.toLowerCase());
+                anuncios.push({
+                    id: 'destacado_' + idx,
+                    titulo: titulo,
+                    badge: badge,
+                    fecha: badge,
+                    ubicacion: ubicacion,
+                    imagen: imgEl ? imgEl.src : '',
+                    descripcion: mainParagraphs.join('<br><br>'),
+                    extraHtml: stepsHtml
+                });
+            }
+        });
+
+        // 2. Recopilar tarjetas dinámicas en #anunciosContainer (si ya están en el DOM)
+        const cards = container.querySelectorAll('#anunciosContainer .anuncio-card');
+        cards.forEach((el, idx) => {
+            const imgEl = el.querySelector('.anuncio-card-img, img');
+            const badgeEl = el.querySelector('.anuncio-categoria-badge, .anuncio-card-fecha');
+            const titleEl = el.querySelector('.anuncio-card-titulo, h3, h4');
+            const descEl = el.querySelector('.anuncio-card-contenido, p');
+            const metaEl = el.querySelector('.anuncio-card-meta');
+            const titulo = titleEl ? titleEl.innerText.trim() : 'Anuncio';
+
+            if (titulo && !titulosVistos.has(titulo.toLowerCase())) {
+                titulosVistos.add(titulo.toLowerCase());
+                anuncios.push({
+                    id: 'card_' + idx,
+                    titulo: titulo,
+                    badge: badgeEl ? badgeEl.innerText.trim() : 'Anuncio',
+                    fecha: metaEl ? metaEl.innerText.trim() : '',
+                    ubicacion: '',
+                    imagen: imgEl ? imgEl.src : '',
+                    descripcion: descEl ? descEl.innerHTML.trim() : '',
+                    extraHtml: ''
+                });
+            }
+        });
+    }
+
+    // 3. Complementar con anuncios en localStorage (si no estaban ya en DOM)
+    const desdeStorage = obtenerAnunciosDesdeLocalStorage();
+    desdeStorage.forEach(item => {
+        if (item.titulo && !titulosVistos.has(item.titulo.toLowerCase())) {
+            titulosVistos.add(item.titulo.toLowerCase());
+            anuncios.push(item);
+        }
+    });
+
+    // 4. Si aún no hay nada y existe window.cargarAnuncios(), invocarlo
+    if (anuncios.length === 0 && typeof window.cargarAnuncios === 'function') {
+        try {
+            const dinamicos = window.cargarAnuncios();
+            if (Array.isArray(dinamicos)) {
+                dinamicos.forEach(a => {
+                    if (!a) return;
+                    const titulo = a.titulo || 'Anuncio';
+                    if (!titulosVistos.has(titulo.toLowerCase())) {
+                        titulosVistos.add(titulo.toLowerCase());
+                        const fechaInicio = a.fechaInicio ? new Date(a.fechaInicio + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+                        anuncios.push({
+                            id: a.id || String(Math.random()),
+                            titulo: titulo,
+                            badge: a.categoria || fechaInicio || 'Anuncio',
+                            fecha: fechaInicio,
+                            ubicacion: a.ubicacion || 'Templo Principal',
+                            descripcion: a.contenido ? a.contenido.replace(/\n/g, '<br>') : '',
+                            imagen: a.imagen || '',
+                            extraHtml: ''
+                        });
+                    }
+                });
+            }
+        } catch (e) {
+            console.warn('⚠️ Error al obtener fallback de anuncios:', e);
+        }
+    }
+
+    return anuncios;
+}
+
+/**
+ * Función wrapper para obtener los anuncios para la presentación
+ */
+function obtenerAnunciosParaPresentacion() {
+    return clonarAnunciosDelDOM();
+}
+
+/**
+ * Inicia el modo presentación a pantalla completa
+ */
+function iniciarPresentacionAnuncios() {
+    presentacionAnunciosData = clonarAnunciosDelDOM();
+
+    if (presentacionAnunciosData.length === 0) {
+        alert('⚠️ No hay anuncios disponibles para presentar en este momento.');
+        return;
+    }
+
+    presentacionIndex = 0;
+    isPresentacionAutoplay = true;
+
+    const modal = document.getElementById('modalPresentacionAnuncios') || document.getElementById('modal-presentacion');
+    if (!modal) return;
+
+    modal.classList.remove('hidden');
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    const btnControl = document.getElementById('btnAutoplayAnuncios');
+    if (btnControl) {
+        btnControl.innerHTML = `<i class="fas fa-pause"></i> <span class="btn-control-label">Pausar</span>`;
+    }
+
+    renderizarAnuncioActual();
+    iniciarAutoplayAnunciosTimer();
+
+    document.addEventListener('keydown', manejarTecladoPresentacionAnuncios);
+}
+
+/**
+ * Renderiza el anuncio actual en el modal con protección contra 404 de imágenes (placeholder)
+ */
+function renderizarAnuncioActual() {
+    if (!presentacionAnunciosData || presentacionAnunciosData.length === 0) return;
+
+    const total = presentacionAnunciosData.length;
+    if (presentacionIndex < 0) presentacionIndex = total - 1;
+    if (presentacionIndex >= total) presentacionIndex = 0;
+
+    const item = presentacionAnunciosData[presentacionIndex];
+    const textoProgreso = `Anuncio ${presentacionIndex + 1} de ${total}`;
+
+    const badgeProgreso = document.getElementById('badgeProgresoPresentacion');
+    const barraProgreso = document.getElementById('barra-progreso');
+    if (badgeProgreso) badgeProgreso.textContent = textoProgreso;
+    if (barraProgreso) barraProgreso.textContent = textoProgreso;
+
+    const slideContent = document.getElementById('presentacionSlideContent') || document.getElementById('anuncio-contenido');
+    const dotsContainer = document.getElementById('presentacionDots');
+
+    if (slideContent) {
+        slideContent.classList.remove('fade-in');
+        void slideContent.offsetWidth;
+        slideContent.classList.add('fade-in');
+
+        let metaBadges = '';
+        if (item.badge) {
+            metaBadges += `<span class="presentacion-slide-badge"><i class="far fa-calendar-alt"></i> ${item.badge}</span>`;
+        }
+        if (item.ubicacion) {
+            metaBadges += `<span class="presentacion-slide-badge" style="background: rgba(212, 160, 56, 0.15); color: var(--golden); border: 1px solid var(--golden);"><i class="fas fa-map-marker-alt"></i> ${item.ubicacion}</span>`;
+        }
+
+        const hasImgSrc = Boolean(item.imagen && item.imagen.trim());
+
+        slideContent.innerHTML = `
+            <div class="presentacion-slide-card">
+                <div class="presentacion-img-wrapper" id="anuncio-imagen-wrapper">
+                    ${hasImgSrc ? `
+                    <img src="${item.imagen}" alt="${item.titulo}" class="presentacion-slide-img" id="anuncio-imagen" />
+                    ` : ''}
+                    <div class="presentacion-img-placeholder" id="anuncio-placeholder" style="display: ${hasImgSrc ? 'none' : 'flex'}; background: linear-gradient(135deg, #1a2a4a, #2a4a6a); color: var(--golden); border: 2px solid var(--golden); border-radius: 1rem; width: 100%; min-height: 200px; max-height: 300px; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 1.5rem; box-shadow: inset 0 0 20px rgba(0,0,0,0.4);">
+                        <i class="fas fa-bullhorn" style="font-size: 3.5rem; margin-bottom: 0.8rem; opacity: 0.95; color: var(--golden);"></i>
+                        <span style="font-size: 1.1rem; font-weight: 700; font-family: Montserrat, sans-serif; letter-spacing: 0.5px;">IASD Belén · Anuncio Especial</span>
+                    </div>
+                </div>
+
+                <div class="presentacion-slide-info">
+                    ${metaBadges ? `<div style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.8rem;">${metaBadges}</div>` : ''}
+                    <h2 class="presentacion-slide-title" id="anuncio-titulo">${item.titulo}</h2>
+                    ${item.descripcion ? `<div class="presentacion-slide-desc" id="anuncio-descripcion">${item.descripcion}</div>` : ''}
+                    ${item.extraHtml ? `<div class="presentacion-slide-extra">${item.extraHtml}</div>` : ''}
+                </div>
+            </div>
+        `;
+
+        // Capturar error 404 en la imagen y mostrar el placeholder automáticamente (evitando marco roto)
+        const imgEl = slideContent.querySelector('#anuncio-imagen');
+        if (imgEl) {
+            imgEl.addEventListener('error', function() {
+                this.style.display = 'none';
+                const placeholder = slideContent.querySelector('#anuncio-placeholder');
+                if (placeholder) {
+                    placeholder.style.display = 'flex';
+                }
+            });
+        }
+    }
+
+    if (dotsContainer) {
+        dotsContainer.innerHTML = presentacionAnunciosData.map((_, idx) => `
+            <button type="button" class="presentacion-dot ${idx === presentacionIndex ? 'active' : ''}" 
+                data-csp-click="irADiapositivaAnuncios(${idx})" title="Ir a diapositiva ${idx + 1}"></button>
+        `).join('');
+    }
+}
+
+/**
+ * Alias para renderizarAnuncioActual
+ */
+function renderizarDiapositivaActual() {
+    renderizarAnuncioActual();
+}
+
+/**
+ * Cambia de diapositiva (anterior / siguiente)
+ */
+function cambiarDiapositiva(direccion) {
+    if (!presentacionAnunciosData || presentacionAnunciosData.length === 0) return;
+    presentacionIndex += direccion;
+    renderizarAnuncioActual();
+    if (isPresentacionAutoplay) {
+        iniciarAutoplayAnunciosTimer();
+    }
+}
+
+function cambiarDiapositivaAnuncios(direccion) {
+    cambiarDiapositiva(direccion);
+}
+
+/**
+ * Ir a diapositiva por índice directo
+ */
+function irADiapositivaAnuncios(index) {
+    if (!presentacionAnunciosData || presentacionAnunciosData.length === 0) return;
+    presentacionIndex = index;
+    renderizarAnuncioActual();
+    if (isPresentacionAutoplay) {
+        iniciarAutoplayAnunciosTimer();
+    }
+}
+
+/**
+ * Alterna autoplay (Pausar / Reproducir)
+ */
+function toggleAutoplayPresentacionAnuncios() {
+    isPresentacionAutoplay = !isPresentacionAutoplay;
+    const btnControl = document.getElementById('btnAutoplayAnuncios');
+
+    if (isPresentacionAutoplay) {
+        iniciarAutoplayAnunciosTimer();
+        if (btnControl) {
+            btnControl.innerHTML = `<i class="fas fa-pause"></i> <span class="btn-control-label">Pausar</span>`;
+        }
+    } else {
+        detenerAutoplayAnunciosTimer();
+        if (btnControl) {
+            btnControl.innerHTML = `<i class="fas fa-play"></i> <span class="btn-control-label">Reproducir</span>`;
+        }
+    }
+}
+
+function iniciarAutoplayAnunciosTimer() {
+    detenerAutoplayAnunciosTimer();
+    if (isPresentacionAutoplay) {
+        presentacionAutoplayTimer = setInterval(() => {
+            cambiarDiapositiva(1);
+        }, 5000);
+    }
+}
+
+function detenerAutoplayAnunciosTimer() {
+    if (presentacionAutoplayTimer) {
+        clearInterval(presentacionAutoplayTimer);
+        presentacionAutoplayTimer = null;
+    }
+}
+
+/**
+ * Manejo de teclado (flechas e izquierda/derecha y Escape)
+ */
+function manejarTecladoPresentacionAnuncios(e) {
+    const modal = document.getElementById('modalPresentacionAnuncios') || document.getElementById('modal-presentacion');
+    if (!modal || modal.classList.contains('hidden')) return;
+
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        cambiarDiapositiva(1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        cambiarDiapositiva(-1);
+    } else if (e.key === 'Escape' || e.key === 'Esc') {
+        cerrarPresentacion();
+    }
+}
+
+/**
+ * Cierra el modal de presentación y restaura el scroll
+ */
+function cerrarPresentacion() {
+    detenerAutoplayAnunciosTimer();
+    document.removeEventListener('keydown', manejarTecladoPresentacionAnuncios);
+
+    const modal = document.getElementById('modalPresentacionAnuncios') || document.getElementById('modal-presentacion');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+    document.body.style.overflow = '';
+}
+
+function cerrarPresentacionAnuncios() {
+    cerrarPresentacion();
+}
+
+// Exponer en window para event delegator (data-csp-click) y llamadas globales
+window.iniciarPresentacionAnuncios = iniciarPresentacionAnuncios;
+window.clonarAnunciosDelDOM = clonarAnunciosDelDOM;
+window.obtenerAnunciosParaPresentacion = obtenerAnunciosParaPresentacion;
+window.renderizarAnuncioActual = renderizarAnuncioActual;
+window.renderizarDiapositivaActual = renderizarDiapositivaActual;
+window.cambiarDiapositiva = cambiarDiapositiva;
+window.cambiarDiapositivaAnuncios = cambiarDiapositivaAnuncios;
+window.irADiapositivaAnuncios = irADiapositivaAnuncios;
+window.toggleAutoplayPresentacionAnuncios = toggleAutoplayPresentacionAnuncios;
+window.cerrarPresentacion = cerrarPresentacion;
+window.cerrarPresentacionAnuncios = cerrarPresentacionAnuncios;
+
 // Inicialización Automática al Cargar DOM
 document.addEventListener('DOMContentLoaded', () => {
     initTema();
@@ -2262,4 +2674,4 @@ document.addEventListener('DOMContentLoaded', () => {
     initFabMenu();
 });
 
-console.log('✅ app.js (Iglesia, Parallax, Confetti, Bienvenida, Tema, FAB y Estadísticas) cargado correctamente');
+console.log('✅ app.js (Iglesia, Parallax, Confetti, Bienvenida, Tema, FAB, Estadísticas y Presentación de Anuncios) cargado correctamente');

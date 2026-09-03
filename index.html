@@ -5935,8 +5935,13 @@
 
         <!-- ==================== ANUNCIOS ==================== -->
         <div id="anuncios" class="page">
-            <button class="back-link" data-csp-click="showPage('home')"><i class="fas fa-arrow-left"></i>
-                Volver</button>
+            <div class="anuncios-top-bar">
+                <button class="back-link" data-csp-click="showPage('home')"><i class="fas fa-arrow-left"></i>
+                    Volver</button>
+                <button type="button" class="btn-presentar-anuncios" data-csp-click="iniciarPresentacionAnuncios()" title="Modo Diapositivas a Pantalla Completa">
+                    <i class="fas fa-desktop"></i> PRESENTAR
+                </button>
+            </div>
             <h2 class="page-title"><i class="fas fa-bullhorn"></i> Anuncios Especiales</h2>
 
             <!-- ANUNCIO 1: Descubriendo mi Don (IMAGEN 20% MÁS PEQUEÑA) -->
@@ -11255,6 +11260,55 @@
 
                 <button type="button" id="btnSantuarioNext" class="santuario-tour-nav-btn next"
                     data-csp-click="cambiarEscena(1)">
+                    <span>Siguiente →</span> <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+    <!-- ==========================================================================
+         MODAL MODO PRESENTACIÓN DE DIAPOSITIVAS DE ANUNCIOS
+         ========================================================================== -->
+    <div id="modalPresentacionAnuncios" data-modal="modal-presentacion" class="modal-presentacion-anuncios hidden" aria-hidden="true" role="dialog"
+        aria-label="Presentación de Anuncios Especiales">
+        <div class="presentacion-anuncios-overlay" data-csp-click="cerrarPresentacionAnuncios()"></div>
+
+        <div class="presentacion-anuncios-container">
+            <!-- BARRA SUPERIOR (HEADER DEL MODO PRESENTACIÓN) -->
+            <div class="presentacion-anuncios-header">
+                <div class="presentacion-header-left">
+                    <span class="presentacion-badge"><i class="fas fa-desktop"></i> MODO PRESENTACIÓN</span>
+                    <span id="badgeProgresoPresentacion" class="presentacion-progress-badge"><span id="barra-progreso">Anuncio 1 de 1</span></span>
+                </div>
+                <div class="presentacion-header-right">
+                    <button type="button" id="btnAutoplayAnuncios" class="btn-presentacion-control"
+                        data-csp-click="toggleAutoplayPresentacionAnuncios()" title="Pausar / Reproducir Diapositivas">
+                        <i class="fas fa-pause"></i> <span class="btn-control-label">Pausar</span>
+                    </button>
+                    <button type="button" class="btn-presentacion-close" data-csp-click="cerrarPresentacionAnuncios()"
+                        title="Cerrar Presentación (Esc)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- VISOR DE DIAPOSITIVA ACTIVAS -->
+            <div id="presentacionViewport" class="presentacion-viewport">
+                <div id="presentacionSlideContent" class="presentacion-slide-content">
+                    <!-- Contenido cargado dinámicamente -->
+                </div>
+            </div>
+
+            <!-- BARRA INFERIOR DE CONTROLES DE NAVEGACIÓN -->
+            <div class="presentacion-anuncios-footer">
+                <button type="button" id="btnPresentacionPrev" class="btn-presentacion-nav prev"
+                    data-csp-click="cambiarDiapositivaAnuncios(-1)">
+                    <i class="fas fa-chevron-left"></i> <span>← Anterior</span>
+                </button>
+
+                <div id="presentacionDots" class="presentacion-dots">
+                    <!-- Indicadores de puntos dinámicos -->
+                </div>
+
+                <button type="button" id="btnPresentacionNext" class="btn-presentacion-nav next"
+                    data-csp-click="cambiarDiapositivaAnuncios(1)">
                     <span>Siguiente →</span> <i class="fas fa-chevron-right"></i>
                 </button>
             </div>

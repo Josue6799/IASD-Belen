@@ -28,10 +28,10 @@
         if (!element) return;
         const item = element.closest('.teologia-faq-item');
         if (!item) return;
-        
+
         const answer = item.querySelector('.teologia-faq-a');
         const icon = item.querySelector('.teologia-faq-q i');
-        
+
         if (answer) {
             const isHidden = answer.style.display === 'none' || getComputedStyle(answer).display === 'none';
             answer.style.display = isHidden ? 'block' : 'none';
@@ -49,7 +49,7 @@
         if (!element) return;
         const item = element.closest('.sabado-arg-item');
         if (!item) return;
-        
+
         const body = item.querySelector('.sabado-arg-body');
         const icon = item.querySelector('.sabado-arg-toggle i');
         const isOpen = item.classList.contains('open');
@@ -119,7 +119,7 @@
         if (!element) return;
         const item = element.closest('.santuario-arg-item');
         if (!item) return;
-        
+
         const body = item.querySelector('.santuario-arg-body');
         const icon = item.querySelector('.santuario-arg-toggle i');
         const isOpen = item.classList.contains('open');
@@ -219,8 +219,8 @@
                 {
                     id: "sc3_cuernos_altar",
                     titulo: "Los Cuernos del Altar",
-                    left: 32,
-                    top: 30,
+                    left: 43,
+                    top: 45,
                     leftMobile: 74,
                     topMobile: 58,
                     material: "Madera de acacia revestida de bronce macizo",
@@ -253,7 +253,7 @@
                 {
                     id: "sc4_bronce_pulido",
                     titulo: "El Bronce Pulido",
-                    left: 58,
+                    left: 50,
                     top: 72,
                     material: "Espejos de bronce fino donados por las mujeres piadasas de Israel",
                     simbolismo: "Representa la Palabra de Dios que actúa como espejo espiritual revelando nuestras faltas para conducirnos a la gracia limpiadora."
@@ -286,16 +286,16 @@
                 {
                     id: "sc6_candelabro",
                     titulo: "El Candelabro de Oro",
-                    left: 20,
-                    top: 65,
+                    left: 35,
+                    top: 62,
                     material: "",
                     simbolismo: ""
                 },
                 {
                     id: "sc6_mesa",
                     titulo: "La Mesa de los Panes",
-                    left: 80,
-                    top: 65,
+                    left: 66,
+                    top: 62,
                     material: "",
                     simbolismo: ""
                 },
@@ -440,8 +440,8 @@
                 {
                     id: "sc12_mana",
                     titulo: "La Urna de Oro con el Maná",
-                    left: 63,
-                    top: 62,
+                    left: 62,
+                    top: 77,
                     material: "Vasija de oro conteniendo el maná conservado milagrosamente incorrupto",
                     simbolismo: "Recordatorio eterno del continuo e inagotable sustento providencial de Dios para su pueblo."
                 }
