@@ -3302,19 +3302,23 @@ body.tema-oscuro .btn-estadisticas-quienes:hover {
         object-fit: contain !important;
     }
 
-    /* Texto cuando no hay imagen en Celular */
+    /* Texto cuando no hay imagen en Celular (50% reducido) */
     .anuncio-expandido-text-only {
-        padding: 1.5rem 1rem !important;
-        width: 92% !important;
+        padding: 1rem !important;
+        width: 90% !important;
+        max-width: 90vw !important;
         max-height: 80vh !important;
     }
 
     .anuncio-expandido-text-only .anuncio-expandido-desc,
     .anuncio-expandido-text-only p {
-        font-size: 1.5rem !important;
+        font-size: 0.85rem !important;
+        line-height: 1.2 !important;
+        padding: 1rem !important;
         text-align: center !important;
-        line-height: 1.4 !important;
-        padding: 1rem 0.5rem !important;
+        max-width: 90vw !important;
+        overflow-wrap: break-word !important;
+        word-break: break-word !important;
     }
 
     /* Insignias (Tipo, Fecha, Ubicación) en Celular */
