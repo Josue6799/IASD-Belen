@@ -832,6 +832,102 @@
         });
     }
 
+    /**
+     * Alterna la visibilidad de una tarjeta acordeón o línea de tiempo en La Inmortalidad del Alma
+     * @param {HTMLElement} element - El elemento clickeado (encabezado)
+     */
+    function toggleAcordeonInmortalidad(element) {
+        if (!element) return;
+        const item = element.closest('.inmortalidad-arg-item, .inmortalidad-timeline-item');
+        if (!item) return;
+
+        const body = item.querySelector('.inmortalidad-arg-body, .inmortalidad-timeline-body');
+        const icon = item.querySelector('.inmortalidad-arg-toggle i, .inmortalidad-timeline-toggle i');
+        const isOpen = item.classList.contains('open');
+
+        if (isOpen) {
+            item.classList.remove('open');
+            if (body) body.style.maxHeight = null;
+            if (icon) {
+                if (icon.classList.contains('fa-minus')) icon.className = 'fas fa-plus';
+                else icon.className = 'fas fa-chevron-down';
+            }
+        } else {
+            item.classList.add('open');
+            if (body) body.style.maxHeight = (body.scrollHeight + 100) + 'px';
+            if (icon) {
+                if (icon.classList.contains('fa-plus')) icon.className = 'fas fa-minus';
+                else icon.className = 'fas fa-chevron-up';
+            }
+        }
+    }
+
+    /**
+     * Expande o contrae todos los acordeones de La Inmortalidad del Alma
+     * @param {boolean} expandir - True para expandir todos, false para contraer
+     */
+    function toggleTodosAcordeonesInmortalidad(expandir) {
+        const items = document.querySelectorAll('.inmortalidad-arg-item, .inmortalidad-timeline-item');
+        items.forEach(item => {
+            const body = item.querySelector('.inmortalidad-arg-body, .inmortalidad-timeline-body');
+            const icon = item.querySelector('.inmortalidad-arg-toggle i, .inmortalidad-timeline-toggle i');
+            if (expandir) {
+                item.classList.add('open');
+                if (body) body.style.maxHeight = (body.scrollHeight + 120) + 'px';
+                if (icon) {
+                    if (icon.classList.contains('fa-plus') || icon.classList.contains('fa-minus')) icon.className = 'fas fa-minus';
+                    else icon.className = 'fas fa-chevron-up';
+                }
+            } else {
+                item.classList.remove('open');
+                if (body) body.style.maxHeight = null;
+                if (icon) {
+                    if (icon.classList.contains('fa-plus') || icon.classList.contains('fa-minus')) icon.className = 'fas fa-plus';
+                    else icon.className = 'fas fa-chevron-down';
+                }
+            }
+        });
+    }
+
+    /**
+     * Muestra o alterna el contenedor con el análisis exhaustivo de Elena G. de White sobre la Trinidad
+     */
+    function abrirAnalisisElenaWhite() {
+        const container = document.getElementById('elena-white-analisis-container');
+        const btn = document.getElementById('btn-elena-white-trinidad');
+        if (!container) return;
+
+        const isHidden = container.style.display === 'none' || getComputedStyle(container).display === 'none';
+
+        if (isHidden) {
+            container.style.display = 'block';
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(15px)';
+            container.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+
+            setTimeout(() => {
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 50);
+
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-chevron-up"></i> Ocultar Análisis de Elena G. de White';
+            }
+
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(15px)';
+            setTimeout(() => {
+                container.style.display = 'none';
+            }, 400);
+
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-book-open"></i> ¿Qué creía Elena G. de White sobre la Trinidad?';
+            }
+        }
+    }
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', inicializarVideoSantuario);
     } else {
@@ -847,6 +943,9 @@
     window.toggleAcordeonSantuario = toggleAcordeonSantuario;
     window.toggleTodosArgumentosSantuario = toggleTodosArgumentosSantuario;
     window.filtrarMobiliarioSantuario = filtrarMobiliarioSantuario;
+    window.toggleAcordeonInmortalidad = toggleAcordeonInmortalidad;
+    window.toggleTodosAcordeonesInmortalidad = toggleTodosAcordeonesInmortalidad;
+    window.abrirAnalisisElenaWhite = abrirAnalisisElenaWhite;
 
     // Funciones del Tour Interactivo del Santuario
     window.iniciarTourSantuario = iniciarTourSantuario;
@@ -860,6 +959,9 @@
     window.toggleOjo = toggleOjo;
     window.inicializarVideoSantuario = inicializarVideoSantuario;
 
-    console.log('✅ Módulo de Teología Avanzada, Video con Fade Out y Tour Interactivo cargados correctamente.');
+    console.log('✅ Módulo de Teología Avanzada, Video con Fade Out, Tour Interactivo, Módulo Inmortalidad y Módulo Trinidad en Modo Continuo cargados correctamente.');
 })();
+
+
+
 

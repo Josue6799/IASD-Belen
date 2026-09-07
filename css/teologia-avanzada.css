@@ -10,7 +10,7 @@
 
 .teologia-index-hero {
     background: radial-gradient(circle at top right, rgba(201, 165, 59, 0.18), transparent 50%),
-                linear-gradient(135deg, #091a30 0%, #0d274c 50%, #061324 100%);
+        linear-gradient(135deg, #091a30 0%, #0d274c 50%, #061324 100%);
     border-radius: 1.5rem;
     padding: 3.5rem 2rem 3rem;
     color: #ffffff;
@@ -353,9 +353,10 @@
 /* Paletas temáticas para los Heroes */
 .hero-santuario {
     background: radial-gradient(circle at top right, rgba(201, 165, 59, 0.3), transparent 60%),
-                linear-gradient(135deg, #091a30 0%, #1e3a8a 100%);
+        linear-gradient(135deg, #091a30 0%, #1e3a8a 100%);
     border: 2px solid rgba(201, 165, 59, 0.4);
 }
+
 .hero-santuario .hero-badge {
     background: rgba(201, 165, 59, 0.2);
     border: 1px solid #c9a53b;
@@ -363,21 +364,39 @@
 }
 
 .hero-inmortalidad {
-    background: radial-gradient(circle at top right, rgba(20, 184, 166, 0.3), transparent 60%),
-                linear-gradient(135deg, #0f172a 0%, #0369a1 50%, #0d9488 100%);
-    border: 1px solid rgba(20, 184, 166, 0.4);
+    background: linear-gradient(135deg, rgba(9, 26, 48, 0.9) 0%, rgba(13, 39, 76, 0.84) 50%, rgba(6, 19, 36, 0.94) 100%),
+        url('https://res.cloudinary.com/onjg5kf6/image/upload/v1788809916/Jesus_dando_aliento_de_vida_a_ad%C3%A1n_t3adid.jpg') center/cover no-repeat;
+    border: 2px solid rgba(201, 165, 59, 0.5);
+    box-shadow: 0 20px 45px -10px rgba(6, 19, 36, 0.65), 0 0 25px rgba(201, 165, 59, 0.25);
+    position: relative;
+    overflow: hidden;
 }
+
+.hero-inmortalidad::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(201, 165, 59, 0.15), transparent 70%);
+    pointer-events: none;
+}
+
 .hero-inmortalidad .hero-badge {
-    background: rgba(20, 184, 166, 0.2);
-    border: 1px solid #14b8a6;
-    color: #99f6e4;
+    background: rgba(201, 165, 59, 0.25);
+    border: 1px solid #c9a53b;
+    color: #f7df8f;
+    box-shadow: 0 0 15px rgba(201, 165, 59, 0.3);
 }
+
 
 .hero-sabado {
     background: radial-gradient(circle at top right, rgba(201, 165, 59, 0.3), transparent 60%),
-                linear-gradient(135deg, #064e3b 0%, #047857 50%, #0b2b4f 100%);
+        linear-gradient(135deg, #064e3b 0%, #047857 50%, #0b2b4f 100%);
     border: 1px solid rgba(201, 165, 59, 0.4);
 }
+
 .hero-sabado .hero-badge {
     background: rgba(201, 165, 59, 0.25);
     border: 1px solid #c9a53b;
@@ -386,9 +405,10 @@
 
 .hero-conflicto {
     background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.3), transparent 60%),
-                linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #312e81 100%);
+        linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #312e81 100%);
     border: 1px solid rgba(139, 92, 246, 0.4);
 }
+
 .hero-conflicto .hero-badge {
     background: rgba(139, 92, 246, 0.25);
     border: 1px solid #a78bfa;
@@ -397,9 +417,10 @@
 
 .hero-ley {
     background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.3), transparent 60%),
-                linear-gradient(135deg, #091a30 0%, #78350f 50%, #b45309 100%);
+        linear-gradient(135deg, #091a30 0%, #78350f 50%, #b45309 100%);
     border: 1px solid rgba(245, 158, 11, 0.4);
 }
+
 .hero-ley .hero-badge {
     background: rgba(245, 158, 11, 0.25);
     border: 1px solid #f59e0b;
@@ -407,23 +428,41 @@
 }
 
 .hero-trinidad {
-    background: radial-gradient(circle at top right, rgba(236, 72, 153, 0.25), transparent 60%),
-                linear-gradient(135deg, #1e293b 0%, #831843 50%, #1e3a8a 100%);
-    border: 1px solid rgba(236, 72, 153, 0.35);
+    background: linear-gradient(135deg, rgba(9, 26, 48, 0.92) 0%, rgba(13, 39, 76, 0.86) 50%, rgba(6, 19, 36, 0.94) 100%),
+        url('https://res.cloudinary.com/onjg5kf6/image/upload/v1788816515/TRINIDAD_kazhhn.jpg') center/cover no-repeat;
+    border: 2px solid rgba(201, 165, 59, 0.5);
+    box-shadow: 0 20px 45px -10px rgba(6, 19, 36, 0.65), 0 0 25px rgba(201, 165, 59, 0.25);
+    position: relative;
+    overflow: hidden;
 }
+
+.hero-trinidad::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(201, 165, 59, 0.15), transparent 70%);
+    pointer-events: none;
+}
+
 .hero-trinidad .hero-badge {
-    background: rgba(236, 72, 153, 0.2);
-    border: 1px solid #f472b6;
-    color: #fbcfe8;
+    background: rgba(201, 165, 59, 0.25);
+    border: 1px solid #c9a53b;
+    color: #f7df8f;
+    box-shadow: 0 0 15px rgba(201, 165, 59, 0.3);
 }
+
 
 .hero-profecia {
     background: radial-gradient(circle at top left, rgba(201, 165, 59, 0.25), transparent 50%),
-                radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.2), transparent 50%),
-                linear-gradient(145deg, #050d18 0%, #091a30 50%, #030810 100%);
+        radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.2), transparent 50%),
+        linear-gradient(145deg, #050d18 0%, #091a30 50%, #030810 100%);
     border: 2px solid #c9a53b;
     box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7);
 }
+
 .hero-profecia .hero-badge {
     background: linear-gradient(90deg, #c9a53b, #f5d77f);
     color: #050d18;
@@ -762,8 +801,8 @@
    ========================================================================== */
 #profecia .teologia-content-card {
     background: radial-gradient(circle at 10% 20%, rgba(201, 165, 59, 0.1), transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(37, 99, 235, 0.12), transparent 45%),
-                linear-gradient(145deg, #071324 0%, #0b213e 50%, #050d18 100%);
+        radial-gradient(circle at 90% 80%, rgba(37, 99, 235, 0.12), transparent 45%),
+        linear-gradient(145deg, #071324 0%, #0b213e 50%, #050d18 100%);
     border: 2px solid #c9a53b;
     color: #ffffff;
     box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.65);
@@ -1282,7 +1321,7 @@
 /* Banner de Recurso Externo Destacado (sabadobiblico.com) */
 .sabado-external-banner {
     background: radial-gradient(circle at top right, rgba(201, 165, 59, 0.2), transparent 50%),
-                linear-gradient(135deg, #062f26 0%, #064e3b 50%, #0a2540 100%);
+        linear-gradient(135deg, #062f26 0%, #064e3b 50%, #0a2540 100%);
     border: 2px solid #c9a53b;
     border-radius: 1.4rem;
     padding: 2.2rem 2.4rem;
@@ -1932,8 +1971,13 @@
     margin: 0 0 0.8rem 0;
 }
 
-.santuario-phase-card.phase-one h4 { color: #1e3a8a; }
-.santuario-phase-card.phase-two h4 { color: #78350f; }
+.santuario-phase-card.phase-one h4 {
+    color: #1e3a8a;
+}
+
+.santuario-phase-card.phase-two h4 {
+    color: #78350f;
+}
 
 .santuario-phase-list {
     list-style: none;
@@ -1952,21 +1996,31 @@
     gap: 0.6rem;
 }
 
-.santuario-phase-card.phase-one li { color: #1e293b; }
-.santuario-phase-card.phase-two li { color: #451a03; }
+.santuario-phase-card.phase-one li {
+    color: #1e293b;
+}
+
+.santuario-phase-card.phase-two li {
+    color: #451a03;
+}
 
 .santuario-phase-list i {
     margin-top: 0.2rem;
     font-size: 0.85rem;
 }
 
-.santuario-phase-card.phase-one .santuario-phase-list i { color: #2563eb; }
-.santuario-phase-card.phase-two .santuario-phase-list i { color: #d97706; }
+.santuario-phase-card.phase-one .santuario-phase-list i {
+    color: #2563eb;
+}
+
+.santuario-phase-card.phase-two .santuario-phase-list i {
+    color: #d97706;
+}
 
 /* Línea de Tiempo Profética: Daniel 8:14 y Daniel 9 */
 .santuario-prophecy-box {
     background: radial-gradient(circle at top right, rgba(201, 165, 59, 0.15), transparent 50%),
-                linear-gradient(135deg, #071324 0%, #0d274c 50%, #061324 100%);
+        linear-gradient(135deg, #071324 0%, #0d274c 50%, #061324 100%);
     border: 2px solid #c9a53b;
     border-radius: 1.4rem;
     padding: 2.2rem 2rem;
@@ -2687,9 +2741,17 @@
 
 /* Animación Ken Burns (Zoom Cinematográfico Lento) */
 @keyframes kenburns {
-    0% { transform: scale(1.0); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1.0); }
+    0% {
+        transform: scale(1.0);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1.0);
+    }
 }
 
 .santuario-tour-bg-img.kenburns {
@@ -2779,8 +2841,15 @@
 }
 
 @keyframes pulse {
-    0% { transform: scale(0.5); opacity: 1; }
-    100% { transform: scale(1.6); opacity: 0; }
+    0% {
+        transform: scale(0.5);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
 }
 
 /* Hotspot Activo */
@@ -2817,8 +2886,15 @@
 }
 
 @keyframes cardAppear {
-    0% { opacity: 0; transform: scale(0.9) translateY(8px); }
-    100% { opacity: 1; transform: scale(1) translateY(0); }
+    0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(8px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 .santuario-tour-card.hidden {
@@ -2979,6 +3055,7 @@
 }
 
 @media (max-width: 768px) {
+
     /* 1. CONTENEDOR Y HEADER DEL TOUR EN CELULARES */
     .santuario-tour-container {
         width: 100vw;
@@ -3211,9 +3288,17 @@
     }
 
     @keyframes kenburns-mobile {
-        0% { transform: scale(1.0); }
-        50% { transform: scale(1.02); }
-        100% { transform: scale(1.0); }
+        0% {
+            transform: scale(1.0);
+        }
+
+        50% {
+            transform: scale(1.02);
+        }
+
+        100% {
+            transform: scale(1.0);
+        }
     }
 
     .santuario-tour-bg-img.kenburns {
@@ -3264,8 +3349,15 @@
 }
 
 @keyframes titleGlowAppear {
-    0% { opacity: 0; transform: translate(-50%, -15px) scale(0.95); }
-    100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -15px) scale(0.95);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+    }
 }
 
 @media (max-width: 768px) {
@@ -3275,6 +3367,7 @@
         border-radius: 1.5rem;
         max-width: 94%;
     }
+
     .santuario-tour-scene-overlay-title span {
         font-size: clamp(1.1rem, 5.5vw, 1.8rem);
         letter-spacing: 1.5px;
@@ -3390,9 +3483,11 @@
         min-height: 38px;
         gap: 0.35rem;
     }
+
     .ojo-tour-label {
         font-size: 0.74rem;
     }
+
     .ojo-svg {
         width: 32px;
         height: 18px;
@@ -3471,7 +3566,1031 @@
     }
 }
 
+/* ==================== ESTILOS DEDICADOS: LA INMORTALIDAD DEL ALMA ==================== */
 
+/* Tarjeta Introductoria Ambiental */
+.inmortalidad-intro-hero {
+    position: relative;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(201, 165, 59, 0.35);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, rgba(9, 26, 48, 0.92) 0%, rgba(15, 23, 42, 0.86) 100%),
+        url('https://res.cloudinary.com/onjg5kf6/image/upload/v1788809916/Un_anciano_durmiendo_tlzj64.jpg') center/cover no-repeat;
+    padding: 2.2rem 2rem;
+    color: #ffffff;
+}
 
+.inmortalidad-intro-hero p {
+    font-size: 1.08rem;
+    line-height: 1.75;
+    color: #e2e8f0;
+    margin-bottom: 0;
+}
 
+/* Tarjetas Acordeón Doctrinales */
+.inmortalidad-arg-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+}
 
+.inmortalidad-arg-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1.2rem;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(11, 43, 79, 0.04);
+}
+
+.inmortalidad-arg-item.open {
+    border-color: #c9a53b;
+    box-shadow: 0 12px 30px -5px rgba(201, 165, 59, 0.2), 0 0 0 1px rgba(201, 165, 59, 0.3);
+}
+
+.inmortalidad-arg-header {
+    padding: 1.35rem 1.6rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: #ffffff;
+    user-select: none;
+    transition: background 0.2s ease;
+}
+
+.inmortalidad-arg-header:hover {
+    background: #faf8f5;
+}
+
+.inmortalidad-arg-item.open .inmortalidad-arg-header {
+    background: linear-gradient(90deg, #fefce8 0%, #ffffff 100%);
+    border-bottom: 1px solid #fef08a;
+}
+
+.inmortalidad-arg-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    flex-grow: 1;
+}
+
+.inmortalidad-arg-badge {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #854d0e;
+    background: #fef08a;
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    border: 1px solid #fde047;
+}
+
+.inmortalidad-arg-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: 'Playfair Display', serif;
+}
+
+.inmortalidad-arg-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #0b2b4f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+}
+
+.inmortalidad-arg-item.open .inmortalidad-arg-toggle {
+    background: #c9a53b;
+    color: #ffffff;
+    transform: rotate(180deg);
+}
+
+.inmortalidad-arg-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.inmortalidad-arg-content {
+    padding: 1.8rem 1.8rem;
+    background: #ffffff;
+}
+
+/* Imagen destacada dentro de acordeón */
+.inmortalidad-img-wrapper {
+    margin: 1.5rem 0;
+    border-radius: 1.1rem;
+    overflow: hidden;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    position: relative;
+    max-height: 420px;
+}
+
+.inmortalidad-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.inmortalidad-img-wrapper:hover img {
+    transform: scale(1.02);
+}
+
+.inmortalidad-img-caption {
+    background: rgba(15, 23, 42, 0.88);
+    color: #f7df8f;
+    padding: 0.65rem 1.2rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-align: center;
+    border-top: 1px solid rgba(201, 165, 59, 0.4);
+}
+
+/* Términos lingüísticos (Pills de Hebreo/Griego) */
+.inmortalidad-term-pills {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin: 1.2rem 0;
+}
+
+.inmortalidad-term-pill {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #c9a53b;
+    padding: 0.6rem 1rem;
+    border-radius: 0.6rem;
+    font-size: 0.9rem;
+    color: #334155;
+}
+
+.inmortalidad-term-pill strong {
+    color: #0f172a;
+}
+
+/* Bloque apologético de textos malinterpretados */
+.inmortalidad-text-block {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 5px solid #0284c7;
+    border-radius: 0.85rem;
+    padding: 1.35rem 1.5rem;
+    margin-bottom: 1.25rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inmortalidad-text-block:hover {
+    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.08);
+}
+
+.inmortalidad-text-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: #0369a1;
+    margin-bottom: 0.65rem;
+}
+
+/* Línea de Tiempo Histórica */
+.inmortalidad-timeline-section {
+    margin-top: 3.5rem;
+    padding: 2.5rem 2rem;
+    background: linear-gradient(135deg, #091a30 0%, #0d274c 50%, #061324 100%);
+    border-radius: 1.5rem;
+    border: 1px solid rgba(201, 165, 59, 0.35);
+    box-shadow: 0 16px 40px -10px rgba(6, 19, 36, 0.45);
+    color: #ffffff;
+}
+
+.inmortalidad-timeline-title {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+    color: #f7df8f;
+    margin-bottom: 0.5rem;
+    font-weight: 800;
+}
+
+.inmortalidad-timeline-subtitle {
+    text-align: center;
+    color: #cbd5e1;
+    font-size: 1.05rem;
+    margin-bottom: 2.2rem;
+}
+
+.inmortalidad-timeline-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.inmortalidad-timeline-item {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(201, 165, 59, 0.25);
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+}
+
+.inmortalidad-timeline-item.open {
+    border-color: #c9a53b;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 25px rgba(201, 165, 59, 0.15);
+}
+
+.inmortalidad-timeline-header {
+    padding: 1.2rem 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    user-select: none;
+}
+
+.inmortalidad-timeline-header:hover {
+    background: rgba(251, 191, 36, 0.08);
+}
+
+.inmortalidad-timeline-year {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #f7df8f;
+    background: rgba(201, 165, 59, 0.25);
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(201, 165, 59, 0.5);
+}
+
+.inmortalidad-timeline-event-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-grow: 1;
+}
+
+.inmortalidad-timeline-toggle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    color: #f7df8f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+}
+
+.inmortalidad-timeline-item.open .inmortalidad-timeline-toggle {
+    background: #c9a53b;
+    color: #0f172a;
+    transform: rotate(180deg);
+}
+
+.inmortalidad-timeline-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+
+.inmortalidad-timeline-content {
+    padding: 1.2rem 1.6rem 1.6rem;
+    color: #e2e8f0;
+    font-size: 0.98rem;
+    line-height: 1.7;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Fuentes y Lecturas Recomendadas */
+.inmortalidad-biblio-section {
+    margin-top: 3rem;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1.4rem;
+    padding: 2.2rem;
+    box-shadow: 0 6px 25px rgba(11, 43, 79, 0.05);
+}
+
+.inmortalidad-biblio-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: #854d0e;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 2px solid #fef08a;
+    padding-bottom: 0.75rem;
+}
+
+.inmortalidad-biblio-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.inmortalidad-biblio-item a {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.9rem 1.2rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.8rem;
+    color: #0f172a;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.inmortalidad-biblio-item a:hover {
+    background: #fefce8;
+    border-color: #c9a53b;
+    color: #854d0e;
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(201, 165, 59, 0.12);
+}
+
+.inmortalidad-biblio-item i.link-icon {
+    margin-left: auto;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    transition: color 0.2s ease;
+}
+
+.inmortalidad-biblio-item a:hover i.link-icon {
+    color: #c9a53b;
+}
+
+@media (max-width: 768px) {
+    .inmortalidad-arg-header {
+        padding: 1.1rem 1.2rem;
+    }
+
+    .inmortalidad-arg-content {
+        padding: 1.2rem 1.2rem;
+    }
+
+    .inmortalidad-intro-hero {
+        padding: 1.5rem 1.2rem;
+    }
+
+    .inmortalidad-timeline-section {
+        padding: 1.8rem 1.2rem;
+    }
+}
+
+/* ==================== ESTILOS DEDICADOS: LA TRINIDAD ==================== */
+
+.trinidad-intro-hero {
+    position: relative;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(201, 165, 59, 0.35);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, rgba(9, 26, 48, 0.92) 0%, rgba(15, 23, 42, 0.86) 100%),
+        url('https://res.cloudinary.com/onjg5kf6/image/upload/v1788816515/SIMBOLO_DE_LA_TRINIDAD_uefg93.jpg') center/cover no-repeat;
+    padding: 2.2rem 2rem;
+    color: #ffffff;
+}
+
+.trinidad-intro-hero p {
+    font-size: 1.08rem;
+    line-height: 1.8;
+    color: #e2e8f0;
+    margin-bottom: 0;
+}
+
+.trinidad-arg-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+}
+
+.trinidad-arg-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1.2rem;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(11, 43, 79, 0.04);
+}
+
+.trinidad-arg-item.open {
+    border-color: #c9a53b;
+    box-shadow: 0 12px 30px -5px rgba(201, 165, 59, 0.2), 0 0 0 1px rgba(201, 165, 59, 0.3);
+}
+
+.trinidad-arg-header {
+    padding: 1.35rem 1.6rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: #ffffff;
+    user-select: none;
+    transition: background 0.2s ease;
+}
+
+.trinidad-arg-header:hover {
+    background: #faf8f5;
+}
+
+.trinidad-arg-item.open .trinidad-arg-header {
+    background: linear-gradient(90deg, #fefce8 0%, #ffffff 100%);
+    border-bottom: 1px solid #fef08a;
+}
+
+.trinidad-arg-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    flex-grow: 1;
+}
+
+.trinidad-arg-badge {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #854d0e;
+    background: #fef08a;
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    border: 1px solid #fde047;
+}
+
+.trinidad-arg-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: 'Playfair Display', serif;
+}
+
+.trinidad-arg-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #0b2b4f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+}
+
+.trinidad-arg-item.open .trinidad-arg-toggle {
+    background: #c9a53b;
+    color: #ffffff;
+    transform: rotate(180deg);
+}
+
+.trinidad-arg-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.trinidad-arg-content {
+    padding: 2rem 2rem;
+    background: #ffffff;
+}
+
+.trinidad-arg-content p {
+    font-size: 1.02rem;
+    line-height: 1.8;
+    color: #334155;
+    margin-bottom: 1.25rem;
+}
+
+.trinidad-img-wrapper {
+    margin: 1.8rem 0;
+    border-radius: 1.1rem;
+    overflow: hidden;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    position: relative;
+    max-height: 480px;
+}
+
+.trinidad-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    max-height: 480px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.trinidad-img-wrapper:hover img {
+    transform: scale(1.02);
+}
+
+.trinidad-img-caption {
+    background: rgba(15, 23, 42, 0.9);
+    color: #f7df8f;
+    padding: 0.75rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: center;
+    border-top: 1px solid rgba(201, 165, 59, 0.4);
+}
+
+/* Tarjeta de Padres de la Iglesia */
+.trinidad-patristica-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 5px solid #c9a53b;
+    border-radius: 0.9rem;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.trinidad-patristica-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #854d0e;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.trinidad-patristica-quote {
+    font-style: italic;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    padding: 0.85rem 1.1rem;
+    border-radius: 0.6rem;
+    margin: 0.75rem 0;
+    color: #1e293b;
+}
+
+@media (max-width: 768px) {
+    .trinidad-arg-header {
+        padding: 1.1rem 1.2rem;
+    }
+
+    .trinidad-arg-content {
+        padding: 1.2rem 1.2rem;
+    }
+}
+
+/* Bloques Continuos de Lectura Directa (Sin Acordeón) */
+.trinidad-block-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+}
+
+.trinidad-block-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1.3rem;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(11, 43, 79, 0.05);
+    border-top: 4px solid #c9a53b;
+    transition: box-shadow 0.3s ease;
+}
+
+.trinidad-block-item:hover {
+    box-shadow: 0 10px 28px rgba(201, 165, 59, 0.14);
+}
+
+.trinidad-block-header {
+    padding: 1.4rem 1.8rem;
+    background: linear-gradient(90deg, #fefce8 0%, #ffffff 100%);
+    border-bottom: 1px solid #fef08a;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.trinidad-block-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-family: 'Playfair Display', serif;
+}
+
+.trinidad-block-content {
+    padding: 2.2rem 2.2rem;
+    background: #ffffff;
+}
+
+.trinidad-block-content p {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: #334155;
+    margin-bottom: 1.35rem;
+}
+
+@media (max-width: 768px) {
+    .trinidad-block-header {
+        padding: 1.2rem 1.2rem;
+    }
+
+    .trinidad-block-content {
+        padding: 1.3rem 1.2rem;
+    }
+}
+
+/* ==================== ÍNDICE Y RECURSOS VISUALES DE LA TRINIDAD ==================== */
+.trinidad-toc-card {
+    background: linear-gradient(135deg, #091a30 0%, #0d274c 50%, #061324 100%);
+    border: 2px solid rgba(201, 165, 59, 0.4);
+    border-radius: 1.4rem;
+    padding: 2.2rem 2rem;
+    color: #ffffff;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 12px 35px -5px rgba(6, 19, 36, 0.4);
+}
+
+.trinidad-toc-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #f5d77f;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid rgba(201, 165, 59, 0.3);
+    padding-bottom: 0.75rem;
+}
+
+.trinidad-toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.trinidad-toc-item {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(201, 165, 59, 0.25);
+    border-radius: 0.85rem;
+    padding: 0.85rem 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #e2e8f0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+.trinidad-toc-item i {
+    color: #c9a53b;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.trinidad-toc-item:hover {
+    background: rgba(201, 165, 59, 0.18);
+    border-color: #c9a53b;
+    color: #ffffff;
+    transform: translateX(4px);
+}
+
+.trinidad-refutacion-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #dc2626;
+    border-radius: 0.9rem;
+    padding: 1.6rem 1.8rem;
+    margin: 1.5rem 0 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.trinidad-refutacion-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #991b1b;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.trinidad-refutacion-body p {
+    font-size: 1.02rem;
+    line-height: 1.8;
+    color: #334155;
+    margin-bottom: 0.9rem;
+}
+
+.trinidad-refutacion-body p:last-child {
+    margin-bottom: 0;
+}
+
+.trinidad-subbadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(201, 165, 59, 0.15);
+    border: 1px solid rgba(201, 165, 59, 0.4);
+    color: #854d0e;
+    padding: 0.3rem 0.85rem;
+    border-radius: 1rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.8rem;
+}
+
+/* ==================== ESTILOS PARA ANÁLISIS ELENA G. DE WHITE Y LA TRINIDAD ==================== */
+.elena-white-container {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(201, 165, 59, 0.35);
+    box-shadow: 0 20px 50px -15px rgba(11, 43, 79, 0.12);
+    margin: 2.5rem 0;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.elena-white-hero {
+    background: radial-gradient(circle at top right, rgba(201, 165, 59, 0.25), transparent 60%),
+        linear-gradient(135deg, #061324 0%, #0d274c 50%, #091a30 100%);
+    padding: 3.5rem 2.5rem;
+    color: #ffffff;
+    text-align: center;
+    position: relative;
+    border-bottom: 3px solid #c9a53b;
+}
+
+.elena-white-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(201, 165, 59, 0.2);
+    border: 1px solid rgba(201, 165, 59, 0.5);
+    color: #f7df8f;
+    padding: 0.45rem 1.4rem;
+    border-radius: 2rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+}
+
+.elena-white-hero-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.8rem, 3.8vw, 2.8rem);
+    font-weight: 800;
+    color: #f5d77f;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    margin-bottom: 0.8rem;
+    line-height: 1.25;
+}
+
+.elena-white-hero-subtitle {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: #e2e8f0;
+    max-width: 800px;
+    margin: 0 auto;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.elena-white-body {
+    padding: 3rem 2.5rem;
+    color: #1e293b;
+}
+
+.elena-white-section {
+    margin-bottom: 3.5rem;
+}
+
+.elena-white-section-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: #0b2b4f;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid rgba(201, 165, 59, 0.3);
+}
+
+.elena-white-section-title i {
+    color: #c9a53b;
+    font-size: 1.4rem;
+}
+
+.elena-white-text-block {
+    margin-bottom: 1.8rem;
+}
+
+.elena-white-text-block p {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: #334155;
+    margin-bottom: 1.4rem;
+    text-align: justify;
+}
+
+.elena-white-quote-box {
+    background: linear-gradient(135deg, #0b1a2e 0%, #112238 100%);
+    border-left: 4px solid #c9a53b;
+    border-radius: 0.8rem;
+    padding: 1.6rem 2rem;
+    margin: 1.8rem 0;
+    box-shadow: 0 8px 24px -4px rgba(6, 19, 36, 0.25);
+    position: relative;
+}
+
+.elena-white-quote-num {
+    display: inline-block;
+    background: rgba(201, 165, 59, 0.25);
+    border: 1px solid rgba(201, 165, 59, 0.4);
+    color: #f5d77f;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    margin-bottom: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.elena-white-quote-text {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 1.08rem;
+    line-height: 1.8;
+    color: #f1f5f9;
+    margin-bottom: 0.8rem;
+}
+
+.elena-white-quote-ref {
+    text-align: right;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #c9a53b;
+    margin-top: 0.5rem;
+}
+
+.elena-white-analysis-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #0b2b4f;
+    border-radius: 0.75rem;
+    padding: 1.5rem 1.8rem;
+    margin: 1.5rem 0 2.2rem;
+}
+
+.elena-white-analysis-box h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0b2b4f;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.elena-white-analysis-box p {
+    font-size: 0.98rem;
+    line-height: 1.75;
+    color: #475569;
+    margin-bottom: 0.8rem;
+}
+
+.elena-white-analysis-box p:last-child {
+    margin-bottom: 0;
+}
+
+.elena-white-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 3rem 0;
+    color: #c9a53b;
+}
+
+.elena-white-separator::before,
+.elena-white-separator::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201, 165, 59, 0.4), transparent);
+}
+
+.elena-white-summary-card {
+    background: linear-gradient(135deg, #091a30 0%, #0d274c 100%);
+    border: 1px solid rgba(201, 165, 59, 0.4);
+    border-radius: 1.2rem;
+    padding: 2.2rem 2rem;
+    color: #ffffff;
+    margin: 2.5rem 0;
+}
+
+.elena-white-summary-card h4 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.35rem;
+    color: #f5d77f;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.elena-white-summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.elena-white-summary-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #e2e8f0;
+}
+
+.elena-white-summary-list li i {
+    color: #c9a53b;
+    font-size: 1.1rem;
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .elena-white-hero {
+        padding: 2.5rem 1.25rem;
+    }
+
+    .elena-white-body {
+        padding: 1.8rem 1.25rem;
+    }
+
+    .elena-white-quote-box {
+        padding: 1.25rem 1.25rem;
+    }
+
+    .elena-white-analysis-box {
+        padding: 1.25rem 1.25rem;
+    }
+
+    .elena-white-text-block p {
+        text-align: left;
+    }
+}
