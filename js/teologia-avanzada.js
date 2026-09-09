@@ -221,8 +221,8 @@
                     titulo: "Los Cuernos del Altar",
                     left: 43,
                     top: 45,
-                    leftMobile: 74,
-                    topMobile: 58,
+                    leftMobile: 35,
+                    topMobile: 30,
                     material: "Madera de acacia revestida de bronce macizo",
                     simbolismo: "Simbolizan el poder salvador supremo de Cristo y el refugio inquebrantable de gracia para el pecador arrepentido que busca misericordia."
                 },
@@ -288,6 +288,8 @@
                     titulo: "El Candelabro de Oro",
                     left: 35,
                     top: 62,
+                    leftMobile: 15,
+                    topMobile: 40,
                     material: "",
                     simbolismo: ""
                 },
@@ -296,6 +298,8 @@
                     titulo: "La Mesa de los Panes",
                     left: 66,
                     top: 62,
+                    leftMobile: 85,
+                    topMobile: 40,
                     material: "",
                     simbolismo: ""
                 },
@@ -393,6 +397,8 @@
                     titulo: "El Arca del Pacto (Cerrada)",
                     left: 50,
                     top: 70,
+                    leftMobile: 50,
+                    topMobile: 50,
                     material: "Cofre de madera de acacia revestido totalmente en oro interior y exteriormente",
                     simbolismo: "El centro sagrado de la presencia de Dios en la Tierra y guardián de la eterna Ley Moral."
                 },
@@ -442,6 +448,8 @@
                     titulo: "La Urna de Oro con el Maná",
                     left: 62,
                     top: 77,
+                    leftMobile: 70,
+                    topMobile: 45,
                     material: "Vasija de oro conteniendo el maná conservado milagrosamente incorrupto",
                     simbolismo: "Recordatorio eterno del continuo e inagotable sustento providencial de Dios para su pueblo."
                 }
@@ -928,6 +936,68 @@
         }
     }
 
+    /**
+     * Alterna la visibilidad de un argumento de refutación en la Sección 10 de la Trinidad
+     * @param {number|string} num - Número del argumento (1 al 5)
+     */
+    function toggleArgumentoTrinidad(num) {
+        const item = document.getElementById('trinidad-arg-' + num);
+        if (!item) return;
+
+        const body = item.querySelector('.trinidad-refutacion-body');
+        const icon = item.querySelector('.trinidad-arg-toggle-icon');
+        const isOpen = item.classList.contains('open');
+
+        if (isOpen) {
+            item.classList.remove('open');
+            if (body) {
+                body.style.display = 'none';
+            }
+            if (icon) {
+                icon.className = 'fas fa-chevron-down trinidad-arg-toggle-icon';
+            }
+        } else {
+            item.classList.add('open');
+            if (body) {
+                body.style.display = 'block';
+            }
+            if (icon) {
+                icon.className = 'fas fa-chevron-up trinidad-arg-toggle-icon';
+            }
+        }
+    }
+
+    /**
+     * Alterna la visibilidad de una pregunta frecuente en la sección de La Gran Controversia
+     * @param {number|string} num - Número de la pregunta (1 al 10)
+     */
+    function togglePreguntaFrecuente(num) {
+        const item = document.getElementById('conflicto-faq-' + num);
+        if (!item) return;
+
+        const body = item.querySelector('.conflicto-faq-a');
+        const icon = item.querySelector('.conflicto-faq-icon');
+        const isOpen = item.classList.contains('open');
+
+        if (isOpen) {
+            item.classList.remove('open');
+            if (body) {
+                body.style.display = 'none';
+            }
+            if (icon) {
+                icon.className = 'fas fa-chevron-down conflicto-faq-icon';
+            }
+        } else {
+            item.classList.add('open');
+            if (body) {
+                body.style.display = 'block';
+            }
+            if (icon) {
+                icon.className = 'fas fa-chevron-up conflicto-faq-icon';
+            }
+        }
+    }
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', inicializarVideoSantuario);
     } else {
@@ -945,6 +1015,8 @@
     window.filtrarMobiliarioSantuario = filtrarMobiliarioSantuario;
     window.toggleAcordeonInmortalidad = toggleAcordeonInmortalidad;
     window.toggleTodosAcordeonesInmortalidad = toggleTodosAcordeonesInmortalidad;
+    window.toggleArgumentoTrinidad = toggleArgumentoTrinidad;
+    window.togglePreguntaFrecuente = togglePreguntaFrecuente;
     window.abrirAnalisisElenaWhite = abrirAnalisisElenaWhite;
 
     // Funciones del Tour Interactivo del Santuario

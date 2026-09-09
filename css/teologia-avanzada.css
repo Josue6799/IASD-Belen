@@ -4346,6 +4346,136 @@
     margin-bottom: 0.8rem;
 }
 
+/* ==================== ADAPTACIÓN EXCLUSIVA PARA CELULARES: SECCIÓN LA TRINIDAD ==================== */
+@media (max-width: 768px) {
+    /* 1. CONTENEDOR PRINCIPAL */
+    #trinidad .teologia-content-card {
+        padding: 1.5rem;
+        margin: 1rem;
+        border-radius: 12px;
+    }
+
+    #trinidad .trinidad-intro-hero {
+        padding: 0.5rem 0;
+    }
+
+    /* 2. TÍTULOS Y ENCABEZADOS */
+    #trinidad h1,
+    #trinidad .hero-trinidad h1,
+    #trinidad .teologia-theme-hero h1 {
+        font-size: 1.8rem;
+        text-align: center;
+        line-height: 1.3;
+    }
+
+    #trinidad h3,
+    #trinidad h4,
+    #trinidad .trinidad-block-content h3,
+    #trinidad .trinidad-block-content h4 {
+        font-size: 1.2rem;
+        margin-top: 2rem;
+        line-height: 1.35;
+    }
+
+    #trinidad .trinidad-block-title {
+        font-size: 1.2rem;
+        margin-top: 0;
+        line-height: 1.35;
+    }
+
+    #trinidad .trinidad-block-header h2,
+    #trinidad .trinidad-block-header h3 {
+        margin-top: 0;
+    }
+
+    /* 3. TEXTOS Y PÁRRAFOS */
+    #trinidad p,
+    #trinidad .trinidad-intro-hero p,
+    #trinidad .trinidad-block-content p,
+    #trinidad .teologia-lead-text {
+        font-size: 1rem;
+        line-height: 1.7;
+        text-align: justify;
+        margin-bottom: 1.5rem;
+    }
+
+    /* 4. IMÁGENES */
+    #trinidad img,
+    #trinidad .trinidad-img-wrapper img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin: 1rem 0;
+        max-height: none;
+        object-fit: contain;
+    }
+
+    #trinidad .trinidad-img-wrapper {
+        margin: 1rem 0;
+        border-radius: 10px;
+        max-height: none;
+    }
+
+    #trinidad .trinidad-img-caption {
+        font-size: 0.85rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    /* 5. CITAS DESTACADAS Y CAJAS DE RECURSOS */
+    #trinidad .teologia-box-biblico,
+    #trinidad .exegesis-box,
+    #trinidad .trinidad-refutacion-box,
+    #trinidad .trinidad-patristica-box,
+    #trinidad .trinidad-patristica-quote,
+    #trinidad .inmortalidad-text-block,
+    #trinidad blockquote {
+        padding: 1rem;
+        font-size: 0.95rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+    }
+
+    #trinidad .trinidad-patristica-quote p,
+    #trinidad .trinidad-refutacion-body p,
+    #trinidad .exegesis-box p,
+    #trinidad .texto-biblico {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 0.5rem;
+    }
+
+    /* 6. SEPARADORES VISUALES */
+    #trinidad .teologia-separador,
+    #trinidad .trinidad-sep-line,
+    #trinidad hr {
+        margin: 1.5rem 0;
+        width: 100%;
+    }
+
+    /* 7. ÍNDICE O TABLA DE CONTENIDO */
+    #trinidad .trinidad-toc-card {
+        padding: 1rem;
+        font-size: 0.9rem;
+        overflow-x: auto;
+        border-radius: 12px;
+    }
+
+    #trinidad .trinidad-toc-title {
+        font-size: 1.1rem;
+        line-height: 1.3;
+    }
+
+    #trinidad .trinidad-toc-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    #trinidad .trinidad-toc-item {
+        font-size: 0.9rem;
+        padding: 0.75rem 0.9rem;
+    }
+}
+
 /* ==================== ESTILOS PARA ANÁLISIS ELENA G. DE WHITE Y LA TRINIDAD ==================== */
 .elena-white-container {
     background: #ffffff;
@@ -4592,5 +4722,653 @@
 
     .elena-white-text-block p {
         text-align: left;
+    }
+}
+
+/* ==================== ESTILOS VISUALES Y RESPONSIVOS: LA GRAN CONTROVERSIA ==================== */
+.hero-conflicto {
+    background: radial-gradient(circle at top right, rgba(201, 165, 59, 0.25), transparent 60%),
+        linear-gradient(135deg, #091a30 0%, #1e1b4b 50%, #061324 100%);
+    border: 2px solid rgba(201, 165, 59, 0.4);
+    box-shadow: 0 12px 35px -5px rgba(6, 19, 36, 0.4);
+}
+
+.conflicto-block-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2.2rem;
+    margin-bottom: 2.5rem;
+}
+
+.conflicto-block-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1.3rem;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(11, 43, 79, 0.05);
+    border-top: 4px solid #c9a53b;
+    transition: box-shadow 0.3s ease;
+}
+
+.conflicto-block-item:hover {
+    box-shadow: 0 10px 28px rgba(201, 165, 59, 0.14);
+}
+
+.conflicto-block-header {
+    padding: 1.4rem 1.8rem;
+    background: linear-gradient(90deg, #fefce8 0%, #ffffff 100%);
+    border-bottom: 1px solid #fef08a;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.conflicto-block-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-family: 'Playfair Display', serif;
+}
+
+.conflicto-block-content {
+    padding: 2.2rem 2.2rem;
+    background: #ffffff;
+}
+
+.conflicto-block-content p {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: #334155;
+    margin-bottom: 1.35rem;
+    text-align: justify;
+}
+
+.conflicto-subbadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(201, 165, 59, 0.15);
+    border: 1px solid rgba(201, 165, 59, 0.4);
+    color: #854d0e;
+    padding: 0.3rem 0.85rem;
+    border-radius: 1rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.8rem;
+}
+
+.conflicto-img-wrapper {
+    margin: 2rem auto;
+    border-radius: 1.1rem;
+    overflow: hidden;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    position: relative;
+    background: #091a30;
+    width: 100%;
+}
+
+.conflicto-img-wrapper img {
+    width: 100%;
+    height: auto;
+    max-height: 800px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+    border-radius: 12px 12px 0 0;
+    transition: transform 0.5s ease;
+}
+
+.conflicto-img-wrapper:hover img {
+    transform: scale(1.02);
+}
+
+.conflicto-img-caption {
+    background: rgba(15, 23, 42, 0.92);
+    color: #f5d77f;
+    padding: 0.85rem 1.2rem;
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-align: center;
+    border-top: 1px solid rgba(201, 165, 59, 0.4);
+}
+
+/* Estilos para Preguntas Frecuentes de La Gran Controversia */
+.conflicto-faq-card {
+    background: linear-gradient(135deg, #091a30 0%, #0d274c 100%);
+    border: 2px solid rgba(201, 165, 59, 0.4);
+    border-radius: 1.3rem;
+    padding: 2.2rem 2rem;
+    color: #ffffff;
+    margin: 2.5rem 0;
+    box-shadow: 0 12px 35px -5px rgba(6, 19, 36, 0.4);
+}
+
+.conflicto-faq-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #f5d77f;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.conflicto-faq-subtitle {
+    font-size: 0.98rem;
+    color: #e2e8f0;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+    border-bottom: 1px solid rgba(201, 165, 59, 0.3);
+    padding-bottom: 0.8rem;
+}
+
+.conflicto-faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.conflicto-faq-item {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(201, 165, 59, 0.25);
+    border-radius: 0.9rem;
+    overflow: hidden;
+    transition: all 0.25s ease;
+}
+
+.conflicto-faq-item.open {
+    border-color: #c9a53b;
+    background: rgba(201, 165, 59, 0.12);
+}
+
+.conflicto-faq-q {
+    padding: 1.1rem 1.3rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #f5d77f;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    user-select: none;
+}
+
+.conflicto-faq-q:hover {
+    color: #ffffff;
+}
+
+.conflicto-faq-icon {
+    font-size: 0.9rem;
+    color: #c9a53b;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+}
+
+.conflicto-faq-a {
+    padding: 0 1.3rem 1.3rem 1.3rem;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: #f1f5f9;
+    border-top: 1px dashed rgba(201, 165, 59, 0.25);
+    margin-top: 0.3rem;
+    padding-top: 0.9rem;
+}
+
+.conflicto-quote-box {
+    background: linear-gradient(135deg, #091a30 0%, #112238 100%);
+    border-left: 4px solid #c9a53b;
+    border-radius: 0.9rem;
+    padding: 1.6rem 2rem;
+    margin: 1.8rem 0;
+    box-shadow: 0 8px 24px -4px rgba(6, 19, 36, 0.25);
+    color: #f1f5f9;
+}
+
+.conflicto-quote-box p {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 1.08rem;
+    line-height: 1.8;
+    color: #f1f5f9;
+    margin-bottom: 0.6rem;
+}
+
+.conflicto-quote-ref {
+    text-align: right;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #c9a53b;
+    margin-top: 0.5rem;
+}
+
+.conflicto-biblio-card {
+    background: linear-gradient(135deg, #091a30 0%, #0d274c 100%);
+    border: 2px solid rgba(201, 165, 59, 0.4);
+    border-radius: 1.3rem;
+    padding: 2.2rem 2rem;
+    color: #ffffff;
+    margin: 2.5rem 0;
+    box-shadow: 0 12px 35px -5px rgba(6, 19, 36, 0.4);
+}
+
+.conflicto-biblio-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #f5d77f;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid rgba(201, 165, 59, 0.3);
+    padding-bottom: 0.75rem;
+}
+
+.conflicto-biblio-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.conflicto-biblio-list li a {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: #f5d77f;
+    font-size: 1.02rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(201, 165, 59, 0.25);
+    border-radius: 0.85rem;
+    transition: all 0.25s ease;
+}
+
+.conflicto-biblio-list li a:hover {
+    background: rgba(201, 165, 59, 0.2);
+    border-color: #c9a53b;
+    color: #ffffff;
+    transform: translateX(4px);
+}
+
+.conflicto-btn-egw-wrapper {
+    text-align: center;
+    margin: 3rem 0 2rem;
+}
+
+.conflicto-btn-egw {
+    background: linear-gradient(135deg, #c9a53b 0%, #a38226 100%);
+    color: #061324;
+    font-size: 1.1rem;
+    font-weight: 800;
+    padding: 1rem 2.2rem;
+    border-radius: 2rem;
+    border: none;
+    box-shadow: 0 10px 30px rgba(201, 165, 59, 0.35);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+.conflicto-btn-egw:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 35px rgba(201, 165, 59, 0.45);
+}
+
+/* ==================== ADAPTACIÓN EXCLUSIVA PARA CELULARES: LA GRAN CONTROVERSIA ==================== */
+@media (max-width: 768px) {
+    /* 1. CONTENEDOR PRINCIPAL */
+    #conflicto .teologia-content-card {
+        padding: 1.5rem;
+        margin: 1rem;
+        border-radius: 12px;
+    }
+
+    #conflicto .hero-conflicto {
+        padding: 2.2rem 1.25rem;
+        border-radius: 12px;
+    }
+
+    #conflicto .conflicto-intro-hero {
+        padding: 1.5rem 1.25rem;
+        border-radius: 12px;
+    }
+
+    /* 2. TÍTULOS Y ENCABEZADOS */
+    #conflicto h1,
+    #conflicto .hero-conflicto h1 {
+        font-size: 1.8rem;
+        text-align: center;
+        line-height: 1.3;
+    }
+
+    #conflicto h2,
+    #conflicto h3,
+    #conflicto h4,
+    #conflicto .conflicto-block-title {
+        font-size: 1.2rem;
+        margin-top: 2rem;
+        line-height: 1.35;
+    }
+
+    #conflicto .conflicto-block-header {
+        padding: 1.1rem 1.2rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    /* 3. TEXTOS Y PÁRRAFOS */
+    #conflicto p,
+    #conflicto .conflicto-block-content p,
+    #conflicto .conflicto-intro-hero p {
+        font-size: 1rem;
+        line-height: 1.7;
+        text-align: justify;
+        margin-bottom: 1.5rem;
+    }
+
+    /* 4. IMÁGENES */
+    #conflicto img,
+    #conflicto .conflicto-img-wrapper img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px 10px 0 0;
+        margin: 1rem 0;
+        max-height: 500px;
+        object-fit: contain;
+        display: block;
+    }
+
+    #conflicto .conflicto-img-wrapper {
+        margin: 1rem 0;
+        border-radius: 10px;
+        max-height: none;
+    }
+
+    #conflicto .conflicto-img-caption {
+        font-size: 0.85rem;
+        padding: 0.6rem 0.8rem;
+    }
+
+    /* 5. CITAS DESTACADAS Y SECCIONES DE RECURSOS */
+    #conflicto .conflicto-quote-box {
+        padding: 1rem;
+        font-size: 0.95rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+    }
+
+    #conflicto .conflicto-quote-box p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    /* 6. SEPARADORES VISUALES */
+    #conflicto .teologia-separador,
+    #conflicto hr {
+        margin: 1.5rem 0;
+        width: 100%;
+    }
+
+    /* 7. CONTENEDORES DE BIBLIOGRAFÍA Y PREGUNTAS FRECUENTES */
+    #conflicto .conflicto-biblio-card,
+    #conflicto .conflicto-faq-card {
+        padding: 1rem;
+        font-size: 0.9rem;
+        overflow-x: auto;
+        border-radius: 12px;
+        margin: 1.5rem 0;
+    }
+
+    #conflicto .conflicto-biblio-title,
+    #conflicto .conflicto-faq-title {
+        font-size: 1.25rem;
+    }
+
+    #conflicto .conflicto-faq-q {
+        font-size: 0.98rem;
+        padding: 0.9rem 1rem;
+    }
+
+    #conflicto .conflicto-faq-a {
+        font-size: 0.92rem;
+        padding: 0 1rem 1rem 1rem;
+    }
+
+    #conflicto .conflicto-btn-egw {
+        font-size: 0.95rem;
+        padding: 0.85rem 1.4rem;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ==================== VIDEO EXPLICATIVO: LA GRAN CONTROVERSIA ==================== */
+.conflicto-video-container {
+    background: linear-gradient(135deg, #091a30 0%, #0d274c 100%);
+    border: 2px solid rgba(201, 165, 59, 0.4);
+    border-radius: 1.3rem;
+    padding: 1.8rem;
+    margin: 2.5rem 0;
+    box-shadow: 0 12px 35px -5px rgba(6, 19, 36, 0.4);
+}
+
+.conflicto-video-header {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #f5d77f;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid rgba(201, 165, 59, 0.3);
+    padding-bottom: 0.75rem;
+}
+
+.conflicto-video-player {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 12px;
+    margin: 0.5rem 0;
+    display: block;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    background: #000000;
+}
+
+@media (max-width: 768px) {
+    .conflicto-video-container {
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 12px;
+    }
+
+    .conflicto-video-header {
+        font-size: 1.15rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .conflicto-video-player {
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        object-fit: contain;
+        border-radius: 10px;
+        margin: 1rem 0;
+    }
+}
+
+
+/* ==================== FONDO SÓLIDO PARA LA INTRODUCCIÓN DE LA GRAN CONTROVERSIA ==================== */
+.conflicto-intro-hero {
+    position: relative;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(201, 165, 59, 0.35);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #091a30 0%, #0d274c 50%, #061324 100%);
+    padding: 2.2rem 2rem;
+    color: #ffffff;
+}
+
+.conflicto-intro-hero p {
+    font-size: 1.08rem;
+    line-height: 1.8;
+    color: #e2e8f0;
+    margin-bottom: 1.2rem;
+    text-align: justify;
+}
+
+.conflicto-intro-hero p:last-child {
+    margin-bottom: 0;
+}
+
+/* ==================== ADAPTACIÓN EXCLUSIVA PARA CELULARES: SECCIÓN LA LEY DE DIOS ==================== */
+@media (max-width: 768px) {
+    /* 1. CONTENEDOR PRINCIPAL */
+    #ley .teologia-content-card {
+        padding: 1.5rem;
+        margin: 1rem;
+        border-radius: 12px;
+    }
+
+    #ley .hero-ley {
+        padding: 2.2rem 1.25rem;
+        border-radius: 12px;
+    }
+
+    /* 2. TÍTULOS Y ENCABEZADOS */
+    #ley h1,
+    #ley .hero-ley h1,
+    #ley .teologia-theme-hero h1 {
+        font-size: 1.8rem;
+        text-align: center;
+        line-height: 1.3;
+    }
+
+    #ley h2,
+    #ley h3,
+    #ley h4,
+    #ley .trinidad-block-title {
+        font-size: 1.2rem;
+        margin-top: 1.8rem;
+        line-height: 1.35;
+    }
+
+    #ley .trinidad-block-header {
+        padding: 1.1rem 1.2rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    #ley .trinidad-block-header h2,
+    #ley .trinidad-block-header h3 {
+        margin-top: 0;
+    }
+
+    /* 3. TEXTOS Y PÁRRAFOS */
+    #ley p,
+    #ley .hero-ley p,
+    #ley .trinidad-block-content p,
+    #ley .teologia-lead-text {
+        font-size: 1rem;
+        line-height: 1.7;
+        text-align: justify;
+        margin-bottom: 1.5rem;
+    }
+
+    /* 4. IMÁGENES */
+    #ley img,
+    #ley .ley-img-wrapper img,
+    #ley .trinidad-img-wrapper img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin: 1rem 0;
+        max-height: none;
+        object-fit: contain;
+    }
+
+    #ley .ley-img-wrapper,
+    #ley .trinidad-img-wrapper {
+        margin: 1rem 0;
+        border-radius: 10px;
+        max-height: none;
+    }
+
+    /* 5. CITAS DESTACADAS Y CAJAS DE RECURSOS */
+    #ley .teologia-box-biblico,
+    #ley .exegesis-box,
+    #ley .trinidad-refutacion-box,
+    #ley .elena-white-quote-box,
+    #ley .elena-white-analysis-box,
+    #ley blockquote {
+        padding: 1rem;
+        font-size: 0.95rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+    }
+
+    #ley .trinidad-refutacion-body p,
+    #ley .exegesis-box p,
+    #ley .elena-white-quote-text,
+    #ley .texto-biblico {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 0.5rem;
+    }
+
+    /* 6. SEPARADORES VISUALES */
+    #ley .teologia-separador,
+    #ley .trinidad-sep-line,
+    #ley hr {
+        margin: 1.5rem 0;
+        width: 100%;
+    }
+
+    /* 7. ÍNDICE O TABLA DE CONTENIDO */
+    #ley .trinidad-toc-card {
+        padding: 1rem;
+        font-size: 0.9rem;
+        overflow-x: auto;
+        border-radius: 12px;
+    }
+
+    #ley .trinidad-toc-title {
+        font-size: 1.1rem;
+        line-height: 1.3;
+    }
+
+    #ley .trinidad-toc-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    #ley .trinidad-toc-item {
+        font-size: 0.9rem;
+        padding: 0.75rem 0.9rem;
     }
 }
