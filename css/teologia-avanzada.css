@@ -428,30 +428,100 @@
 }
 
 .hero-trinidad {
-    background: linear-gradient(135deg, rgba(9, 26, 48, 0.92) 0%, rgba(13, 39, 76, 0.86) 50%, rgba(6, 19, 36, 0.94) 100%),
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, rgba(6, 19, 36, 0.75) 0%, rgba(9, 26, 48, 0.85) 60%, #061324 100%),
         url('https://res.cloudinary.com/onjg5kf6/image/upload/v1788816515/TRINIDAD_kazhhn.jpg') center/cover no-repeat;
-    border: 2px solid rgba(201, 165, 59, 0.5);
-    box-shadow: 0 20px 45px -10px rgba(6, 19, 36, 0.65), 0 0 25px rgba(201, 165, 59, 0.25);
+    border: 2px solid rgba(201, 165, 59, 0.65);
+    border-radius: 1.5rem;
+    box-shadow: 0 25px 60px -10px rgba(6, 19, 36, 0.8), 0 0 40px rgba(201, 165, 59, 0.4), inset 0 0 30px rgba(247, 223, 143, 0.2);
     position: relative;
     overflow: hidden;
+    margin-bottom: 2.5rem;
+    padding: 4rem 2rem;
 }
 
 .hero-trinidad::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at center, rgba(201, 165, 59, 0.15), transparent 70%);
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(201, 165, 59, 0.28), rgba(59, 130, 246, 0.22) 40%, transparent 70%);
+    animation: trinidadGoldOverlay 10s ease-in-out infinite alternate;
     pointer-events: none;
+    z-index: 1;
+}
+
+.hero-trinidad::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(247, 223, 143, 0.25) 50%, transparent 100%);
+    transform: skewX(-25deg);
+    animation: heroShimmerSweep 7s infinite ease-in-out;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.hero-trinidad .hero-inner {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 .hero-trinidad .hero-badge {
-    background: rgba(201, 165, 59, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(15, 23, 42, 0.85);
     border: 1px solid #c9a53b;
     color: #f7df8f;
-    box-shadow: 0 0 15px rgba(201, 165, 59, 0.3);
+    padding: 0.5rem 1.4rem;
+    border-radius: 2rem;
+    font-size: 0.88rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    box-shadow: 0 0 25px rgba(201, 165, 59, 0.4), inset 0 0 10px rgba(201, 165, 59, 0.2);
+    backdrop-filter: blur(10px);
+    margin-bottom: 1.5rem;
+}
+
+.hero-trinidad h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2.5rem, 5.5vw, 4.2rem);
+    font-weight: 900;
+    line-height: 1.15;
+    margin-bottom: 1.2rem;
+}
+
+.hero-trinidad h1 .gold-highlight {
+    background: linear-gradient(135deg, #ffffff 0%, #ffe8a3 25%, #c9a53b 50%, #f7df8f 75%, #ffffff 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: titleGoldShimmer 5s linear infinite, titleGoldPulsate 3.5s ease-in-out infinite;
+    display: inline-block;
+}
+
+.hero-trinidad p {
+    font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+    line-height: 1.8;
+    color: #e2e8f0;
+    max-width: 780px;
+    margin: 0 auto;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    font-weight: 400;
 }
 
 
@@ -3566,263 +3636,464 @@
     }
 }
 
-/* ==================== ESTILOS DEDICADOS: LA INMORTALIDAD DEL ALMA ==================== */
+/* ==================== ESTILOS DEDICADOS: LA INMORTALIDAD DEL ALMA (DISEÑO RADICAL WOW) ==================== */
 
-/* Tarjeta Introductoria Ambiental */
+/* Keyframes para Efectos Visuales Avanzados */
+@keyframes goldGlowPulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.6)) drop-shadow(0 0 25px rgba(245, 215, 110, 0.4));
+        text-shadow: 0 0 20px rgba(212, 175, 55, 0.6), 0 0 40px rgba(245, 215, 110, 0.3);
+    }
+    50% {
+        filter: drop-shadow(0 0 25px rgba(245, 215, 110, 0.95)) drop-shadow(0 0 45px rgba(255, 223, 0, 0.7));
+        text-shadow: 0 0 35px rgba(245, 215, 110, 0.9), 0 0 60px rgba(212, 175, 55, 0.7), 0 0 80px rgba(212, 175, 55, 0.5);
+    }
+}
+
+@keyframes holoGlowBorder {
+    0% { border-color: rgba(212, 175, 55, 0.5); box-shadow: 0 6px 25px rgba(212, 175, 55, 0.15); }
+    50% { border-color: rgba(14, 165, 233, 0.6); box-shadow: 0 6px 25px rgba(14, 165, 233, 0.22); }
+    100% { border-color: rgba(212, 175, 55, 0.5); box-shadow: 0 6px 25px rgba(212, 175, 55, 0.15); }
+}
+
+@keyframes accordionSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulseGoldDot {
+    0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.9), 0 0 8px rgba(212, 175, 55, 0.8); }
+    70% { box-shadow: 0 0 0 14px rgba(212, 175, 55, 0), 0 0 15px rgba(212, 175, 55, 0.4); }
+    100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0), 0 0 8px rgba(212, 175, 55, 0.8); }
+}
+
+/* 1. HERO GIGANTE A PANTALLA COMPLETA (min 60vh) */
+.hero-inmortalidad {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, rgba(6, 19, 36, 0.88) 0%, rgba(9, 26, 48, 0.94) 50%, rgba(6, 19, 36, 0.98) 100%),
+        url('https://res.cloudinary.com/onjg5kf6/image/upload/v1788809916/Jesus_dando_aliento_de_vida_a_ad%C3%A1n_t3adid.jpg') center/cover no-repeat;
+    border: 2px solid rgba(212, 175, 55, 0.5);
+    border-radius: 20px;
+    box-shadow: 0 25px 60px -10px rgba(6, 19, 36, 0.8), 0 0 35px rgba(212, 175, 55, 0.3);
+    position: relative;
+    overflow: hidden;
+    padding: 3.5rem 2rem !important;
+}
+
+.hero-inmortalidad h1 span.gold-highlight,
+.hero-inmortalidad h1 {
+    font-size: clamp(2.2rem, 5vw, 4rem) !important;
+    background: linear-gradient(135deg, #FFF099 0%, #D4AF37 40%, #F5D76E 70%, #FFF5CC 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: goldGlowPulse 4s infinite ease-in-out;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    margin-top: 0.8rem;
+    margin-bottom: 1.2rem;
+}
+
+/* 2. TARJETA INTRODUCTORIA AMBIENTAL CON GLASSMORPHISM DE ALTO CONTRASTE */
 .inmortalidad-intro-hero {
     position: relative;
-    border-radius: 1.25rem;
+    border-radius: 18px;
     overflow: hidden;
-    margin-bottom: 2rem;
-    border: 1px solid rgba(201, 165, 59, 0.35);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    background: linear-gradient(135deg, rgba(9, 26, 48, 0.92) 0%, rgba(15, 23, 42, 0.86) 100%),
+    margin-bottom: 2.2rem;
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4), 0 0 25px rgba(212, 175, 55, 0.2);
+    background: linear-gradient(135deg, rgba(6, 19, 36, 0.94) 0%, rgba(15, 23, 42, 0.88) 100%),
         url('https://res.cloudinary.com/onjg5kf6/image/upload/v1788809916/Un_anciano_durmiendo_tlzj64.jpg') center/cover no-repeat;
-    padding: 2.2rem 2rem;
+    padding: 2.2rem;
     color: #ffffff;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.inmortalidad-intro-hero:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45), 0 0 30px rgba(212, 175, 55, 0.3);
 }
 
 .inmortalidad-intro-hero p {
     font-size: 1.08rem;
-    line-height: 1.75;
-    color: #e2e8f0;
+    line-height: 1.85;
+    color: #f8fafc;
     margin-bottom: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-/* Tarjetas Acordeón Doctrinales */
+/* 3. TARJETAS DOCTRINALES "HOLOGRÁFICAS" (EFECTO WOW CON ELEVACIÓN DE 8px) */
 .inmortalidad-arg-container {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
-    margin-bottom: 2.5rem;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
 }
 
 .inmortalidad-arg-item {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 1.2rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(254, 252, 232, 0.94) 50%, rgba(255, 255, 255, 0.98) 100%);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    border-radius: 18px;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(11, 43, 79, 0.04);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+    animation: holoGlowBorder 6s infinite ease-in-out;
+}
+
+.inmortalidad-arg-item:hover {
+    transform: translateY(-8px) scale(1.008);
+    box-shadow: 0 20px 45px -5px rgba(212, 175, 55, 0.38), 0 0 30px rgba(245, 215, 110, 0.25), 0 0 0 2px rgba(212, 175, 55, 0.6) !important;
+    border-color: #D4AF37 !important;
 }
 
 .inmortalidad-arg-item.open {
-    border-color: #c9a53b;
-    box-shadow: 0 12px 30px -5px rgba(201, 165, 59, 0.2), 0 0 0 1px rgba(201, 165, 59, 0.3);
+    border-color: #D4AF37;
+    box-shadow: 0 16px 40px rgba(212, 175, 55, 0.25), 0 0 0 2px rgba(212, 175, 55, 0.4);
 }
 
 .inmortalidad-arg-header {
-    padding: 1.35rem 1.6rem;
+    padding: 1.4rem 1.8rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.92);
     user-select: none;
-    transition: background 0.2s ease;
+    transition: background 0.3s ease;
 }
 
 .inmortalidad-arg-header:hover {
-    background: #faf8f5;
+    background: #fefce8;
 }
 
 .inmortalidad-arg-item.open .inmortalidad-arg-header {
-    background: linear-gradient(90deg, #fefce8 0%, #ffffff 100%);
-    border-bottom: 1px solid #fef08a;
+    background: linear-gradient(90deg, #fef9c3 0%, #ffffff 100%);
+    border-bottom: 2px solid rgba(212, 175, 55, 0.4);
 }
 
 .inmortalidad-arg-meta {
     display: flex;
     align-items: center;
-    gap: 0.85rem;
+    gap: 0.9rem;
     flex-wrap: wrap;
     flex-grow: 1;
 }
 
 .inmortalidad-arg-badge {
-    font-size: 0.8rem;
-    font-weight: 800;
-    color: #854d0e;
-    background: #fef08a;
-    padding: 0.25rem 0.75rem;
+    font-size: 0.82rem;
+    font-weight: 900;
+    color: #78350f;
+    background: linear-gradient(135deg, #fef08a, #fde047);
+    padding: 0.3rem 0.85rem;
     border-radius: 2rem;
-    border: 1px solid #fde047;
+    border: 1px solid rgba(212, 175, 55, 0.6);
+    box-shadow: 0 3px 8px rgba(212, 175, 55, 0.2);
+    letter-spacing: 0.03em;
 }
 
 .inmortalidad-arg-title {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 800;
     color: #0f172a;
     margin: 0;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.65rem;
     font-family: 'Playfair Display', serif;
 }
 
+.inmortalidad-arg-title i {
+    font-size: 1.25rem;
+    filter: drop-shadow(0 2px 4px rgba(212, 175, 55, 0.5));
+}
+
 .inmortalidad-arg-toggle {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     background: #f1f5f9;
     color: #0b2b4f;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     flex-shrink: 0;
-    transition: all 0.25s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .inmortalidad-arg-item.open .inmortalidad-arg-toggle {
-    background: #c9a53b;
-    color: #ffffff;
+    background: linear-gradient(135deg, #D4AF37, #F5D76E);
+    color: #071324;
     transform: rotate(180deg);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
 }
 
 .inmortalidad-arg-body {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.inmortalidad-arg-item.open .inmortalidad-arg-body {
+    animation: accordionSlideDown 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .inmortalidad-arg-content {
-    padding: 1.8rem 1.8rem;
+    padding: 2.2rem;
     background: #ffffff;
+    font-size: 1.02rem;
+    line-height: 1.85;
+    color: #334155;
 }
 
-/* Imagen destacada dentro de acordeón */
-.inmortalidad-img-wrapper {
-    margin: 1.5rem 0;
-    border-radius: 1.1rem;
-    overflow: hidden;
-    border: 1px solid #cbd5e1;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+.inmortalidad-arg-content p {
+    line-height: 1.85;
+    margin-bottom: 1.6rem;
+}
+
+/* 4. CITAS BÍBLICAS Y BOXES CON COMILLAS GIGANTES DECORATIVAS Y GRADIENTE OSCURO */
+#inmortalidad .teologia-punto-item,
+#inmortalidad .teologia-box-biblico,
+#inmortalidad .teologia-aplicacion-card {
     position: relative;
-    max-height: 420px;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(6, 19, 36, 0.96) 0%, rgba(15, 23, 42, 0.94) 60%, rgba(35, 28, 12, 0.96) 100%) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(212, 175, 55, 0.5) !important;
+    border-left: 6px solid #D4AF37 !important;
+    border-radius: 16px !important;
+    padding: 1.8rem 2rem !important;
+    margin: 1.8rem 0 !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 15px rgba(212, 175, 55, 0.15) !important;
+}
+
+#inmortalidad .teologia-box-biblico::before,
+#inmortalidad .teologia-punto-item::before {
+    content: '“';
+    position: absolute;
+    top: -25px;
+    right: 15px;
+    font-size: 6.5rem;
+    font-family: 'Playfair Display', serif;
+    color: rgba(212, 175, 55, 0.12);
+    line-height: 1;
+    pointer-events: none;
+}
+
+#inmortalidad .teologia-box-biblico .box-title,
+#inmortalidad .teologia-punto-item h4,
+#inmortalidad .teologia-aplicacion-card h4 {
+    color: #F5D76E !important;
+    font-size: 1.15rem;
+    font-weight: 800;
+}
+
+#inmortalidad .teologia-box-biblico .texto-biblico,
+#inmortalidad .teologia-punto-item p,
+#inmortalidad .teologia-aplicacion-card p {
+    color: #f1f5f9 !important;
+    font-size: 1.02rem;
+    line-height: 1.8;
+}
+
+#inmortalidad .teologia-box-biblico .exegesis-box {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    border-radius: 10px !important;
+    color: #e2e8f0 !important;
+    padding: 1rem 1.2rem !important;
+    margin-top: 1rem !important;
+}
+
+#inmortalidad .teologia-box-biblico .exegesis-box strong {
+    color: #F5D76E !important;
+}
+
+/* 5. IMÁGENES (ZOOM 1.08 + FILTRO DE BRILLO DORADO) */
+.inmortalidad-img-wrapper {
+    margin: 2rem 0;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 175, 55, 0.2);
+    position: relative;
+    max-height: 500px;
+    background: #061324;
 }
 
 .inmortalidad-img-wrapper img {
     width: 100%;
-    height: 100%;
-    max-height: 420px;
+    height: auto;
+    max-height: 500px;
     object-fit: cover;
     display: block;
-    transition: transform 0.5s ease;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.6s ease;
 }
 
 .inmortalidad-img-wrapper:hover img {
-    transform: scale(1.02);
+    transform: scale(1.08);
+    filter: brightness(1.15) contrast(1.05) drop-shadow(0 0 25px rgba(212, 175, 55, 0.5));
 }
 
 .inmortalidad-img-caption {
-    background: rgba(15, 23, 42, 0.88);
-    color: #f7df8f;
-    padding: 0.65rem 1.2rem;
-    font-size: 0.88rem;
-    font-weight: 700;
+    background: linear-gradient(135deg, rgba(6, 19, 36, 0.96) 0%, rgba(15, 23, 42, 0.96) 100%);
+    color: #F5D76E;
+    padding: 0.85rem 1.4rem;
+    font-size: 0.9rem;
+    font-weight: 800;
     text-align: center;
-    border-top: 1px solid rgba(201, 165, 59, 0.4);
+    border-top: 1px solid rgba(212, 175, 55, 0.5);
+    letter-spacing: 0.02em;
 }
 
-/* Términos lingüísticos (Pills de Hebreo/Griego) */
+/* Términos lingüísticos (Pills de Hebreo/Griego con Estilo Oscuro Radiante) */
 .inmortalidad-term-pills {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.85rem;
     flex-wrap: wrap;
-    margin: 1.2rem 0;
+    margin: 1.8rem 0;
 }
 
 .inmortalidad-term-pill {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-left: 4px solid #c9a53b;
-    padding: 0.6rem 1rem;
-    border-radius: 0.6rem;
-    font-size: 0.9rem;
-    color: #334155;
+    background: linear-gradient(135deg, #091a30 0%, #0f172a 100%);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-left: 5px solid #D4AF37;
+    padding: 0.9rem 1.2rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    color: #f1f5f9;
+    line-height: 1.65;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.inmortalidad-term-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.25);
 }
 
 .inmortalidad-term-pill strong {
-    color: #0f172a;
+    color: #F5D76E;
 }
 
 /* Bloque apologético de textos malinterpretados */
 .inmortalidad-text-block {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-left: 5px solid #0284c7;
-    border-radius: 0.85rem;
-    padding: 1.35rem 1.5rem;
-    margin-bottom: 1.25rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.98) 0%, rgba(254, 252, 232, 0.95) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-left: 6px solid #D4AF37;
+    border-radius: 16px;
+    padding: 1.6rem;
+    margin-bottom: 1.6rem;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 
 .inmortalidad-text-block:hover {
-    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.08);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(212, 175, 55, 0.25);
+    border-color: #D4AF37;
 }
 
 .inmortalidad-text-header {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.75rem;
     font-weight: 800;
-    font-size: 1.05rem;
-    color: #0369a1;
-    margin-bottom: 0.65rem;
+    font-size: 1.1rem;
+    color: #854d0e;
+    margin-bottom: 0.75rem;
 }
 
-/* Línea de Tiempo Histórica */
+/* Separadores Visuales Dorados Brillantes */
+.inmortalidad-gold-divider {
+    height: 3px;
+    width: 100%;
+    background: linear-gradient(90deg, transparent 0%, #D4AF37 50%, transparent 100%);
+    margin: 2.5rem 0;
+    border: none;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+}
+
+/* 6. LÍNEA DE TIEMPO HISTÓRICA CON PUNTO PULSANTE (LATIDO DORADO) Y LÍNEA ILUMINADA */
 .inmortalidad-timeline-section {
-    margin-top: 3.5rem;
-    padding: 2.5rem 2rem;
-    background: linear-gradient(135deg, #091a30 0%, #0d274c 50%, #061324 100%);
-    border-radius: 1.5rem;
-    border: 1px solid rgba(201, 165, 59, 0.35);
-    box-shadow: 0 16px 40px -10px rgba(6, 19, 36, 0.45);
+    margin-top: 4rem;
+    padding: 3rem 2.2rem;
+    background: linear-gradient(135deg, rgba(6, 19, 36, 0.97) 0%, rgba(13, 39, 76, 0.95) 50%, rgba(6, 19, 36, 0.99) 100%);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 20px;
+    border: 2px solid rgba(212, 175, 55, 0.45);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(212, 175, 55, 0.2);
     color: #ffffff;
 }
 
 .inmortalidad-timeline-title {
     text-align: center;
     font-family: 'Playfair Display', serif;
-    font-size: clamp(1.8rem, 3.5vw, 2.5rem);
-    color: #f7df8f;
-    margin-bottom: 0.5rem;
-    font-weight: 800;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    background: linear-gradient(135deg, #FFF099 0%, #D4AF37 50%, #F5D76E 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.6rem;
+    font-weight: 900;
+    animation: goldGlowPulse 4s infinite ease-in-out;
 }
 
 .inmortalidad-timeline-subtitle {
     text-align: center;
     color: #cbd5e1;
-    font-size: 1.05rem;
-    margin-bottom: 2.2rem;
+    font-size: 1.08rem;
+    margin-bottom: 2.5rem;
 }
 
 .inmortalidad-timeline-container {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.2rem;
 }
 
 .inmortalidad-timeline-item {
     background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(201, 165, 59, 0.25);
-    border-radius: 1rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: 16px;
     overflow: hidden;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(8px);
+    transition: all 0.35s ease;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.inmortalidad-timeline-item:hover {
+    transform: translateY(-4px) translateX(4px);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: #D4AF37;
+    border-left: 5px solid #D4AF37;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(212, 175, 55, 0.35);
 }
 
 .inmortalidad-timeline-item.open {
-    border-color: #c9a53b;
-    background: rgba(255, 255, 255, 0.12);
-    box-shadow: 0 8px 25px rgba(201, 165, 59, 0.15);
+    border-color: #D4AF37;
+    border-left: 5px solid #D4AF37;
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.25);
 }
 
 .inmortalidad-timeline-header {
-    padding: 1.2rem 1.5rem;
+    padding: 1.3rem 1.6rem;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -3831,85 +4102,89 @@
     user-select: none;
 }
 
-.inmortalidad-timeline-header:hover {
-    background: rgba(251, 191, 36, 0.08);
-}
-
 .inmortalidad-timeline-year {
-    font-size: 0.85rem;
-    font-weight: 800;
-    color: #f7df8f;
-    background: rgba(201, 165, 59, 0.25);
-    padding: 0.25rem 0.75rem;
+    font-size: 0.88rem;
+    font-weight: 900;
+    color: #F5D76E;
+    background: rgba(212, 175, 55, 0.28);
+    padding: 0.3rem 0.85rem;
     border-radius: 1rem;
-    border: 1px solid rgba(201, 165, 59, 0.5);
+    border: 1px solid rgba(212, 175, 55, 0.6);
+    animation: pulseGoldDot 2.5s infinite ease-in-out;
 }
 
 .inmortalidad-timeline-event-title {
-    font-size: 1.05rem;
-    font-weight: 700;
+    font-size: 1.08rem;
+    font-weight: 800;
     color: #ffffff;
     margin: 0;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.65rem;
     flex-grow: 1;
 }
 
 .inmortalidad-timeline-toggle {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    color: #f7df8f;
+    background: rgba(255, 255, 255, 0.18);
+    color: #F5D76E;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     flex-shrink: 0;
-    transition: all 0.25s ease;
+    transition: all 0.3s ease;
 }
 
 .inmortalidad-timeline-item.open .inmortalidad-timeline-toggle {
-    background: #c9a53b;
-    color: #0f172a;
+    background: linear-gradient(135deg, #D4AF37, #F5D76E);
+    color: #071324;
     transform: rotate(180deg);
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
 }
 
 .inmortalidad-timeline-body {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.4s ease;
+    transition: max-height 0.45s ease;
 }
 
 .inmortalidad-timeline-content {
-    padding: 1.2rem 1.6rem 1.6rem;
-    color: #e2e8f0;
-    font-size: 0.98rem;
-    line-height: 1.7;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.4rem 1.8rem 1.8rem;
+    color: #f1f5f9;
+    font-size: 1.02rem;
+    line-height: 1.8;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-/* Fuentes y Lecturas Recomendadas */
+/* 7. FUENTES Y LECTURAS RECOMENDADAS */
 .inmortalidad-biblio-section {
-    margin-top: 3rem;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 1.4rem;
-    padding: 2.2rem;
-    box-shadow: 0 6px 25px rgba(11, 43, 79, 0.05);
+    margin-top: 3.5rem;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    border-radius: 18px;
+    padding: 2.4rem;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
 }
 
 .inmortalidad-biblio-title {
     font-family: 'Playfair Display', serif;
     font-size: 1.5rem;
-    color: #854d0e;
-    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #B8860B, #D4AF37);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1.8rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    border-bottom: 2px solid #fef08a;
-    padding-bottom: 0.75rem;
+    gap: 0.8rem;
+    border-bottom: 3px solid rgba(212, 175, 55, 0.4);
+    padding-bottom: 0.85rem;
+    font-weight: 900;
 }
 
 .inmortalidad-biblio-list {
@@ -3918,810 +4193,1039 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
+    gap: 1rem;
 }
 
 .inmortalidad-biblio-item a {
     display: flex;
     align-items: center;
-    gap: 0.85rem;
-    padding: 0.9rem 1.2rem;
+    gap: 0.9rem;
+    padding: 1rem 1.4rem;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
-    border-radius: 0.8rem;
+    border-radius: 14px;
     color: #0f172a;
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
-    transition: all 0.25s ease;
+    transition: all 0.35s ease;
 }
 
 .inmortalidad-biblio-item a:hover {
     background: #fefce8;
-    border-color: #c9a53b;
+    border-color: #D4AF37;
     color: #854d0e;
-    transform: translateX(5px);
-    box-shadow: 0 4px 12px rgba(201, 165, 59, 0.12);
+    transform: translateX(8px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.2);
 }
 
 .inmortalidad-biblio-item i.link-icon {
     margin-left: auto;
     color: #94a3b8;
-    font-size: 0.85rem;
-    transition: color 0.2s ease;
+    font-size: 0.9rem;
+    transition: color 0.25s ease;
 }
 
 .inmortalidad-biblio-item a:hover i.link-icon {
-    color: #c9a53b;
+    color: #D4AF37;
 }
 
+/* 8. ADAPTACIÓN CELULAR 100% (MEDIA QUERY MAX-WIDTH 768px) */
 @media (max-width: 768px) {
-    .inmortalidad-arg-header {
-        padding: 1.1rem 1.2rem;
+    #inmortalidad .teologia-content-card {
+        padding: 1.2rem !important;
     }
 
-    .inmortalidad-arg-content {
-        padding: 1.2rem 1.2rem;
+    .hero-inmortalidad {
+        min-height: 50vh;
+        border-radius: 16px;
+        padding: 2.2rem 1.2rem !important;
+    }
+
+    .hero-inmortalidad h1 span.gold-highlight,
+    .hero-inmortalidad h1 {
+        font-size: 1.9rem !important;
     }
 
     .inmortalidad-intro-hero {
-        padding: 1.5rem 1.2rem;
+        padding: 1.4rem;
+        border-radius: 14px;
+        margin-bottom: 1.5rem;
+    }
+
+    .inmortalidad-intro-hero p {
+        font-size: 1rem !important;
+        line-height: 1.75 !important;
+    }
+
+    .inmortalidad-arg-header {
+        padding: 1.2rem 1.2rem;
+    }
+
+    .inmortalidad-arg-title {
+        font-size: 1.15rem !important;
+    }
+
+    .inmortalidad-arg-content {
+        padding: 1.3rem;
+        font-size: 1rem !important;
+    }
+
+    .inmortalidad-arg-content p {
+        font-size: 1rem !important;
+        line-height: 1.75 !important;
+        margin-bottom: 1.4rem !important;
+    }
+
+    #inmortalidad .teologia-punto-item,
+    #inmortalidad .teologia-box-biblico,
+    #inmortalidad .teologia-aplicacion-card {
+        padding: 1.2rem !important;
+        font-size: 0.98rem !important;
+        margin: 1.4rem 0 !important;
+    }
+
+    .inmortalidad-img-wrapper {
+        margin: 1.4rem 0;
+        border-radius: 14px;
+    }
+
+    .inmortalidad-img-wrapper img {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 500px !important;
+        object-fit: contain !important;
+    }
+
+    .inmortalidad-img-caption {
+        padding: 0.7rem 0.9rem;
+        font-size: 0.85rem;
+    }
+
+    .inmortalidad-text-block {
+        padding: 1.2rem;
+        font-size: 0.98rem !important;
     }
 
     .inmortalidad-timeline-section {
         padding: 1.8rem 1.2rem;
+        border-radius: 16px;
+        margin-top: 2.5rem;
+    }
+
+    .inmortalidad-timeline-title {
+        font-size: 1.6rem !important;
+    }
+
+    .inmortalidad-timeline-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 1.6rem;
+    }
+
+    .inmortalidad-timeline-header {
+        padding: 1.1rem;
+    }
+
+    .inmortalidad-timeline-content {
+        padding: 1.1rem;
+        font-size: 0.98rem;
+    }
+
+    .inmortalidad-biblio-section {
+        padding: 1.5rem;
+        border-radius: 16px;
+        margin-top: 2rem;
+    }
+
+    .inmortalidad-biblio-title {
+        font-size: 1.25rem !important;
+    }
+
+    .inmortalidad-biblio-item a {
+        padding: 0.85rem 1rem;
+        font-size: 0.92rem;
     }
 }
 
-/* ==================== ESTILOS DEDICADOS: LA TRINIDAD ==================== */
+/* ==================== KEYFRAMES Y ANIMACIONES DE LA TRINIDAD ==================== */
+@keyframes titleGoldShimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
 
+@keyframes titleGoldPulsate {
+    0%, 100% {
+        text-shadow: 0 0 25px rgba(201, 165, 59, 0.9), 0 0 50px rgba(247, 223, 143, 0.7), 0 0 75px rgba(59, 130, 246, 0.5);
+        filter: drop-shadow(0 0 15px rgba(201, 165, 59, 0.8));
+    }
+    50% {
+        text-shadow: 0 0 45px rgba(247, 223, 143, 1), 0 0 85px rgba(201, 165, 59, 1), 0 0 120px rgba(59, 130, 246, 0.8);
+        filter: drop-shadow(0 0 30px rgba(247, 223, 143, 1));
+    }
+}
+
+@keyframes trinidadGoldOverlay {
+    0% { opacity: 0.5; transform: scale(1) rotate(0deg); }
+    50% { opacity: 0.85; transform: scale(1.1) rotate(3deg); }
+    100% { opacity: 0.5; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes heroShimmerSweep {
+    0% { left: -100%; }
+    50% { left: 200%; }
+    100% { left: 200%; }
+}
+
+@keyframes trinidadHoloBorder {
+    0%, 100% {
+        border-color: rgba(201, 165, 59, 0.65);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(201, 165, 59, 0.3), inset 0 0 20px rgba(201, 165, 59, 0.15);
+    }
+    50% {
+        border-color: rgba(59, 130, 246, 0.75);
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.6), 0 0 35px rgba(59, 130, 246, 0.4), inset 0 0 25px rgba(59, 130, 246, 0.2);
+    }
+}
+
+@keyframes trinidadStaggerReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.96);
+        filter: blur(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes holoSweep {
+    0% { transform: translateX(-150%) skewX(-20deg); }
+    100% { transform: translateX(250%) skewX(-20deg); }
+}
+
+@keyframes imageShineSweep {
+    0% { transform: translateX(-100%) rotate(25deg); }
+    100% { transform: translateX(220%) rotate(25deg); }
+}
+
+/* ==================== ESTILOS DEDICADOS: LA TRINIDAD (ESPECTACULAR & AUDÁZ) ==================== */
+
+/* Estilo Base del Contenedor de Trinidad */
+#trinidad .teologia-content-card {
+    background: linear-gradient(180deg, rgba(6, 19, 36, 0.95) 0%, rgba(9, 26, 48, 0.98) 50%, #030810 100%) !important;
+    border: 1px solid rgba(201, 165, 59, 0.35) !important;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 30px rgba(201, 165, 59, 0.2) !important;
+    border-radius: 1.5rem !important;
+    color: #f8fafc !important;
+}
+
+#trinidad strong {
+    color: #f7df8f !important;
+    font-weight: 800 !important;
+}
+
+#trinidad em {
+    color: #ffe8a3 !important;
+}
+
+#trinidad .pasaje-referencia {
+    color: #93c5fd !important;
+    font-weight: 700 !important;
+}
+
+/* ==================== ARREGLO DE ALTO CONTRASTE PARA TARJETAS INTERNAS EN SECCIONES 4, 8 Y 11 ==================== */
+#trinidad .inmortalidad-text-block {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(9, 26, 48, 0.96) 100%) !important;
+    border: 1px solid rgba(201, 165, 59, 0.45) !important;
+    border-left: 5px solid #f7df8f !important;
+    border-radius: 1.25rem !important;
+    padding: 1.8rem 2rem !important;
+    margin-bottom: 1.8rem !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45), 0 0 20px rgba(201, 165, 59, 0.15) !important;
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+}
+
+#trinidad .inmortalidad-text-block:hover {
+    transform: translateY(-6px) scale(1.01) !important;
+    box-shadow: 0 20px 45px rgba(201, 165, 59, 0.4), 0 0 30px rgba(59, 130, 246, 0.25) !important;
+    border-color: #f7df8f !important;
+}
+
+#trinidad .inmortalidad-text-header {
+    color: #f7df8f !important;
+    font-family: 'Playfair Display', Georgia, serif !important;
+    font-size: 1.2rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    text-shadow: 0 0 15px rgba(201, 165, 59, 0.6) !important;
+}
+
+#trinidad .inmortalidad-text-header i {
+    color: #f7df8f !important;
+    font-size: 1.25rem !important;
+    filter: drop-shadow(0 0 10px rgba(201, 165, 59, 0.9)) !important;
+}
+
+#trinidad .inmortalidad-text-block p,
+#trinidad .inmortalidad-text-block li,
+#trinidad .inmortalidad-text-block span:not(.trinidad-subbadge) {
+    color: #f8fafc !important;
+    font-size: 1.05rem !important;
+    line-height: 1.85 !important;
+}
+
+#trinidad .inmortalidad-text-block strong {
+    color: #f7df8f !important;
+    font-weight: 800 !important;
+    text-shadow: 0 0 8px rgba(201, 165, 59, 0.3) !important;
+}
+
+#trinidad .inmortalidad-text-block em {
+    color: #ffe8a3 !important;
+    font-style: italic !important;
+}
+
+#trinidad .trinidad-subbadge {
+    background: linear-gradient(135deg, #c9a53b 0%, #f7df8f 100%) !important;
+    color: #061324 !important;
+    font-weight: 800 !important;
+    font-size: 0.85rem !important;
+    padding: 0.4rem 1.1rem !important;
+    border-radius: 2rem !important;
+    box-shadow: 0 0 15px rgba(201, 165, 59, 0.5) !important;
+    margin-bottom: 1rem !important;
+    display: inline-flex !important;
+}
+
+/* 1. HERO INTRODUCCIÓN CON HOLOGRAFÍA */
 .trinidad-intro-hero {
     position: relative;
-    border-radius: 1.25rem;
+    border-radius: 1.5rem;
     overflow: hidden;
-    margin-bottom: 2rem;
-    border: 1px solid rgba(201, 165, 59, 0.35);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    background: linear-gradient(135deg, rgba(9, 26, 48, 0.92) 0%, rgba(15, 23, 42, 0.86) 100%),
+    margin-bottom: 2.5rem;
+    border: 1px solid rgba(201, 165, 59, 0.5);
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(9, 26, 48, 0.92) 100%),
         url('https://res.cloudinary.com/onjg5kf6/image/upload/v1788816515/SIMBOLO_DE_LA_TRINIDAD_uefg93.jpg') center/cover no-repeat;
-    padding: 2.2rem 2rem;
+    padding: 3rem 2.5rem;
     color: #ffffff;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    animation: trinidadHoloBorder 7s ease-in-out infinite;
 }
 
 .trinidad-intro-hero p {
-    font-size: 1.08rem;
-    line-height: 1.8;
+    font-size: 1.12rem;
+    line-height: 1.85;
     color: #e2e8f0;
+    margin-bottom: 1.25rem;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+.trinidad-intro-hero p:last-child {
     margin-bottom: 0;
 }
 
-.trinidad-arg-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-    margin-bottom: 2.5rem;
-}
-
-.trinidad-arg-item {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 1.2rem;
-    overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(11, 43, 79, 0.04);
-}
-
-.trinidad-arg-item.open {
-    border-color: #c9a53b;
-    box-shadow: 0 12px 30px -5px rgba(201, 165, 59, 0.2), 0 0 0 1px rgba(201, 165, 59, 0.3);
-}
-
-.trinidad-arg-header {
-    padding: 1.35rem 1.6rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    background: #ffffff;
-    user-select: none;
-    transition: background 0.2s ease;
-}
-
-.trinidad-arg-header:hover {
-    background: #faf8f5;
-}
-
-.trinidad-arg-item.open .trinidad-arg-header {
-    background: linear-gradient(90deg, #fefce8 0%, #ffffff 100%);
-    border-bottom: 1px solid #fef08a;
-}
-
-.trinidad-arg-meta {
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    flex-wrap: wrap;
-    flex-grow: 1;
-}
-
-.trinidad-arg-badge {
-    font-size: 0.8rem;
-    font-weight: 800;
-    color: #854d0e;
-    background: #fef08a;
-    padding: 0.25rem 0.75rem;
-    border-radius: 2rem;
-    border: 1px solid #fde047;
-}
-
-.trinidad-arg-title {
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: #0f172a;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-family: 'Playfair Display', serif;
-}
-
-.trinidad-arg-toggle {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #f1f5f9;
-    color: #0b2b4f;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    flex-shrink: 0;
-    transition: all 0.25s ease;
-}
-
-.trinidad-arg-item.open .trinidad-arg-toggle {
-    background: #c9a53b;
-    color: #ffffff;
-    transform: rotate(180deg);
-}
-
-.trinidad-arg-body {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.trinidad-arg-content {
-    padding: 2rem 2rem;
-    background: #ffffff;
-}
-
-.trinidad-arg-content p {
-    font-size: 1.02rem;
-    line-height: 1.8;
-    color: #334155;
-    margin-bottom: 1.25rem;
-}
-
-.trinidad-img-wrapper {
-    margin: 1.8rem 0;
-    border-radius: 1.1rem;
-    overflow: hidden;
-    border: 1px solid #cbd5e1;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-    position: relative;
-    max-height: 480px;
-}
-
-.trinidad-img-wrapper img {
-    width: 100%;
-    height: 100%;
-    max-height: 480px;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.5s ease;
-}
-
-.trinidad-img-wrapper:hover img {
-    transform: scale(1.02);
-}
-
-.trinidad-img-caption {
-    background: rgba(15, 23, 42, 0.9);
-    color: #f7df8f;
-    padding: 0.75rem 1.2rem;
-    font-size: 0.9rem;
-    font-weight: 700;
-    text-align: center;
-    border-top: 1px solid rgba(201, 165, 59, 0.4);
-}
-
-/* Tarjeta de Padres de la Iglesia */
-.trinidad-patristica-box {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-left: 5px solid #c9a53b;
-    border-radius: 0.9rem;
-    padding: 1.5rem;
-    margin-bottom: 1.25rem;
-}
-
-.trinidad-patristica-name {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: #854d0e;
-    margin-bottom: 0.4rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-}
-
-.trinidad-patristica-quote {
-    font-style: italic;
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    padding: 0.85rem 1.1rem;
-    border-radius: 0.6rem;
-    margin: 0.75rem 0;
-    color: #1e293b;
-}
-
-@media (max-width: 768px) {
-    .trinidad-arg-header {
-        padding: 1.1rem 1.2rem;
-    }
-
-    .trinidad-arg-content {
-        padding: 1.2rem 1.2rem;
-    }
-}
-
-/* Bloques Continuos de Lectura Directa (Sin Acordeón) */
-.trinidad-block-container {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    margin-bottom: 2.5rem;
-}
-
-.trinidad-block-item {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 1.3rem;
-    overflow: hidden;
-    box-shadow: 0 6px 20px rgba(11, 43, 79, 0.05);
-    border-top: 4px solid #c9a53b;
-    transition: box-shadow 0.3s ease;
-}
-
-.trinidad-block-item:hover {
-    box-shadow: 0 10px 28px rgba(201, 165, 59, 0.14);
-}
-
-.trinidad-block-header {
-    padding: 1.4rem 1.8rem;
-    background: linear-gradient(90deg, #fefce8 0%, #ffffff 100%);
-    border-bottom: 1px solid #fef08a;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.trinidad-block-title {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: #0f172a;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    font-family: 'Playfair Display', serif;
-}
-
-.trinidad-block-content {
-    padding: 2.2rem 2.2rem;
-    background: #ffffff;
-}
-
-.trinidad-block-content p {
-    font-size: 1.05rem;
-    line-height: 1.85;
-    color: #334155;
-    margin-bottom: 1.35rem;
-}
-
-@media (max-width: 768px) {
-    .trinidad-block-header {
-        padding: 1.2rem 1.2rem;
-    }
-
-    .trinidad-block-content {
-        padding: 1.3rem 1.2rem;
-    }
-}
-
-/* ==================== ÍNDICE Y RECURSOS VISUALES DE LA TRINIDAD ==================== */
+/* 2. ÍNDICE TEMÁTICO DE NAVEGACIÓN CON GLASSMORPHISM Y HOVER INTENSO */
 .trinidad-toc-card {
-    background: linear-gradient(135deg, #091a30 0%, #0d274c 50%, #061324 100%);
-    border: 2px solid rgba(201, 165, 59, 0.4);
-    border-radius: 1.4rem;
-    padding: 2.2rem 2rem;
-    color: #ffffff;
-    margin-bottom: 2.5rem;
-    box-shadow: 0 12px 35px -5px rgba(6, 19, 36, 0.4);
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(9, 26, 48, 0.9) 100%) !important;
+    backdrop-filter: blur(15px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+    border: 1px solid rgba(201, 165, 59, 0.4) !important;
+    border-radius: 1.5rem !important;
+    padding: 2.5rem 2.2rem !important;
+    color: #ffffff !important;
+    margin-bottom: 3rem !important;
+    box-shadow: 0 15px 40px -5px rgba(6, 19, 36, 0.6) !important;
+    position: relative;
+    overflow: hidden;
+    animation: trinidadHoloBorder 8s ease-in-out infinite;
 }
 
 .trinidad-toc-title {
     font-family: 'Playfair Display', Georgia, serif;
-    font-size: 1.4rem;
+    font-size: 1.45rem;
     font-weight: 800;
-    color: #f5d77f;
-    margin-bottom: 1.2rem;
+    color: #f7df8f;
+    margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    border-bottom: 1px solid rgba(201, 165, 59, 0.3);
-    padding-bottom: 0.75rem;
+    gap: 0.85rem;
+    border-bottom: 2px solid rgba(201, 165, 59, 0.35);
+    padding-bottom: 0.85rem;
+    text-shadow: 0 0 15px rgba(201, 165, 59, 0.5);
+}
+
+.trinidad-toc-title i {
+    color: #f7df8f;
+    font-size: 1.35rem;
+    filter: drop-shadow(0 0 10px rgba(201, 165, 59, 0.9));
 }
 
 .trinidad-toc-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1rem;
+    gap: 1.15rem;
 }
 
 .trinidad-toc-item {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(201, 165, 59, 0.25);
-    border-radius: 0.85rem;
-    padding: 0.85rem 1.1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(201, 165, 59, 0.3);
+    border-radius: 1rem;
+    padding: 1rem 1.25rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.85rem;
     color: #e2e8f0;
-    font-size: 0.95rem;
+    font-size: 0.98rem;
     font-weight: 600;
-    transition: all 0.25s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(8px);
 }
 
+.trinidad-toc-item:nth-child(1) { animation: trinidadStaggerReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both; }
+.trinidad-toc-item:nth-child(2) { animation: trinidadStaggerReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+.trinidad-toc-item:nth-child(3) { animation: trinidadStaggerReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+.trinidad-toc-item:nth-child(4) { animation: trinidadStaggerReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+.trinidad-toc-item:nth-child(5) { animation: trinidadStaggerReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both; }
+.trinidad-toc-item:nth-child(6) { animation: trinidadStaggerReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; }
+.trinidad-toc-item:nth-child(7) { animation: trinidadStaggerReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+.trinidad-toc-item:nth-child(8) { animation: trinidadStaggerReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both; }
+.trinidad-toc-item:nth-child(9) { animation: trinidadStaggerReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both; }
+.trinidad-toc-item:nth-child(10) { animation: trinidadStaggerReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both; }
+.trinidad-toc-item:nth-child(11) { animation: trinidadStaggerReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both; }
+.trinidad-toc-item:nth-child(12) { animation: trinidadStaggerReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both; }
+
 .trinidad-toc-item i {
-    color: #c9a53b;
-    font-size: 1.1rem;
+    color: #f7df8f;
+    font-size: 1.25rem;
     flex-shrink: 0;
+    filter: drop-shadow(0 0 8px rgba(201, 165, 59, 0.8));
+    transition: transform 0.3s ease;
 }
 
 .trinidad-toc-item:hover {
-    background: rgba(201, 165, 59, 0.18);
-    border-color: #c9a53b;
+    background: linear-gradient(135deg, rgba(201, 165, 59, 0.25) 0%, rgba(59, 130, 246, 0.25) 100%);
+    border-color: #f7df8f;
     color: #ffffff;
-    transform: translateX(4px);
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(201, 165, 59, 0.4), 0 0 25px rgba(59, 130, 246, 0.3);
 }
 
-.trinidad-refutacion-box {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-left: 4px solid #dc2626;
-    border-radius: 0.9rem;
-    padding: 1.6rem 1.8rem;
-    margin: 1.5rem 0 2rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+.trinidad-toc-item:hover i {
+    transform: scale(1.25) rotate(8deg);
+    filter: drop-shadow(0 0 15px rgba(247, 223, 143, 1));
 }
 
-.trinidad-refutacion-title {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #991b1b;
-    margin-bottom: 0.75rem;
+/* 3. BLOQUES DOCTRINALES CONTINUOS CON EFECTO HOLOGRÁFICO Y GLASSMORPHISM */
+.trinidad-block-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    margin-bottom: 3rem;
+}
+
+.trinidad-block-item {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(9, 26, 48, 0.9) 100%) !important;
+    backdrop-filter: blur(15px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+    border: 1px solid rgba(201, 165, 59, 0.4) !important;
+    border-radius: 1.5rem !important;
+    overflow: hidden;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4);
+    border-top: 4px solid #f7df8f !important;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease;
+    animation: trinidadStaggerReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    position: relative;
+}
+
+.trinidad-block-item:nth-child(1) { animation-delay: 0.08s; }
+.trinidad-block-item:nth-child(2) { animation-delay: 0.16s; }
+.trinidad-block-item:nth-child(3) { animation-delay: 0.24s; }
+.trinidad-block-item:nth-child(4) { animation-delay: 0.32s; }
+.trinidad-block-item:nth-child(5) { animation-delay: 0.4s; }
+.trinidad-block-item:nth-child(6) { animation-delay: 0.48s; }
+.trinidad-block-item:nth-child(7) { animation-delay: 0.56s; }
+.trinidad-block-item:nth-child(8) { animation-delay: 0.64s; }
+.trinidad-block-item:nth-child(9) { animation-delay: 0.72s; }
+.trinidad-block-item:nth-child(10) { animation-delay: 0.8s; }
+.trinidad-block-item:nth-child(11) { animation-delay: 0.88s; }
+.trinidad-block-item:nth-child(12) { animation-delay: 0.96s; }
+
+.trinidad-block-item:hover {
+    transform: translateY(-10px) scale(1.015);
+    box-shadow: 0 25px 55px -10px rgba(201, 165, 59, 0.5), 0 0 40px rgba(59, 130, 246, 0.35), inset 0 0 25px rgba(247, 223, 143, 0.2) !important;
+    border-color: #f7df8f !important;
+}
+
+.trinidad-block-header {
+    padding: 1.6rem 2.2rem;
+    background: linear-gradient(90deg, rgba(201, 165, 59, 0.18) 0%, rgba(15, 23, 42, 0.9) 100%);
+    border-bottom: 1px solid rgba(201, 165, 59, 0.3);
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 1.2rem;
+    flex-wrap: wrap;
 }
 
-.trinidad-refutacion-body p {
-    font-size: 1.02rem;
-    line-height: 1.8;
-    color: #334155;
-    margin-bottom: 0.9rem;
+.trinidad-block-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #f7df8f;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: 'Playfair Display', serif;
+    text-shadow: 0 0 12px rgba(201, 165, 59, 0.5);
 }
 
-.trinidad-refutacion-body p:last-child {
-    margin-bottom: 0;
+.trinidad-block-title i {
+    color: #f7df8f !important;
+    font-size: 1.3rem;
+    filter: drop-shadow(0 0 10px rgba(201, 165, 59, 0.9)) drop-shadow(0 0 20px rgba(247, 223, 143, 0.6)) !important;
+    transition: transform 0.3s ease;
 }
 
+.trinidad-block-item:hover .trinidad-block-title i {
+    transform: scale(1.2) rotate(6deg);
+}
+
+.trinidad-block-content {
+    padding: 2.5rem 2.5rem;
+    background: transparent;
+    color: #e2e8f0;
+}
+
+.trinidad-block-content p {
+    font-size: 1.08rem;
+    line-height: 1.88;
+    color: #e2e8f0;
+    margin-bottom: 1.5rem;
+}
+
+.trinidad-arg-badge,
 .trinidad-subbadge {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    background: rgba(201, 165, 59, 0.15);
-    border: 1px solid rgba(201, 165, 59, 0.4);
-    color: #854d0e;
-    padding: 0.3rem 0.85rem;
-    border-radius: 1rem;
-    font-size: 0.78rem;
-    font-weight: 700;
+    gap: 0.45rem;
+    background: linear-gradient(135deg, #c9a53b 0%, #f7df8f 100%);
+    color: #061324;
+    padding: 0.35rem 0.95rem;
+    border-radius: 2rem;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 0.8rem;
+    box-shadow: 0 0 15px rgba(201, 165, 59, 0.5);
+    margin-bottom: 0.85rem;
 }
 
-/* ==================== ADAPTACIÓN EXCLUSIVA PARA CELULARES: SECCIÓN LA TRINIDAD ==================== */
-@media (max-width: 768px) {
-    /* 1. CONTENEDOR PRINCIPAL */
-    #trinidad .teologia-content-card {
-        padding: 1.5rem;
-        margin: 1rem;
-        border-radius: 12px;
-    }
-
-    #trinidad .trinidad-intro-hero {
-        padding: 0.5rem 0;
-    }
-
-    /* 2. TÍTULOS Y ENCABEZADOS */
-    #trinidad h1,
-    #trinidad .hero-trinidad h1,
-    #trinidad .teologia-theme-hero h1 {
-        font-size: 1.8rem;
-        text-align: center;
-        line-height: 1.3;
-    }
-
-    #trinidad h3,
-    #trinidad h4,
-    #trinidad .trinidad-block-content h3,
-    #trinidad .trinidad-block-content h4 {
-        font-size: 1.2rem;
-        margin-top: 2rem;
-        line-height: 1.35;
-    }
-
-    #trinidad .trinidad-block-title {
-        font-size: 1.2rem;
-        margin-top: 0;
-        line-height: 1.35;
-    }
-
-    #trinidad .trinidad-block-header h2,
-    #trinidad .trinidad-block-header h3 {
-        margin-top: 0;
-    }
-
-    /* 3. TEXTOS Y PÁRRAFOS */
-    #trinidad p,
-    #trinidad .trinidad-intro-hero p,
-    #trinidad .trinidad-block-content p,
-    #trinidad .teologia-lead-text {
-        font-size: 1rem;
-        line-height: 1.7;
-        text-align: justify;
-        margin-bottom: 1.5rem;
-    }
-
-    /* 4. IMÁGENES */
-    #trinidad img,
-    #trinidad .trinidad-img-wrapper img {
-        width: 100%;
-        height: auto;
-        border-radius: 10px;
-        margin: 1rem 0;
-        max-height: none;
-        object-fit: contain;
-    }
-
-    #trinidad .trinidad-img-wrapper {
-        margin: 1rem 0;
-        border-radius: 10px;
-        max-height: none;
-    }
-
-    #trinidad .trinidad-img-caption {
-        font-size: 0.85rem;
-        padding: 0.6rem 0.8rem;
-    }
-
-    /* 5. CITAS DESTACADAS Y CAJAS DE RECURSOS */
-    #trinidad .teologia-box-biblico,
-    #trinidad .exegesis-box,
-    #trinidad .trinidad-refutacion-box,
-    #trinidad .trinidad-patristica-box,
-    #trinidad .trinidad-patristica-quote,
-    #trinidad .inmortalidad-text-block,
-    #trinidad blockquote {
-        padding: 1rem;
-        font-size: 0.95rem;
-        border-radius: 8px;
-        margin: 1rem 0;
-    }
-
-    #trinidad .trinidad-patristica-quote p,
-    #trinidad .trinidad-refutacion-body p,
-    #trinidad .exegesis-box p,
-    #trinidad .texto-biblico {
-        font-size: 0.95rem;
-        line-height: 1.6;
-        margin-bottom: 0.5rem;
-    }
-
-    /* 6. SEPARADORES VISUALES */
-    #trinidad .teologia-separador,
-    #trinidad .trinidad-sep-line,
-    #trinidad hr {
-        margin: 1.5rem 0;
-        width: 100%;
-    }
-
-    /* 7. ÍNDICE O TABLA DE CONTENIDO */
-    #trinidad .trinidad-toc-card {
-        padding: 1rem;
-        font-size: 0.9rem;
-        overflow-x: auto;
-        border-radius: 12px;
-    }
-
-    #trinidad .trinidad-toc-title {
-        font-size: 1.1rem;
-        line-height: 1.3;
-    }
-
-    #trinidad .trinidad-toc-grid {
-        grid-template-columns: 1fr;
-        gap: 0.75rem;
-    }
-
-    #trinidad .trinidad-toc-item {
-        font-size: 0.9rem;
-        padding: 0.75rem 0.9rem;
-    }
+/* 4. ACORDEONES E ITEMS DE ARGUMENTOS */
+.trinidad-arg-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
 }
 
-/* ==================== ESTILOS PARA ANÁLISIS ELENA G. DE WHITE Y LA TRINIDAD ==================== */
-.elena-white-container {
-    background: #ffffff;
-    border-radius: 1.5rem;
-    border: 1px solid rgba(201, 165, 59, 0.35);
-    box-shadow: 0 20px 50px -15px rgba(11, 43, 79, 0.12);
-    margin: 2.5rem 0;
+.trinidad-arg-item {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(9, 26, 48, 0.9) 100%) !important;
+    backdrop-filter: blur(15px) saturate(180%) !important;
+    border: 1px solid rgba(201, 165, 59, 0.35) !important;
+    border-radius: 1.3rem !important;
     overflow: hidden;
-    transition: all 0.4s ease;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.trinidad-arg-item:hover,
+.trinidad-arg-item.open {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 20px 45px rgba(201, 165, 59, 0.4), 0 0 30px rgba(59, 130, 246, 0.3) !important;
+    border-color: #f7df8f !important;
+}
+
+.trinidad-arg-header {
+    padding: 1.5rem 1.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    user-select: none;
+    transition: background 0.3s ease;
+}
+
+.trinidad-arg-header:hover {
+    background: rgba(201, 165, 59, 0.12);
+}
+
+.trinidad-arg-item.open .trinidad-arg-header {
+    background: linear-gradient(90deg, rgba(201, 165, 59, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%);
+    border-bottom: 1px solid rgba(201, 165, 59, 0.4);
+}
+
+.trinidad-arg-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: 'Playfair Display', serif;
+}
+
+.trinidad-arg-title i {
+    color: #f7df8f;
+    filter: drop-shadow(0 0 8px rgba(201, 165, 59, 0.9));
+}
+
+.trinidad-arg-toggle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(201, 165, 59, 0.25), rgba(247, 223, 143, 0.4));
+    border: 1px solid #c9a53b;
+    color: #f7df8f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.trinidad-arg-item.open .trinidad-arg-toggle {
+    background: linear-gradient(135deg, #c9a53b 0%, #f7df8f 100%);
+    color: #061324;
+    transform: rotate(180deg) scale(1.15);
+    box-shadow: 0 0 20px rgba(201, 165, 59, 0.8);
+}
+
+.trinidad-arg-content {
+    padding: 2.2rem 2.2rem;
+    background: transparent;
+    color: #e2e8f0;
+}
+
+.trinidad-arg-content p {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: #e2e8f0;
+    margin-bottom: 1.25rem;
+}
+
+/* 5. CITAS BÍBLICAS Y PATRÍSTICAS CON COMILLAS GIGANTES DECORATIVAS */
+.teologia-versiculos-container,
+.teologia-box-biblico,
+.trinidad-patristica-box,
+.trinidad-refutacion-box,
+.elena-white-quote-box {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(9, 26, 48, 0.95) 100%) !important;
+    border: 1px solid rgba(201, 165, 59, 0.4) !important;
+    border-radius: 1.3rem !important;
+    padding: 2.2rem 2.2rem !important;
+    margin: 2rem 0 !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4) !important;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+}
+
+.teologia-box-biblico:hover,
+.trinidad-patristica-box:hover,
+.trinidad-refutacion-box:hover,
+.elena-white-quote-box:hover {
+    transform: translateY(-10px) scale(1.015);
+    box-shadow: 0 25px 50px rgba(201, 165, 59, 0.45), 0 0 30px rgba(59, 130, 246, 0.3) !important;
+    border-color: #f7df8f !important;
+}
+
+/* Comillas Gigantes en Dorado Semitransparente */
+.teologia-box-biblico::before,
+.trinidad-patristica-quote::before,
+.elena-white-quote-box::before,
+.texto-biblico::before {
+    content: '“';
+    position: absolute;
+    top: -20px;
+    left: 15px;
+    font-size: 7.5rem;
+    line-height: 1;
+    font-family: 'Playfair Display', Georgia, serif;
+    color: rgba(201, 165, 59, 0.25);
+    pointer-events: none;
+    text-shadow: 0 0 25px rgba(201, 165, 59, 0.4);
+    z-index: 0;
+}
+
+.teologia-box-biblico::after,
+.elena-white-quote-box::after {
+    content: '”';
+    position: absolute;
+    bottom: -50px;
+    right: 20px;
+    font-size: 7.5rem;
+    line-height: 1;
+    font-family: 'Playfair Display', Georgia, serif;
+    color: rgba(201, 165, 59, 0.18);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.teologia-box-biblico > *,
+.trinidad-patristica-box > *,
+.trinidad-refutacion-box > *,
+.elena-white-quote-box > * {
+    position: relative;
+    z-index: 1;
+}
+
+.box-title,
+.trinidad-patristica-name,
+.trinidad-refutacion-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #f7df8f !important;
+    margin-bottom: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-shadow: 0 0 10px rgba(201, 165, 59, 0.5);
+}
+
+.box-title i,
+.trinidad-patristica-name i,
+.trinidad-refutacion-title i {
+    color: #f7df8f !important;
+    font-size: 1.3rem;
+    filter: drop-shadow(0 0 10px rgba(201, 165, 59, 0.9));
+}
+
+.texto-biblico,
+.trinidad-patristica-quote,
+.elena-white-quote-text {
+    font-size: 1.1rem !important;
+    line-height: 1.85 !important;
+    color: #ffffff !important;
+    font-style: italic;
+    margin: 1rem 0 !important;
+    padding: 1rem 1.25rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-left: 4px solid #f7df8f !important;
+    border-radius: 0.6rem;
+}
+
+.exegesis-box,
+.elena-white-analysis-box {
+    background: rgba(2, 132, 199, 0.18) !important;
+    border: 1px solid rgba(59, 130, 246, 0.4) !important;
+    border-radius: 0.9rem !important;
+    padding: 1.25rem 1.5rem !important;
+    margin-top: 1.25rem !important;
+    color: #e0f2fe !important;
+    font-size: 1.02rem;
+    line-height: 1.8;
+}
+
+.trinidad-refutacion-box {
+    border-left: 5px solid #ef4444 !important;
+    background: linear-gradient(135deg, rgba(30, 10, 10, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%) !important;
+}
+
+.trinidad-refutacion-title {
+    color: #fca5a5 !important;
+}
+
+/* 6. EFECTO PARALLAX 3D EN IMÁGENES */
+.trinidad-img-wrapper {
+    margin: 2.5rem 0;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    border: 2px solid rgba(201, 165, 59, 0.5);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 30px rgba(201, 165, 59, 0.3);
+    position: relative;
+    max-height: 520px;
+    perspective: 1200px;
+    transform-style: preserve-3d;
+}
+
+.trinidad-img-wrapper::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 60%;
+    height: 200%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+    animation: imageShineSweep 7s infinite ease-in-out;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.trinidad-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    max-height: 520px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1), filter 0.7s ease;
+    transform: scale(1) translateZ(0);
+}
+
+.trinidad-img-wrapper:hover img {
+    transform: scale(1.08) translateZ(20px) rotateX(2.5deg) rotateY(-2.5deg);
+    filter: brightness(1.15) contrast(1.1);
+}
+
+.trinidad-img-caption {
+    background: rgba(6, 19, 36, 0.92);
+    color: #f7df8f;
+    padding: 0.95rem 1.4rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align: center;
+    border-top: 1px solid rgba(201, 165, 59, 0.5);
+    position: relative;
+    z-index: 3;
+    backdrop-filter: blur(10px);
+}
+
+.trinidad-img-caption i {
+    color: #f7df8f;
+    margin-right: 0.5rem;
+    filter: drop-shadow(0 0 8px rgba(201, 165, 59, 0.9));
+}
+
+/* 7. BOTÓN Y SECCIÓN ESPECIAL ELENA WHITE DE LA TRINIDAD */
+#btn-elena-white-trinidad {
+    background: linear-gradient(135deg, #c9a53b 0%, #f7df8f 50%, #b88f28 100%) !important;
+    color: #061324 !important;
+    font-weight: 800 !important;
+    font-size: 1.1rem !important;
+    padding: 1rem 2.2rem !important;
+    border-radius: 3rem !important;
+    box-shadow: 0 12px 35px rgba(201, 165, 59, 0.5), 0 0 25px rgba(247, 223, 143, 0.4) !important;
+    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    border: 1px solid #ffffff !important;
+}
+
+#btn-elena-white-trinidad:hover {
+    transform: translateY(-6px) scale(1.05) !important;
+    box-shadow: 0 20px 50px rgba(201, 165, 59, 0.75), 0 0 35px rgba(247, 223, 143, 0.7) !important;
+}
+
+.elena-white-container {
+    background: linear-gradient(180deg, rgba(6, 19, 36, 0.95) 0%, rgba(9, 26, 48, 0.98) 100%) !important;
+    border-radius: 1.8rem !important;
+    border: 1px solid rgba(201, 165, 59, 0.45) !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(201, 165, 59, 0.25) !important;
+    margin: 3rem 0 !important;
+    overflow: hidden;
+    animation: trinidadHoloBorder 8s ease-in-out infinite;
 }
 
 .elena-white-hero {
-    background: radial-gradient(circle at top right, rgba(201, 165, 59, 0.25), transparent 60%),
-        linear-gradient(135deg, #061324 0%, #0d274c 50%, #091a30 100%);
-    padding: 3.5rem 2.5rem;
-    color: #ffffff;
+    background: radial-gradient(circle at top right, rgba(201, 165, 59, 0.3), transparent 60%),
+        linear-gradient(135deg, #061324 0%, #0d274c 50%, #091a30 100%) !important;
+    padding: 4rem 2.5rem !important;
+    color: #ffffff !important;
     text-align: center;
-    position: relative;
-    border-bottom: 3px solid #c9a53b;
-}
-
-.elena-white-hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    background: rgba(201, 165, 59, 0.2);
-    border: 1px solid rgba(201, 165, 59, 0.5);
-    color: #f7df8f;
-    padding: 0.45rem 1.4rem;
-    border-radius: 2rem;
-    font-size: 0.82rem;
-    font-weight: 700;
-    letter-spacing: 1.8px;
-    text-transform: uppercase;
-    margin-bottom: 1.2rem;
+    border-bottom: 3px solid #f7df8f !important;
 }
 
 .elena-white-hero-title {
     font-family: 'Playfair Display', Georgia, serif;
-    font-size: clamp(1.8rem, 3.8vw, 2.8rem);
-    font-weight: 800;
-    color: #f5d77f;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    margin-bottom: 0.8rem;
-    line-height: 1.25;
-}
-
-.elena-white-hero-subtitle {
-    font-size: clamp(1rem, 2vw, 1.2rem);
-    color: #e2e8f0;
-    max-width: 800px;
-    margin: 0 auto;
-    font-weight: 400;
-    font-style: italic;
+    font-size: clamp(2rem, 4.2vw, 3rem);
+    font-weight: 900;
+    color: #f7df8f !important;
+    text-shadow: 0 0 25px rgba(201, 165, 59, 0.7);
+    margin-bottom: 1rem;
 }
 
 .elena-white-body {
-    padding: 3rem 2.5rem;
-    color: #1e293b;
-}
-
-.elena-white-section {
-    margin-bottom: 3.5rem;
+    padding: 3.5rem 2.8rem !important;
+    color: #e2e8f0 !important;
 }
 
 .elena-white-section-title {
     font-family: 'Playfair Display', Georgia, serif;
-    font-size: 1.65rem;
-    font-weight: 700;
-    color: #0b2b4f;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #f7df8f !important;
     display: flex;
     align-items: center;
-    gap: 0.8rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.6rem;
-    border-bottom: 2px solid rgba(201, 165, 59, 0.3);
+    gap: 0.85rem;
+    margin-bottom: 1.8rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid rgba(201, 165, 59, 0.35);
 }
 
 .elena-white-section-title i {
-    color: #c9a53b;
-    font-size: 1.4rem;
-}
-
-.elena-white-text-block {
-    margin-bottom: 1.8rem;
+    color: #f7df8f !important;
+    filter: drop-shadow(0 0 10px rgba(201, 165, 59, 0.9));
 }
 
 .elena-white-text-block p {
-    font-size: 1.05rem;
-    line-height: 1.85;
-    color: #334155;
-    margin-bottom: 1.4rem;
-    text-align: justify;
-}
-
-.elena-white-quote-box {
-    background: linear-gradient(135deg, #0b1a2e 0%, #112238 100%);
-    border-left: 4px solid #c9a53b;
-    border-radius: 0.8rem;
-    padding: 1.6rem 2rem;
-    margin: 1.8rem 0;
-    box-shadow: 0 8px 24px -4px rgba(6, 19, 36, 0.25);
-    position: relative;
-}
-
-.elena-white-quote-num {
-    display: inline-block;
-    background: rgba(201, 165, 59, 0.25);
-    border: 1px solid rgba(201, 165, 59, 0.4);
-    color: #f5d77f;
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 0.25rem 0.75rem;
-    border-radius: 1rem;
-    margin-bottom: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.elena-white-quote-text {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-style: italic;
     font-size: 1.08rem;
-    line-height: 1.8;
-    color: #f1f5f9;
-    margin-bottom: 0.8rem;
-}
-
-.elena-white-quote-ref {
-    text-align: right;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: #c9a53b;
-    margin-top: 0.5rem;
-}
-
-.elena-white-analysis-box {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-left: 4px solid #0b2b4f;
-    border-radius: 0.75rem;
-    padding: 1.5rem 1.8rem;
-    margin: 1.5rem 0 2.2rem;
-}
-
-.elena-white-analysis-box h4 {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #0b2b4f;
-    margin-bottom: 0.6rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.elena-white-analysis-box p {
-    font-size: 0.98rem;
-    line-height: 1.75;
-    color: #475569;
-    margin-bottom: 0.8rem;
-}
-
-.elena-white-analysis-box p:last-child {
-    margin-bottom: 0;
-}
-
-.elena-white-separator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    margin: 3rem 0;
-    color: #c9a53b;
-}
-
-.elena-white-separator::before,
-.elena-white-separator::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(201, 165, 59, 0.4), transparent);
+    line-height: 1.88;
+    color: #e2e8f0;
+    margin-bottom: 1.5rem;
 }
 
 .elena-white-summary-card {
-    background: linear-gradient(135deg, #091a30 0%, #0d274c 100%);
-    border: 1px solid rgba(201, 165, 59, 0.4);
-    border-radius: 1.2rem;
-    padding: 2.2rem 2rem;
-    color: #ffffff;
-    margin: 2.5rem 0;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(9, 26, 48, 0.95) 100%) !important;
+    border: 1px solid rgba(201, 165, 59, 0.4) !important;
+    border-radius: 1.5rem !important;
+    padding: 2.5rem 2.2rem !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5) !important;
 }
 
 .elena-white-summary-card h4 {
+    color: #f7df8f !important;
     font-family: 'Playfair Display', Georgia, serif;
-    font-size: 1.35rem;
-    color: #f5d77f;
-    margin-bottom: 1.2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-}
-
-.elena-white-summary-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    font-size: 1.4rem;
 }
 
 .elena-white-summary-list li {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.8rem;
-    font-size: 1rem;
-    line-height: 1.7;
-    color: #e2e8f0;
+    color: #e2e8f0 !important;
+    font-size: 1.05rem;
+    line-height: 1.8;
 }
 
 .elena-white-summary-list li i {
-    color: #c9a53b;
-    font-size: 1.1rem;
-    margin-top: 0.25rem;
-    flex-shrink: 0;
+    color: #f7df8f !important;
+    filter: drop-shadow(0 0 8px rgba(201, 165, 59, 0.9));
 }
 
+/* ==================== ADAPTACIÓN EXCLUSIVA Y COMPLETA PARA CELULARES ==================== */
 @media (max-width: 768px) {
-    .elena-white-hero {
-        padding: 2.5rem 1.25rem;
+    #trinidad,
+    #trinidad * {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        word-wrap: break-word !important;
     }
 
-    .elena-white-body {
-        padding: 1.8rem 1.25rem;
+    /* 1. HERO CELULAR */
+    .hero-trinidad {
+        min-height: 55vh !important;
+        padding: 3rem 1.25rem !important;
+        border-radius: 1rem !important;
+        margin-bottom: 1.5rem !important;
     }
 
-    .elena-white-quote-box {
-        padding: 1.25rem 1.25rem;
+    .hero-trinidad h1 {
+        font-size: clamp(1.8rem, 7vw, 2.5rem) !important;
+        line-height: 1.25 !important;
     }
 
-    .elena-white-analysis-box {
-        padding: 1.25rem 1.25rem;
+    .hero-trinidad p {
+        font-size: 1rem !important;
+        line-height: 1.7 !important;
     }
 
-    .elena-white-text-block p {
-        text-align: left;
+    .hero-trinidad .hero-badge {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 1rem !important;
+    }
+
+    /* 2. CONTENEDORES Y PADDING EN CELULAR */
+    #trinidad .teologia-content-card,
+    #trinidad .trinidad-intro-hero,
+    #trinidad .trinidad-toc-card,
+    #trinidad .trinidad-block-content,
+    #trinidad .trinidad-arg-content,
+    #trinidad .elena-white-body,
+    #trinidad .elena-white-hero,
+    #trinidad .elena-white-summary-card {
+        padding: 1.5rem !important;
+        border-radius: 1rem !important;
+    }
+
+    /* 3. TÍTULOS Y TEXTOS A 16px (1rem) EN CELULAR */
+    #trinidad p,
+    #trinidad .trinidad-intro-hero p,
+    #trinidad .trinidad-block-content p,
+    #trinidad .trinidad-arg-content p,
+    #trinidad .elena-white-text-block p,
+    #trinidad .teologia-lead-text,
+    #trinidad .texto-biblico,
+    #trinidad .trinidad-patristica-quote {
+        font-size: 16px !important;
+        line-height: 1.75 !important;
+        text-align: left !important;
+        margin-bottom: 1.25rem !important;
+    }
+
+    #trinidad h3,
+    #trinidad h4,
+    #trinidad .trinidad-block-title,
+    #trinidad .trinidad-arg-title,
+    #trinidad .trinidad-toc-title,
+    #trinidad .elena-white-section-title {
+        font-size: 1.2rem !important;
+        line-height: 1.35 !important;
+    }
+
+    /* 4. IMÁGENES AL 100% Y MÁXIMO 500PX DE ALTO */
+    #trinidad img,
+    #trinidad .trinidad-img-wrapper img {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 500px !important;
+        object-fit: cover !important;
+        border-radius: 1rem !important;
+        margin: 0.8rem 0 !important;
+    }
+
+    #trinidad .trinidad-img-wrapper {
+        max-height: 500px !important;
+        width: 100% !important;
+        margin: 1.2rem 0 !important;
+        border-radius: 1rem !important;
+    }
+
+    #trinidad .trinidad-img-caption {
+        font-size: 0.85rem !important;
+        padding: 0.75rem 0.9rem !important;
+    }
+
+    /* 5. ÍNDICE GRID Y CAJAS EN CELULAR */
+    .trinidad-toc-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+
+    .trinidad-toc-item {
+        font-size: 0.92rem !important;
+        padding: 0.85rem 1rem !important;
+    }
+
+    #trinidad .teologia-box-biblico,
+    #trinidad .trinidad-patristica-box,
+    #trinidad .trinidad-refutacion-box,
+    #trinidad .elena-white-quote-box {
+        padding: 1.25rem 1.25rem !important;
+        margin: 1.25rem 0 !important;
+    }
+
+    #trinidad .teologia-box-biblico::before,
+    #trinidad .trinidad-patristica-quote::before,
+    #trinidad .elena-white-quote-box::before {
+        font-size: 5rem !important;
+        top: -15px !important;
+        left: 8px !important;
     }
 }
 
