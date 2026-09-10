@@ -2711,7 +2711,6 @@
     font-weight: 800;
     background: linear-gradient(90deg, #f7df8f 0%, #c99d3b 50%, #dfb75c 100%);
     -webkit-background-clip: text;
-    background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: -0.02em;
     font-family: var(--font-heading, 'Playfair Display', serif);
@@ -3927,7 +3926,6 @@
     line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
-    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
