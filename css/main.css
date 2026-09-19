@@ -3157,8 +3157,9 @@ body.tema-oscuro .btn-estadisticas-quienes:hover {
 
 .anuncio-expandido-content,
 .presentacion-imagen-area {
-    width: 90vw !important;
-    height: 90vh !important;
+    width: 92vw !important;
+    height: 86vh !important;
+    margin-top: 30px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -3177,11 +3178,17 @@ body.tema-oscuro .btn-estadisticas-quienes:hover {
 }
 
 .anuncio-expandido-img,
-.presentacion-imagen {
+.presentacion-imagen,
+.anuncio-expandido img,
+.presentacion-imagen-area img,
+#anuncioExpandidoImg,
+.modal-presentacion img {
+    max-width: 90% !important;
+    max-height: 85vh !important;
     width: auto !important;
-    height: 90vh !important;
-    max-height: 90vh !important;
-    max-width: 90vw !important;
+    height: auto !important;
+    display: block !important;
+    margin: 0 auto !important;
     object-fit: contain !important;
     border-radius: 10px !important;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.8) !important;
@@ -3286,7 +3293,8 @@ body.tema-oscuro .btn-estadisticas-quienes:hover {
     .anuncio-expandido-content,
     .presentacion-imagen-area {
         width: 95vw !important;
-        height: 85vh !important;
+        height: 65vh !important;
+        margin-top: 30px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -3294,11 +3302,17 @@ body.tema-oscuro .btn-estadisticas-quienes:hover {
 
     /* Imagen en Celular */
     .anuncio-expandido-img,
-    .presentacion-imagen {
+    .presentacion-imagen,
+    .anuncio-expandido img,
+    .presentacion-imagen-area img,
+    #anuncioExpandidoImg,
+    .modal-presentacion img {
+        max-width: 85% !important;
+        max-height: 60vh !important;
         width: auto !important;
-        height: 80vh !important;
-        max-height: 80vh !important;
-        max-width: 90vw !important;
+        height: auto !important;
+        display: block !important;
+        margin: 0 auto !important;
         object-fit: contain !important;
     }
 

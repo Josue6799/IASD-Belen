@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ========================================
 
 async function cargarAnunciosPublicos() {
-    // 1. Mostrar de inmediato lo que exista en almacenamiento local
+    // 1. Mostrar de inmediato lo que exista en almacenamiento local o memoria
     if (typeof window.renderizarAnunciosPublicos === 'function') {
         window.renderizarAnunciosPublicos();
     }
@@ -320,7 +320,8 @@ async function cargarAnunciosPublicos() {
     try {
         const { data, error } = await client
             .from('anuncios')
-            .select('*');
+            .select('*')
+            .order('fecha_inicio', { ascending: false });
 
         if (error) {
             // Fallback silencioso con datos locales
@@ -375,7 +376,107 @@ async function cargarAnunciosPublicos() {
     }
 }
 
+// ===== RENDERIZAR ANUNCIOS PÚBLICOS (SIN LÍMITE DE 10) =====
+function renderizarAnunciosPublicos() {
+    const container = document.getElementById('anunciosContainer');
+    if (!container) return;
+
+    let anuncios = [];
+    if (Array.isArray(window.datosAnunciosSupabase) && window.datosAnunciosSupabase.length > 0) {
+        anuncios = window.datosAnunciosSupabase;
+    } else if (typeof window.cargarAnuncios === 'function') {
+        anuncios = window.cargarAnuncios();
+    } else {
+        try {
+            const raw = localStorage.getItem('anuncios_eventos');
+            if (raw) anuncios = JSON.parse(raw);
+        } catch (e) {}
+    }
+
+    if (!Array.isArray(anuncios)) anuncios = [];
+
+    // Filtrar únicamente los inactivos (mostrar todos los activos sin ningún límite)
+    const activos = anuncios.filter(a => a && a.activo !== false);
+
+    // Ordenar cronológicamente descendente (más recientes primero) con desempate por id
+    activos.sort((a, b) => {
+        const fA = a.fechaInicio || a.fecha_inicio || '';
+        const fB = b.fechaInicio || b.fecha_inicio || '';
+        const comp = fB.localeCompare(fA);
+        if (comp !== 0) return comp;
+        return String(b.id || '').localeCompare(String(a.id || ''));
+    });
+
+    if (activos.length === 0) {
+        container.innerHTML = `
+    <div style="text-align:center; padding:3rem 1rem; color: var(--muted-text);">
+        <i class="fas fa-bullhorn" style="font-size:3rem; display:block; margin-bottom:1rem; opacity:0.5;"></i>
+        <p>No hay anuncios o eventos programados actualmente.</p>
+    </div>`;
+        return;
+    }
+
+    let html = '';
+    // Recorrer TODOS los anuncios devueltos por Supabase
+    activos.forEach(a => {
+        const fRaw = a.fechaInicio || a.fecha_inicio || '';
+        let fechaInicio = '';
+        if (fRaw && fRaw !== '0001-01-01') {
+            try {
+                fechaInicio = new Date(fRaw + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+            } catch (e) {
+                fechaInicio = fRaw;
+            }
+        }
+        const horaInicio = a.horaInicio || a.hora_inicio || '';
+        const fFinRaw = a.fechaFin || a.fecha_fin || '';
+        let fechaFin = '';
+        if (fFinRaw && fFinRaw !== fRaw && fFinRaw !== '0001-01-01') {
+            try {
+                fechaFin = new Date(fFinRaw + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+            } catch (e) {
+                fechaFin = fFinRaw;
+            }
+        }
+        const horaFin = a.horaFin || a.hora_fin || '';
+        const ubicacion = a.ubicacion || '';
+        const categoria = a.categoria || 'Anuncio General';
+        const contenido = a.contenido ? a.contenido.replace(/\n/g, '<br>') : (a.descripcion ? a.descripcion.replace(/\n/g, '<br>') : '');
+        const imagen = a.imagen || a.image || a.url || '';
+        const titulo = a.titulo || '';
+
+        const hasMeta = Boolean(fechaInicio || ubicacion);
+
+        html += `
+<div class="anuncio-card" data-id="${a.id || ''}" style="cursor:pointer;" title="Clic para expandir anuncio">
+    ${imagen ? `
+    <div class="anuncio-card-img-wrapper">
+        <img src="${imagen}" alt="${titulo || 'Anuncio'}" class="anuncio-card-img" />
+    </div>` : ''}
+    
+    ${categoria ? `<span class="anuncio-categoria-badge">${categoria}</span>` : ''}
+    
+    ${titulo ? `<h3 class="anuncio-card-titulo">${titulo}</h3>` : ''}
+    
+    ${hasMeta ? `
+    <div class="anuncio-card-meta">
+        ${fechaInicio ? `<span><i class="far fa-calendar-alt"></i> ${fechaInicio} ${horaInicio ? '· 🕐 ' + horaInicio : ''}</span>` : ''}
+        ${fechaFin ? `<span><i class="fas fa-hourglass-end"></i> Finaliza: ${fechaFin} ${horaFin ? '· 🕐 ' + horaFin : ''}</span>` : ''}
+        ${ubicacion ? `<span><i class="fas fa-map-marker-alt"></i> ${ubicacion}</span>` : ''}
+    </div>` : ''}
+    
+    ${contenido ? `
+    <div class="anuncio-card-contenido">
+        ${contenido}
+    </div>` : ''}
+</div>`;
+    });
+
+    container.innerHTML = html;
+}
+
 window.cargarAnunciosPublicos = cargarAnunciosPublicos;
+window.renderizarAnunciosPublicos = renderizarAnunciosPublicos;
 
 // Carga automática al instanciar
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
@@ -2264,57 +2365,18 @@ let listaAnunciosExpandidos = [];
 let indiceAnuncioExpandido = 0;
 
 /**
- * Obtiene la lista unificada de anuncios:
- * id = 0: Anuncio Fijo (Descubriendo mi Don / Dones)
- * id = 1: Anuncio Fijo (Horarios de Culto)
- * id >= 2: Anuncios dinámicos desde Supabase / LocalStorage
+ * Obtiene la lista unificada de anuncios desde Supabase / LocalStorage
+ * Comenzando directamente desde el primer anuncio activo de Supabase
  */
 function obtenerListaCompletaAnuncios() {
     const lista = [];
-
-    // 0. Anuncio Fijo 1: Descubriendo mi Don (Dones)
-    lista.push({
-        id: 0,
-        titulo: 'Descubriendo mi Don',
-        badge: 'Comienza: 1 de agosto del 2026',
-        fecha: '1 de agosto del 2026',
-        ubicacion: 'Iglesia Adventista Belén',
-        imagen: 'https://res.cloudinary.com/onjg5kf6/image/upload/v1787333423/Descubriendo_mi_don_fqtmr9.jpg',
-        descripcion: 'Descubre tu talento, sirve a Dios y a los demás.',
-        extraHtml: `
-            <div style="background: rgba(255,255,255,0.08); padding: 1rem; border-radius: 1rem; text-align: left; border-left: 4px solid var(--golden); margin-top: 0.8rem; max-width: 550px; margin-left: auto; margin-right: auto;">
-                <p style="font-size: 0.85rem; margin: 0.2rem 0; font-weight: 700; color: var(--golden);">📌 PARTICIPA Y APRENDE:</p>
-                <p style="font-size: 0.8rem; margin: 0.3rem 0;">1. <strong>ELIGE UN STAND.</strong> Cada stand tiene un líder y 3 colaboradores para guiarte.</p>
-                <p style="font-size: 0.8rem; margin: 0.3rem 0;">2. <strong>INTRODUCCIÓN AL CURSO.</strong> Conoce el plan de estudio y los detalles del curso de formación.</p>
-                <p style="font-size: 0.8rem; margin: 0.3rem 0;">3. <strong>INSCRÍBETE Y CRECE.</strong> Únete al curso para desarrollar tu don.</p>
-                <p style="font-size: 0.8rem; margin: 0.3rem 0;">4. <strong>PONLO EN PRÁCTICA.</strong> Sigue sirviendo en los departamentos de la iglesia.</p>
-            </div>
-        `
-    });
-
-    // 1. Anuncio Fijo 2: Horarios de Culto
-    lista.push({
-        id: 1,
-        titulo: 'Horarios de Culto',
-        badge: 'Sábados',
-        fecha: 'Cada Sábado',
-        ubicacion: 'Templo Principal',
-        imagen: '',
-        descripcion: `
-            <p style="margin-bottom: 0.5rem;">📖 <strong>Escuela Sabática:</strong> 8:00 AM</p>
-            <p style="margin-bottom: 0.5rem;">🙏 <strong>Culto Divino:</strong> 10:30 AM</p>
-            <p style="margin-bottom: 0.5rem;">👥 <strong>Sociedad de Jóvenes:</strong> 4:00 PM</p>
-            <p style="margin-top: 0.5rem;"><strong>Lugar:</strong> Templo Principal</p>
-        `,
-        extraHtml: ''
-    });
-
-    // 2+. Anuncios de Supabase
-    const titulosVistos = new Set(['descubriendo mi don', 'horarios de culto']);
+    const idsVistos = new Set();
     let supabaseData = [];
 
     if (Array.isArray(window.datosAnunciosSupabase) && window.datosAnunciosSupabase.length > 0) {
         supabaseData = window.datosAnunciosSupabase;
+    } else if (typeof window.cargarAnuncios === 'function') {
+        supabaseData = window.cargarAnuncios();
     } else {
         try {
             const raw = localStorage.getItem('anuncios_eventos');
@@ -2325,61 +2387,65 @@ function obtenerListaCompletaAnuncios() {
     if (Array.isArray(supabaseData)) {
         supabaseData.forEach(a => {
             if (!a || a.activo === false) return;
+            const aId = String(a.id != null ? a.id : '');
             const titulo = a.titulo || 'Anuncio';
-            if (titulo && !titulosVistos.has(titulo.toLowerCase())) {
-                titulosVistos.add(titulo.toLowerCase());
 
-                const fStr = a.fechaInicio || a.fecha_inicio || '';
-                let fechaFormateada = fStr;
-                if (fStr) {
-                    try {
-                        fechaFormateada = new Date(fStr + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
-                    } catch (e) {}
-                }
-                const horaStr = a.horaInicio || a.hora_inicio || '';
-                const fechaCompleta = fechaFormateada + (horaStr ? ' · ' + horaStr : '');
+            if (aId && idsVistos.has(aId)) return;
+            if (aId) idsVistos.add(aId);
 
-                lista.push({
-                    id: lista.length,
-                    supabaseId: String(a.id || Math.random()),
-                    titulo: titulo,
-                    badge: a.categoria || fechaCompleta || 'Anuncio',
-                    fecha: fechaCompleta,
-                    ubicacion: a.ubicacion || 'Templo Principal',
-                    descripcion: a.contenido ? a.contenido.replace(/\n/g, '<br>') : (a.descripcion || ''),
-                    imagen: a.imagen || a.image || '',
-                    extraHtml: ''
-                });
+            const fStr = a.fechaInicio || a.fecha_inicio || '';
+            let fechaFormateada = fStr;
+            if (fStr && fStr !== '0001-01-01') {
+                try {
+                    fechaFormateada = new Date(fStr + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+                } catch (e) {}
             }
+            const horaStr = a.horaInicio || a.hora_inicio || '';
+            const fechaCompleta = fechaFormateada + (horaStr ? ' · ' + horaStr : '');
+
+            lista.push({
+                id: lista.length,
+                supabaseId: aId || String(Date.now() + Math.random()),
+                titulo: titulo,
+                badge: a.categoria || fechaCompleta || 'Anuncio',
+                fecha: fechaCompleta,
+                ubicacion: a.ubicacion || 'Templo Principal',
+                descripcion: a.contenido ? a.contenido.replace(/\n/g, '<br>') : (a.descripcion ? a.descripcion.replace(/\n/g, '<br>') : ''),
+                imagen: a.imagen || a.image || a.url || '',
+                extraHtml: ''
+            });
         });
     }
 
-    // Complementar con tarjetas dinámicas en el DOM si existieran
+    // Complementar con tarjetas dinámicas en el DOM si existieran adicionales
     const container = document.getElementById('anunciosContainer');
     if (container) {
         const cards = container.querySelectorAll('.anuncio-card');
         cards.forEach(el => {
+            const cardId = el.getAttribute('data-id');
+            if (cardId && idsVistos.has(cardId)) return;
+
             const titleEl = el.querySelector('.anuncio-card-titulo, h3, h4');
             const titulo = titleEl ? titleEl.innerText.trim() : 'Anuncio';
 
-            if (titulo && !titulosVistos.has(titulo.toLowerCase())) {
-                titulosVistos.add(titulo.toLowerCase());
-                const imgEl = el.querySelector('.anuncio-card-img, img');
-                const badgeEl = el.querySelector('.anuncio-categoria-badge, .anuncio-card-fecha');
-                const descEl = el.querySelector('.anuncio-card-contenido, p');
-                const metaEl = el.querySelector('.anuncio-card-meta');
+            if (cardId) idsVistos.add(cardId);
 
-                lista.push({
-                    id: lista.length,
-                    titulo: titulo,
-                    badge: badgeEl ? badgeEl.innerText.trim() : 'Anuncio',
-                    fecha: metaEl ? metaEl.innerText.trim() : '',
-                    ubicacion: 'Templo Principal',
-                    imagen: imgEl ? imgEl.src : '',
-                    descripcion: descEl ? descEl.innerHTML.trim() : '',
-                    extraHtml: ''
-                });
-            }
+            const imgEl = el.querySelector('.anuncio-card-img, img');
+            const badgeEl = el.querySelector('.anuncio-categoria-badge, .anuncio-card-fecha');
+            const descEl = el.querySelector('.anuncio-card-contenido, p');
+            const metaEl = el.querySelector('.anuncio-card-meta');
+
+            lista.push({
+                id: lista.length,
+                supabaseId: cardId || String(Date.now() + Math.random()),
+                titulo: titulo,
+                badge: badgeEl ? badgeEl.innerText.trim() : 'Anuncio',
+                fecha: metaEl ? metaEl.innerText.trim() : '',
+                ubicacion: 'Templo Principal',
+                imagen: imgEl ? imgEl.src : '',
+                descripcion: descEl ? descEl.innerHTML.trim() : '',
+                extraHtml: ''
+            });
         });
     }
 
@@ -2412,7 +2478,7 @@ function abrirAnuncioExpandido(id) {
         indiceAnuncioExpandido = id;
     } else if (typeof id === 'string') {
         const parsed = parseInt(id, 10);
-        if (!isNaN(parsed) && parsed >= 0 && parsed < listaAnunciosExpandidos.length) {
+        if (!isNaN(parsed) && parsed >= 0 && parsed < listaAnunciosExpandidos.length && String(parsed) === id) {
             indiceAnuncioExpandido = parsed;
         } else {
             const idx = listaAnunciosExpandidos.findIndex(a => 
@@ -2424,9 +2490,16 @@ function abrirAnuncioExpandido(id) {
         }
     } else if (id && id.closest) {
         const card = id.closest('.anuncio-card, .anuncio-destacado') || id;
-        const titleEl = card.querySelector('h3, .anuncio-card-titulo');
-        const titleText = titleEl ? titleEl.innerText.trim() : '';
-        const idx = listaAnunciosExpandidos.findIndex(a => titleText && a.titulo.toLowerCase() === titleText.toLowerCase());
+        const cardId = card.getAttribute('data-id');
+        let idx = -1;
+        if (cardId) {
+            idx = listaAnunciosExpandidos.findIndex(a => String(a.supabaseId) === String(cardId) || String(a.id) === String(cardId));
+        }
+        if (idx < 0) {
+            const titleEl = card.querySelector('h3, .anuncio-card-titulo');
+            const titleText = titleEl ? titleEl.innerText.trim() : '';
+            idx = listaAnunciosExpandidos.findIndex(a => titleText && a.titulo.toLowerCase() === titleText.toLowerCase());
+        }
         indiceAnuncioExpandido = idx >= 0 ? idx : 0;
     } else {
         indiceAnuncioExpandido = 0;

@@ -3243,10 +3243,14 @@ const STORAGE_ANUNCIOS = 'anuncios_eventos';
 let anuncioPendienteEditarId = null;
 
 function cargarAnuncios() {
+    if (Array.isArray(window.datosAnunciosSupabase) && window.datosAnunciosSupabase.length > 0) {
+        return window.datosAnunciosSupabase;
+    }
     return StorageHelper.get(STORAGE_ANUNCIOS, []);
 }
 
 function guardarAnuncios(anuncios) {
+    window.datosAnunciosSupabase = anuncios;
     StorageHelper.set(STORAGE_ANUNCIOS, anuncios);
     window.dispatchEvent(new CustomEvent('datosAnunciosActualizados'));
     window.dispatchEvent(new Event('datosAnunciosActualizados'));
@@ -3456,9 +3460,33 @@ function renderizarAnunciosPublicos() {
     const container = document.getElementById('anunciosContainer');
     if (!container) return;
 
-    const anuncios = cargarAnuncios().sort((a, b) => (b.fechaInicio || '').localeCompare(a.fechaInicio || ''));
+    let anuncios = [];
+    if (Array.isArray(window.datosAnunciosSupabase) && window.datosAnunciosSupabase.length > 0) {
+        anuncios = window.datosAnunciosSupabase;
+    } else if (typeof cargarAnuncios === 'function') {
+        anuncios = cargarAnuncios();
+    } else {
+        try {
+            const raw = localStorage.getItem(STORAGE_ANUNCIOS);
+            if (raw) anuncios = JSON.parse(raw);
+        } catch (e) {}
+    }
 
-    if (anuncios.length === 0) {
+    if (!Array.isArray(anuncios)) anuncios = [];
+
+    // Filtrar únicamente los inactivos (mostrar todos los activos sin ningún límite)
+    const activos = anuncios.filter(a => a && a.activo !== false);
+
+    // Ordenar cronológicamente descendente (más recientes primero) con desempate por id
+    activos.sort((a, b) => {
+        const fA = a.fechaInicio || a.fecha_inicio || '';
+        const fB = b.fechaInicio || b.fecha_inicio || '';
+        const comp = fB.localeCompare(fA);
+        if (comp !== 0) return comp;
+        return String(b.id || '').localeCompare(String(a.id || ''));
+    });
+
+    if (activos.length === 0) {
         container.innerHTML = `
     <div style="text-align:center; padding:3rem 1rem; color: var(--muted-text);">
         <i class="fas fa-bullhorn" style="font-size:3rem; display:block; margin-bottom:1rem; opacity:0.5;"></i>
@@ -3468,20 +3496,37 @@ function renderizarAnunciosPublicos() {
     }
 
     let html = '';
-    anuncios.forEach(a => {
-        const fechaInicio = a.fechaInicio ? new Date(a.fechaInicio + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
-        const horaInicio = a.horaInicio || '';
-        const fechaFin = a.fechaFin && a.fechaFin !== a.fechaInicio ? new Date(a.fechaFin + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+    activos.forEach(a => {
+        const fRaw = a.fechaInicio || a.fecha_inicio || '';
+        let fechaInicio = '';
+        if (fRaw && fRaw !== '0001-01-01') {
+            try {
+                fechaInicio = new Date(fRaw + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+            } catch (e) {
+                fechaInicio = fRaw;
+            }
+        }
+        const horaInicio = a.horaInicio || a.hora_inicio || '';
+        const fFinRaw = a.fechaFin || a.fecha_fin || '';
+        let fechaFin = '';
+        if (fFinRaw && fFinRaw !== fRaw && fFinRaw !== '0001-01-01') {
+            try {
+                fechaFin = new Date(fFinRaw + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+            } catch (e) {
+                fechaFin = fFinRaw;
+            }
+        }
+        const horaFin = a.horaFin || a.hora_fin || '';
         const ubicacion = a.ubicacion || '';
-        const categoria = a.categoria || '';
-        const contenido = a.contenido ? a.contenido.replace(/\n/g, '<br>') : '';
-        const imagen = a.imagen || '';
+        const categoria = a.categoria || 'Anuncio General';
+        const contenido = a.contenido ? a.contenido.replace(/\n/g, '<br>') : (a.descripcion ? a.descripcion.replace(/\n/g, '<br>') : '');
+        const imagen = a.imagen || a.image || a.url || '';
         const titulo = a.titulo || '';
 
         const hasMeta = Boolean(fechaInicio || ubicacion);
 
         html += `
-<div class="anuncio-card">
+<div class="anuncio-card" data-id="${a.id || ''}" style="cursor:pointer;" title="Clic para expandir anuncio">
     ${imagen ? `
     <div class="anuncio-card-img-wrapper">
         <img src="${imagen}" alt="${titulo || 'Anuncio'}" class="anuncio-card-img" />
@@ -3494,7 +3539,7 @@ function renderizarAnunciosPublicos() {
     ${hasMeta ? `
     <div class="anuncio-card-meta">
         ${fechaInicio ? `<span><i class="far fa-calendar-alt"></i> ${fechaInicio} ${horaInicio ? '· 🕐 ' + horaInicio : ''}</span>` : ''}
-        ${fechaFin ? `<span><i class="fas fa-hourglass-end"></i> Finaliza: ${fechaFin}</span>` : ''}
+        ${fechaFin ? `<span><i class="fas fa-hourglass-end"></i> Finaliza: ${fechaFin} ${horaFin ? '· 🕐 ' + horaFin : ''}</span>` : ''}
         ${ubicacion ? `<span><i class="fas fa-map-marker-alt"></i> ${ubicacion}</span>` : ''}
     </div>` : ''}
     

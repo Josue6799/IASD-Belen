@@ -7517,3 +7517,38 @@ body.tema-oscuro .devocional-opcion-card:hover .opcion-btn-label {
         z-index: 10000 !important;
     }
 }
+
+/* ==========================================================================
+   AJUSTE DE TAMAÑO: IMAGEN EN MODO PRESENTACIÓN DE ANUNCIOS (PROYECTOR / CELULAR)
+   ========================================================================== */
+.modal-presentacion img,
+.anuncio-expandido img,
+.presentacion-imagen,
+.anuncio-expandido-img,
+.presentacion-imagen-area img,
+#anuncioExpandidoImg {
+    max-width: 90% !important; /* Grande para computadora / proyector */
+    max-height: 85vh !important;
+    width: auto !important;
+    height: auto !important;
+    display: block !important;
+    margin: 0 auto !important;
+    object-fit: contain !important;
+}
+
+@media (max-width: 768px) {
+    .modal-presentacion img,
+    .anuncio-expandido img,
+    .presentacion-imagen,
+    .anuncio-expandido-img,
+    .presentacion-imagen-area img,
+    #anuncioExpandidoImg {
+        max-width: 85% !important; /* Mediana para celular */
+        max-height: 60vh !important;
+        width: auto !important;
+        height: auto !important;
+        display: block !important;
+        margin: 0 auto !important;
+        object-fit: contain !important;
+    }
+}
