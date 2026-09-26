@@ -3269,137 +3269,6 @@ function mostrarToastAnuncios(mensaje, bg = '#2e7d32') {
     }, 2000);
 }
 
-// --- Funciones de soporte para Imagen R2 (bucket iasdbele) ---
-function mostrarPreviewImagenAnuncio(url) {
-    const previewContainer = document.getElementById('anuncio-imagen-preview');
-    if (!previewContainer) return;
-    if (!url || typeof url !== 'string' || !url.trim()) {
-        previewContainer.innerHTML = '';
-        previewContainer.className = 'anuncio-imagen-preview';
-        return;
-    }
-    const cleanUrl = url.trim();
-    previewContainer.className = 'anuncio-imagen-preview has-image';
-    previewContainer.innerHTML = `
-        <div class="anuncio-preview-wrapper">
-            <span class="anuncio-preview-badge"><i class="fas fa-cloud"></i> Cloudflare R2</span>
-            <button type="button" class="anuncio-preview-remove" data-csp-click="quitarImagenAnuncio()" title="Quitar imagen">&times;</button>
-            <img src="${cleanUrl}" alt="Vista previa anuncio">
-        </div>
-    `;
-}
-
-function quitarImagenAnuncio() {
-    const fileInput = document.getElementById('anuncio-imagen-file');
-    const urlHidden = document.getElementById('anuncio-imagen-url');
-    const imgOld = document.getElementById('anuncioImagen');
-    if (fileInput) fileInput.value = '';
-    if (urlHidden) urlHidden.value = '';
-    if (imgOld) imgOld.value = '';
-    mostrarPreviewImagenAnuncio('');
-}
-
-function previsualizarArchivoSeleccionado(event) {
-    const fileInput = event && event.target ? event.target : document.getElementById('anuncio-imagen-file');
-    if (!fileInput || !fileInput.files || fileInput.files.length === 0) return;
-    const file = fileInput.files[0];
-    if (!file.type.startsWith('image/')) {
-        mostrarAlertaAdmin('⚠️ Por favor selecciona un archivo de imagen válido (JPG, PNG, WebP).');
-        fileInput.value = '';
-        return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-        mostrarAlertaAdmin('⚠️ La imagen seleccionada supera los 5 MB permitidos.');
-        fileInput.value = '';
-        return;
-    }
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const previewContainer = document.getElementById('anuncio-imagen-preview');
-        if (!previewContainer) return;
-        previewContainer.className = 'anuncio-imagen-preview has-image';
-        previewContainer.innerHTML = `
-            <div class="anuncio-preview-wrapper">
-                <span class="anuncio-preview-badge" style="background:rgba(180,83,9,0.85);"><i class="fas fa-clock"></i> Pendiente de subir</span>
-                <button type="button" class="anuncio-preview-remove" data-csp-click="quitarImagenAnuncio()" title="Quitar archivo">&times;</button>
-                <img src="${e.target.result}" alt="Vista previa local">
-            </div>
-        `;
-    };
-    reader.readAsDataURL(file);
-}
-
-async function subirImagenAnuncio() {
-    const fileInput = document.getElementById('anuncio-imagen-file');
-    const btnSubir = document.getElementById('btnSubirImagenAnuncio');
-
-    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-        mostrarAlertaAdmin('⚠️ Por favor selecciona un archivo de imagen antes de presionar "Subir Imagen".');
-        return false;
-    }
-
-    const file = fileInput.files[0];
-    if (!file.type.startsWith('image/')) {
-        mostrarAlertaAdmin('⚠️ El archivo seleccionado no es una imagen válida (JPG, PNG, WebP).');
-        return false;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-        mostrarAlertaAdmin('⚠️ La imagen no debe superar los 5 MB de tamaño.');
-        return false;
-    }
-
-    const textoOriginalBtn = btnSubir ? btnSubir.innerHTML : '';
-    if (btnSubir) {
-        btnSubir.disabled = true;
-        btnSubir.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subiendo a R2...';
-    }
-
-    try {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            let errorMsg = 'Error en el servidor (' + response.status + ')';
-            try {
-                const errData = await response.json();
-                if (errData && errData.error) errorMsg = errData.error;
-            } catch (e) {}
-            mostrarAlertaAdmin('❌ No se pudo subir la imagen a R2: ' + errorMsg);
-            return false;
-        }
-
-        const data = await response.json();
-        if (!data || !data.url) {
-            mostrarAlertaAdmin('❌ Respuesta inesperada del servidor al subir la imagen.');
-            return false;
-        }
-
-        const r2Url = data.url;
-        const hiddenUrl = document.getElementById('anuncio-imagen-url');
-        const legacyInput = document.getElementById('anuncioImagen');
-        if (hiddenUrl) hiddenUrl.value = r2Url;
-        if (legacyInput) legacyInput.value = r2Url;
-
-        mostrarPreviewImagenAnuncio(r2Url);
-        mostrarToastAnuncios('<i class="fas fa-check-circle"></i> Imagen subida con éxito a Cloudflare R2');
-        return true;
-    } catch (err) {
-        mostrarAlertaAdmin('❌ Error de conexión al subir la imagen: ' + (err.message || 'Error de red'));
-        return false;
-    } finally {
-        if (btnSubir) {
-            btnSubir.disabled = false;
-            btnSubir.innerHTML = textoOriginalBtn || '<i class="fas fa-cloud-upload-alt"></i> Subir Imagen';
-        }
-    }
-}
-
 // --- Agregar / Editar Anuncio ---
 function abrirModalAgregarAnuncio() {
     anuncioPendienteEditarId = null;
@@ -3410,16 +3279,7 @@ function abrirModalAgregarAnuncio() {
     document.getElementById('anuncioHoraFin').value = '';
     document.getElementById('anuncioUbicacion').value = 'Templo Principal';
     document.getElementById('anuncioCategoria').value = 'Culto';
-    
-    // Limpiar imagen y estado R2
-    const legacyImg = document.getElementById('anuncioImagen');
-    if (legacyImg) legacyImg.value = '';
-    const hiddenUrl = document.getElementById('anuncio-imagen-url');
-    if (hiddenUrl) hiddenUrl.value = '';
-    const fileInput = document.getElementById('anuncio-imagen-file');
-    if (fileInput) fileInput.value = '';
-    mostrarPreviewImagenAnuncio('');
-
+    document.getElementById('anuncioImagen').value = '';
     document.getElementById('anuncioContenido').value = '';
 
     const tituloEl = document.getElementById('modalAnuncioTitulo');
@@ -3462,17 +3322,7 @@ function abrirModalEditarAnuncio(id) {
     document.getElementById('anuncioHoraFin').value = anuncio.horaFin || '';
     document.getElementById('anuncioUbicacion').value = anuncio.ubicacion || 'Templo Principal';
     document.getElementById('anuncioCategoria').value = anuncio.categoria || 'Culto';
-    
-    // Cargar imagen existente (desde imagen_url o imagen)
-    const imagenActual = anuncio.imagen_url || anuncio.imagen || '';
-    const legacyImg = document.getElementById('anuncioImagen');
-    if (legacyImg) legacyImg.value = imagenActual;
-    const hiddenUrl = document.getElementById('anuncio-imagen-url');
-    if (hiddenUrl) hiddenUrl.value = imagenActual;
-    const fileInput = document.getElementById('anuncio-imagen-file');
-    if (fileInput) fileInput.value = '';
-    mostrarPreviewImagenAnuncio(imagenActual);
-
+    document.getElementById('anuncioImagen').value = anuncio.imagen || '';
     document.getElementById('anuncioContenido').value = anuncio.contenido || '';
 
     anuncioPendienteEditarId = id;
@@ -3490,15 +3340,7 @@ function abrirModalEditarAnuncio(id) {
     document.body.style.overflow = 'hidden';
 }
 
-async function guardarNuevoAnuncio() {
-    // Si hay un archivo seleccionado pendiente de subir, subirlo automáticamente antes de guardar
-    const fileInput = document.getElementById('anuncio-imagen-file');
-    const hiddenUrl = document.getElementById('anuncio-imagen-url');
-    if (fileInput && fileInput.files && fileInput.files.length > 0 && (!hiddenUrl || !hiddenUrl.value.trim())) {
-        const subidaOk = await subirImagenAnuncio();
-        if (!subidaOk) return; // Si la subida a R2 falla, no continuar para evitar guardar sin imagen
-    }
-
+function guardarNuevoAnuncio() {
     const titulo = document.getElementById('anuncioTitulo').value.trim();
     const fechaInicio = document.getElementById('anuncioFechaInicio').value;
     const horaInicio = document.getElementById('anuncioHoraInicio').value;
@@ -3506,7 +3348,7 @@ async function guardarNuevoAnuncio() {
     const horaFin = document.getElementById('anuncioHoraFin').value;
     const ubicacion = document.getElementById('anuncioUbicacion').value.trim();
     const categoria = document.getElementById('anuncioCategoria').value;
-    const imagenVal = (hiddenUrl ? hiddenUrl.value.trim() : '') || (document.getElementById('anuncioImagen') ? document.getElementById('anuncioImagen').value.trim() : '');
+    const imagen = document.getElementById('anuncioImagen').value.trim();
     const contenido = document.getElementById('anuncioContenido').value.trim();
 
     if (fechaFin && fechaInicio && fechaFin < fechaInicio) {
@@ -3526,8 +3368,7 @@ async function guardarNuevoAnuncio() {
             anuncios[idx].horaFin = horaFin || horaInicio || '';
             anuncios[idx].ubicacion = ubicacion;
             anuncios[idx].categoria = categoria;
-            anuncios[idx].imagen = imagenVal;
-            anuncios[idx].imagen_url = imagenVal;
+            anuncios[idx].imagen = imagen;
             anuncios[idx].contenido = contenido;
         }
         anuncioPendienteEditarId = null;
@@ -3541,8 +3382,7 @@ async function guardarNuevoAnuncio() {
             fechaFin: fechaFin || fechaInicio,
             horaFin: horaFin || horaInicio || '',
             ubicacion: ubicacion,
-            imagen: imagenVal || '',
-            imagen_url: imagenVal || '',
+            imagen: imagen || '',
             categoria: categoria || 'Anuncio General'
         });
     }
@@ -3562,9 +3402,7 @@ function generarVistaPreviaAnuncio() {
     const horaFin = document.getElementById('anuncioHoraFin') ? document.getElementById('anuncioHoraFin').value : '';
     const ubicacion = document.getElementById('anuncioUbicacion').value.trim();
     const categoria = document.getElementById('anuncioCategoria').value;
-    const hiddenUrl = document.getElementById('anuncio-imagen-url');
-    const legacyImg = document.getElementById('anuncioImagen');
-    const imagen = (hiddenUrl && hiddenUrl.value.trim()) ? hiddenUrl.value.trim() : (legacyImg ? legacyImg.value.trim() : '');
+    const imagen = document.getElementById('anuncioImagen') ? document.getElementById('anuncioImagen').value.trim() : '';
     const contenido = document.getElementById('anuncioContenido').value.trim();
 
     const fechaStr = fechaInicio
@@ -3854,10 +3692,6 @@ window.cerrarModalQuitarAnuncio = cerrarModalQuitarAnuncio;
 window.filtrarAnunciosQuitar = filtrarAnunciosQuitar;
 window.renderizarListaQuitar = renderizarListaQuitar;
 window.confirmarEliminarAnuncio = confirmarEliminarAnuncio;
-window.subirImagenAnuncio = subirImagenAnuncio;
-window.previsualizarArchivoSeleccionado = previsualizarArchivoSeleccionado;
-window.mostrarPreviewImagenAnuncio = mostrarPreviewImagenAnuncio;
-window.quitarImagenAnuncio = quitarImagenAnuncio;
 
 
 // ===== EXPORTACIONES GLOBALES ADICIONALES =====
@@ -4114,10 +3948,6 @@ window.cerrarModalQuitarAnuncio = cerrarModalQuitarAnuncio;
 window.filtrarAnunciosQuitar = filtrarAnunciosQuitar;
 window.abrirModalEditarAnuncio = abrirModalEditarAnuncio;
 window.confirmarEliminarAnuncio = confirmarEliminarAnuncio;
-window.subirImagenAnuncio = subirImagenAnuncio;
-window.previsualizarArchivoSeleccionado = previsualizarArchivoSeleccionado;
-window.mostrarPreviewImagenAnuncio = mostrarPreviewImagenAnuncio;
-window.quitarImagenAnuncio = quitarImagenAnuncio;
 if (typeof abrirModalCrearExamen !== 'undefined') window.abrirModalCrearExamen = abrirModalCrearExamen;
 if (typeof abrirModalEditarExamenes !== 'undefined') window.abrirModalEditarExamenes = abrirModalEditarExamenes;
 if (typeof abrirModalGestionarResultados !== 'undefined') window.abrirModalGestionarResultados = abrirModalGestionarResultados;

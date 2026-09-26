@@ -605,8 +605,7 @@ const TABLE_TRANSFORMERS = {
         hora_inicio: data.hora_inicio || data.horaInicio || '00:00',
         fecha_fin: data.fecha_fin || data.fechaFin || data.fecha_inicio || data.fechaInicio || '',
         hora_fin: data.hora_fin || data.horaFin || data.hora_inicio || data.horaInicio || '00:00',
-        imagen: data.imagen || data.imagen_url || data.image || data.url || '',
-        imagen_url: data.imagen_url || data.imagen || data.image || data.url || null,
+        imagen: data.imagen || data.image || data.url || '',
         activo: data.activo !== undefined ? Boolean(data.activo) : true
       };
     },
@@ -632,8 +631,7 @@ const TABLE_TRANSFORMERS = {
           fechaFin: fFin,
           horaInicio: hInicio,
           horaFin: hFin,
-          imagen: r.imagen || r.imagen_url || r.image || r.url || '',
-          imagen_url: r.imagen_url || r.imagen || r.image || r.url || '',
+          imagen: r.imagen || r.image || r.url || '',
           activo: r.activo !== undefined ? Boolean(r.activo) : true
         };
       };
@@ -651,8 +649,7 @@ const TABLE_TRANSFORMERS = {
         hora_inicio: data.hora_inicio || data.horaInicio || '00:00',
         fecha_fin: data.fecha_fin || data.fechaFin || data.fecha_inicio || data.fechaInicio || '',
         hora_fin: data.hora_fin || data.horaFin || data.hora_inicio || data.horaInicio || '00:00',
-        imagen: data.imagen || data.imagen_url || data.image || data.url || '',
-        imagen_url: data.imagen_url || data.imagen || data.image || data.url || null,
+        imagen: data.imagen || data.image || data.url || '',
         activo: data.activo !== undefined ? Boolean(data.activo) : true
       };
     },
@@ -676,8 +673,7 @@ const TABLE_TRANSFORMERS = {
         fechaFin: fFin,
         horaInicio: hInicio,
         horaFin: hFin,
-        imagen: row.imagen || row.imagen_url || row.image || row.url || '',
-        imagen_url: row.imagen_url || row.imagen || row.image || row.url || '',
+        imagen: row.imagen || row.image || row.url || '',
         activo: row.activo !== undefined ? Boolean(row.activo) : true
       };
     }
@@ -697,8 +693,7 @@ const TABLE_TRANSFORMERS = {
         hora_inicio: data.hora_inicio || data.horaInicio || data.hora || '00:00',
         fecha_fin: data.fecha_fin || data.fechaFin || '',
         hora_fin: data.hora_fin || data.horaFin || '',
-        imagen: data.imagen || data.imagen_url || data.image || data.url || '',
-        imagen_url: data.imagen_url || data.imagen || data.image || data.url || null,
+        imagen: data.imagen || data.image || data.url || '',
         activo: data.activo !== undefined ? Boolean(data.activo) : true
       };
     },
@@ -724,8 +719,7 @@ const TABLE_TRANSFORMERS = {
           fechaFin: fFin,
           horaInicio: hInicio,
           horaFin: hFin,
-          imagen: row.imagen || row.imagen_url || row.image || row.url || '',
-          imagen_url: row.imagen_url || row.imagen || row.image || row.url || '',
+          imagen: row.imagen || row.image || row.url || '',
           activo: row.activo !== undefined ? Boolean(row.activo) : true
         };
       };
@@ -741,8 +735,7 @@ const TABLE_TRANSFORMERS = {
       hora_inicio: data.hora_inicio || data.horaInicio || data.hora || '00:00',
       fecha_fin: data.fecha_fin || data.fechaFin || '',
       hora_fin: data.hora_fin || data.horaFin || '',
-      imagen: data.imagen || data.imagen_url || data.image || data.url || '',
-      imagen_url: data.imagen_url || data.imagen || data.image || data.url || null,
+      imagen: data.imagen || data.image || data.url || '',
       activo: data.activo !== undefined ? data.activo : true
     }),
     untransform: (row) => ({
@@ -759,8 +752,7 @@ const TABLE_TRANSFORMERS = {
       fechaFin: row.fecha_fin || row.fechaFin || '',
       horaInicio: row.hora_inicio || row.horaInicio || '00:00',
       horaFin: row.hora_fin || row.horaFin || '',
-      imagen: row.imagen || row.imagen_url || row.image || row.url || '',
-      imagen_url: row.imagen_url || row.imagen || row.image || row.url || '',
+      imagen: row.imagen || row.image || row.url || '',
       activo: row.activo !== undefined ? row.activo : true
     })
   },
@@ -1096,7 +1088,7 @@ const _tableIgnoredCols = {
 };
 const _tableKnownCols = {
   eventos_iglesia: new Set(['id', 'titulo', 'descripcion', 'fecha', 'hora', 'lugar', 'categoria']),
-  anuncios: new Set(['id', 'titulo', 'contenido', 'categoria', 'ubicacion', 'fecha_inicio', 'hora_inicio', 'fecha_fin', 'hora_fin', 'imagen', 'imagen_url', 'activo']),
+  anuncios: new Set(['id', 'titulo', 'contenido', 'categoria', 'ubicacion', 'fecha_inicio', 'hora_inicio', 'fecha_fin', 'hora_fin', 'imagen', 'activo']),
   cronograma_predicadores: new Set(['id', 'fecha', 'predicador', 'culto_tipo', 'actividad', 'tema', 'curso', 'recurrente', 'semanas']),
   cursos: new Set(['id', 'nombre', 'icono', 'descripcion', 'temas', 'ayudas']),
   plan_estudios: new Set(['id', 'curso', 'temas', 'ayudas', 'actualizado_en']),
