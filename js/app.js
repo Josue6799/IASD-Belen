@@ -419,28 +419,39 @@ function renderizarAnunciosPublicos() {
     let html = '';
     // Recorrer TODOS los anuncios devueltos por Supabase
     activos.forEach(a => {
-        const fRaw = a.fechaInicio || a.fecha_inicio || '';
+        const fRaw = (a.fechaInicio || a.fecha_inicio || '').trim();
         let fechaInicio = '';
-        if (fRaw && fRaw !== '0001-01-01') {
+        if (fRaw && fRaw !== '0001-01-01' && fRaw !== '0000-00-00') {
             try {
-                fechaInicio = new Date(fRaw + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+                const parsed = new Date(fRaw + 'T00:00:00');
+                if (!isNaN(parsed.getTime())) {
+                    fechaInicio = parsed.toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+                }
             } catch (e) {
                 fechaInicio = fRaw;
             }
         }
-        const horaInicio = a.horaInicio || a.hora_inicio || '';
-        const fFinRaw = a.fechaFin || a.fecha_fin || '';
+        const rawHora = (a.horaInicio || a.hora_inicio || '').trim();
+        const esHoraValida = Boolean(rawHora && rawHora !== '00:00' && rawHora !== '00:00:00' && rawHora !== '0:00');
+        const horaInicio = esHoraValida ? rawHora : '';
+
+        const fFinRaw = (a.fechaFin || a.fecha_fin || '').trim();
         let fechaFin = '';
-        if (fFinRaw && fFinRaw !== fRaw && fFinRaw !== '0001-01-01') {
+        if (fFinRaw && fFinRaw !== fRaw && fFinRaw !== '0001-01-01' && fFinRaw !== '0000-00-00') {
             try {
-                fechaFin = new Date(fFinRaw + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+                const parsedFin = new Date(fFinRaw + 'T00:00:00');
+                if (!isNaN(parsedFin.getTime())) {
+                    fechaFin = parsedFin.toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+                }
             } catch (e) {
                 fechaFin = fFinRaw;
             }
         }
-        const horaFin = a.horaFin || a.hora_fin || '';
-        const ubicacion = a.ubicacion || '';
-        const categoria = a.categoria || 'Anuncio General';
+        const rawHoraFin = (a.horaFin || a.hora_fin || '').trim();
+        const esHoraFinValida = Boolean(rawHoraFin && rawHoraFin !== '00:00' && rawHoraFin !== '00:00:00' && rawHoraFin !== '0:00');
+        const horaFin = esHoraFinValida ? rawHoraFin : '';
+        const ubicacion = (a.ubicacion || '').trim();
+        const categoria = (a.categoria || 'Anuncio General').trim();
         const contenido = a.contenido ? a.contenido.replace(/\n/g, '<br>') : (a.descripcion ? a.descripcion.replace(/\n/g, '<br>') : '');
         const imagen = a.imagen || a.image || a.url || '';
         const titulo = a.titulo || '';
@@ -2391,23 +2402,41 @@ function obtenerListaCompletaAnuncios() {
             if (aId && idsVistos.has(aId)) return;
             if (aId) idsVistos.add(aId);
 
-            const fStr = a.fechaInicio || a.fecha_inicio || '';
-            let fechaFormateada = fStr;
-            if (fStr && fStr !== '0001-01-01') {
+            const fStr = (a.fechaInicio || a.fecha_inicio || '').trim();
+            let fechaFormateada = '';
+            if (fStr && fStr !== '0001-01-01' && fStr !== '0000-00-00') {
                 try {
-                    fechaFormateada = new Date(fStr + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
-                } catch (e) { }
+                    const parsedDate = new Date(fStr + 'T00:00:00');
+                    if (!isNaN(parsedDate.getTime())) {
+                        fechaFormateada = parsedDate.toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+                    }
+                } catch (e) {
+                    fechaFormateada = fStr;
+                }
             }
-            const horaStr = a.horaInicio || a.hora_inicio || '';
-            const fechaCompleta = fechaFormateada + (horaStr ? ' · ' + horaStr : '');
+
+            const rawHora = (a.horaInicio || a.hora_inicio || '').trim();
+            const esHoraValida = Boolean(rawHora && rawHora !== '00:00' && rawHora !== '00:00:00' && rawHora !== '0:00');
+            const horaStr = esHoraValida ? rawHora : '';
+
+            let fechaCompleta = '';
+            if (fechaFormateada && horaStr) {
+                fechaCompleta = `${fechaFormateada} · ${horaStr}`;
+            } else if (fechaFormateada) {
+                fechaCompleta = fechaFormateada;
+            } else if (horaStr) {
+                fechaCompleta = horaStr;
+            }
+
+            const rawUbicacion = (a.ubicacion || '').trim();
 
             lista.push({
                 id: lista.length,
                 supabaseId: aId || String(Date.now() + Math.random()),
                 titulo: titulo,
-                badge: a.categoria || fechaCompleta || 'Anuncio',
+                badge: (a.categoria || 'Anuncio General').trim(),
                 fecha: fechaCompleta,
-                ubicacion: a.ubicacion || 'Templo Principal',
+                ubicacion: rawUbicacion,
                 descripcion: a.contenido ? a.contenido.replace(/\n/g, '<br>') : (a.descripcion ? a.descripcion.replace(/\n/g, '<br>') : ''),
                 imagen: a.imagen || a.image || a.url || '',
                 extraHtml: ''

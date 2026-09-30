@@ -3132,24 +3132,24 @@ body.tema-oscuro .btn-estadisticas-quienes:hover {
 .anuncio-expandido-title,
 .presentacion-titulo {
     position: absolute !important;
-    top: 15px !important;
+    top: 20px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     color: #D4AF37 !important;
-    font-size: 1.5rem !important;
+    font-size: 2.4rem !important; /* 60% más grande en computador y portátil (1.5rem * 1.6 = 2.4rem) */
     font-weight: 700 !important;
     font-family: 'Montserrat', sans-serif !important;
     text-align: center !important;
     margin: 0 !important;
     z-index: 10000 !important;
-    max-width: 70% !important;
+    max-width: 85% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
 .anuncio-expandido-counter {
-    font-size: 0.9rem !important;
+    font-size: 1.35rem !important;
     opacity: 0.8 !important;
     font-weight: 400 !important;
     margin-left: 0.5rem !important;
@@ -3226,18 +3226,18 @@ body.tema-oscuro .btn-estadisticas-quienes:hover {
     font-weight: 500 !important;
 }
 
-/* AMPLIACIÓN DE INSIGNIAS / BADGES EN LA PRESENTACIÓN (70% MÁS GRANDES) */
+/* INSIGNIAS / BADGES EN LA PRESENTACIÓN (40% REDUCIDAS EN COMPUTADOR Y PORTÁTIL) */
 .anuncio-expandido .anuncio-grande-badge,
 #anuncioExpandidoContainer .anuncio-grande-badge,
 .anuncio-expandido-content .anuncio-grande-badge {
-    font-size: clamp(1.2rem, 2.5vw, 1.7rem) !important;
-    padding: 0.8rem 1.5rem !important;
-    margin: 0.5rem !important;
-    border-radius: 30px !important;
-    font-weight: bold !important;
+    font-size: clamp(0.78rem, 1.2vw, 0.98rem) !important;
+    padding: 0.45rem 1rem !important;
+    margin: 0.3rem 0.4rem !important;
+    border-radius: 20px !important;
+    font-weight: 700 !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 0.5rem !important;
+    gap: 0.4rem !important;
 }
 
 .btn-expandido-nav,
