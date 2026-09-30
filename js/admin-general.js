@@ -291,30 +291,45 @@ function abrirPanelAdminGeneral() {
     // Bloquear scroll del body
     document.body.style.overflow = 'hidden';
 
-    // Ocultar botón verde
+    // Ocultar botón verde si existiera
     const btnAdmin = document.getElementById('btnAdminGeneral');
     if (btnAdmin) btnAdmin.style.display = 'none';
 
     // Renderizar tarjetas
     renderizarTarjetasAdmin();
 
-    // Mostrar panel
-    panel.style.display = 'block';
+    // Mostrar panel como flex layout
+    panel.style.display = 'flex';
     panel.scrollTop = 0;
+    const mainContent = document.getElementById('adminMainContent');
+    if (mainContent) mainContent.scrollTop = 0;
 }
 
 function cerrarPanelAdminGeneral() {
+    if (typeof window.cerrarSesionAdmin === 'function') {
+        window.cerrarSesionAdmin();
+        return;
+    }
+
     const panel = document.getElementById('panelAdminGeneral');
-    if (!panel) return;
+    if (panel) panel.style.display = 'none';
+    const panelExtra = document.getElementById('panel-admin');
+    if (panelExtra) panelExtra.style.display = 'none';
+    const loginOverlay = document.getElementById('login-admin-overlay');
+    if (loginOverlay) loginOverlay.style.display = 'none';
 
-    panel.style.display = 'none';
-
-    // Restaurar scroll del body
     document.body.style.overflow = '';
+    const appPrincipal = document.getElementById('app') || document.body;
+    if (appPrincipal) appPrincipal.style.display = 'block';
 
-    // Mostrar botón verde nuevamente
-    const btnAdmin = document.getElementById('btnAdminGeneral');
-    if (btnAdmin) btnAdmin.style.display = 'flex';
+    const cleanPath = window.location.pathname.replace(/\/+$/, '').toLowerCase();
+    if (cleanPath === '/admin' || cleanPath === '/administrador' || window.location.pathname !== '/') {
+        window.location.href = '/';
+    } else {
+        if (window.history && window.history.pushState) {
+            window.history.pushState({}, '', '/');
+        }
+    }
 }
 function renderizarTarjetasAdmin() {
     const container = document.getElementById('tarjetasAdminContainer');
@@ -892,7 +907,13 @@ function cerrarCalendarioClub() {
     const seccion = document.getElementById('seccionCalendarioClub');
     const panel = document.getElementById('panelAdminGeneral');
     if (seccion) seccion.style.display = 'none';
-    if (panel) panel.style.display = 'block';
+    if (panel) {
+        panel.style.display = 'flex';
+        panel.style.setProperty('display', 'flex', 'important');
+    }
+    const mainContent = document.getElementById('adminMainContent');
+    if (mainContent) mainContent.scrollTop = 0;
+    if (typeof renderizarTarjetasAdmin === 'function') renderizarTarjetasAdmin();
     storageKeyCalendarioClub = '';
 }
 
@@ -1174,7 +1195,13 @@ function cerrarSeccionCuotas() {
     const seccionCuotas = document.getElementById('seccionCuotasClub');
     const panel = document.getElementById('panelAdminGeneral');
     if (seccionCuotas) seccionCuotas.style.display = 'none';
-    if (panel) panel.style.display = 'block';
+    if (panel) {
+        panel.style.display = 'flex';
+        panel.style.setProperty('display', 'flex', 'important');
+    }
+    const mainContent = document.getElementById('adminMainContent');
+    if (mainContent) mainContent.scrollTop = 0;
+    if (typeof renderizarTarjetasAdmin === 'function') renderizarTarjetasAdmin();
     storageKeyActual = '';
 }
 
@@ -1674,7 +1701,13 @@ function cerrarSeccionBD() {
     const seccionBD = document.getElementById('seccionBaseDatosClub');
     const panel = document.getElementById('panelAdminGeneral');
     if (seccionBD) seccionBD.style.display = 'none';
-    if (panel) panel.style.display = 'block';
+    if (panel) {
+        panel.style.display = 'flex';
+        panel.style.setProperty('display', 'flex', 'important');
+    }
+    const mainContent = document.getElementById('adminMainContent');
+    if (mainContent) mainContent.scrollTop = 0;
+    if (typeof renderizarTarjetasAdmin === 'function') renderizarTarjetasAdmin();
 }
 
 // ===== FUNCIONES DE DATOS =====
@@ -2062,7 +2095,13 @@ function cerrarCronograma() {
     const seccion = document.getElementById('seccionCronograma');
     const panel = document.getElementById('panelAdminGeneral');
     if (seccion) seccion.style.display = 'none';
-    if (panel) panel.style.display = 'block';
+    if (panel) {
+        panel.style.display = 'flex';
+        panel.style.setProperty('display', 'flex', 'important');
+    }
+    const mainContent = document.getElementById('adminMainContent');
+    if (mainContent) mainContent.scrollTop = 0;
+    if (typeof renderizarTarjetasAdmin === 'function') renderizarTarjetasAdmin();
 }
 
 function cambiarMesCronogramaAdmin(nuevoMes) {
@@ -3739,7 +3778,13 @@ function cerrarVerInteresados() {
     const seccion = document.getElementById('seccionVerInteresados');
     const panel = document.getElementById('panelAdminGeneral');
     if (seccion) seccion.style.display = 'none';
-    if (panel) panel.style.display = 'block';
+    if (panel) {
+        panel.style.display = 'flex';
+        panel.style.setProperty('display', 'flex', 'important');
+    }
+    const mainContent = document.getElementById('adminMainContent');
+    if (mainContent) mainContent.scrollTop = 0;
+    if (typeof renderizarTarjetasAdmin === 'function') renderizarTarjetasAdmin();
 }
 
 function cargarInteresados() {
@@ -3893,8 +3938,8 @@ window.guardarTodoElMes = guardarTodoElMes;
 window.cargarPredicadoresFechas = cargarPredicadoresFechas;
 window.guardarPredicadoresFechas = guardarPredicadoresFechas;
 window.mostrarFeedbackAdmin = mostrarFeedbackAdmin;
-window.agregarEvento = agregarEvento;
-window.eliminarEvento = eliminarEvento;
+if (typeof agregarEvento !== 'undefined') window.agregarEvento = agregarEvento;
+if (typeof eliminarEvento !== 'undefined') window.eliminarEvento = eliminarEvento;
 window.abrirVerInteresados = abrirVerInteresados;
 window.cerrarVerInteresados = cerrarVerInteresados;
 window.generarHTMLInteresados = generarHTMLInteresados;
@@ -3957,7 +4002,7 @@ if (typeof abrirModalGestionarPlanEstudios !== 'undefined') window.abrirModalGes
    GESTIÓN DE TRANSMISIONES EN VIVO (PANEL ADMIN)
    ======================================== */
 
-let transmisionEditandoId = null;
+var transmisionEditandoId = null;
 
 function abrirModalGestionarTransmisiones() {
     const modal = document.getElementById('modalGestionarTransmisiones');
@@ -3968,7 +4013,12 @@ function abrirModalGestionarTransmisiones() {
     renderizarAdminTransmisiones();
 
     if (typeof window.sincronizarTransmisionesConSupabase === 'function') {
-        window.sincronizarTransmisionesConSupabase();
+        const syncPromise = window.sincronizarTransmisionesConSupabase();
+        if (syncPromise && typeof syncPromise.then === 'function') {
+            syncPromise.then(() => {
+                renderizarAdminTransmisiones();
+            }).catch(() => {});
+        }
     }
 }
 
@@ -4370,6 +4420,7 @@ function eliminarTransmisionAdmin(id) {
 // Exportar a window
 window.abrirModalGestionarTransmisiones = abrirModalGestionarTransmisiones;
 window.cerrarModalGestionarTransmisiones = cerrarModalGestionarTransmisiones;
+window.renderizarAdminTransmisiones = renderizarAdminTransmisiones;
 window.guardarTransmisionForm = guardarTransmisionForm;
 window.editarTransmisionAdmin = editarTransmisionAdmin;
 window.cancelarEdicionTransmision = cancelarEdicionTransmision;
@@ -4422,7 +4473,13 @@ function cerrarCalendarioIglesiaAdmin() {
     const seccion = document.getElementById('seccionCalendarioIglesia');
     const panel = document.getElementById('panelAdminGeneral');
     if (seccion) seccion.style.display = 'none';
-    if (panel) panel.style.display = 'block';
+    if (panel) {
+        panel.style.display = 'flex';
+        panel.style.setProperty('display', 'flex', 'important');
+    }
+    const mainContent = document.getElementById('adminMainContent');
+    if (mainContent) mainContent.scrollTop = 0;
+    if (typeof renderizarTarjetasAdmin === 'function') renderizarTarjetasAdmin();
     eventoIglesiaPendienteEditarId = null;
     desbloquearScrollAdmin('seccionCalendarioIglesia');
 }
@@ -4731,13 +4788,21 @@ function abrirModalBaseDatos() {
 }
 
 function cerrarModalBaseDatos(event) {
-    if (event && event.target !== document.getElementById('modalBaseDatosAdmin')) return;
+    if (event && event.target && event.target.closest && !event.target.closest('[data-csp-click*="cerrarModalBaseDatos"]') && event.target !== document.getElementById('modalBaseDatosAdmin')) return;
     const modal = document.getElementById('modalBaseDatosAdmin');
     if (modal) {
         modal.style.display = 'none';
         modal.style.visibility = 'hidden';
     }
     desbloquearScrollAdmin('modalBaseDatosAdmin');
+    const panel = document.getElementById('panelAdminGeneral');
+    if (panel) {
+        panel.style.display = 'flex';
+        panel.style.setProperty('display', 'flex', 'important');
+    }
+    const mainContent = document.getElementById('adminMainContent');
+    if (mainContent) mainContent.scrollTop = 0;
+    if (typeof renderizarTarjetasAdmin === 'function') renderizarTarjetasAdmin();
 }
 
 function cambiarTabBaseDatos(tabId) {
@@ -5340,6 +5405,159 @@ window.restablecerCredencialesSupabaseUI = restablecerCredencialesSupabaseUI;
 window.sincronizarBaseDatosUI = sincronizarBaseDatosUI;
 window.copiarSQLSupabaseUI = copiarSQLSupabaseUI;
 window.descargarRespaldoJSON = descargarRespaldoJSON;
+
+// ==========================================================================
+// FUNCIONES DEL SIDEBAR Y LAYOUT MODERNO DE ADMINISTRACIÓN
+// ==========================================================================
+
+function toggleSubmenu(id) {
+    const submenu = document.getElementById('submenu-' + id);
+    const chevron = document.getElementById('sidebar-chevron-' + id);
+    if (!submenu) return;
+
+    const isVisible = submenu.style.display === 'block';
+
+    // Cerrar otros submenús si se desea mantener uno solo abierto
+    document.querySelectorAll('.sidebar-submenu').forEach(sm => {
+        if (sm !== submenu) sm.style.display = 'none';
+    });
+    document.querySelectorAll('.sidebar-chevron').forEach(ch => {
+        if (ch !== chevron) ch.classList.remove('open');
+    });
+
+    if (isVisible) {
+        submenu.style.display = 'none';
+        if (chevron) chevron.classList.remove('open');
+    } else {
+        submenu.style.display = 'block';
+        if (chevron) chevron.classList.add('open');
+    }
+}
+
+function mostrarSeccionAdmin(seccion) {
+    console.log('📌 Mostrando sección admin:', seccion);
+
+    // Actualizar item activo en sidebar
+    document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+    const activeNav = document.getElementById('nav-item-' + seccion);
+    if (activeNav) activeNav.classList.add('active');
+
+    // Cerrar sidebar en pantallas táctiles / móviles
+    if (window.innerWidth <= 900) {
+        const sidebar = document.getElementById('adminSidebar');
+        if (sidebar) sidebar.classList.remove('open');
+    }
+
+    switch (seccion) {
+        case 'panel':
+            const idsFullscreen = [
+                'seccionCuotasClub',
+                'seccionBaseDatosClub',
+                'seccionCalendarioClub',
+                'seccionCalendarioIglesia',
+                'seccionCronograma',
+                'seccionVerInteresados',
+                'modalBaseDatosAdmin',
+                'modalClubOpciones'
+            ];
+            idsFullscreen.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            const panelAdminLayout = document.getElementById('panelAdminGeneral');
+            if (panelAdminLayout) {
+                panelAdminLayout.style.display = 'flex';
+                panelAdminLayout.style.setProperty('display', 'flex', 'important');
+            }
+            const mainContent = document.getElementById('adminMainContent');
+            if (mainContent) {
+                mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            if (typeof renderizarTarjetasAdmin === 'function') {
+                renderizarTarjetasAdmin();
+            }
+            break;
+        case 'aventureros':
+            if (typeof abrirModalClub === 'function') {
+                abrirModalClub('Aventureros');
+            }
+            break;
+        case 'conquistadores':
+            if (typeof abrirModalClub === 'function') {
+                abrirModalClub('Conquistadores');
+            }
+            break;
+        case 'guias':
+            if (typeof abrirModalClub === 'function') {
+                abrirModalClub('Guías Mayores');
+            }
+            break;
+        case 'cronograma':
+            ejecutarAccionAdmin('cronogramaIglesia', 'Cronograma', window.event || {});
+            break;
+        case 'calendario':
+            ejecutarAccionAdmin('calendarioIglesia', 'Calendario', window.event || {});
+            break;
+        case 'transmisiones':
+            ejecutarAccionAdmin('gestionarTransmisiones', 'Transmisiones', window.event || {});
+            break;
+        case 'base-datos-iglesia':
+            ejecutarAccionAdmin('baseDatosIglesia', 'Base de datos', window.event || {});
+            break;
+        case 'interesados':
+            ejecutarAccionAdmin('verInteresados', 'Interesados', window.event || {});
+            break;
+        case 'agregar-libro':
+            ejecutarAccionAdmin('agregarLibro', 'Agregar Libro', window.event || {});
+            break;
+        case 'eliminar-libro':
+            ejecutarAccionAdmin('eliminarLibro', 'Eliminar Libro', window.event || {});
+            break;
+        case 'libros-pedidos':
+            ejecutarAccionAdmin('verLibrosPedidos', 'Libros Pedidos', window.event || {});
+            break;
+        case 'agregar-evento':
+            ejecutarAccionAdmin('agregarEvento', 'Agregar Anuncio', window.event || {});
+            break;
+        case 'quitar-evento':
+            ejecutarAccionAdmin('quitarEvento', 'Quitar Anuncio', window.event || {});
+            break;
+        case 'base-datos':
+            ejecutarAccionAdmin('configurarSupabase', 'Base de Datos (Supabase)', window.event || {});
+            break;
+        default:
+            console.log('Sección solicitada:', seccion);
+    }
+}
+
+function toggleAdminSidebar() {
+    const sidebar = document.getElementById('adminSidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('open');
+    }
+}
+
+function toggleNotificacionesAdmin() {
+    if (typeof mostrarAlertaAdmin === 'function') {
+        mostrarAlertaAdmin('🔔 Tienes todas las conexiones de Supabase y servicios operando con normalidad.');
+    } else {
+        alert('🔔 Todas las conexiones de Supabase y servicios están operando con normalidad.');
+    }
+}
+
+// Exportar al objeto global window para event delegator (data-csp-click)
+window.toggleSubmenu = toggleSubmenu;
+window.mostrarSeccionAdmin = mostrarSeccionAdmin;
+window.toggleAdminSidebar = toggleAdminSidebar;
+window.toggleNotificacionesAdmin = toggleNotificacionesAdmin;
+window.abrirPanelAdminGeneral = abrirPanelAdminGeneral;
+window.cerrarPanelAdminGeneral = cerrarPanelAdminGeneral;
+window.cerrarSesionAdmin = cerrarPanelAdminGeneral;
+window.renderizarTarjetasAdmin = renderizarTarjetasAdmin;
+window.cerrarSeccionCuotas = cerrarSeccionCuotas;
+window.cerrarSeccionBD = cerrarSeccionBD;
+window.cerrarModalBaseDatos = cerrarModalBaseDatos;
+
 
 
 

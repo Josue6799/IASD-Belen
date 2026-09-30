@@ -2350,9 +2350,6 @@ window.initFabMenu = initFabMenu;
 window.abrirTransmisiones = function () {
     if (typeof window.abrirEnVivo === 'function') window.abrirEnVivo();
 };
-window.abrirLMS = function () {
-    if (typeof window.abrirModalEvaluacion === 'function') window.abrirModalEvaluacion();
-};
 window.abrirAdmin = function () {
     if (typeof window.abrirModalAdminGeneral === 'function') window.abrirModalAdminGeneral();
 };
@@ -2649,4 +2646,213 @@ document.addEventListener('DOMContentLoaded', () => {
     initFabMenu();
 });
 
-console.log('✅ app.js (Iglesia, Parallax, Confetti, Bienvenida, Tema, FAB y Estadísticas) cargado correctamente');
+/* ==========================================================================
+   PANTALLA DE LOGIN PROFESIONAL - MODO ADMINISTRADOR (/admin)
+   ========================================================================== */
+
+const ADMIN_CREDENTIALS = {
+    email: 'josuemcas24@gmail.com',
+    password: 'admin2026'
+};
+
+function abrirLoginAdmin() {
+    // Asegurar que el modal simple antiguo nunca se muestre
+    const modalAntiguo = document.getElementById('modalAdminGeneral');
+    if (modalAntiguo) {
+        modalAntiguo.style.setProperty('display', 'none', 'important');
+    }
+
+    const overlay = document.getElementById('login-admin-overlay');
+    if (!overlay) return;
+
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // Limpiar campos y errores anteriores
+    const inputEmail = document.getElementById('login-email');
+    const inputPassword = document.getElementById('login-password');
+    const errorDiv = document.getElementById('login-error');
+
+    if (errorDiv) {
+        errorDiv.style.display = 'none';
+        errorDiv.textContent = '';
+    }
+
+    if (inputPassword) {
+        inputPassword.value = '';
+    }
+
+    // Auto-focus en el email
+    setTimeout(() => {
+        if (inputEmail) {
+            inputEmail.focus();
+        }
+    }, 250);
+}
+
+function cerrarLoginAdmin() {
+    const overlay = document.getElementById('login-admin-overlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+    document.body.style.overflow = '';
+
+    // Si la URL actual es /admin o /administrador, redirigir a la ruta raíz
+    const cleanPath = window.location.pathname.replace(/\/+$/, '').toLowerCase();
+    if (cleanPath === '/admin' || cleanPath === '/administrador') {
+        window.location.href = '/';
+    }
+}
+
+function toggleLoginPasswordVisibility() {
+    const passwordInput = document.getElementById('login-password');
+    const icon = document.getElementById('iconToggleLoginPassword');
+    if (!passwordInput) return;
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        if (icon) {
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    } else {
+        passwordInput.type = 'password';
+        if (icon) {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+}
+
+function validarLoginAdmin() {
+    const inputEmail = document.getElementById('login-email');
+    const inputPassword = document.getElementById('login-password');
+    const errorDiv = document.getElementById('login-error');
+    const card = document.querySelector('.login-card');
+
+    const email = (inputEmail ? inputEmail.value : '').trim().toLowerCase();
+    const password = (inputPassword ? inputPassword.value : '').trim();
+
+    if (!email || !password) {
+        if (errorDiv) {
+            errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Por favor completa todos los campos.';
+            errorDiv.style.display = 'flex';
+        }
+        if (!email && inputEmail) inputEmail.focus();
+        else if (inputPassword) inputPassword.focus();
+        return;
+    }
+
+    if (email === ADMIN_CREDENTIALS.email.toLowerCase() && password === ADMIN_CREDENTIALS.password) {
+        // Credenciales correctas: Ocultar pantalla de login manteniendo la ruta /admin
+        const overlay = document.getElementById('login-admin-overlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+
+        // Abrir el Panel de Administración General
+        if (typeof abrirPanelAdminGeneral === 'function') {
+            abrirPanelAdminGeneral();
+        } else if (typeof window.abrirPanelAdminGeneral === 'function') {
+            window.abrirPanelAdminGeneral();
+        } else {
+            const panel = document.getElementById('panelAdminGeneral') || document.getElementById('panel-admin');
+            if (panel) {
+                panel.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // Limpiar inputs
+        if (inputEmail) inputEmail.value = '';
+        if (inputPassword) inputPassword.value = '';
+    } else {
+        // Credenciales incorrectas
+        if (errorDiv) {
+            errorDiv.innerHTML = '<i class="fas fa-times-circle"></i> Credenciales incorrectas. Verifica tu correo y contraseña.';
+            errorDiv.style.display = 'flex';
+        }
+
+        if (inputPassword) {
+            inputPassword.value = '';
+            inputPassword.focus();
+        }
+
+        // Efecto Shake en la tarjeta
+        if (card) {
+            card.style.animation = 'none';
+            card.offsetHeight; // Forzar reflow
+            card.style.animation = 'shakeError 0.4s ease';
+        }
+    }
+}
+
+// Cerrar sesión del modo administrador y volver a la página pública
+function cerrarSesionAdmin() {
+    sessionStorage.removeItem('iasd_admin_authenticated');
+    Object.keys(sessionStorage).forEach(k => {
+        if (k.startsWith('desbloqueado_')) sessionStorage.removeItem(k);
+    });
+
+    const panelAdminGeneral = document.getElementById('panelAdminGeneral');
+    if (panelAdminGeneral) panelAdminGeneral.style.display = 'none';
+    const panelAdmin = document.getElementById('panel-admin');
+    if (panelAdmin) panelAdmin.style.display = 'none';
+    const loginOverlay = document.getElementById('login-admin-overlay');
+    if (loginOverlay) loginOverlay.style.display = 'none';
+    const modalAntiguo = document.getElementById('modalAdminGeneral');
+    if (modalAntiguo) modalAntiguo.style.display = 'none';
+
+    document.body.style.overflow = '';
+    window.location.href = '/';
+}
+
+// Escuchar tecla Enter en los inputs de login
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const overlay = document.getElementById('login-admin-overlay');
+        if (overlay && overlay.style.display === 'flex') {
+            const activeTag = document.activeElement ? document.activeElement.id : '';
+            if (activeTag === 'login-email' || activeTag === 'login-password' || activeTag === 'btnSubmitLoginAdmin') {
+                e.preventDefault();
+                validarLoginAdmin();
+            }
+        }
+    }
+});
+
+// Detección de Ruta Oculta de Administración (/admin)
+function detectarRutaAdmin() {
+    const path = window.location.pathname.replace(/\/+$/, '').toLowerCase();
+    const esRutaAdmin = path === '/admin' || path === '/administrador';
+
+    if (esRutaAdmin) {
+        window.location.href = '/admin.html';
+        return;
+    }
+
+    const loginOverlay = document.getElementById('login-admin-overlay');
+    const panelAdminGeneral = document.getElementById('panelAdminGeneral');
+    const panelAdmin = document.getElementById('panel-admin');
+
+    if (loginOverlay) loginOverlay.style.display = 'none';
+    if (panelAdminGeneral) panelAdminGeneral.style.display = 'none';
+    if (panelAdmin) panelAdmin.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+// Redireccionar llamadas y exportar a window para event delegator (data-csp-click)
+window.abrirLoginAdmin = abrirLoginAdmin;
+window.cerrarLoginAdmin = cerrarLoginAdmin;
+window.validarLoginAdmin = validarLoginAdmin;
+window.toggleLoginPasswordVisibility = toggleLoginPasswordVisibility;
+window.cerrarSesionAdmin = cerrarSesionAdmin;
+window.cerrarPanelAdminGeneral = cerrarSesionAdmin;
+window.abrirModalAdminGeneral = abrirLoginAdmin;
+window.abrirAdmin = abrirLoginAdmin;
+
+window.detectarRutaAdmin = detectarRutaAdmin;
+document.addEventListener('DOMContentLoaded', detectarRutaAdmin);
+window.addEventListener('popstate', detectarRutaAdmin);
+
+console.log('✅ app.js (Iglesia, Parallax, Confetti, Bienvenida, Tema, FAB, Estadísticas y Login Admin) cargado correctamente');

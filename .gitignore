@@ -1,0 +1,18 @@
+# Dependencias y servidor local
+node_modules/
+package.json
+package-lock.json
+server.js
+
+# Funciones y configuraciones no utilizadas / sensibles
+functions/
+.env
+.env.*
+*.local
+*.log
+
+# Archivos de sistema y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

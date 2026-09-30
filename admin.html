@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>Consola de Gestión · IASD Belén</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&display=swap"
+        rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <!-- Hojas de Estilo Modulares -->
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/pages.css" />
+    <link rel="stylesheet" href="css/animations.css" />
+    <link rel="stylesheet" href="css/biblioteca.css" />
+
+    <!-- CSP Safe Event Delegator -->
+    <script src="js/event-delegator.js"></script>
+    <script>
+        try {
+            if (localStorage.getItem('tema') === 'oscuro') {
+                document.documentElement.classList.add('tema-oscuro');
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.body.classList.add('tema-oscuro');
+                });
+            }
+        } catch (e) { }
+    </script>
+</head>
+
+<body style="background: #f8fafc; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden;">
+
+    <!-- ==================== PANTALLA DE LOGIN PROFESIONAL ADMIN (/admin) ==================== -->
+    <div id="login-admin-overlay" class="login-overlay" style="display: flex;" role="dialog" aria-modal="true" aria-label="Inicio de sesión administrador">
+        <div class="login-card">
+            <!-- Botón de Cerrar / Volver en esquina superior -->
+            <button type="button" class="login-card-close" data-csp-click="cerrarLoginAdmin()" title="Volver a la página pública" aria-label="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <!-- Logo Circular de la Iglesia -->
+            <div class="login-logo-container">
+                <img src="https://res.cloudinary.com/onjg5kf6/image/upload/v1787333423/belen-logo-iasd_pvpdsk.png"
+                    alt="Logo IASD Belén" class="login-logo"
+                    onerror="this.style.display='none'; document.getElementById('login-logo-fallback').style.display='flex';" />
+                <div id="login-logo-fallback" class="login-logo-fallback" style="display: none;">
+                    <i class="fas fa-church"></i>
+                </div>
+            </div>
+
+            <!-- Títulos -->
+            <h2 class="login-title">IASD Belén</h2>
+            <p class="login-subtitle">PANEL DE ADMINISTRACIÓN</p>
+
+            <form id="formLoginAdmin" class="login-form" autocomplete="on">
+                <!-- Campo de Correo Electrónico -->
+                <div class="login-field">
+                    <label for="login-email">
+                        <i class="fas fa-envelope"></i> Correo Electrónico
+                    </label>
+                    <div class="login-input-wrap">
+                        <input type="email" id="login-email" placeholder="nombre@ejemplo.com" autocomplete="email" required />
+                    </div>
+                </div>
+
+                <!-- Campo de Contraseña -->
+                <div class="login-field">
+                    <label for="login-password">
+                        <i class="fas fa-lock"></i> Contraseña
+                    </label>
+                    <div class="login-input-wrap password-wrap">
+                        <input type="password" id="login-password" placeholder="••••••••••" autocomplete="current-password" required />
+                        <button type="button" class="btn-toggle-password" data-csp-click="toggleLoginPasswordVisibility()" title="Mostrar u ocultar contraseña" tabindex="-1">
+                            <i class="fas fa-eye" id="iconToggleLoginPassword"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mensaje de Error Dinámico -->
+                <div id="login-error" class="login-error" style="display: none;" role="alert"></div>
+
+                <!-- Botón de Inicio de Sesión -->
+                <button type="button" class="login-btn" data-csp-click="validarLoginAdmin()" id="btnSubmitLoginAdmin">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+            </form>
+
+            <!-- Acciones secundarias -->
+            <div class="login-footer-actions">
+                <button type="button" class="login-btn-cancelar" data-csp-click="cerrarLoginAdmin()">
+                    <i class="fas fa-arrow-left"></i> Volver a la página principal
+                </button>
+            </div>
+
+            <!-- Badge de Seguridad -->
+            <p class="login-security">
+                <i class="fas fa-shield-alt"></i> Conexión segura · Solo para administradores autorizados
+            </p>
+        </div>
+    </div>
+
+    <!-- ===== PANEL DE ADMINISTRACIÓN GENERAL CON SIDEBAR ===== -->
+    <div id="panelAdminGeneral" class="admin-layout" style="display: none;">
+        <!-- SIDEBAR IZQUIERDO -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <!-- Header del Sidebar -->
+            <div class="sidebar-header">
+                <div class="sidebar-logo-container">
+                    <img src="https://res.cloudinary.com/onjg5kf6/image/upload/v1787333423/belen-logo-iasd_pvpdsk.png"
+                        alt="Logo IASD Belén" class="sidebar-logo-img"
+                        onerror="this.style.display='none'; document.getElementById('sidebar-church-fallback').style.display='flex';" />
+                    <div id="sidebar-church-fallback" class="sidebar-logo-fallback" style="display: none;">
+                        <i class="fas fa-church"></i>
+                    </div>
+                </div>
+                <div class="sidebar-brand-text">
+                    <h2>IASD Belén</h2>
+                    <p>CONSOLA DE GESTIÓN</p>
+                </div>
+            </div>
+
+            <!-- Menú de Navegación -->
+            <nav class="sidebar-menu">
+                <!-- 1. Panel Principal -->
+                <button type="button" class="sidebar-item active" id="nav-item-panel" data-csp-click="mostrarSeccionAdmin('panel')">
+                    <i class="fas fa-th-large"></i>
+                    <span>Panel Principal</span>
+                </button>
+
+                <!-- 2. Clubes con Subsecciones -->
+                <div class="sidebar-group">
+                    <button type="button" class="sidebar-item sidebar-dropdown-btn" id="nav-item-clubes" data-csp-click="toggleSubmenu('clubes')">
+                        <i class="fas fa-users"></i>
+                        <span>Clubes</span>
+                        <i class="fas fa-chevron-down sidebar-chevron" id="sidebar-chevron-clubes"></i>
+                    </button>
+                    <div id="submenu-clubes" class="sidebar-submenu" style="display: none;">
+                        <button type="button" class="sidebar-subitem" data-csp-click="mostrarSeccionAdmin('aventureros')">
+                            <span class="subitem-dot"></span> Aventureros
+                        </button>
+                        <button type="button" class="sidebar-subitem" data-csp-click="mostrarSeccionAdmin('conquistadores')">
+                            <span class="subitem-dot"></span> Conquistadores
+                        </button>
+                        <button type="button" class="sidebar-subitem" data-csp-click="mostrarSeccionAdmin('guias')">
+                            <span class="subitem-dot"></span> Guías Mayores
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. Iglesia con Subsecciones -->
+                <div class="sidebar-group">
+                    <button type="button" class="sidebar-item sidebar-dropdown-btn" id="nav-item-iglesia" data-csp-click="toggleSubmenu('iglesia')">
+                        <i class="fas fa-church"></i>
+                        <span>Iglesia</span>
+                        <i class="fas fa-chevron-down sidebar-chevron" id="sidebar-chevron-iglesia"></i>
+                    </button>
+                    <div id="submenu-iglesia" class="sidebar-submenu" style="display: none;">
+                        <button type="button" class="sidebar-subitem" data-csp-click="mostrarSeccionAdmin('cronograma')">
+                            <span class="subitem-dot"></span> Cronograma
+                        </button>
+                        <button type="button" class="sidebar-subitem" data-csp-click="mostrarSeccionAdmin('calendario')">
+                            <span class="subitem-dot"></span> Calendario
+                        </button>
+                        <button type="button" class="sidebar-subitem" data-csp-click="mostrarSeccionAdmin('transmisiones')">
+                            <span class="subitem-dot"></span> Transmisiones
+                        </button>
+                        <button type="button" class="sidebar-subitem" data-csp-click="mostrarSeccionAdmin('base-datos-iglesia')">
+                            <span class="subitem-dot"></span> Base de Datos
+                        </button>
+                        <button type="button" class="sidebar-subitem" data-csp-click="mostrarSeccionAdmin('interesados')">
+                            <span class="subitem-dot"></span> Interesados
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. Biblioteca con Subsecciones -->
+                <div class="sidebar-group">
+                    <button type="button" class="sidebar-item sidebar-dropdown-btn" id="nav-item-biblioteca" data-csp-click="toggleSubmenu('biblioteca')">
+                        <i class="fas fa-book"></i>
+                        <span>Biblioteca</span>
+                        <i class="fas fa-chevron-down sidebar-chevron" id="sidebar-chevron-biblioteca"></i>
+                    </button>
+                    <div id="submenu-biblioteca" class="sidebar-submenu" style="display: none;">
+                        <button type="button" class="sidebar-subitem" data-csp-click="mostrarSeccionAdmin('agregar-libro')">
+                            <span class="subitem-dot"></span> Agregar Libro
+                        </button>
+                        <button type="button" class="sidebar-subitem" data-csp-click="mostrarSeccionAdmin('eliminar-libro')">
+                            <span class="subitem-dot"></span> Eliminar Libro
+                        </button>
+                        <button type="button" class="sidebar-subitem" data-csp-click="mostrarSeccionAdmin('libros-pedidos')">
+                            <span class="subitem-dot"></span> Libros Pedidos
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 5. Anuncios con Subsecciones -->
+                <div class="sidebar-group">
+                    <button type="button" class="sidebar-item sidebar-dropdown-btn" id="nav-item-anuncios" data-csp-click="toggleSubmenu('anuncios')">
+                        <i class="fas fa-bullhorn"></i>
+                        <span>Anuncios</span>
+                        <i class="fas fa-chevron-down sidebar-chevron" id="sidebar-chevron-anuncios"></i>
+                    </button>
+                    <div id="submenu-anuncios" class="sidebar-submenu" style="display: none;">
+                        <button type="button" class="sidebar-subitem" data-csp-click="mostrarSeccionAdmin('agregar-evento')">
+                            <span class="subitem-dot"></span> Agregar Anuncio
+                        </button>
+                        <button type="button" class="sidebar-subitem" data-csp-click="mostrarSeccionAdmin('quitar-evento')">
+                            <span class="subitem-dot"></span> Quitar Anuncio
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 6. Base de Datos (Supabase) -->
+                <button type="button" class="sidebar-item" id="nav-item-basedatos" data-csp-click="mostrarSeccionAdmin('base-datos')">
+                    <i class="fas fa-database"></i>
+                    <span>Base de Datos (Supabase)</span>
+                </button>
+            </nav>
+
+            <!-- Footer del Sidebar -->
+            <div class="sidebar-footer">
+                <button type="button" class="sidebar-btn-logout" data-csp-click="cerrarSesionAdmin()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- ÁREA DE CONTENIDO PRINCIPAL -->
+        <main class="admin-content" id="adminMainContent">
+            <!-- Barra Superior (Topbar) -->
+            <header class="admin-topbar">
+                <div class="topbar-left">
+                    <button type="button" class="admin-mobile-toggle" data-csp-click="toggleAdminSidebar()" aria-label="Abrir menú de navegación">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="topbar-welcome-title">Bienvenido, Administrador</h1>
+                </div>
+
+                <div class="topbar-actions">
+                    <button type="button" class="topbar-icon-btn" data-csp-click="toggleNotificacionesAdmin()" title="Notificaciones del sistema" aria-label="Notificaciones">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <div class="topbar-session-badge">
+                        <span class="status-pulse-dot"></span>
+                        <span>Sesión activa</span>
+                    </div>
+                    <button type="button" class="btn-cerrar-sesion" data-csp-click="cerrarSesionAdmin()">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                    </button>
+                </div>
+            </header>
+
+            <!-- Contenido del Panel -->
+            <section id="admin-content-area" class="admin-content-area">
+                <!-- Tarjeta Grande de Bienvenida -->
+                <div class="admin-welcome-card">
+                    <p class="welcome-badge">PANEL DE ADMINISTRACIÓN ACTIVO</p>
+                    <h2>Bienvenida a la consola de gestión</h2>
+                    <p>Desde este módulo centralizado gestionarás las solicitudes, la asignación de recursos y los registros de la iglesia.</p>
+                </div>
+
+                <!-- Tarjetas de Resumen (Supabase, JWT Seguro, Logs de Acceso) -->
+                <div class="admin-summary-cards">
+                    <div class="admin-summary-card">
+                        <div class="summary-icon-box">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="summary-info">
+                            <h3>Supabase</h3>
+                            <p>Base de datos conectada</p>
+                            <span class="status-active">● Operativa</span>
+                        </div>
+                    </div>
+
+                    <div class="admin-summary-card">
+                        <div class="summary-icon-box">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="summary-info">
+                            <h3>JWT Seguro (8h)</h3>
+                            <p>Cifrado Web Crypto &amp; bcrypt</p>
+                            <span class="status-active">● Protegido</span>
+                        </div>
+                    </div>
+
+                    <div class="admin-summary-card">
+                        <div class="summary-icon-box">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="summary-info">
+                            <h3>Logs de Acceso</h3>
+                            <p>Auditoría y Rate Limiting</p>
+                            <span class="status-active">● Monitoreado</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Módulos de Gestión de la Iglesia (Tarjetas Dinámicas) -->
+                <div class="admin-modules-section">
+                    <div class="modules-section-header">
+                        <h2><i class="fas fa-th-large" style="color: #c9a53b;"></i> Módulos de Gestión de la Iglesia</h2>
+                        <p>Selecciona un módulo para gestionar sus opciones y registros.</p>
+                    </div>
+
+                    <div id="tarjetasAdminContainer" class="admin-cards-grid">
+                        <!-- Las tarjetas interactivas se cargan con renderizarTarjetasAdmin() -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ===== MODAL FLOTANTE PARA CLUBES ===== -->
+    <div id="modalClubOpciones" class="modal-club-overlay" data-csp-click="cerrarModalClub(event)">
+        <div class="modal-club-card" data-csp-click="event.stopPropagation()">
+            <button class="modal-club-close" data-csp-click="cerrarModalClub()" title="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="modal-club-titulo" id="modalClubTitulo">Opciones para Aventureros</h3>
+            <div class="modal-club-herramientas">
+                <button class="btn-herramienta exportar" data-csp-click="exportarDatosClub()">📦 Exportar datos</button>
+                <button class="btn-herramienta importar"
+                    data-csp-click="document.getElementById('inputImportarClub').click()">📂 Importar datos</button>
+                <input type="file" id="inputImportarClub" accept=".json" style="display:none"
+                    data-csp-change="importarDatosClub(event)">
+            </div>
+            <div class="modal-club-botones">
+                <button class="modal-club-btn cuotas" data-csp-click="abrirCuotasClub()">
+                    <span class="btn-icono">💰</span>
+                    <span class="btn-texto">
+                        <span class="btn-titulo">Cuotas</span>
+                        <span class="btn-descripcion">Ver y gestionar pagos</span>
+                    </span>
+                </button>
+                <button class="modal-club-btn basedatos" data-csp-click="abrirBaseDatosClub()">
+                    <span class="btn-icono">🗄️</span>
+                    <span class="btn-texto">
+                        <span class="btn-titulo">Base de datos</span>
+                        <span class="btn-descripcion">Gestionar miembros</span>
+                    </span>
+                </button>
+                <button class="modal-club-btn calendario" data-csp-click="abrirCalendarioClub()">
+                    <span class="btn-icono">📅</span>
+                    <span class="btn-texto">
+                        <span class="btn-titulo">Calendario</span>
+                        <span class="btn-descripcion">Gestionar eventos del club</span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DE CONFIRMACIÓN PARA ELIMINAR MIEMBRO ===== -->
+    <div id="modalConfirmarEliminar" class="modal-confirm-overlay" data-csp-click="cerrarModalConfirmarEliminar(event)">
+        <div class="modal-confirm-card" data-csp-click="event.stopPropagation()">
+            <button class="modal-confirm-close" data-csp-click="cerrarModalConfirmarEliminar()" title="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-confirm-icono">⚠️</div>
+            <h3 class="modal-confirm-titulo">Confirmar eliminación</h3>
+            <p class="modal-confirm-mensaje">¿Estás seguro de que deseas eliminar este miembro? Esta acción no se puede deshacer.</p>
+            <div class="modal-confirm-botones">
+                <button class="modal-confirm-btn btn-confirm-si" data-csp-click="confirmarEliminarMiembro()">
+                    <i class="fas fa-trash"></i> Sí, eliminar
+                </button>
+                <button class="modal-confirm-btn btn-confirm-no" data-csp-click="cerrarModalConfirmarEliminar()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL AGREGAR MIEMBRO A BASE DE DATOS ===== -->
+    <div id="modalAgregarMiembroBD" class="modal-bd-overlay" data-csp-click="cerrarModalAgregarMiembroBD(event)">
+        <div class="modal-bd-card" data-csp-click="event.stopPropagation()">
+            <h3 id="modalBdTitulo"><i class="fas fa-user-plus"></i> Agregar Miembro</h3>
+            <div class="form-group">
+                <label>Nombre completo *</label>
+                <input type="text" id="bdInputNombre" placeholder="Ej: Juan Pérez">
+            </div>
+            <div class="form-group">
+                <label>Edad *</label>
+                <input type="number" id="bdInputEdad" placeholder="Ej: 12">
+            </div>
+            <div class="form-group">
+                <label>Unidad *</label>
+                <input type="text" id="bdInputUnidad" placeholder="Ej: Halcones">
+            </div>
+            <div class="form-group">
+                <label>Cargo *</label>
+                <select id="bdInputCargo">
+                    <option value="Miembro">Miembro</option>
+                    <option value="Capitán">Capitán</option>
+                    <option value="Secretario">Secretario</option>
+                    <option value="Subdirector">Subdirector</option>
+                    <option value="Director">Director</option>
+                    <option value="Consejero">Consejero</option>
+                    <option value="Instructor">Instructor</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Teléfono de contacto</label>
+                <input type="tel" id="bdInputTelefono" placeholder="Ej: 3001234567">
+            </div>
+            <div class="form-group">
+                <label>Fecha de nacimiento</label>
+                <input type="date" id="bdInputFechaNacimiento">
+            </div>
+            <div class="form-group">
+                <label>Cartillas</label>
+                <input type="text" id="bdInputCartillas" placeholder="Ej: 3">
+            </div>
+            <div class="form-group">
+                <label>Especialidades</label>
+                <input type="text" id="bdInputEspecialidades" placeholder="Ej: Natación, Campismo">
+            </div>
+            <div class="modal-bd-botones">
+                <button class="btn-bd-guardar" data-csp-click="guardarNuevoMiembroBD()">
+                    <i class="fas fa-save"></i> Guardar
+                </button>
+                <button class="btn-bd-cancelar" data-csp-click="cerrarModalAgregarMiembroBD()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DE CONFIRMACIÓN PARA ELIMINAR MIEMBRO BD ===== -->
+    <div id="modalConfirmarEliminarBD" class="modal-confirm-overlay"
+        data-csp-click="cerrarModalConfirmarEliminarBD(event)">
+        <div class="modal-confirm-card" data-csp-click="event.stopPropagation()">
+            <button class="modal-confirm-close" data-csp-click="cerrarModalConfirmarEliminarBD()" title="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-confirm-icono">⚠️</div>
+            <h3 class="modal-confirm-titulo">Confirmar eliminación</h3>
+            <p class="modal-confirm-mensaje">¿Estás seguro de que deseas eliminar a este miembro de la base de datos?
+                Esta acción no se puede deshacer.</p>
+            <div class="modal-confirm-botones">
+                <button class="modal-confirm-btn btn-confirm-si" data-csp-click="confirmarEliminarMiembroBD()">
+                    <i class="fas fa-trash"></i> Sí, eliminar
+                </button>
+                <button class="modal-confirm-btn btn-confirm-no" data-csp-click="cerrarModalConfirmarEliminarBD()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SECCIÓN ENCUESTAS ===== -->
+    <div id="seccionEncuestas" style="display:none;"></div>
+
+    <!-- ===== SECCIÓN CRONOGRAMA ===== -->
+    <div id="seccionCronograma" style="display:none;"></div>
+
+    <!-- ===== MODAL GENÉRICO DE ALERTA ===== -->
+    <div id="modalAlertaAdmin" class="modal-generico-overlay">
+        <div class="modal-generico-card" data-csp-click="event.stopPropagation()">
+            <div class="modal-generico-icono">⚠️</div>
+            <h3 class="modal-generico-titulo" id="modalAlertaTitulo">Atención</h3>
+            <p class="modal-generico-mensaje" id="modalAlertaMensaje"></p>
+            <div class="modal-generico-botones">
+                <button class="modal-generico-btn btn-modal-primario"
+                    data-csp-click="cerrarModalAlerta()">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL GENÉRICO DE CONFIRMACIÓN (PROFESIONAL) ===== -->
+    <div id="modalConfirmAdmin" class="modal-confirm-overlay" data-csp-click="cerrarModalConfirm()">
+        <div class="modal-confirm-card" data-csp-click="event.stopPropagation()">
+            <div class="modal-confirm-icono">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h3 class="modal-confirm-titulo" id="modalConfirmTitulo">Confirmar acción</h3>
+            <p class="modal-confirm-mensaje" id="modalConfirmMensaje"></p>
+            <div class="modal-confirm-botones">
+                <button class="modal-confirm-btn btn-confirm-si" id="btnConfirmSi">Sí, eliminar</button>
+                <button class="modal-confirm-btn btn-confirm-no" data-csp-click="cerrarModalConfirm()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL AGREGAR / EDITAR LIBRO ===== -->
+    <div id="modalAgregarLibro" class="modal-biblioteca-overlay" data-csp-click="cerrarModalAgregarLibro(event)">
+        <div class="modal-biblioteca-card" data-csp-click="event.stopPropagation()">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
+                <h3 id="modalBiblioTitulo" style="margin:0; text-align:left; color:#1a3a4a; font-size:1.2rem;"><i
+                        class="fas fa-plus-circle"></i> Agregar Libro</h3>
+                <button type="button" data-csp-click="cerrarModalAgregarLibro()"
+                    style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;"
+                    title="Cerrar">&times;</button>
+            </div>
+            <div class="form-agregar-libro">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:0.8rem;">
+                    <div class="form-group">
+                        <label style="font-weight:600; color:#1a3a4a; font-size:0.85rem;">ID del libro *</label>
+                        <input type="text" id="inputIdLibro" placeholder="Ej: 56 o LIB-001">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label style="font-weight:600; color:#1a3a4a; font-size:0.85rem;">Título del libro *</label>
+                        <input type="text" id="inputTituloLibro" placeholder="Ej: El conflicto de los siglos">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight:600; color:#1a3a4a; font-size:0.85rem;">Autor *</label>
+                        <input type="text" id="inputAutorLibro" placeholder="Ej: Elena G. de White">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight:600; color:#1a3a4a; font-size:0.85rem;">Cantidad</label>
+                        <input type="number" id="inputCantidadLibro" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight:600; color:#1a3a4a; font-size:0.85rem;">Categoría</label>
+                        <input type="text" id="inputCategoriaLibro" placeholder="Ej: Teología, Salud, Juvenil">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight:600; color:#1a3a4a; font-size:0.85rem;">Estado</label>
+                        <select id="inputEstadoLibro">
+                            <option value="Disponible">Disponible</option>
+                            <option value="Prestado">Prestado</option>
+                            <option value="Dañado">Dañado</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label style="font-weight:600; color:#1a3a4a; font-size:0.85rem;">Ubicación (Estante/Sección)</label>
+                        <input type="text" id="inputUbicacionLibro" placeholder="Ej: Sección 2 - Estante A">
+                    </div>
+                </div>
+                <button id="btnGuardarLibro" class="modal-generico-btn btn-modal-primario"
+                    data-csp-click="guardarNuevoLibro()"
+                    style="width:100%; margin-top:1rem; padding:0.8rem; border-radius:2rem; font-weight:700; font-family:Inter,sans-serif; background:linear-gradient(135deg, #1a3a4a 0%, #2c5f7c 100%); color:white; border:none; cursor:pointer;">
+                    <i class="fas fa-save"></i> Guardar Libro
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL ELIMINAR / EDITAR LIBROS ===== -->
+    <div id="modalEliminarLibro" class="modal-biblioteca-overlay" data-csp-click="cerrarModalEliminarLibro(event)">
+        <div class="modal-biblioteca-card" data-csp-click="event.stopPropagation()" style="max-width:780px;">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
+                <h3 style="margin:0; text-align:left; color:#1a3a4a; font-size:1.2rem;"><i class="fas fa-book"></i>
+                    Catálogo y Gestión de Libros</h3>
+                <button type="button" data-csp-click="cerrarModalEliminarLibro()"
+                    style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;"
+                    title="Cerrar">&times;</button>
+            </div>
+            <div class="buscador-biblioteca">
+                <i class="fas fa-search icono-buscar"></i>
+                <input type="text" id="buscadorEliminarLibro" placeholder="Buscar por título, autor o ID..."
+                    data-csp-input="filtrarLibrosEliminar()">
+            </div>
+            <div id="listaEliminarLibros" style="overflow-x:auto; max-height:55vh;"></div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL VER LIBROS Y PEDIDOS ===== -->
+    <div id="modalVerPedidos" class="modal-biblioteca-overlay" data-csp-click="cerrarModalVerPedidos(event)">
+        <div class="modal-biblioteca-card" data-csp-click="event.stopPropagation()" style="max-width:920px;">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
+                <h3 style="margin:0; text-align:left; color:#1a3a4a; font-size:1.2rem;">
+                    <i class="fas fa-book-open"></i> Gestión de Libros y Pedidos
+                </h3>
+                <button type="button" data-csp-click="cerrarModalVerPedidos()"
+                    style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;"
+                    title="Cerrar">&times;</button>
+            </div>
+
+            <!-- Pestañas Principales: Catálogo de Libros vs Solicitudes de Préstamo -->
+            <div
+                style="display:flex; gap:0.5rem; margin-bottom:1rem; border-bottom:1px solid #e0e0e0; padding-bottom:0.6rem; flex-wrap:wrap;">
+                <button id="btnTabSeccionLibros" data-csp-click="cambiarSeccionVerPedidos('Libros')"
+                    style="padding:0.5rem 1.4rem; border-radius:1.5rem; border:none; background:#1a3a4a; color:white; font-weight:700; cursor:pointer; font-size:0.88rem; font-family:Inter,sans-serif; min-height:44px; display:inline-flex; align-items:center; gap:0.4rem;">
+                    <i class="fas fa-book"></i> Catálogo y Estados
+                </button>
+                <button id="btnTabSeccionPedidos" data-csp-click="cambiarSeccionVerPedidos('Pedidos')"
+                    style="padding:0.5rem 1.4rem; border-radius:1.5rem; border:1px solid #1a3a4a; background:white; color:#1a3a4a; font-weight:700; cursor:pointer; font-size:0.88rem; font-family:Inter,sans-serif; min-height:44px; display:inline-flex; align-items:center; gap:0.4rem;">
+                    <i class="fas fa-list-alt"></i> Solicitudes de Préstamo
+                </button>
+            </div>
+
+            <!-- SECCIÓN 1: CATÁLOGO Y ESTADOS DE LIBROS -->
+            <div id="seccionVerLibros">
+                <div class="buscador-biblioteca" style="margin-bottom:1rem;">
+                    <i class="fas fa-search icono-buscar"></i>
+                    <input type="text" id="buscadorLibrosPedidos" placeholder="Buscar libro por título, autor o ID..."
+                        data-csp-input="filtrarLibrosPedidosAdmin()">
+                </div>
+                <div id="listaLibrosAdminEstados" style="overflow-x:auto; max-height:55vh;"></div>
+            </div>
+
+            <!-- SECCIÓN 2: SOLICITUDES DE PRÉSTAMO DE LIBROS -->
+            <div id="seccionVerPedidos" style="display:none;">
+                <div style="display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap; align-items:center;">
+                    <button id="btnFiltroPedidosPendientes" data-csp-click="filtrarPedidosTab('Pendientes')"
+                        style="padding:0.4rem 1rem; border-radius:1.5rem; border:none; background:#1a3a4a; color:white; font-weight:600; cursor:pointer; font-size:0.82rem; font-family:Inter,sans-serif; min-height:44px; display:inline-flex; align-items:center; justify-content:center;">Pendientes</button>
+                    <button id="btnFiltroPedidosEnCurso" data-csp-click="filtrarPedidosTab('EnCurso')"
+                        style="padding:0.4rem 1rem; border-radius:1.5rem; border:1px solid #1a3a4a; background:white; color:#1a3a4a; font-weight:600; cursor:pointer; font-size:0.82rem; font-family:Inter,sans-serif; min-height:44px; display:inline-flex; align-items:center; justify-content:center;">En curso</button>
+                    <button id="btnFiltroPedidosTodos" data-csp-click="filtrarPedidosTab('Todos')"
+                        style="padding:0.4rem 1rem; border-radius:1.5rem; border:1px solid #1a3a4a; background:white; color:#1a3a4a; font-weight:600; cursor:pointer; font-size:0.82rem; font-family:Inter,sans-serif; min-height:44px; display:inline-flex; align-items:center; justify-content:center;">Todos los pedidos</button>
+                </div>
+                <div id="listaPedidosLibros" style="overflow-x:auto; max-height:55vh;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL AGREGAR / EDITAR ANUNCIO ===== -->
+    <div id="modalAgregarAnuncio" class="modal-anuncio-overlay" style="display: none;"
+        data-csp-click="cerrarModalAgregarAnuncio(event)">
+        <div class="modal-anuncio-card" data-csp-click="event.stopPropagation()">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
+                <h3 id="modalAnuncioTitulo" style="margin:0; text-align:left; color:#1a3a4a; font-size:1.3rem;"><i
+                        class="fas fa-bullhorn"></i> Publicar Nuevo Anuncio</h3>
+                <button type="button" data-csp-click="cerrarModalAgregarAnuncio()"
+                    style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;"
+                    title="Cerrar">&times;</button>
+            </div>
+            <p class="modal-anuncio-subtitulo" style="text-align:left; margin-bottom:1.2rem;">Completa los campos para
+                crear o editar un anuncio de la iglesia</p>
+
+            <div class="form-anuncio-grid">
+                <div class="form-group full-width">
+                    <label>Título del evento</label>
+                    <input type="text" id="anuncioTitulo" placeholder="Ej: Culto de Oración Especial (opcional)">
+                </div>
+                <div class="form-group">
+                    <label>Fecha de inicio</label>
+                    <input type="date" id="anuncioFechaInicio">
+                </div>
+                <div class="form-group">
+                    <label>Hora de inicio</label>
+                    <input type="time" id="anuncioHoraInicio">
+                </div>
+                <div class="form-group">
+                    <label>Fecha de fin</label>
+                    <input type="date" id="anuncioFechaFin">
+                </div>
+                <div class="form-group">
+                    <label>Hora de fin</label>
+                    <input type="time" id="anuncioHoraFin">
+                </div>
+                <div class="form-group">
+                    <label>Ubicación</label>
+                    <input type="text" id="anuncioUbicacion" placeholder="Templo Principal">
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <select id="anuncioCategoria">
+                        <option value="Culto">Culto</option>
+                        <option value="Sociedad de Jóvenes">Sociedad de Jóvenes</option>
+                        <option value="Reunión de Oración">Reunión de Oración</option>
+                        <option value="Anuncio General" selected>Anuncio General</option>
+                        <option value="Grupos Pequeños">Grupos Pequeños</option>
+                        <option value="Clubes">Clubes</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label>Imagen destacada (URL)</label>
+                    <input type="url" id="anuncioImagen" placeholder="https://... (opcional)">
+                </div>
+                <div class="form-group full-width">
+                    <label>Contenido del anuncio</label>
+                    <textarea id="anuncioContenido" rows="4"
+                        placeholder="Escribe la descripción del evento o anuncio (opcional)..."></textarea>
+                </div>
+            </div>
+
+            <div class="anuncio-botones">
+                <button id="btnGuardarAnuncio" class="btn-publicar-anuncio" data-csp-click="guardarNuevoAnuncio()">
+                    <i class="fas fa-paper-plane"></i> Publicar Evento
+                </button>
+                <button class="btn-vista-previa" data-csp-click="generarVistaPreviaAnuncio()">
+                    <i class="fas fa-eye"></i> Vista previa
+                </button>
+                <button class="btn-cancelar-anuncio" data-csp-click="cerrarModalAgregarAnuncio()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL VISTA PREVIA DE ANUNCIO ===== -->
+    <div id="modalVistaPrevia" class="modal-vista-previa" style="display: none;"
+        data-csp-click="cerrarVistaPrevia(event)">
+        <div class="vista-previa-card" data-csp-click="event.stopPropagation()"
+            style="position:relative; max-width:650px; width:92%; max-height:85vh; overflow-y:auto; padding:2rem; background:white; border-radius:1.8rem;">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.6rem;">
+                <h4 style="margin:0; color:#1a3a4a; font-size:1.1rem;"><i class="fas fa-eye"></i> Vista Previa del Anuncio</h4>
+                <button type="button" data-csp-click="cerrarVistaPrevia()"
+                    style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;"
+                    title="Cerrar">&times;</button>
+            </div>
+            <div id="vistaPreviaContenido"></div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL QUITAR / EDITAR ANUNCIOS Y EVENTOS ===== -->
+    <div id="modalQuitarAnuncio" class="modal-quitar-overlay" style="display: none;"
+        data-csp-click="cerrarModalQuitarAnuncio(event)">
+        <div class="modal-quitar-card" data-csp-click="event.stopPropagation()" style="max-width:800px; width:92%;">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
+                <h3 style="margin:0; text-align:left; color:#1a3a4a; font-size:1.2rem;"><i class="fas fa-bullhorn"
+                        style="color: #d4a038;"></i> Gestión de Anuncios y Eventos</h3>
+                <button type="button" data-csp-click="cerrarModalQuitarAnuncio()"
+                    style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;"
+                    title="Cerrar">&times;</button>
+            </div>
+
+            <div class="buscador-quitar-wrapper">
+                <i class="fas fa-search icono-buscar"></i>
+                <input type="text" id="buscadorQuitarAnuncio" placeholder="Buscar por título o categoría..."
+                    data-csp-input="filtrarAnunciosQuitar()">
+            </div>
+
+            <div id="listaQuitarAnuncios" class="tabla-quitar-wrapper" style="overflow-x:auto; max-height:60vh;"></div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DE ADMINISTRACIÓN: GESTIONAR TRANSMISIONES ===== -->
+    <div id="modalGestionarTransmisiones" class="modal-quitar-overlay" style="display: none;"
+        data-csp-click="cerrarModalGestionarTransmisiones(event)">
+        <div class="modal-quitar-card" data-csp-click="event.stopPropagation()" style="max-width: 900px; width: 95%;">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:2px solid #f0e6d2; padding-bottom:0.8rem;">
+                <h3 style="margin:0; text-align:left; color:#1a3a4a; font-size:1.3rem;">
+                    <i class="fas fa-video" style="color: #e53e3e;"></i> Gestión de Transmisiones En Vivo
+                </h3>
+                <button type="button" data-csp-click="cerrarModalGestionarTransmisiones()"
+                    style="background:none; border:none; font-size:1.5rem; color:#5a6474; cursor:pointer; padding:0 0.5rem; line-height:1;"
+                    title="Cerrar">&times;</button>
+            </div>
+
+            <div id="adminTransmisionesContenido"></div>
+        </div>
+    </div>
+
+    <!-- Módulos JavaScript para Administración -->
+    <script src="js/supabase.min.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/seguridad.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/transmisiones.js"></script>
+    <script src="js/admin-general.js"></script>
+
+    <!-- Control de Autenticación y Navegación Exclusiva de Admin -->
+    <script>
+        const ADMIN_CREDENTIALS = {
+            email: 'josuemcas24@gmail.com',
+            password: 'admin2026'
+        };
+
+        function checkAdminAuth() {
+            const isAuth = sessionStorage.getItem('iasd_admin_authenticated') === 'true';
+            const loginOverlay = document.getElementById('login-admin-overlay');
+            const panel = document.getElementById('panelAdminGeneral');
+
+            if (isAuth) {
+                if (loginOverlay) loginOverlay.style.setProperty('display', 'none', 'important');
+                if (panel) {
+                    panel.style.setProperty('display', 'flex', 'important');
+                    document.body.style.overflow = 'hidden';
+                }
+                const mainContent = document.getElementById('adminMainContent');
+                if (mainContent) mainContent.scrollTop = 0;
+                if (typeof renderizarTarjetasAdmin === 'function') {
+                    renderizarTarjetasAdmin();
+                }
+            } else {
+                if (panel) panel.style.setProperty('display', 'none', 'important');
+                if (loginOverlay) loginOverlay.style.setProperty('display', 'flex', 'important');
+                const emailInput = document.getElementById('login-email');
+                if (emailInput) setTimeout(() => emailInput.focus(), 250);
+            }
+        }
+
+        function validarLoginAdmin() {
+            const inputEmail = document.getElementById('login-email');
+            const inputPassword = document.getElementById('login-password');
+            const errorDiv = document.getElementById('login-error');
+            const card = document.querySelector('.login-card');
+
+            const email = (inputEmail ? inputEmail.value : '').trim().toLowerCase();
+            const password = (inputPassword ? inputPassword.value : '').trim();
+
+            if (!email || !password) {
+                if (errorDiv) {
+                    errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Por favor completa todos los campos.';
+                    errorDiv.style.display = 'flex';
+                }
+                if (!email && inputEmail) inputEmail.focus();
+                else if (inputPassword) inputPassword.focus();
+                return;
+            }
+
+            if (email === ADMIN_CREDENTIALS.email.toLowerCase() && password === ADMIN_CREDENTIALS.password) {
+                sessionStorage.setItem('iasd_admin_authenticated', 'true');
+                const loginOverlay = document.getElementById('login-admin-overlay');
+                if (loginOverlay) loginOverlay.style.setProperty('display', 'none', 'important');
+                const panel = document.getElementById('panelAdminGeneral');
+                if (panel) {
+                    panel.style.setProperty('display', 'flex', 'important');
+                    document.body.style.overflow = 'hidden';
+                }
+                const mainContent = document.getElementById('adminMainContent');
+                if (mainContent) mainContent.scrollTop = 0;
+                if (typeof renderizarTarjetasAdmin === 'function') {
+                    renderizarTarjetasAdmin();
+                }
+                if (inputPassword) inputPassword.value = '';
+                if (errorDiv) errorDiv.style.display = 'none';
+            } else {
+                if (errorDiv) {
+                    errorDiv.innerHTML = '<i class="fas fa-times-circle"></i> Credenciales incorrectas. Verifica tu correo y contraseña.';
+                    errorDiv.style.display = 'flex';
+                }
+                if (inputPassword) {
+                    inputPassword.value = '';
+                    inputPassword.focus();
+                }
+                if (card) {
+                    card.style.animation = 'none';
+                    card.offsetHeight;
+                    card.style.animation = 'shakeError 0.4s ease';
+                }
+            }
+        }
+
+        function toggleLoginPasswordVisibility() {
+            const passwordInput = document.getElementById('login-password');
+            const icon = document.getElementById('iconToggleLoginPassword');
+            if (!passwordInput) return;
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                if (icon) {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                }
+            } else {
+                passwordInput.type = 'password';
+                if (icon) {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            }
+        }
+
+        function cerrarSesionAdmin() {
+            sessionStorage.removeItem('iasd_admin_authenticated');
+            Object.keys(sessionStorage).forEach(k => {
+                if (k.startsWith('desbloqueado_')) sessionStorage.removeItem(k);
+            });
+            window.location.href = '/';
+        }
+
+        function cerrarLoginAdmin() {
+            window.location.href = '/';
+        }
+
+        window.validarLoginAdmin = validarLoginAdmin;
+        window.toggleLoginPasswordVisibility = toggleLoginPasswordVisibility;
+        window.cerrarSesionAdmin = cerrarSesionAdmin;
+        window.cerrarPanelAdminGeneral = cerrarSesionAdmin;
+        window.cerrarLoginAdmin = cerrarLoginAdmin;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const overlay = document.getElementById('login-admin-overlay');
+                if (overlay && overlay.style.display !== 'none') {
+                    validarLoginAdmin();
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAdminAuth();
+            document.querySelectorAll('.sidebar-btn-logout, .btn-cerrar-sesion').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    cerrarSesionAdmin();
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
