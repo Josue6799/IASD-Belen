@@ -376,6 +376,20 @@ async function cargarAnunciosPublicos() {
     }
 }
 
+// Obtener anuncios públicos activos (Supabase / Local)
+function cargarAnuncios() {
+    if (Array.isArray(window.datosAnunciosSupabase) && window.datosAnunciosSupabase.length > 0) {
+        return window.datosAnunciosSupabase;
+    }
+    try {
+        const raw = localStorage.getItem('anuncios_eventos');
+        return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+        return [];
+    }
+}
+window.cargarAnuncios = cargarAnuncios;
+
 // ===== RENDERIZAR ANUNCIOS PÚBLICOS (SIN LÍMITE DE 10) =====
 function renderizarAnunciosPublicos() {
     const container = document.getElementById('anunciosContainer');
