@@ -360,12 +360,12 @@ async function cargarAnunciosPublicos() {
 
             try {
                 localStorage.setItem('anuncios_eventos', JSON.stringify(normalizados));
-            } catch (e) {}
+            } catch (e) { }
 
             // Notificar sincronización y refrescar vista pública
             window.dispatchEvent(new CustomEvent('datosAnunciosActualizados'));
             window.dispatchEvent(new CustomEvent('supabase_synced_anuncios_eventos', { detail: normalizados }));
-            
+
             if (typeof window.renderizarAnunciosPublicos === 'function') {
                 window.renderizarAnunciosPublicos();
             }
@@ -390,7 +390,7 @@ function renderizarAnunciosPublicos() {
         try {
             const raw = localStorage.getItem('anuncios_eventos');
             if (raw) anuncios = JSON.parse(raw);
-        } catch (e) {}
+        } catch (e) { }
     }
 
     if (!Array.isArray(anuncios)) anuncios = [];
@@ -1501,7 +1501,7 @@ function seleccionarDevocional(num, autoPlay = true) {
             if (icon) icon.className = 'fas fa-volume-high devocional-item-icon';
             try {
                 btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            } catch (e) {}
+            } catch (e) { }
         } else {
             btn.classList.remove('active');
             const icon = btn.querySelector('.devocional-item-icon');
@@ -2176,7 +2176,7 @@ function initModalBienvenida() {
 function cerrarModalBienvenida() {
     try {
         localStorage.setItem('bienvenidaMostrada', 'true');
-    } catch (e) {}
+    } catch (e) { }
     const modal = document.getElementById('modalBienvenida');
     if (modal) {
         modal.style.display = 'none';
@@ -2218,7 +2218,7 @@ function toggleTema() {
     const esOscuro = document.body.classList.toggle('tema-oscuro');
     try {
         localStorage.setItem('tema', esOscuro ? 'oscuro' : 'claro');
-    } catch (e) {}
+    } catch (e) { }
     actualizarBotonTema(esOscuro);
 }
 
@@ -2350,6 +2350,7 @@ window.initFabMenu = initFabMenu;
 window.abrirTransmisiones = function () {
     if (typeof window.abrirEnVivo === 'function') window.abrirEnVivo();
 };
+
 window.abrirAdmin = function () {
     if (typeof window.abrirModalAdminGeneral === 'function') window.abrirModalAdminGeneral();
 };
@@ -2378,7 +2379,7 @@ function obtenerListaCompletaAnuncios() {
         try {
             const raw = localStorage.getItem('anuncios_eventos');
             if (raw) supabaseData = JSON.parse(raw);
-        } catch (e) {}
+        } catch (e) { }
     }
 
     if (Array.isArray(supabaseData)) {
@@ -2395,7 +2396,7 @@ function obtenerListaCompletaAnuncios() {
             if (fStr && fStr !== '0001-01-01') {
                 try {
                     fechaFormateada = new Date(fStr + 'T00:00:00').toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
-                } catch (e) {}
+                } catch (e) { }
             }
             const horaStr = a.horaInicio || a.hora_inicio || '';
             const fechaCompleta = fechaFormateada + (horaStr ? ' · ' + horaStr : '');
@@ -2478,8 +2479,8 @@ function abrirAnuncioExpandido(id) {
         if (!isNaN(parsed) && parsed >= 0 && parsed < listaAnunciosExpandidos.length && String(parsed) === id) {
             indiceAnuncioExpandido = parsed;
         } else {
-            const idx = listaAnunciosExpandidos.findIndex(a => 
-                String(a.id) === String(id) || 
+            const idx = listaAnunciosExpandidos.findIndex(a =>
+                String(a.id) === String(id) ||
                 (a.supabaseId && String(a.supabaseId) === String(id)) ||
                 a.titulo.toLowerCase().includes(id.toLowerCase())
             );
@@ -2565,7 +2566,7 @@ function renderizarAnuncioExpandidoActual() {
 
     const imgEl = container.querySelector('#anuncioExpandidoImg');
     if (imgEl) {
-        imgEl.addEventListener('error', function() {
+        imgEl.addEventListener('error', function () {
             this.style.display = 'none';
         });
     }
