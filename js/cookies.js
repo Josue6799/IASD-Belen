@@ -215,7 +215,7 @@
       });
     });
 
-    // Vincular botones dentro del modal de configuración
+    // Vincular botones dentro del modal de configuración y del banner
     const saveButtons = document.querySelectorAll('[data-csp-click*="guardarPreferenciasCookies"], .btn-cookie-primary');
     saveButtons.forEach(function (btn) {
       if (btn.dataset.saveBound) return;
@@ -225,7 +225,9 @@
       });
     });
 
-    const acceptButtons = document.querySelectorAll('#cookie-config-modal [data-csp-click*="aceptarTodasCookies"], .btn-cookie-accent');
+    const acceptButtons = document.querySelectorAll(
+      '[data-csp-click*="aceptarTodasCookies"], .cookie-btn-accept, .btn-cookie-accent'
+    );
     acceptButtons.forEach(function (btn) {
       if (btn.dataset.acceptBound) return;
       btn.dataset.acceptBound = 'true';
@@ -235,7 +237,7 @@
     });
 
     const rejectButtons = document.querySelectorAll(
-      '#cookie-config-modal [data-csp-click*="rechazarCookiesNoEsenciales"], #cookie-config-modal [data-csp-click*="rechazarTodasCookies"], .btn-cookie-secondary'
+      '[data-csp-click*="rechazarCookiesNoEsenciales"], [data-csp-click*="rechazarTodasCookies"], .cookie-btn-reject, .btn-cookie-secondary'
     );
     rejectButtons.forEach(function (btn) {
       if (btn.dataset.rejectBound) return;
@@ -287,21 +289,23 @@
       }
     }
 
-    // C. Botones de acción dentro del modal de preferencias
+    // C. Botones de acción dentro del modal y banner
     const saveTrigger = e.target.closest('[data-csp-click*="guardarPreferenciasCookies"], .btn-cookie-primary');
     if (saveTrigger) {
       guardarPreferenciasCookies(e);
       return;
     }
 
-    const acceptTrigger = e.target.closest('#cookie-config-modal [data-csp-click*="aceptarTodasCookies"], .btn-cookie-accent');
+    const acceptTrigger = e.target.closest(
+      '[data-csp-click*="aceptarTodasCookies"], .cookie-btn-accept, .btn-cookie-accent'
+    );
     if (acceptTrigger) {
       aceptarTodasCookies(e);
       return;
     }
 
     const rejectTrigger = e.target.closest(
-      '#cookie-config-modal [data-csp-click*="rechazarCookiesNoEsenciales"], #cookie-config-modal [data-csp-click*="rechazarTodasCookies"], .btn-cookie-secondary'
+      '[data-csp-click*="rechazarCookiesNoEsenciales"], [data-csp-click*="rechazarTodasCookies"], .cookie-btn-reject, .btn-cookie-secondary'
     );
     if (rejectTrigger) {
       rechazarCookiesNoEsenciales(e);
