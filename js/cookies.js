@@ -5,6 +5,13 @@
 (function () {
   'use strict';
 
+  // Desactivar restauración automática de scroll del navegador para mantener siempre la vista al inicio
+  if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+    try {
+      window.history.scrollRestoration = 'manual';
+    } catch (e) {}
+  }
+
   // Helper seguro para llamar a gtag
   function safeGtag() {
     if (typeof window.gtag === 'function') {
@@ -181,11 +188,12 @@
   function mostrarBannerCookies() {
     const banner = document.getElementById('cookie-banner');
     if (banner) {
-      if (banner.parentElement !== document.body) {
-        document.body.appendChild(banner);
-      }
       banner.style.display = 'block';
     }
+    // Asegurar que la vista permanezca firmemente en la cabecera / inicio superior
+    window.scrollTo(0, 0);
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
   }
 
   // 6. Vincular botones y toggles usando querySelectorAll (NO querySelector) para evitar errores .forEach is not a function
@@ -399,27 +407,32 @@
       }
     });
 
-    // Gestión de rutas por hash en la URL
-    function checkHashRoute() {
-      const hash = window.location.hash;
-      if (hash === '#politica-privacidad' || hash === '#politica-cookies') {
-        const pageId = hash.substring(1);
-        if (typeof window.showPage === 'function') {
-          window.showPage(pageId);
-        }
+    // Si la URL inicial arrastra hash de políticas de una prueba anterior, limpiarlo para iniciar en Home
+    if (window.location.hash === '#politica-privacidad' || window.location.hash === '#politica-cookies') {
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', window.location.pathname);
       }
     }
 
-    checkHashRoute();
-    window.addEventListener('hashchange', checkHashRoute);
+    // Garantizar que la página inicie arriba en el hero / cabecera
+    function forzarScrollInicio() {
+      if (!window.location.hash || window.location.hash === '#' || window.location.hash === '#home') {
+        window.scrollTo(0, 0);
+        if (document.documentElement) document.documentElement.scrollTop = 0;
+        if (document.body) document.body.scrollTop = 0;
+      }
+    }
 
-    // Delegación para enlaces con hash hacia las políticas legales
+    forzarScrollInicio();
+    setTimeout(forzarScrollInicio, 50);
+    setTimeout(forzarScrollInicio, 200);
+
+    // Delegación para enlaces hacia las políticas legales
     document.addEventListener('click', function (e) {
-      const link = e.target.closest('a[href="#politica-privacidad"], a[href="#politica-cookies"]');
+      const link = e.target.closest('a[href*="politica-privacidad"], a[href*="politica-cookies"], a[data-page*="politica"]');
       if (link) {
-        const hash = link.getAttribute('href');
-        const pageId = hash.substring(1);
-        if (typeof window.showPage === 'function') {
+        const pageId = link.getAttribute('data-page') || (link.getAttribute('href') || '').replace('#', '');
+        if (pageId && typeof window.showPage === 'function') {
           e.preventDefault();
           window.showPage(pageId);
         }
@@ -432,6 +445,12 @@
   } else {
     initCookies();
   }
+
+  window.addEventListener('load', function () {
+    if (!window.location.hash || window.location.hash === '#' || window.location.hash === '#home') {
+      window.scrollTo(0, 0);
+    }
+  });
 
   console.log('🍪 [Cookies] Sistema de Consent Mode de GA4 y Preferencias listo.');
 })();
