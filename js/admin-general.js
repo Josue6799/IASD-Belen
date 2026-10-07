@@ -3279,6 +3279,7 @@ window.addEventListener('storage', function (e) {
 
 // ===== ANUNCIOS / EVENTOS =====
 const STORAGE_ANUNCIOS = 'anuncios_eventos';
+const STORAGE_ORDEN_ANUNCIOS = 'orden_manual_anuncios';
 let anuncioPendienteEditarId = null;
 
 function cargarAnuncios() {
@@ -3286,6 +3287,74 @@ function cargarAnuncios() {
         return window.datosAnunciosSupabase;
     }
     return StorageHelper.get(STORAGE_ANUNCIOS, []);
+}
+
+function obtenerAnunciosOrdenados(listaBase) {
+    let lista = Array.isArray(listaBase) ? [...listaBase] : (typeof cargarAnuncios === 'function' ? [...cargarAnuncios()] : []);
+    if (lista.length === 0) return [];
+
+    let orden = [];
+    try {
+        const raw = localStorage.getItem(STORAGE_ORDEN_ANUNCIOS);
+        if (raw) orden = JSON.parse(raw);
+    } catch (e) {}
+
+    if (Array.isArray(orden) && orden.length > 0) {
+        lista.sort((a, b) => {
+            const idA = String(a.id != null ? a.id : '');
+            const idB = String(b.id != null ? b.id : '');
+            const idxA = orden.indexOf(idA);
+            const idxB = orden.indexOf(idB);
+            if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+            if (idxA !== -1) return -1;
+            if (idxB !== -1) return 1;
+            const fA = a.fechaInicio || a.fecha_inicio || '';
+            const fB = b.fechaInicio || b.fecha_inicio || '';
+            const comp = (fB || '').localeCompare(fA || '');
+            if (comp !== 0) return comp;
+            return idB.localeCompare(idA);
+        });
+    } else {
+        lista.sort((a, b) => {
+            const fA = a.fechaInicio || a.fecha_inicio || '';
+            const fB = b.fechaInicio || b.fecha_inicio || '';
+            const comp = (fB || '').localeCompare(fA || '');
+            if (comp !== 0) return comp;
+            return String(b.id || '').localeCompare(String(a.id || ''));
+        });
+    }
+    return lista;
+}
+
+function moverPosicionAnuncio(id, direccion) {
+    const lista = obtenerAnunciosOrdenados();
+    const idx = lista.findIndex(a => String(a.id) === String(id));
+    if (idx === -1) return;
+
+    const nuevoIdx = idx + direccion;
+    if (nuevoIdx < 0 || nuevoIdx >= lista.length) return;
+
+    // Intercambiar posiciones en el array
+    const temp = lista[idx];
+    lista[idx] = lista[nuevoIdx];
+    lista[nuevoIdx] = temp;
+
+    // Guardar nuevo orden de IDs en localStorage
+    const nuevoOrden = lista.map(a => String(a.id));
+    try {
+        localStorage.setItem(STORAGE_ORDEN_ANUNCIOS, JSON.stringify(nuevoOrden));
+    } catch (e) {}
+
+    // Guardar lista completa reordenada
+    guardarAnuncios(lista);
+
+    // Refrescar modal de quitar anuncios
+    filtrarAnunciosQuitar();
+
+    // Refrescar en la página pública
+    if (typeof renderizarAnunciosPublicos === 'function') {
+        renderizarAnunciosPublicos();
+    }
 }
 
 function guardarAnuncios(anuncios) {
@@ -3412,8 +3481,9 @@ function guardarNuevoAnuncio() {
         }
         anuncioPendienteEditarId = null;
     } else {
-        anuncios.push({
-            id: Date.now(),
+        const nuevoId = Date.now();
+        anuncios.unshift({
+            id: nuevoId,
             titulo: titulo,
             contenido: contenido,
             fechaInicio: fechaInicio,
@@ -3424,6 +3494,13 @@ function guardarNuevoAnuncio() {
             imagen: imagen || '',
             categoria: categoria || 'Anuncio General'
         });
+        try {
+            let ord = JSON.parse(localStorage.getItem(STORAGE_ORDEN_ANUNCIOS) || '[]');
+            if (Array.isArray(ord) && ord.length > 0) {
+                ord.unshift(String(nuevoId));
+                localStorage.setItem(STORAGE_ORDEN_ANUNCIOS, JSON.stringify(ord));
+            }
+        } catch (e) {}
     }
 
     guardarAnuncios(anuncios);
@@ -3516,16 +3593,10 @@ function renderizarAnunciosPublicos() {
     // Filtrar únicamente los inactivos (mostrar todos los activos sin ningún límite)
     const activos = anuncios.filter(a => a && a.activo !== false);
 
-    // Ordenar cronológicamente descendente (más recientes primero) con desempate por id
-    activos.sort((a, b) => {
-        const fA = a.fechaInicio || a.fecha_inicio || '';
-        const fB = b.fechaInicio || b.fecha_inicio || '';
-        const comp = fB.localeCompare(fA);
-        if (comp !== 0) return comp;
-        return String(b.id || '').localeCompare(String(a.id || ''));
-    });
+    // Ordenar respetando el orden manual si existe o por fecha por defecto
+    const activosOrdenados = obtenerAnunciosOrdenados(activos);
 
-    if (activos.length === 0) {
+    if (activosOrdenados.length === 0) {
         container.innerHTML = `
     <div style="text-align:center; padding:3rem 1rem; color: var(--muted-text);">
         <i class="fas fa-bullhorn" style="font-size:3rem; display:block; margin-bottom:1rem; opacity:0.5;"></i>
@@ -3535,7 +3606,7 @@ function renderizarAnunciosPublicos() {
     }
 
     let html = '';
-    activos.forEach(a => {
+    activosOrdenados.forEach(a => {
         const fRaw = a.fechaInicio || a.fecha_inicio || '';
         let fechaInicio = '';
         if (fRaw && fRaw !== '0001-01-01') {
@@ -3609,8 +3680,12 @@ window.addEventListener('supabase_synced_anuncios', function () {
     }
 });
 window.addEventListener('storage', function (e) {
-    if (e.key === STORAGE_ANUNCIOS) {
+    if (e.key === STORAGE_ANUNCIOS || e.key === STORAGE_ORDEN_ANUNCIOS) {
         renderizarAnunciosPublicos();
+        const modalQuitar = document.getElementById('modalQuitarAnuncio');
+        if (modalQuitar && modalQuitar.classList.contains('active')) {
+            filtrarAnunciosQuitar();
+        }
     }
 });
 
@@ -3624,7 +3699,7 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 function abrirModalQuitarAnuncio() {
     const buscador = document.getElementById('buscadorQuitarAnuncio');
     if (buscador) buscador.value = '';
-    const anuncios = cargarAnuncios().sort((a, b) => (b.fechaInicio || '').localeCompare(a.fechaInicio || ''));
+    const anuncios = obtenerAnunciosOrdenados();
     renderizarListaQuitar(anuncios);
     const modal = document.getElementById('modalQuitarAnuncio');
     if (modal) {
@@ -3647,11 +3722,12 @@ function cerrarModalQuitarAnuncio(event) {
 function filtrarAnunciosQuitar() {
     const buscador = document.getElementById('buscadorQuitarAnuncio');
     const termino = buscador ? buscador.value.trim().toLowerCase() : '';
-    const anuncios = cargarAnuncios().filter(a =>
+    const todos = obtenerAnunciosOrdenados();
+    const anuncios = termino ? todos.filter(a =>
         (a.titulo && a.titulo.toLowerCase().includes(termino)) ||
         (a.categoria && a.categoria.toLowerCase().includes(termino)) ||
         (a.ubicacion && a.ubicacion.toLowerCase().includes(termino))
-    ).sort((a, b) => (b.fechaInicio || '').localeCompare(a.fechaInicio || ''));
+    ) : todos;
     renderizarListaQuitar(anuncios);
 }
 
@@ -3668,8 +3744,11 @@ function renderizarListaQuitar(anuncios) {
         return;
     }
 
-    let html = `<div style="overflow-x:auto;"><table class="tabla-quitar" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:600px;">`;
+    const todos = obtenerAnunciosOrdenados();
+
+    let html = `<div style="overflow-x:auto;"><table class="tabla-quitar" style="width:100%; border-collapse:collapse; font-size:0.85rem; min-width:650px;">`;
     html += `<thead><tr style="background:#1a3a4a; color:white; text-align:left;">`;
+    html += `<th style="padding:0.7rem; text-align:center; width:100px;">Orden</th>`;
     html += `<th style="padding:0.7rem;">Título</th>`;
     html += `<th style="padding:0.7rem;">Categoría</th>`;
     html += `<th style="padding:0.7rem;">Fecha Inicio</th>`;
@@ -3679,10 +3758,22 @@ function renderizarListaQuitar(anuncios) {
     anuncios.forEach((a, index) => {
         const bgRow = index % 2 === 0 ? '#ffffff' : '#f9f8f5';
         const fecha = a.fechaInicio ? new Date(a.fechaInicio + 'T00:00:00').toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Sin fecha';
-        const tituloEscapado = a.titulo.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const tituloEscapado = (a.titulo || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+        const fullIdx = todos.findIndex(x => String(x.id) === String(a.id));
+        const posNum = fullIdx !== -1 ? fullIdx + 1 : index + 1;
+        const esPrimero = fullIdx === 0;
+        const esUltimo = fullIdx === todos.length - 1;
 
         html += `
     <tr style="background:${bgRow}; border-bottom:1px solid #eee;">
+        <td style="padding:0.7rem; text-align:center; white-space:nowrap;">
+            <div style="display:inline-flex; align-items:center; justify-content:center; gap:0.35rem;">
+                <span style="font-weight:700; color:#5a6474; font-size:0.82rem; min-width:20px; text-align:center;">#${posNum}</span>
+                <button type="button" data-csp-click="moverPosicionAnuncio('${a.id}', -1)" ${esPrimero ? 'disabled' : ''} style="background:${esPrimero ? '#e2e8f0' : '#1a3a4a'}; color:${esPrimero ? '#94a3b8' : '#ffffff'}; border:none; width:28px; height:28px; border-radius:50%; cursor:${esPrimero ? 'not-allowed' : 'pointer'}; font-size:0.75rem; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.1);" title="${esPrimero ? 'Ya está en la primera posición' : 'Subir anuncio'}"><i class="fas fa-arrow-up"></i></button>
+                <button type="button" data-csp-click="moverPosicionAnuncio('${a.id}', 1)" ${esUltimo ? 'disabled' : ''} style="background:${esUltimo ? '#e2e8f0' : '#1a3a4a'}; color:${esUltimo ? '#94a3b8' : '#ffffff'}; border:none; width:28px; height:28px; border-radius:50%; cursor:${esUltimo ? 'not-allowed' : 'pointer'}; font-size:0.75rem; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.1);" title="${esUltimo ? 'Ya está en la última posición' : 'Bajar anuncio'}"><i class="fas fa-arrow-down"></i></button>
+            </div>
+        </td>
         <td style="padding:0.7rem; font-weight:600; color:#1a3a4a;">${tituloEscapado}</td>
         <td style="padding:0.7rem; color:#5a6474;">${a.categoria || 'Anuncio General'}</td>
         <td style="padding:0.7rem; color:#5a6474; white-space:nowrap;">${fecha}</td>
@@ -3708,6 +3799,13 @@ function confirmarEliminarAnuncio(id) {
         function () {
             StorageHelper.delete(STORAGE_ANUNCIOS, id, 'id');
             let nuevosAnuncios = cargarAnuncios().filter(a => String(a.id) !== String(id));
+            try {
+                let ord = JSON.parse(localStorage.getItem(STORAGE_ORDEN_ANUNCIOS) || '[]');
+                if (Array.isArray(ord)) {
+                    ord = ord.filter(x => String(x) !== String(id));
+                    localStorage.setItem(STORAGE_ORDEN_ANUNCIOS, JSON.stringify(ord));
+                }
+            } catch (e) {}
             guardarAnuncios(nuevosAnuncios);
             filtrarAnunciosQuitar();
             mostrarToastAnuncios('<i class="fas fa-trash"></i> Anuncio eliminado correctamente', '#c62828');
@@ -3718,6 +3816,8 @@ function confirmarEliminarAnuncio(id) {
 // Asignaciones globales a window para delegador CSP
 window.cargarAnuncios = cargarAnuncios;
 window.guardarAnuncios = guardarAnuncios;
+window.obtenerAnunciosOrdenados = obtenerAnunciosOrdenados;
+window.moverPosicionAnuncio = moverPosicionAnuncio;
 window.mostrarToastAnuncios = mostrarToastAnuncios;
 window.abrirModalAgregarAnuncio = abrirModalAgregarAnuncio;
 window.cerrarModalAgregarAnuncio = cerrarModalAgregarAnuncio;
