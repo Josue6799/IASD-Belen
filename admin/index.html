@@ -216,7 +216,7 @@
                             <span class="subitem-dot"></span> Agregar Anuncio
                         </button>
                         <button type="button" class="sidebar-subitem" data-csp-click="mostrarSeccionAdmin('quitar-evento')">
-                            <span class="subitem-dot"></span> Quitar Anuncio
+                            <span class="subitem-dot"></span> Organizar / Quitar Anuncio
                         </button>
                     </div>
                 </div>
@@ -716,6 +716,17 @@
                 <i class="fas fa-search icono-buscar"></i>
                 <input type="text" id="buscadorQuitarAnuncio" placeholder="Buscar por título o categoría..."
                     data-csp-input="filtrarAnunciosQuitar()">
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.6rem; margin-bottom:1rem; padding:0.6rem 0.8rem; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px;">
+                <button type="button" id="btnAplicarOrdenPublico" data-csp-click="aplicarOrdenDiapositivasPublicas()"
+                    style="background:linear-gradient(135deg, #1a3a4a 0%, #2a5a74 100%); color:#ffffff; border:1px solid #d4a038; padding:0.55rem 1.1rem; border-radius:8px; font-weight:700; font-size:0.88rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.5rem; box-shadow:0 2px 5px rgba(0,0,0,0.12); transition:all 0.2s;"
+                    title="Aplica y sincroniza este orden exacto con las diapositivas de la página pública en Supabase">
+                    <i class="fas fa-sync-alt"></i> Aplicar Orden a las Diapositivas Públicas
+                </button>
+                <span style="font-size:0.8rem; color:#475569; display:inline-flex; align-items:center; gap:0.35rem;">
+                    <i class="fas fa-info-circle" style="color:#d4a038;"></i> Ordena con ⬆️ / ⬇️ y pulsa este botón para guardar.
+                </span>
             </div>
 
             <div id="listaQuitarAnuncios" class="tabla-quitar-wrapper" style="overflow-x:auto; max-height:60vh;"></div>

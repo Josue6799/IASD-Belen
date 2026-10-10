@@ -3282,15 +3282,134 @@ const STORAGE_ANUNCIOS = 'anuncios_eventos';
 const STORAGE_ORDEN_ANUNCIOS = 'orden_manual_anuncios';
 let anuncioPendienteEditarId = null;
 
-function cargarAnuncios() {
-    if (Array.isArray(window.datosAnunciosSupabase) && window.datosAnunciosSupabase.length > 0) {
-        return window.datosAnunciosSupabase;
+function sincronizarOrdenAnunciosEnSupabase(ordenIds) {
+    if (!window.supabaseClient || !Array.isArray(ordenIds) || ordenIds.length === 0) return;
+    try {
+        const payload = [{
+            id: '_orden_anuncios',
+            titulo: '_config_orden_anuncios',
+            contenido: JSON.stringify(ordenIds),
+            categoria: 'Sistema',
+            ubicacion: 'Sistema',
+            activo: false,
+            fecha_inicio: '',
+            hora_inicio: '',
+            fecha_fin: '',
+            hora_fin: '',
+            imagen: ''
+        }];
+        window.supabaseClient.from('anuncios').upsert(payload, { onConflict: 'id' })
+            .then(({ error }) => {
+                if (!error) {
+                    console.log('✅ Orden de anuncios sincronizado con Supabase');
+                } else {
+                    console.warn('⚠️ No se pudo sincronizar el orden en Supabase:', error);
+                }
+            })
+            .catch(err => console.warn('⚠️ Error de red al sincronizar orden:', err));
+    } catch (e) {
+        console.warn('Error en sincronizarOrdenAnunciosEnSupabase:', e);
     }
-    return StorageHelper.get(STORAGE_ANUNCIOS, []);
+}
+window.sincronizarOrdenAnunciosEnSupabase = sincronizarOrdenAnunciosEnSupabase;
+
+async function aplicarOrdenDiapositivasPublicas() {
+    const btn = document.getElementById('btnAplicarOrdenPublico');
+    const originalHtml = btn ? btn.innerHTML : '';
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sincronizando con Supabase...';
+    }
+
+    try {
+        const lista = typeof obtenerAnunciosOrdenados === 'function' ? obtenerAnunciosOrdenados() : cargarAnuncios();
+        if (!Array.isArray(lista) || lista.length === 0) {
+            if (typeof mostrarToastAnuncios === 'function') {
+                mostrarToastAnuncios('<i class="fas fa-exclamation-triangle"></i> No hay anuncios registrados para ordenar.', '#c62828');
+            }
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+            return;
+        }
+
+        const nuevoOrden = lista.map(a => String(a.id));
+
+        try {
+            localStorage.setItem(STORAGE_ORDEN_ANUNCIOS, JSON.stringify(nuevoOrden));
+            window._ordenManualAnunciosCache = nuevoOrden;
+            localStorage.setItem(STORAGE_ANUNCIOS, JSON.stringify(lista));
+            window.datosAnunciosSupabase = lista;
+        } catch (e) {}
+
+        if (window.supabaseClient) {
+            const payload = [{
+                id: '_orden_anuncios',
+                titulo: '_config_orden_anuncios',
+                contenido: JSON.stringify(nuevoOrden),
+                categoria: 'Sistema',
+                ubicacion: 'Sistema',
+                activo: false,
+                fecha_inicio: '',
+                hora_inicio: '',
+                fecha_fin: '',
+                hora_fin: '',
+                imagen: ''
+            }];
+            const { error } = await window.supabaseClient.from('anuncios').upsert(payload, { onConflict: 'id' });
+            if (error) {
+                console.warn('⚠️ Advertencia al sincronizar orden en Supabase:', error);
+            } else {
+                console.log('✅ Orden de diapositivas sincronizado en Supabase con éxito');
+            }
+        }
+
+        window.dispatchEvent(new CustomEvent('datosAnunciosActualizados'));
+        window.dispatchEvent(new CustomEvent('supabase_synced_anuncios_eventos', { detail: lista }));
+
+        if (typeof renderizarAnunciosPublicos === 'function') {
+            renderizarAnunciosPublicos();
+        }
+
+        if (typeof filtrarAnunciosQuitar === 'function') {
+            filtrarAnunciosQuitar();
+        }
+
+        if (typeof mostrarToastAnuncios === 'function') {
+            mostrarToastAnuncios('<i class="fas fa-check-circle"></i> ¡Orden aplicado con éxito! Todas las diapositivas públicas ahora tienen el orden del administrador.', '#1b5e20');
+        }
+    } catch (err) {
+        console.error('Error en aplicarOrdenDiapositivasPublicas:', err);
+        if (typeof mostrarToastAnuncios === 'function') {
+            mostrarToastAnuncios('<i class="fas fa-exclamation-circle"></i> Ocurrió un error al aplicar el orden.', '#c62828');
+        }
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check-double"></i> ¡Orden Guardado en la Nube!';
+            setTimeout(() => {
+                if (btn) btn.innerHTML = originalHtml || '<i class="fas fa-sync-alt"></i> Aplicar Orden a las Diapositivas Públicas';
+            }, 3000);
+        }
+    }
+}
+window.aplicarOrdenDiapositivasPublicas = aplicarOrdenDiapositivasPublicas;
+
+function cargarAnuncios() {
+    let lista = [];
+    if (Array.isArray(window.datosAnunciosSupabase) && window.datosAnunciosSupabase.length > 0) {
+        lista = window.datosAnunciosSupabase;
+    } else {
+        const raw = StorageHelper.get(STORAGE_ANUNCIOS, []);
+        lista = Array.isArray(raw) ? raw : [];
+    }
+    return lista.filter(a => a && a.id !== '_orden_anuncios' && !String(a.id).startsWith('_'));
 }
 
 function obtenerAnunciosOrdenados(listaBase) {
     let lista = Array.isArray(listaBase) ? [...listaBase] : (typeof cargarAnuncios === 'function' ? [...cargarAnuncios()] : []);
+    lista = lista.filter(a => a && a.id !== '_orden_anuncios' && !String(a.id).startsWith('_'));
     if (lista.length === 0) return [];
 
     let orden = [];
@@ -3343,23 +3462,30 @@ function moverPosicionAnuncio(id, direccion) {
     const nuevoOrden = lista.map(a => String(a.id));
     try {
         localStorage.setItem(STORAGE_ORDEN_ANUNCIOS, JSON.stringify(nuevoOrden));
+        window._ordenManualAnunciosCache = nuevoOrden;
     } catch (e) {}
+
+    // Sincronizar nuevo orden con Supabase en la nube
+    sincronizarOrdenAnunciosEnSupabase(nuevoOrden);
 
     // Guardar lista completa reordenada
     guardarAnuncios(lista);
 
-    // Refrescar modal de quitar anuncios
+    // Refrescar modal de gestión de anuncios
     filtrarAnunciosQuitar();
 
-    // Refrescar en la página pública
+    // Refrescar en la página pública si está presente
     if (typeof renderizarAnunciosPublicos === 'function') {
         renderizarAnunciosPublicos();
     }
+
+    mostrarToastAnuncios('<i class="fas fa-arrows-alt-v"></i> Posición actualizada y guardada', '#1a3a4a');
 }
 
 function guardarAnuncios(anuncios) {
-    window.datosAnunciosSupabase = anuncios;
-    StorageHelper.set(STORAGE_ANUNCIOS, anuncios);
+    const limpios = (Array.isArray(anuncios) ? anuncios : []).filter(a => a && a.id !== '_orden_anuncios' && !String(a.id).startsWith('_'));
+    window.datosAnunciosSupabase = limpios;
+    StorageHelper.set(STORAGE_ANUNCIOS, limpios);
     window.dispatchEvent(new CustomEvent('datosAnunciosActualizados'));
     window.dispatchEvent(new Event('datosAnunciosActualizados'));
 }
@@ -3496,10 +3622,11 @@ function guardarNuevoAnuncio() {
         });
         try {
             let ord = JSON.parse(localStorage.getItem(STORAGE_ORDEN_ANUNCIOS) || '[]');
-            if (Array.isArray(ord) && ord.length > 0) {
-                ord.unshift(String(nuevoId));
-                localStorage.setItem(STORAGE_ORDEN_ANUNCIOS, JSON.stringify(ord));
-            }
+            if (!Array.isArray(ord)) ord = [];
+            ord = [String(nuevoId), ...ord.filter(x => String(x) !== String(nuevoId))];
+            localStorage.setItem(STORAGE_ORDEN_ANUNCIOS, JSON.stringify(ord));
+            window._ordenManualAnunciosCache = ord;
+            sincronizarOrdenAnunciosEnSupabase(ord);
         } catch (e) {}
     }
 
@@ -3616,7 +3743,9 @@ function renderizarAnunciosPublicos() {
                 fechaInicio = fRaw;
             }
         }
-        const horaInicio = a.horaInicio || a.hora_inicio || '';
+        const rawHInicio = (a.horaInicio || a.hora_inicio || '').trim();
+        const esHoraInicioValida = Boolean(rawHInicio && rawHInicio !== '00:00' && rawHInicio !== '00:00:00' && rawHInicio !== '0:00');
+        const horaInicio = esHoraInicioValida ? rawHInicio : '';
         const fFinRaw = a.fechaFin || a.fecha_fin || '';
         let fechaFin = '';
         if (fFinRaw && fFinRaw !== fRaw && fFinRaw !== '0001-01-01') {
@@ -3626,14 +3755,16 @@ function renderizarAnunciosPublicos() {
                 fechaFin = fFinRaw;
             }
         }
-        const horaFin = a.horaFin || a.hora_fin || '';
+        const rawHFin = (a.horaFin || a.hora_fin || '').trim();
+        const esHoraFinValida = Boolean(rawHFin && rawHFin !== '00:00' && rawHFin !== '00:00:00' && rawHFin !== '0:00');
+        const horaFin = esHoraFinValida ? rawHFin : '';
         const ubicacion = a.ubicacion || '';
         const categoria = a.categoria || 'Anuncio General';
         const contenido = a.contenido ? a.contenido.replace(/\n/g, '<br>') : (a.descripcion ? a.descripcion.replace(/\n/g, '<br>') : '');
         const imagen = a.imagen || a.image || a.url || '';
         const titulo = a.titulo || '';
 
-        const hasMeta = Boolean(fechaInicio || ubicacion);
+        const hasMeta = Boolean(fechaInicio || ubicacion || horaInicio);
 
         html += `
 <div class="anuncio-card" data-id="${a.id || ''}" style="cursor:pointer;" title="Clic para expandir anuncio">
@@ -3804,6 +3935,8 @@ function confirmarEliminarAnuncio(id) {
                 if (Array.isArray(ord)) {
                     ord = ord.filter(x => String(x) !== String(id));
                     localStorage.setItem(STORAGE_ORDEN_ANUNCIOS, JSON.stringify(ord));
+                    window._ordenManualAnunciosCache = ord;
+                    sincronizarOrdenAnunciosEnSupabase(ord);
                 }
             } catch (e) {}
             guardarAnuncios(nuevosAnuncios);
