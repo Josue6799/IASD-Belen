@@ -595,6 +595,7 @@ const TABLE_TRANSFORMERS = {
     table: 'anuncios',
     toDb(data) {
       if (!data) return data;
+      if (data.id && String(data.id).startsWith('_')) return data;
       return {
         id: data.id != null ? String(data.id) : undefined,
         titulo: data.titulo || '',
@@ -611,12 +612,35 @@ const TABLE_TRANSFORMERS = {
     },
     fromDb(data) {
       if (!data) return data;
+      const rawRows = Array.isArray(data) ? data : [data];
+      const configRow = rawRows.find(r => r && (r.id === '_orden_anuncios' || String(r.id) === '_orden_anuncios'));
+      let ordenList = [];
+      if (configRow && configRow.contenido) {
+        try {
+          ordenList = JSON.parse(configRow.contenido);
+          if (Array.isArray(ordenList)) {
+            localStorage.setItem('orden_manual_anuncios', configRow.contenido);
+            window._ordenManualAnunciosCache = ordenList;
+          }
+        } catch (e) {}
+      }
+      if (ordenList.length === 0) {
+        try {
+          const rawOrd = localStorage.getItem('orden_manual_anuncios');
+          if (rawOrd) ordenList = JSON.parse(rawOrd);
+        } catch (e) {}
+      }
+
       const mapRow = r => {
-        if (!r) return r;
+        if (!r || r.id === '_orden_anuncios' || String(r.id).startsWith('_')) return null;
         const fInicio = r.fecha_inicio || r.fechaInicio || (r.fecha ? String(r.fecha).substring(0, 10) : '');
         const fFin = r.fecha_fin || r.fechaFin || fInicio;
-        const hInicio = r.hora_inicio || r.horaInicio || r.hora || '';
-        const hFin = r.hora_fin || r.horaFin || hInicio;
+        const rawHInicio = (r.hora_inicio || r.horaInicio || r.hora || '').trim();
+        const esHInicioValida = Boolean(rawHInicio && rawHInicio !== '00:00' && rawHInicio !== '00:00:00' && rawHInicio !== '0:00');
+        const hInicio = esHInicioValida ? rawHInicio : '';
+        const rawHFin = (r.hora_fin || r.horaFin || '').trim();
+        const esHFinValida = Boolean(rawHFin && rawHFin !== '00:00' && rawHFin !== '00:00:00' && rawHFin !== '0:00');
+        const hFin = esHFinValida ? rawHFin : (esHInicioValida ? hInicio : '');
         return {
           id: r.id != null ? String(r.id) : '',
           titulo: r.titulo || '',
@@ -635,10 +659,29 @@ const TABLE_TRANSFORMERS = {
           activo: r.activo !== undefined ? Boolean(r.activo) : true
         };
       };
-      return Array.isArray(data) ? data.map(mapRow) : mapRow(data);
+
+      const mapped = rawRows.map(mapRow).filter(Boolean);
+      if (Array.isArray(ordenList) && ordenList.length > 0) {
+        mapped.sort((a, b) => {
+          const idA = String(a.id != null ? a.id : '');
+          const idB = String(b.id != null ? b.id : '');
+          const idxA = ordenList.indexOf(idA);
+          const idxB = ordenList.indexOf(idB);
+          if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+          if (idxA !== -1) return -1;
+          if (idxB !== -1) return 1;
+          const fA = a.fechaInicio || a.fecha_inicio || '';
+          const fB = b.fechaInicio || b.fecha_inicio || '';
+          const comp = (fB || '').localeCompare(fA || '');
+          if (comp !== 0) return comp;
+          return idB.localeCompare(idA);
+        });
+      }
+      return Array.isArray(data) ? mapped : (mapped[0] || null);
     },
     transform(data) {
       if (!data) return data;
+      if (data.id && String(data.id).startsWith('_')) return data;
       return {
         id: data.id != null ? String(data.id) : undefined,
         titulo: data.titulo || '',
@@ -654,11 +697,15 @@ const TABLE_TRANSFORMERS = {
       };
     },
     untransform(row) {
-      if (!row) return row;
+      if (!row || row.id === '_orden_anuncios' || String(row.id).startsWith('_')) return row;
       const fInicio = row.fecha_inicio || row.fechaInicio || (row.fecha ? String(row.fecha).substring(0, 10) : '');
       const fFin = row.fecha_fin || row.fechaFin || fInicio;
-      const hInicio = row.hora_inicio || row.horaInicio || row.hora || '';
-      const hFin = row.hora_fin || row.horaFin || hInicio;
+      const rawHInicio = (row.hora_inicio || row.horaInicio || row.hora || '').trim();
+      const esHInicioValida = Boolean(rawHInicio && rawHInicio !== '00:00' && rawHInicio !== '00:00:00' && rawHInicio !== '0:00');
+      const hInicio = esHInicioValida ? rawHInicio : '';
+      const rawHFin = (row.hora_fin || row.horaFin || '').trim();
+      const esHFinValida = Boolean(rawHFin && rawHFin !== '00:00' && rawHFin !== '00:00:00' && rawHFin !== '0:00');
+      const hFin = esHFinValida ? rawHFin : (esHInicioValida ? hInicio : '');
       return {
         id: row.id != null ? String(row.id) : '',
         titulo: row.titulo || '',
@@ -683,6 +730,7 @@ const TABLE_TRANSFORMERS = {
     table: 'anuncios',
     toDb(data) {
       if (!data) return data;
+      if (data.id && String(data.id).startsWith('_')) return data;
       return {
         id: data.id != null ? String(data.id) : undefined,
         titulo: data.titulo || '',
@@ -699,12 +747,35 @@ const TABLE_TRANSFORMERS = {
     },
     fromDb(data) {
       if (!data) return data;
+      const rawRows = Array.isArray(data) ? data : [data];
+      const configRow = rawRows.find(r => r && (r.id === '_orden_anuncios' || String(r.id) === '_orden_anuncios'));
+      let ordenList = [];
+      if (configRow && configRow.contenido) {
+        try {
+          ordenList = JSON.parse(configRow.contenido);
+          if (Array.isArray(ordenList)) {
+            localStorage.setItem('orden_manual_anuncios', configRow.contenido);
+            window._ordenManualAnunciosCache = ordenList;
+          }
+        } catch (e) {}
+      }
+      if (ordenList.length === 0) {
+        try {
+          const rawOrd = localStorage.getItem('orden_manual_anuncios');
+          if (rawOrd) ordenList = JSON.parse(rawOrd);
+        } catch (e) {}
+      }
+
       const mapRow = row => {
-        if (!row) return row;
+        if (!row || row.id === '_orden_anuncios' || String(row.id).startsWith('_')) return null;
         const fInicio = row.fecha_inicio || row.fechaInicio || row.fecha || '';
         const fFin = row.fecha_fin || row.fechaFin || fInicio;
-        const hInicio = row.hora_inicio || row.horaInicio || row.hora || '00:00';
-        const hFin = row.hora_fin || row.horaFin || hInicio;
+        const rawHInicio = (row.hora_inicio || row.horaInicio || row.hora || '').trim();
+        const esHInicioValida = Boolean(rawHInicio && rawHInicio !== '00:00' && rawHInicio !== '00:00:00' && rawHInicio !== '0:00');
+        const hInicio = esHInicioValida ? rawHInicio : '';
+        const rawHFin = (row.hora_fin || row.horaFin || '').trim();
+        const esHFinValida = Boolean(rawHFin && rawHFin !== '00:00' && rawHFin !== '00:00:00' && rawHFin !== '0:00');
+        const hFin = esHFinValida ? rawHFin : (esHInicioValida ? hInicio : '');
         return {
           id: row.id != null ? String(row.id) : '',
           titulo: row.titulo || '',
@@ -723,38 +794,71 @@ const TABLE_TRANSFORMERS = {
           activo: row.activo !== undefined ? Boolean(row.activo) : true
         };
       };
-      return Array.isArray(data) ? data.map(mapRow) : mapRow(data);
+
+      const mapped = rawRows.map(mapRow).filter(Boolean);
+      if (Array.isArray(ordenList) && ordenList.length > 0) {
+        mapped.sort((a, b) => {
+          const idA = String(a.id != null ? a.id : '');
+          const idB = String(b.id != null ? b.id : '');
+          const idxA = ordenList.indexOf(idA);
+          const idxB = ordenList.indexOf(idB);
+          if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+          if (idxA !== -1) return -1;
+          if (idxB !== -1) return 1;
+          const fA = a.fechaInicio || a.fecha_inicio || '';
+          const fB = b.fechaInicio || b.fecha_inicio || '';
+          const comp = (fB || '').localeCompare(fA || '');
+          if (comp !== 0) return comp;
+          return idB.localeCompare(idA);
+        });
+      }
+      return Array.isArray(data) ? mapped : (mapped[0] || null);
     },
-    transform: (data) => ({
-      id: data.id != null ? String(data.id) : undefined,
-      titulo: data.titulo || '',
-      contenido: data.contenido || data.descripcion || '',
-      categoria: data.categoria || 'General',
-      ubicacion: data.ubicacion || 'Templo Principal',
-      fecha_inicio: data.fecha_inicio || data.fechaInicio || data.fecha || '',
-      hora_inicio: data.hora_inicio || data.horaInicio || data.hora || '00:00',
-      fecha_fin: data.fecha_fin || data.fechaFin || '',
-      hora_fin: data.hora_fin || data.horaFin || '',
-      imagen: data.imagen || data.image || data.url || '',
-      activo: data.activo !== undefined ? data.activo : true
-    }),
-    untransform: (row) => ({
-      id: row.id != null ? String(row.id) : '',
-      titulo: row.titulo || '',
-      contenido: row.contenido || row.descripcion || '',
-      categoria: row.categoria || 'General',
-      ubicacion: row.ubicacion || 'Templo Principal',
-      fecha_inicio: row.fecha_inicio || row.fechaInicio || '',
-      hora_inicio: row.hora_inicio || row.horaInicio || '00:00',
-      fecha_fin: row.fecha_fin || row.fechaFin || '',
-      hora_fin: row.hora_fin || row.horaFin || '',
-      fechaInicio: row.fecha_inicio || row.fechaInicio || '',
-      fechaFin: row.fecha_fin || row.fechaFin || '',
-      horaInicio: row.hora_inicio || row.horaInicio || '00:00',
-      horaFin: row.hora_fin || row.horaFin || '',
-      imagen: row.imagen || row.image || row.url || '',
-      activo: row.activo !== undefined ? row.activo : true
-    })
+    transform: (data) => {
+      if (!data) return data;
+      if (data.id && String(data.id).startsWith('_')) return data;
+      return {
+        id: data.id != null ? String(data.id) : undefined,
+        titulo: data.titulo || '',
+        contenido: data.contenido || data.descripcion || '',
+        categoria: data.categoria || 'General',
+        ubicacion: data.ubicacion || 'Templo Principal',
+        fecha_inicio: data.fecha_inicio || data.fechaInicio || data.fecha || '',
+        hora_inicio: data.hora_inicio || data.horaInicio || data.hora || '00:00',
+        fecha_fin: data.fecha_fin || data.fechaFin || '',
+        hora_fin: data.hora_fin || data.horaFin || '',
+        imagen: data.imagen || data.image || data.url || '',
+        activo: data.activo !== undefined ? data.activo : true
+      };
+    },
+    untransform: (row) => {
+      if (!row || row.id === '_orden_anuncios' || String(row.id).startsWith('_')) return row;
+      const fInicio = row.fecha_inicio || row.fechaInicio || '';
+      const fFin = row.fecha_fin || row.fechaFin || '';
+      const rawHInicio = (row.hora_inicio || row.horaInicio || '').trim();
+      const esHInicioValida = Boolean(rawHInicio && rawHInicio !== '00:00' && rawHInicio !== '00:00:00' && rawHInicio !== '0:00');
+      const hInicio = esHInicioValida ? rawHInicio : '';
+      const rawHFin = (row.hora_fin || row.horaFin || '').trim();
+      const esHFinValida = Boolean(rawHFin && rawHFin !== '00:00' && rawHFin !== '00:00:00' && rawHFin !== '0:00');
+      const hFin = esHFinValida ? rawHFin : '';
+      return {
+        id: row.id != null ? String(row.id) : '',
+        titulo: row.titulo || '',
+        contenido: row.contenido || row.descripcion || '',
+        categoria: row.categoria || 'General',
+        ubicacion: row.ubicacion || 'Templo Principal',
+        fecha_inicio: fInicio,
+        hora_inicio: hInicio,
+        fecha_fin: fFin,
+        hora_fin: hFin,
+        fechaInicio: fInicio,
+        fechaFin: fFin,
+        horaInicio: hInicio,
+        horaFin: hFin,
+        imagen: row.imagen || row.image || row.url || '',
+        activo: row.activo !== undefined ? row.activo : true
+      };
+    }
   },
 
 
@@ -1499,7 +1603,7 @@ const SupabaseSync = {
         if (!error && Array.isArray(data)) {
           const deletedIds = data
             .map(row => row && row[matchCol] != null ? String(row[matchCol]) : null)
-            .filter(id => id && !currentIds.has(id));
+            .filter(id => id && !String(id).startsWith('_') && !currentIds.has(id));
 
           if (deletedIds.length > 0) {
             Promise.resolve(window.supabaseClient.from(table).delete().in(matchCol, deletedIds)).catch(() => {});
