@@ -1181,6 +1181,71 @@ const TABLE_TRANSFORMERS = {
       }
       return mapRow(row);
     }
+  },
+
+  transmisiones: {
+    toDb(item) {
+      if (!item) return null;
+      const descConCat = item.categoria ? `[Cat:${item.categoria}] ${item.descripcion || item.url || ''}`.trim() : (item.descripcion || item.url || '');
+      const isActive = Boolean(item.activo === true || item.activa === true || item.enVivo === true || item.en_vivo === true || item.activo === 'true' || item.activa === 'true');
+      const plat = String(item.plataforma || item.tipo || 'youtube').toLowerCase();
+      const vUrl = String(item.url_video || item.videoId || item.url || '');
+      let f = item.fecha || '';
+      if (typeof f === 'string' && f.includes('T')) {
+        f = f.split('T')[0];
+      }
+      return {
+        id: String(item.id != null ? item.id : Date.now()),
+        titulo: String(item.titulo || ''),
+        url_video: vUrl,
+        fecha: f || new Date().toISOString().split('T')[0],
+        tipo: plat,
+        url: descConCat,
+        activo: isActive,
+        activa: isActive
+      };
+    },
+    fromDb(data) {
+      if (!data) return [];
+      const mapRow = r => {
+        if (!r) return null;
+        let desc = String(r.url || r.descripcion || '');
+        let cat = String(r.categoria || 'Sábado (Culto)');
+        if (desc.startsWith('[Cat:')) {
+          const match = desc.match(/^\[Cat:([^\]]+)\]\s*(.*)$/s);
+          if (match) {
+            cat = match[1].trim();
+            desc = match[2].trim();
+          }
+        }
+        const isActive = Boolean(r.activo === true || r.activa === true || r.activo === 'true' || r.activa === 'true');
+        const plat = (r.tipo || r.plataforma || 'youtube').toLowerCase();
+        const vUrl = r.url_video || r.videoId || r.url || '';
+        let f = r.fecha || '';
+        if (typeof f === 'string' && f.includes('T')) {
+          f = f.split('T')[0];
+        }
+        return {
+          id: String(r.id != null ? r.id : Date.now()),
+          titulo: String(r.titulo || ''),
+          categoria: cat,
+          fecha: f,
+          plataforma: plat,
+          tipo: plat,
+          videoId: String(vUrl),
+          url_video: String(vUrl),
+          url: desc,
+          descripcion: desc,
+          destacado: false,
+          en_vivo: isActive,
+          enVivo: isActive,
+          activo: isActive,
+          activa: isActive,
+          fechaCreacion: r.fechaCreacion || new Date().toISOString()
+        };
+      };
+      return Array.isArray(data) ? data.map(mapRow).filter(Boolean) : (mapRow(data) ? [mapRow(data)] : []);
+    }
   }
 };
 
@@ -1196,7 +1261,7 @@ const _tableKnownCols = {
   cronograma_predicadores: new Set(['id', 'fecha', 'predicador', 'culto_tipo', 'actividad', 'tema', 'curso', 'recurrente', 'semanas']),
   cursos: new Set(['id', 'nombre', 'icono', 'descripcion', 'temas', 'ayudas']),
   plan_estudios: new Set(['id', 'curso', 'temas', 'ayudas', 'actualizado_en']),
-  transmisiones: new Set(['id', 'titulo', 'url_video', 'plataforma', 'fecha', 'descripcion', 'destacado', 'en_vivo', 'activo'])
+  transmisiones: new Set(['id', 'titulo', 'url_video', 'fecha', 'activa', 'activo', 'url', 'tipo'])
 };
 
 function _filterPayloadForTable(table, payload) {
