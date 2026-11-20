@@ -628,20 +628,28 @@
                     <input type="text" id="anuncioTitulo" placeholder="Ej: Culto de Oración Especial (opcional)">
                 </div>
                 <div class="form-group">
-                    <label>Fecha de inicio</label>
+                    <label>Fecha del evento</label>
                     <input type="date" id="anuncioFechaInicio">
                 </div>
                 <div class="form-group">
-                    <label>Hora de inicio</label>
+                    <label>Hora del evento</label>
                     <input type="time" id="anuncioHoraInicio">
                 </div>
-                <div class="form-group">
-                    <label>Fecha de fin</label>
-                    <input type="date" id="anuncioFechaFin">
+                <div class="form-group full-width" style="margin-top:-0.3rem;">
+                    <label class="anuncio-varios-dias-label">
+                        <input type="checkbox" id="anuncioVariosDias">
+                        <span>Dura varios días (agregar fecha y hora de fin)</span>
+                    </label>
                 </div>
-                <div class="form-group">
-                    <label>Hora de fin</label>
-                    <input type="time" id="anuncioHoraFin">
+                <div id="anuncioFinWrapper" class="anuncio-fin-wrapper" style="display: none;">
+                    <div class="form-group">
+                        <label>Fecha de fin</label>
+                        <input type="date" id="anuncioFechaFin">
+                    </div>
+                    <div class="form-group">
+                        <label>Hora de fin</label>
+                        <input type="time" id="anuncioHoraFin">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Ubicación</label>
@@ -659,8 +667,21 @@
                     </select>
                 </div>
                 <div class="form-group full-width">
-                    <label>Imagen destacada (URL)</label>
-                    <input type="url" id="anuncioImagen" placeholder="https://... (opcional)">
+                    <label>Imagen destacada (opcional)</label>
+                    <input type="hidden" id="anuncioImagen" value="">
+                    <input type="file" id="anuncioImagenFile" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+                    <div id="anuncioUploadBox" class="anuncio-upload-box">
+                        <button type="button" id="btnSeleccionarImagenAnuncio" class="btn-subir-imagen-anuncio">
+                            <i class="fas fa-cloud-upload-alt"></i> Seleccionar imagen del dispositivo
+                        </button>
+                        <span id="anuncioImagenEstado" class="anuncio-imagen-estado">Ninguna imagen seleccionada (o arrastra / pega con Ctrl+V)</span>
+                    </div>
+                    <div id="anuncioImagenPreviewBox" class="anuncio-imagen-preview-box" style="display: none;">
+                        <img id="anuncioImagenPreview" src="" alt="Vista previa de imagen del anuncio">
+                        <button type="button" id="btnQuitarImagenAnuncio" class="btn-quitar-imagen-anuncio">
+                            <i class="fas fa-trash-alt"></i> Quitar imagen
+                        </button>
+                    </div>
                 </div>
                 <div class="form-group full-width">
                     <label>Contenido del anuncio</label>

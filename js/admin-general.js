@@ -543,15 +543,13 @@ function ejecutarAccionAdmin(accion, texto, event) {
             verificarAccesoSeccion('pedidos_biblioteca', abrirModalVerPedidos);
             break;
         case 'agregarEvento':
-            verificarAccesoSeccion('anuncios', abrirModalAgregarAnuncio);
+            abrirModalAgregarAnuncio();
             break;
         case 'quitarEvento':
-            verificarAccesoSeccion('anuncios', abrirModalQuitarAnuncio);
+            abrirModalQuitarAnuncio();
             break;
         case 'editarAnuncios':
-            verificarAccesoSeccion('anuncios', function () {
-                mostrarAlertaAdmin('Función de Editar anuncios en construcción');
-            });
+            mostrarAlertaAdmin('Función de Editar anuncios en construcción');
             break;
         case 'configurarSupabase':
         case 'sincronizarSupabase':
@@ -3503,6 +3501,235 @@ function mostrarToastAnuncios(mensaje, bg = '#2e7d32') {
     }, 2000);
 }
 
+// --- Subida automática de imagen de anuncio a Cloudflare R2 ---
+const R2_ANUNCIOS_UPLOAD_URL = 'https://iasd-belen-media.adventista.workers.dev/upload';
+const R2_ANUNCIOS_UPLOAD_TOKEN = 'iasd_belen_c0429af56d964678802d1f8b6fcfaeab';
+let subiendoImagenAnuncio = false;
+
+function actualizarVistaPreviaImagenAnuncio(url, estadoTexto) {
+    const hiddenInput = document.getElementById('anuncioImagen');
+    const fileInput = document.getElementById('anuncioImagenFile');
+    const estadoEl = document.getElementById('anuncioImagenEstado');
+    const previewBox = document.getElementById('anuncioImagenPreviewBox');
+    const previewImg = document.getElementById('anuncioImagenPreview');
+    const limpia = (url || '').trim();
+
+    if (hiddenInput) hiddenInput.value = limpia;
+    if (estadoEl) {
+        estadoEl.textContent = estadoTexto || (limpia ? 'Imagen lista en R2' : 'Ninguna imagen seleccionada');
+    }
+    if (previewBox && previewImg) {
+        if (limpia) {
+            previewImg.src = limpia;
+            previewBox.style.display = 'flex';
+        } else {
+            previewImg.src = '';
+            previewBox.style.display = 'none';
+            if (fileInput) fileInput.value = '';
+        }
+    }
+}
+
+async function optimizarImagenAnuncio(file) {
+    if (!file || (file.type || '').toLowerCase() === 'image/gif') return file;
+    try {
+        const bitmap = typeof createImageBitmap === 'function'
+            ? await createImageBitmap(file)
+            : await new Promise((resolve, reject) => {
+                const img = new Image();
+                const objUrl = URL.createObjectURL(file);
+                img.onload = () => { URL.revokeObjectURL(objUrl); resolve(img); };
+                img.onerror = (err) => { URL.revokeObjectURL(objUrl); reject(err); };
+                img.src = objUrl;
+            });
+
+        const maxDim = 1400;
+        let width = bitmap.width;
+        let height = bitmap.height;
+        if (width > maxDim || height > maxDim) {
+            if (width >= height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+            } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+            }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(bitmap, 0, 0, width, height);
+        if (typeof bitmap.close === 'function') bitmap.close();
+
+        let blob = await new Promise(res => canvas.toBlob(res, 'image/webp', 0.84));
+        let mime = 'image/webp';
+        let ext = 'webp';
+        if (!blob) {
+            blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.84));
+            mime = 'image/jpeg';
+            ext = 'jpg';
+        }
+        if (blob && blob.size < file.size) {
+            const baseName = (file.name || 'anuncio').replace(/\.[^.]+$/, '');
+            return new File([blob], `${baseName}.${ext}`, { type: mime });
+        }
+    } catch (e) {
+        console.warn('No se pudo optimizar la imagen, se subirá original:', e);
+    }
+    return file;
+}
+
+function toggleVariosDiasAnuncio(mostrar) {
+    const check = document.getElementById('anuncioVariosDias');
+    const wrapper = document.getElementById('anuncioFinWrapper');
+    if (check) check.checked = !!mostrar;
+    if (wrapper) wrapper.style.display = mostrar ? 'grid' : 'none';
+    if (!mostrar) {
+        const fFin = document.getElementById('anuncioFechaFin');
+        const hFin = document.getElementById('anuncioHoraFin');
+        if (fFin) fFin.value = '';
+        if (hFin) hFin.value = '';
+    }
+}
+
+async function subirImagenAnuncioAR2(file) {
+    if (!file) return;
+    const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    if (!tiposPermitidos.includes((file.type || '').toLowerCase())) {
+        mostrarAlertaAdmin('⚠️ Formato no compatible. Selecciona una imagen JPG, PNG, WEBP o GIF.');
+        return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+        mostrarAlertaAdmin('⚠️ La imagen supera el límite máximo de 10 MB.');
+        return;
+    }
+
+    const btnSeleccionar = document.getElementById('btnSeleccionarImagenAnuncio');
+    const btnGuardar = document.getElementById('btnGuardarAnuncio');
+    const estadoEl = document.getElementById('anuncioImagenEstado');
+    const urlAnterior = document.getElementById('anuncioImagen') ? document.getElementById('anuncioImagen').value : '';
+
+    subiendoImagenAnuncio = true;
+    if (btnSeleccionar) btnSeleccionar.disabled = true;
+    if (btnGuardar) btnGuardar.disabled = true;
+    if (estadoEl) estadoEl.textContent = 'Optimizando y subiendo imagen a R2...';
+
+    try {
+        const archivoFinal = await optimizarImagenAnuncio(file);
+        const formData = new FormData();
+        formData.append('file', archivoFinal);
+
+        const resp = await fetch(R2_ANUNCIOS_UPLOAD_URL, {
+            method: 'POST',
+            headers: {
+                'X-Upload-Token': R2_ANUNCIOS_UPLOAD_TOKEN
+            },
+            body: formData
+        });
+
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok || !data.ok || !data.url) {
+            throw new Error(data.error || 'No se pudo subir la imagen a R2');
+        }
+
+        const kb = Math.max(1, Math.round(archivoFinal.size / 1024));
+        actualizarVistaPreviaImagenAnuncio(data.url, `Imagen lista en R2 (${kb} KB)`);
+        mostrarToastAnuncios('<i class="fas fa-cloud-upload-alt"></i> Imagen optimizada y subida a R2');
+    } catch (err) {
+        console.error('Error subiendo imagen a R2:', err);
+        actualizarVistaPreviaImagenAnuncio(urlAnterior, urlAnterior ? 'Imagen actual cargada' : 'Error al subir imagen');
+        mostrarAlertaAdmin('❌ Error al subir la imagen a R2: ' + (err.message || 'Inténtalo de nuevo'));
+    } finally {
+        subiendoImagenAnuncio = false;
+        if (btnSeleccionar) btnSeleccionar.disabled = false;
+        if (btnGuardar) btnGuardar.disabled = false;
+    }
+}
+
+function initAnuncioImagenUploader() {
+    const btnSeleccionar = document.getElementById('btnSeleccionarImagenAnuncio');
+    const fileInput = document.getElementById('anuncioImagenFile');
+    const btnQuitar = document.getElementById('btnQuitarImagenAnuncio');
+    const uploadBox = document.getElementById('anuncioUploadBox');
+    const checkVariosDias = document.getElementById('anuncioVariosDias');
+
+    if (btnSeleccionar && fileInput && !btnSeleccionar.dataset.r2Bound) {
+        btnSeleccionar.dataset.r2Bound = '1';
+        btnSeleccionar.addEventListener('click', () => {
+            if (!subiendoImagenAnuncio) fileInput.click();
+        });
+    }
+
+    if (fileInput && !fileInput.dataset.r2Bound) {
+        fileInput.dataset.r2Bound = '1';
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files && fileInput.files[0];
+            if (file) subirImagenAnuncioAR2(file);
+        });
+    }
+
+    if (btnQuitar && !btnQuitar.dataset.r2Bound) {
+        btnQuitar.dataset.r2Bound = '1';
+        btnQuitar.addEventListener('click', () => {
+            actualizarVistaPreviaImagenAnuncio('', 'Ninguna imagen seleccionada (o arrastra / pega con Ctrl+V)');
+        });
+    }
+
+    if (uploadBox && !uploadBox.dataset.r2Bound) {
+        uploadBox.dataset.r2Bound = '1';
+        uploadBox.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadBox.classList.add('drag-over');
+        });
+        uploadBox.addEventListener('dragleave', () => {
+            uploadBox.classList.remove('drag-over');
+        });
+        uploadBox.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadBox.classList.remove('drag-over');
+            if (subiendoImagenAnuncio) return;
+            const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+            if (file) subirImagenAnuncioAR2(file);
+        });
+    }
+
+    if (checkVariosDias && !checkVariosDias.dataset.r2Bound) {
+        checkVariosDias.dataset.r2Bound = '1';
+        checkVariosDias.addEventListener('change', () => {
+            toggleVariosDiasAnuncio(checkVariosDias.checked);
+        });
+    }
+
+    if (!document.body.dataset.anuncioPasteBound) {
+        document.body.dataset.anuncioPasteBound = '1';
+        document.addEventListener('paste', (e) => {
+            const modal = document.getElementById('modalAgregarAnuncio');
+            if (!modal || modal.style.display === 'none' || !modal.classList.contains('active')) return;
+            if (subiendoImagenAnuncio) return;
+            const items = e.clipboardData && e.clipboardData.items;
+            if (!items) return;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type && items[i].type.startsWith('image/')) {
+                    const file = items[i].getAsFile();
+                    if (file) {
+                        e.preventDefault();
+                        subirImagenAnuncioAR2(file);
+                        break;
+                    }
+                }
+            }
+        });
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAnuncioImagenUploader);
+} else {
+    initAnuncioImagenUploader();
+}
+
 // --- Agregar / Editar Anuncio ---
 function abrirModalAgregarAnuncio() {
     anuncioPendienteEditarId = null;
@@ -3513,7 +3740,8 @@ function abrirModalAgregarAnuncio() {
     document.getElementById('anuncioHoraFin').value = '';
     document.getElementById('anuncioUbicacion').value = 'Templo Principal';
     document.getElementById('anuncioCategoria').value = 'Culto';
-    document.getElementById('anuncioImagen').value = '';
+    toggleVariosDiasAnuncio(false);
+    actualizarVistaPreviaImagenAnuncio('', 'Ninguna imagen seleccionada (o arrastra / pega con Ctrl+V)');
     document.getElementById('anuncioContenido').value = '';
 
     const tituloEl = document.getElementById('modalAnuncioTitulo');
@@ -3556,7 +3784,9 @@ function abrirModalEditarAnuncio(id) {
     document.getElementById('anuncioHoraFin').value = anuncio.horaFin || '';
     document.getElementById('anuncioUbicacion').value = anuncio.ubicacion || 'Templo Principal';
     document.getElementById('anuncioCategoria').value = anuncio.categoria || 'Culto';
-    document.getElementById('anuncioImagen').value = anuncio.imagen || '';
+    const esVariosDias = Boolean((anuncio.fechaFin && anuncio.fechaFin !== anuncio.fechaInicio) || (anuncio.horaFin && anuncio.horaFin !== anuncio.horaInicio));
+    toggleVariosDiasAnuncio(esVariosDias);
+    actualizarVistaPreviaImagenAnuncio(anuncio.imagen || '', anuncio.imagen ? 'Imagen actual cargada' : 'Ninguna imagen seleccionada (o arrastra / pega con Ctrl+V)');
     document.getElementById('anuncioContenido').value = anuncio.contenido || '';
 
     anuncioPendienteEditarId = id;
@@ -3574,7 +3804,43 @@ function abrirModalEditarAnuncio(id) {
     document.body.style.overflow = 'hidden';
 }
 
+function duplicarAnuncio(id) {
+    const anuncios = cargarAnuncios();
+    const anuncio = anuncios.find(a => String(a.id) === String(id));
+    if (!anuncio) return;
+
+    anuncioPendienteEditarId = null;
+
+    document.getElementById('anuncioTitulo').value = anuncio.titulo || '';
+    document.getElementById('anuncioFechaInicio').value = anuncio.fechaInicio || '';
+    document.getElementById('anuncioHoraInicio').value = anuncio.horaInicio || '';
+    document.getElementById('anuncioFechaFin').value = anuncio.fechaFin || '';
+    document.getElementById('anuncioHoraFin').value = anuncio.horaFin || '';
+    document.getElementById('anuncioUbicacion').value = anuncio.ubicacion || 'Templo Principal';
+    document.getElementById('anuncioCategoria').value = anuncio.categoria || 'Culto';
+    const esVariosDias = Boolean((anuncio.fechaFin && anuncio.fechaFin !== anuncio.fechaInicio) || (anuncio.horaFin && anuncio.horaFin !== anuncio.horaInicio));
+    toggleVariosDiasAnuncio(esVariosDias);
+    actualizarVistaPreviaImagenAnuncio(anuncio.imagen || '', anuncio.imagen ? 'Imagen copiada (puedes cambiarla o dejarla)' : 'Ninguna imagen seleccionada (o arrastra / pega con Ctrl+V)');
+    document.getElementById('anuncioContenido').value = anuncio.contenido || '';
+
+    const tituloEl = document.getElementById('modalAnuncioTitulo');
+    const btnEl = document.getElementById('btnGuardarAnuncio');
+    if (tituloEl) tituloEl.innerHTML = '<i class="fas fa-copy"></i> Duplicar Anuncio';
+    if (btnEl) btnEl.innerHTML = '<i class="fas fa-paper-plane"></i> Publicar Copia';
+
+    const modal = document.getElementById('modalAgregarAnuncio');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+    }
+    document.body.style.overflow = 'hidden';
+}
+
 function guardarNuevoAnuncio() {
+    if (subiendoImagenAnuncio) {
+        mostrarAlertaAdmin('⏳ Espera a que termine de subir la imagen a R2 antes de guardar.');
+        return;
+    }
     const titulo = document.getElementById('anuncioTitulo').value.trim();
     const fechaInicio = document.getElementById('anuncioFechaInicio').value;
     const horaInicio = document.getElementById('anuncioHoraInicio').value;
@@ -3910,6 +4176,7 @@ function renderizarListaQuitar(anuncios) {
         <td style="padding:0.7rem; color:#5a6474; white-space:nowrap;">${fecha}</td>
         <td style="padding:0.7rem; text-align:center; white-space:nowrap;">
             <button type="button" data-csp-click="abrirModalEditarAnuncio('${a.id}')" style="background:#f0a800; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;" title="Editar anuncio">✏️ Editar</button>
+            <button type="button" data-csp-click="duplicarAnuncio('${a.id}')" style="background:#0b2b4f; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem; margin-right:0.3rem;" title="Duplicar anuncio">📋 Duplicar</button>
             <button type="button" data-csp-click="confirmarEliminarAnuncio('${a.id}')" style="background:#c62828; color:white; border:none; padding:0.4rem 0.7rem; border-radius:1.5rem; cursor:pointer; font-weight:600; font-size:0.8rem;" title="Eliminar anuncio">🗑️ Eliminar</button>
         </td>
     </tr>`;
@@ -3955,6 +4222,7 @@ window.mostrarToastAnuncios = mostrarToastAnuncios;
 window.abrirModalAgregarAnuncio = abrirModalAgregarAnuncio;
 window.cerrarModalAgregarAnuncio = cerrarModalAgregarAnuncio;
 window.abrirModalEditarAnuncio = abrirModalEditarAnuncio;
+window.duplicarAnuncio = duplicarAnuncio;
 window.guardarNuevoAnuncio = guardarNuevoAnuncio;
 window.generarVistaPreviaAnuncio = generarVistaPreviaAnuncio;
 window.cerrarVistaPrevia = cerrarVistaPrevia;
@@ -4225,6 +4493,7 @@ window.abrirModalQuitarAnuncio = abrirModalQuitarAnuncio;
 window.cerrarModalQuitarAnuncio = cerrarModalQuitarAnuncio;
 window.filtrarAnunciosQuitar = filtrarAnunciosQuitar;
 window.abrirModalEditarAnuncio = abrirModalEditarAnuncio;
+window.duplicarAnuncio = duplicarAnuncio;
 window.confirmarEliminarAnuncio = confirmarEliminarAnuncio;
 if (typeof abrirModalCrearExamen !== 'undefined') window.abrirModalCrearExamen = abrirModalCrearExamen;
 if (typeof abrirModalEditarExamenes !== 'undefined') window.abrirModalEditarExamenes = abrirModalEditarExamenes;

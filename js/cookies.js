@@ -178,17 +178,63 @@
     cerrarConfiguracionCookies();
   }
 
+  const VALID_CONSENT_VALUES = ['todas', 'no_esenciales', 'personalizada'];
+  let bannerGuardObserver = null;
+
+  function tieneConsentimientoGuardado() {
+    try {
+      const preferencia = localStorage.getItem('cookies_aceptadas');
+      return VALID_CONSENT_VALUES.indexOf(preferencia) !== -1;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function asegurarGuardiaBanner(banner) {
+    if (!banner || typeof MutationObserver === 'undefined' || bannerGuardObserver) return;
+    bannerGuardObserver = new MutationObserver(function () {
+      if (!tieneConsentimientoGuardado()) {
+        const cs = window.getComputedStyle(banner);
+        if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') {
+          aplicarEstilosVisiblesBanner(banner);
+        }
+      }
+    });
+    bannerGuardObserver.observe(banner, {
+      attributes: true,
+      attributeFilter: ['style', 'class', 'hidden']
+    });
+  }
+
+  function aplicarEstilosVisiblesBanner(banner) {
+    if (!banner) return;
+    if (banner.parentElement !== document.body && document.body) {
+      document.body.appendChild(banner);
+    }
+    banner.removeAttribute('hidden');
+    banner.style.setProperty('display', 'block', 'important');
+    banner.style.setProperty('opacity', '1', 'important');
+    banner.style.setProperty('visibility', 'visible', 'important');
+    banner.style.setProperty('pointer-events', 'auto', 'important');
+    banner.style.setProperty('z-index', '99998', 'important');
+  }
+
   function ocultarBannerCookies() {
+    if (bannerGuardObserver) {
+      bannerGuardObserver.disconnect();
+      bannerGuardObserver = null;
+    }
     const banner = document.getElementById('cookie-banner');
     if (banner) {
-      banner.style.display = 'none';
+      banner.style.setProperty('display', 'none', 'important');
     }
   }
 
   function mostrarBannerCookies() {
     const banner = document.getElementById('cookie-banner');
     if (banner) {
-      banner.style.display = 'block';
+      aplicarEstilosVisiblesBanner(banner);
+      asegurarGuardiaBanner(banner);
     }
     // Asegurar que la vista permanezca firmemente en la cabecera / inicio superior
     window.scrollTo(0, 0);
@@ -366,10 +412,11 @@
       const preferencia = localStorage.getItem('cookies_aceptadas');
       const analyticsFlag = localStorage.getItem('cookies_analytics');
 
-      if (!preferencia) {
-        // Primera visita: Mostrar banner de cookies
+      if (!tieneConsentimientoGuardado()) {
+        // Primera visita o sin elección válida: mostrar y mantener visible el banner de cookies
         mostrarBannerCookies();
       } else if (preferencia === 'todas' || analyticsFlag === 'true') {
+        ocultarBannerCookies();
         // Usuario ya había aceptado previamente: restaurar estado granted
         safeGtag('consent', 'update', {
           'ad_storage': 'granted',
@@ -378,6 +425,7 @@
           'analytics_storage': 'granted'
         });
       } else {
+        ocultarBannerCookies();
         // Usuario rechazó: mantener denied
         safeGtag('consent', 'update', {
           'ad_storage': 'denied',
@@ -447,6 +495,9 @@
   }
 
   window.addEventListener('load', function () {
+    if (!tieneConsentimientoGuardado()) {
+      mostrarBannerCookies();
+    }
     if (!window.location.hash || window.location.hash === '#' || window.location.hash === '#home') {
       window.scrollTo(0, 0);
     }
