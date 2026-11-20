@@ -27,16 +27,6 @@
 
     <!-- CSP Safe Event Delegator -->
     <script src="js/event-delegator.js"></script>
-    <script>
-        try {
-            if (localStorage.getItem('tema') === 'oscuro') {
-                document.documentElement.classList.add('tema-oscuro');
-                document.addEventListener('DOMContentLoaded', function () {
-                    document.body.classList.add('tema-oscuro');
-                });
-            }
-        } catch (e) { }
-    </script>
 </head>
 
 <body style="background: #f8fafc; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden;">

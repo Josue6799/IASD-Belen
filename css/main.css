@@ -2743,49 +2743,6 @@
     background: var(--cream-dark)
 }
 
-body.tema-oscuro {
-    color-scheme: dark
-}
-
-body.tema-oscuro .dropdown-menu,
-body.tema-oscuro .livestream-card,
-body.tema-oscuro .modal-card,
-body.tema-oscuro .modal-container,
-body.tema-oscuro .navbar-wrapper,
-body.tema-oscuro .pastor-welcome-card,
-body.tema-oscuro .pillar-card,
-body.tema-oscuro .quick-nav-card,
-body.tema-oscuro .schedule-card,
-body.tema-oscuro .verse-banner {
-    background: var(--cream-card);
-    border-color: var(--border-subtle)
-}
-
-body.tema-oscuro .pillar-card-title,
-body.tema-oscuro .schedule-card-title,
-body.tema-oscuro h1,
-body.tema-oscuro h2,
-body.tema-oscuro h3,
-body.tema-oscuro h4 {
-    color: var(--dark-text)
-}
-
-body.tema-oscuro input[type=email],
-body.tema-oscuro input[type=password],
-body.tema-oscuro input[type=tel],
-body.tema-oscuro input[type=text],
-body.tema-oscuro select,
-body.tema-oscuro textarea {
-    background-color: var(--cream-dark);
-    color: var(--dark-text);
-    border-color: var(--border-subtle)
-}
-
-body.tema-oscuro .modal-form h2,
-body.tema-oscuro .modal-info h3 {
-    color: var(--dark-text)
-}
-
 .estadisticas-seccion {
     margin: 3.5rem 0 4rem;
     padding: 3.2rem 2.2rem;
@@ -2794,11 +2751,6 @@ body.tema-oscuro .modal-info h3 {
     border: 1px solid var(--golden-border, rgba(201, 157, 59, .3));
     position: relative;
     overflow: hidden
-}
-
-body.tema-oscuro .estadisticas-seccion {
-    background: linear-gradient(135deg, rgba(13, 23, 38, .9) 0, rgba(226, 183, 76, .08) 100%);
-    border-color: var(--golden-border, rgba(226, 183, 76, .35))
 }
 
 .badge-sub-title {
@@ -2850,16 +2802,6 @@ body.tema-oscuro .estadisticas-seccion {
     transform: translateY(-6px);
     box-shadow: 0 18px 42px rgba(11, 43, 79, .35), 0 0 22px rgba(201, 157, 59, .3);
     border-color: var(--golden, #c99d3b)
-}
-
-body.tema-oscuro .estadistica-card {
-    background: linear-gradient(145deg, #07192d, #0f2c4e);
-    border-color: rgba(226, 183, 76, .45);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, .5)
-}
-
-body.tema-oscuro .estadistica-card:hover {
-    box-shadow: 0 18px 45px rgba(0, 0, 0, .7), 0 0 25px rgba(226, 183, 76, .35)
 }
 
 .estadistica-icon-box {
@@ -2936,22 +2878,11 @@ body.tema-oscuro .estadistica-card:hover {
     gap: .6rem
 }
 
-body.tema-oscuro .btn-estadisticas-quienes {
-    border-color: var(--golden, #e2b74c);
-    color: #fff
-}
-
 .btn-estadisticas-quienes:hover {
     background: var(--deep-blue, #0b2b4f);
     color: #fff;
     transform: translateY(-2px);
     box-shadow: 0 8px 22px rgba(11, 43, 79, .25)
-}
-
-body.tema-oscuro .btn-estadisticas-quienes:hover {
-    background: var(--golden, #e2b74c);
-    color: #091526;
-    box-shadow: 0 8px 22px rgba(226, 183, 76, .35)
 }
 
 .btn-estadisticas-conocerte {

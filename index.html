@@ -494,39 +494,6 @@ rel="stylesheet" />
     user-select: none;
 }
 
-/* --- MODO OSCURO ADAPTACIONES --- */
-body.tema-oscuro .cookie-banner {
-    background: var(--pure-white, #162436);
-    border-color: var(--golden-border, #c99d3b);
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
-}
-
-body.tema-oscuro .cookie-btn-config {
-    background: rgba(255, 255, 255, 0.1) !important;
-    color: var(--golden, #c99d3b) !important;
-}
-
-body.tema-oscuro .cookie-config-card {
-    background: var(--pure-white, #162436);
-    border-color: var(--golden-border, #c99d3b);
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8);
-}
-
-body.tema-oscuro .cookie-category-item {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: var(--border-subtle, rgba(255, 255, 255, 0.1));
-}
-
-body.tema-oscuro .footer-legal-links a,
-body.tema-oscuro .footer-legal-btn {
-    color: var(--pure-white, #ffffff) !important;
-}
-
-body.tema-oscuro .footer-legal-links a:hover,
-body.tema-oscuro .footer-legal-btn:hover {
-    color: var(--golden, #c99d3b) !important;
-}
-
 /* --- RESPONSIVE ADAPTACIONES --- */
 @media (max-width: 768px) {
     .cookie-banner {
@@ -570,16 +537,6 @@ body.tema-oscuro .footer-legal-btn:hover {
 }
 </style>
 <script src="js/event-delegator.js"></script>
-<script>
-try {
-if (localStorage.getItem('tema') === 'oscuro') {
-document.documentElement.classList.add('tema-oscuro');
-document.addEventListener('DOMContentLoaded', function () {
-document.body.classList.add('tema-oscuro');
-});
-}
-} catch (e) { }
-</script>
 
 <!-- Google Analytics 4 con Consent Mode -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-VVYN5G84LR"></script>
@@ -9904,6 +9861,21 @@ El Padre es también el juez supremo y providencial que vela por las necesidades
 "¿No has sabido, no has oído que el Dios eterno es Jehová, el cual creó los confines de la tierra? No desfallece, ni se fatiga con cansancio, y su entendimiento no hay quien lo alcance." (Isaías 40:28)
 </div>
 <div class="exegesis-box">
+La Biblia atribuye al Padre el origen ejecutivo de todas las obras divinas: de Él proceden la creación, el envío del Hijo al mundo y el derramamiento del Espíritu Santo. El apóstol Pablo resume esta verdad en 1 Corintios 8:6 diciendo: <em>"Para nosotros, sin embargo, sólo hay un Dios, el Padre, del cual proceden todas las cosas, y nosotros somos para él; y un Señor, Jesucristo, por medio del cual son todas las cosas, y nosotros por medio de él"</em>.
+</p>
+<p>
+El Padre es también el juez supremo y providencial que vela por las necesidades cotidianas de sus criaturas (Mateo 6:26). Isaías 40:28-31 nos recuerda que su entendimiento no hay quien lo alcance, y que Él da esfuerzo al cansado y multiplica las fuerzas al que no tiene ningunas.
+</p>
+<div class="teologia-versiculos-container">
+<div class="teologia-box-biblico">
+<div class="box-header">
+<span class="box-title"><i class="fas fa-book-bible"></i> El Padre en la Escritura</span>
+<span class="pasaje-referencia">Génesis 1:1 · Salmo 90:2 · Isaías 40:28-31 · 1 Corintios 8:6</span>
+</div>
+<div class="texto-biblico">
+"¿No has sabido, no has oído que el Dios eterno es Jehová, el cual creó los confines de la tierra? No desfallece, ni se fatiga con cansancio, y su entendimiento no hay quien lo alcance." (Isaías 40:28)
+</div>
+<div class="exegesis-box">
 <strong>Análisis Teológico:</strong> Pablo en 1 Corintios 8:6 no excluye al Hijo de la divinidad al llamar "un Dios" al Padre, sino que contrarresta el politeísmo grecorromano, colocando al Padre como origen y fuente cósmica y al Hijo como agente divino creador de todas las cosas existentes.
 </div>
 </div>
@@ -12449,24 +12421,6 @@ style="border-radius: 2rem; font-size: 0.82rem; border-color: var(--golden); col
 </button>
 </div>
 </div>
-</div>
-<div id="fabContainer" class="fab-container">
-<div id="fabMenu" class="fab-menu" role="menu" aria-label="Menú de Acciones Rápidas">
-<button id="btnEnVivo" class="fab-item fab-item-envivo" data-csp-click="abrirEnVivo(); cerrarFabMenu();"
-title="Ver Transmisión En Vivo" style="display: none;">
-<span class="fab-label">En Vivo</span>
-<span class="fab-icon-wrap"><i class="fas fa-broadcast-tower"></i></span>
-</button>
-<button id="btnTema" class="fab-item fab-item-tema" data-csp-click="toggleTema()"
-title="Cambiar Tema (Claro / Oscuro)">
-<span class="fab-label" id="textoTema">Oscuro</span>
-<span class="fab-icon-wrap"><i class="fas fa-moon" id="iconoTema"></i></span>
-</button>
-</div>
-<button id="fabBtn" class="fab-main" data-csp-click="toggleFabMenu()" title="Menú de Acciones Rápidas"
-aria-label="Abrir Menú de Acciones" aria-expanded="false">
-<i class="fas fa-plus fab-icon-trigger"></i>
-</button>
 </div>
 <script src="js/supabase.min.js"></script>
 <script src="js/storage.js"></script>
