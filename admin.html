@@ -239,9 +239,14 @@
                 </div>
 
                 <div class="topbar-actions">
-                    <button type="button" class="topbar-icon-btn" data-csp-click="toggleNotificacionesAdmin()" title="Notificaciones del sistema" aria-label="Notificaciones">
-                        <i class="fas fa-bell"></i>
-                    </button>
+                    <div id="notifBellWrap" class="notif-bell-wrap">
+                        <button type="button" id="btnNotificacionesAdmin" class="topbar-icon-btn"
+                            data-csp-click="toggleNotificacionesAdmin(event)" title="Notificaciones del sistema" aria-label="Notificaciones">
+                            <i class="fas fa-bell"></i>
+                            <span id="notifBellBadge" class="notif-bell-badge" style="display: none;">0</span>
+                        </button>
+                        <div id="notifAdminDropdown" class="notif-dropdown" style="display: none;" role="region" aria-label="Lista de notificaciones"></div>
+                    </div>
                     <div class="topbar-session-badge">
                         <span class="status-pulse-dot"></span>
                         <span>Sesión activa</span>
@@ -910,6 +915,7 @@
             });
         });
     </script>
+    <script src="js/notificaciones-admin.js"></script>
 </body>
 
 </html>
