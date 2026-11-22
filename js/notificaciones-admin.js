@@ -254,6 +254,38 @@
         if (dropdown) dropdown.style.display = 'none';
     }
 
+    function posicionarDropdown() {
+        const dropdown = document.getElementById('notifAdminDropdown');
+        const wrap = document.getElementById('notifBellWrap');
+        if (!dropdown || !wrap) return;
+
+        if (window.innerWidth <= 768) {
+            if (dropdown.parentElement !== document.body) {
+                document.body.appendChild(dropdown);
+            }
+            dropdown.style.position = 'fixed';
+            dropdown.style.top = '68px';
+            dropdown.style.left = '12px';
+            dropdown.style.right = '12px';
+            dropdown.style.width = 'auto';
+            dropdown.style.maxWidth = 'none';
+            dropdown.style.maxHeight = '75vh';
+            dropdown.style.zIndex = '100050';
+        } else {
+            if (dropdown.parentElement !== wrap) {
+                wrap.appendChild(dropdown);
+            }
+            dropdown.style.position = '';
+            dropdown.style.top = '';
+            dropdown.style.left = '';
+            dropdown.style.right = '';
+            dropdown.style.width = '';
+            dropdown.style.maxWidth = '';
+            dropdown.style.maxHeight = '';
+            dropdown.style.zIndex = '';
+        }
+    }
+
     function toggleNotificacionesAdmin(e) {
         if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
         const dropdown = document.getElementById('notifAdminDropdown');
@@ -261,6 +293,7 @@
 
         STATE.abierto = !STATE.abierto;
         if (STATE.abierto) {
+            posicionarDropdown();
             dropdown.style.display = 'flex';
             renderizarPanel();
             cargarNotificaciones();
@@ -299,9 +332,13 @@
         });
 
         document.addEventListener('click', (e) => {
-            if (STATE.abierto && !wrap.contains(e.target)) {
+            if (STATE.abierto && !wrap.contains(e.target) && !dropdown.contains(e.target)) {
                 cerrarDropdown();
             }
+        });
+
+        window.addEventListener('resize', () => {
+            if (STATE.abierto) posicionarDropdown();
         });
 
         document.addEventListener('keydown', (e) => {
