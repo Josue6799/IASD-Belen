@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --navy: #07192d;
@@ -38,31 +39,42 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.65;
             overflow-x: hidden;
+            transition: background 0.35s ease;
+        }
+
+        body.es-mode-maestro {
+            background: #f4f6fa;
         }
 
         a { color: inherit; text-decoration: none; }
 
-        /* Topbar */
+        /* Topbar + Switch Modo Estudiante / Modo Maestro */
         .es-topbar {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            padding: 1rem clamp(1.2rem, 5vw, 4rem);
+            gap: 0.85rem;
+            padding: 0.9rem clamp(1rem, 4.5vw, 3.5rem);
             background: linear-gradient(135deg, #07192d 0%, #0b2b4f 100%);
             border-bottom: 2px solid rgba(201, 157, 59, 0.35);
             color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            box-shadow: 0 6px 20px rgba(7, 25, 45, 0.16);
         }
 
         .es-back-btn {
             display: inline-flex;
             align-items: center;
-            gap: 0.55rem;
-            padding: 0.55rem 1.15rem;
+            gap: 0.5rem;
+            padding: 0.5rem 1.05rem;
             border-radius: 999px;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.22);
             color: #fff;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             font-weight: 600;
             transition: background 0.2s ease, border-color 0.2s ease;
         }
@@ -72,28 +84,107 @@
             border-color: var(--gold-light);
         }
 
+        .es-mode-switch {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 999px;
+            padding: 0.26rem;
+            gap: 0.25rem;
+        }
+
+        .es-mode-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.48rem 1.05rem;
+            border-radius: 999px;
+            border: none;
+            background: transparent;
+            color: #cbd5e1;
+            font-family: inherit;
+            font-size: 0.83rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .es-mode-btn:hover { color: #fff; }
+
+        .es-mode-btn.active {
+            background: var(--gold);
+            color: var(--navy);
+            box-shadow: 0 4px 14px rgba(201, 157, 59, 0.35);
+        }
+
         .es-brand {
             display: flex;
             align-items: center;
-            gap: 0.6rem;
-            font-size: 0.85rem;
+            gap: 0.55rem;
+            font-size: 0.82rem;
             font-weight: 700;
             letter-spacing: 1px;
             text-transform: uppercase;
             color: #e2e8f0;
         }
 
-        .es-brand img { height: 28px; width: auto; }
+        .es-brand img { height: 26px; width: auto; }
 
-        /* Hero */
+        /* Transición suave entre vistas */
+        .es-view-hidden {
+            display: none !important;
+        }
+
+        .es-view-enter {
+            animation: esFadeSlide 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes esFadeSlide {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero a pantalla completa debajo de la barra superior */
         .es-hero {
             position: relative;
-            min-height: clamp(390px, 56vh, 520px);
+            min-height: calc(100vh - 66px);
+            min-height: calc(100svh - 66px);
             display: flex;
             align-items: center;
-            padding: 3.5rem clamp(1.25rem, 6vw, 5.5rem);
+            padding: 3.5rem clamp(1.25rem, 6vw, 5.5rem) 4.5rem;
             background: var(--navy);
             overflow: hidden;
+        }
+
+        .es-hero-scroll-cue {
+            position: absolute;
+            bottom: 1.4rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            transition: color 0.2s ease;
+        }
+
+        .es-hero-scroll-cue:hover { color: var(--gold-light); }
+
+        .es-hero-scroll-cue i {
+            font-size: 1rem;
+            animation: esBounceDown 1.8s infinite;
+        }
+
+        @keyframes esBounceDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
         }
 
         .es-hero-bg {
@@ -108,13 +199,13 @@
         .es-hero-scrim {
             position: absolute;
             inset: 0;
-            background: linear-gradient(90deg, rgba(7, 25, 45, 0.88) 0%, rgba(7, 25, 45, 0.62) 55%, rgba(7, 25, 45, 0.28) 100%);
+            background: linear-gradient(90deg, rgba(7, 25, 45, 0.9) 0%, rgba(7, 25, 45, 0.66) 56%, rgba(7, 25, 45, 0.26) 100%);
         }
 
         .es-hero-inner {
             position: relative;
             z-index: 2;
-            max-width: 680px;
+            max-width: 720px;
             color: #fff;
         }
 
@@ -124,51 +215,51 @@
             gap: 0.5rem;
             padding: 0.38rem 1rem;
             border-radius: 999px;
-            background: rgba(201, 157, 59, 0.2);
-            border: 1px solid rgba(223, 183, 92, 0.55);
+            background: rgba(201, 157, 59, 0.22);
+            border: 1px solid rgba(223, 183, 92, 0.6);
             color: var(--gold-light);
             font-size: 0.78rem;
             font-weight: 700;
             letter-spacing: 0.7px;
             text-transform: uppercase;
-            margin-bottom: 1rem;
+            margin-bottom: 0.95rem;
         }
 
         .es-hero h1 {
             font-family: 'Playfair Display', Georgia, serif;
-            font-size: clamp(2.2rem, 4.8vw, 3.5rem);
+            font-size: clamp(2.1rem, 4.6vw, 3.35rem);
             font-weight: 800;
-            line-height: 1.12;
-            margin-bottom: 0.9rem;
+            line-height: 1.13;
+            margin-bottom: 0.85rem;
             color: #fff;
         }
 
         .es-hero p {
-            font-size: clamp(1rem, 1.35vw, 1.14rem);
+            font-size: clamp(0.98rem, 1.3vw, 1.12rem);
             color: #f1f5f9;
-            margin-bottom: 1.8rem;
-            max-width: 580px;
+            margin-bottom: 1.7rem;
+            max-width: 600px;
         }
 
         .es-hero-actions {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.9rem;
+            gap: 0.85rem;
         }
 
         .es-btn-gold {
             display: inline-flex;
             align-items: center;
             gap: 0.55rem;
-            padding: 0.9rem 1.8rem;
+            padding: 0.88rem 1.7rem;
             border-radius: 999px;
             background: var(--gold);
             color: var(--navy);
             font-weight: 800;
-            font-size: 0.93rem;
+            font-size: 0.92rem;
             border: none;
             cursor: pointer;
-            box-shadow: 0 8px 22px rgba(201, 157, 59, 0.38);
+            box-shadow: 0 8px 22px rgba(201, 157, 59, 0.36);
             transition: transform 0.2s ease, filter 0.2s ease;
         }
 
@@ -178,32 +269,33 @@
             display: inline-flex;
             align-items: center;
             gap: 0.55rem;
-            padding: 0.88rem 1.65rem;
+            padding: 0.86rem 1.55rem;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.11);
             border: 1.5px solid rgba(255, 255, 255, 0.45);
             color: #fff;
             font-weight: 700;
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: background 0.2s ease;
         }
 
-        .es-btn-outline:hover { background: rgba(255, 255, 255, 0.2); }
+        .es-btn-outline:hover { background: rgba(255, 255, 255, 0.22); }
 
-        /* Container & Sections */
+        /* Container & Sections — Ancho completo */
         .es-container {
-            max-width: 1140px;
+            width: 100%;
+            max-width: none;
             margin: 0 auto;
-            padding: 2.8rem clamp(1.2rem, 4vw, 2.5rem) 4rem;
+            padding: 2.6rem clamp(1rem, 3vw, 2.6rem) 4rem;
         }
 
         .es-section {
-            margin-bottom: 3rem;
+            margin-bottom: 3.1rem;
         }
 
         .es-section-head {
-            margin-bottom: 1.4rem;
+            margin-bottom: 1.35rem;
         }
 
         .es-kicker {
@@ -225,8 +317,232 @@
 
         .es-section-sub {
             color: var(--muted);
-            font-size: 0.96rem;
+            font-size: 0.95rem;
             margin-top: 0.35rem;
+        }
+
+        /* Tarjeta Visual del Versículo de Memoria */
+        .es-verse-card {
+            position: relative;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            background: var(--navy);
+            color: #fff;
+            box-shadow: 0 18px 40px rgba(7, 25, 45, 0.2);
+            border: 1px solid rgba(201, 157, 59, 0.35);
+        }
+
+        .es-verse-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            opacity: 0.55;
+        }
+
+        .es-verse-scrim {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(125deg, rgba(7, 25, 45, 0.92) 0%, rgba(11, 43, 79, 0.76) 55%, rgba(7, 25, 45, 0.65) 100%);
+        }
+
+        .es-verse-inner {
+            position: relative;
+            z-index: 2;
+            padding: clamp(1.6rem, 4vw, 2.6rem);
+        }
+
+        .es-verse-top {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.85rem;
+            margin-bottom: 1.3rem;
+        }
+
+        .es-verse-cita-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.38rem 0.95rem;
+            border-radius: 999px;
+            background: rgba(201, 157, 59, 0.25);
+            border: 1px solid rgba(223, 183, 92, 0.65);
+            color: var(--gold-light);
+            font-weight: 800;
+            font-size: 0.85rem;
+            letter-spacing: 0.4px;
+        }
+
+        .es-verse-levels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+        }
+
+        .es-level-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            color: #e2e8f0;
+            padding: 0.38rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.79rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .es-level-btn.active {
+            background: var(--gold);
+            color: var(--navy);
+            border-color: var(--gold);
+        }
+
+        .es-verse-quote {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(1.28rem, 2.6vw, 1.85rem);
+            line-height: 1.55;
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        .es-verse-blank {
+            display: inline-block;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88em;
+            font-weight: 700;
+            padding: 0.08rem 0.55rem;
+            margin: 0.12rem 0.15rem;
+            border-radius: 0.45rem;
+            border: 1.5px dashed var(--gold-light);
+            background: rgba(201, 157, 59, 0.22);
+            color: var(--gold-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .es-verse-blank:hover {
+            background: rgba(201, 157, 59, 0.38);
+        }
+
+        .es-verse-blank.revealed {
+            background: rgba(22, 163, 74, 0.28);
+            border-style: solid;
+            border-color: #4ade80;
+            color: #dcfce7;
+        }
+
+        .es-verse-hint {
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            margin-bottom: 1.2rem;
+        }
+
+        .es-verse-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+        }
+
+        .es-verse-act-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.55rem 1.05rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            font-size: 0.83rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .es-verse-act-btn:hover { background: rgba(255, 255, 255, 0.24); }
+
+        /* Audio / Escucha la Lección */
+        .es-audio-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1.35rem;
+            padding: 1.6rem;
+            box-shadow: 0 8px 28px rgba(11, 43, 79, 0.06);
+            display: grid;
+            grid-template-columns: 1.25fr 0.75fr;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .es-audio-player-box {
+            background: #f8f5ee;
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 0.9rem 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .es-audio-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--navy-mid);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .es-audio-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.65rem;
+            margin-top: 1rem;
+        }
+
+        .es-speed-pill {
+            padding: 0.36rem 0.75rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            color: var(--navy-mid);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .es-speed-pill.active {
+            background: var(--navy-mid);
+            color: #fff;
+            border-color: var(--navy-mid);
+        }
+
+        .es-audio-side {
+            position: relative;
+            border-radius: 1.1rem;
+            overflow: hidden;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1.2rem;
+            color: #fff;
+            background: var(--navy);
+        }
+
+        .es-audio-side img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.52;
+        }
+
+        .es-audio-side-content {
+            position: relative;
+            z-index: 2;
         }
 
         /* 7-Day Study Checklist Card */
@@ -285,10 +601,7 @@
             transition: all 0.2s ease;
         }
 
-        .es-day-btn i {
-            font-size: 1.15rem;
-            color: #94a3b8;
-        }
+        .es-day-btn i { font-size: 1.15rem; color: #94a3b8; }
 
         .es-day-btn.done {
             background: #ecfdf5;
@@ -296,9 +609,7 @@
             color: #166534;
         }
 
-        .es-day-btn.done i {
-            color: #16a34a;
-        }
+        .es-day-btn.done i { color: #16a34a; }
 
         .es-reset-btn {
             background: transparent;
@@ -313,7 +624,313 @@
 
         .es-reset-btn:hover { background: #f1f5f9; color: var(--navy); }
 
-        /* Teachers Corner */
+        /* Videos de Repaso */
+        .es-videos-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1.5rem;
+        }
+
+        .es-video-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            overflow: hidden;
+            box-shadow: 0 8px 26px rgba(11, 43, 79, 0.07);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .es-video-frame {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #07192d;
+        }
+
+        .es-video-frame iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .es-video-meta {
+            padding: 1.15rem 1.25rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            flex: 1;
+        }
+
+        .es-video-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            width: fit-content;
+            padding: 0.22rem 0.65rem;
+            border-radius: 999px;
+            background: rgba(220, 38, 38, 0.1);
+            color: #b91c1c;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .es-video-meta h3 {
+            font-size: 1.02rem;
+            color: var(--navy-mid);
+            line-height: 1.35;
+        }
+
+        .es-video-desc {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .es-video-yt-link {
+            margin-top: auto;
+            padding-top: 0.45rem;
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: var(--blue-accent);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .es-video-yt-link:hover { text-decoration: underline; }
+
+        /* Folletos para Toda la Familia (#6) */
+        .es-family-banner {
+            position: relative;
+            border-radius: 1.35rem;
+            overflow: hidden;
+            min-height: 170px;
+            display: flex;
+            align-items: flex-end;
+            padding: 1.5rem 1.8rem;
+            margin-bottom: 1.25rem;
+            color: #fff;
+            background: var(--navy);
+        }
+
+        .es-family-banner img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .es-family-banner-scrim {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(7, 25, 45, 0.88) 0%, rgba(7, 25, 45, 0.55) 60%, rgba(7, 25, 45, 0.25) 100%);
+        }
+
+        .es-family-banner-text {
+            position: relative;
+            z-index: 2;
+            max-width: 620px;
+        }
+
+        .es-family-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1.25rem;
+        }
+
+        .es-fam-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1.15rem;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .es-fam-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--gold);
+            box-shadow: 0 12px 26px rgba(11, 43, 79, 0.1);
+        }
+
+        .es-fam-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            width: fit-content;
+            padding: 0.3rem 0.72rem;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .es-fam-card h3 {
+            font-size: 1.03rem;
+            color: var(--navy-mid);
+            margin-top: 0.15rem;
+        }
+
+        .es-fam-card p {
+            font-size: 0.84rem;
+            color: var(--muted);
+            flex: 1;
+        }
+
+        .es-fam-link {
+            font-size: 0.83rem;
+            font-weight: 700;
+            color: var(--blue-accent);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-top: 0.35rem;
+        }
+
+        /* Cuaderno de Apuntes */
+        .es-notes-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1.3rem;
+            padding: 1.6rem;
+            box-shadow: 0 8px 28px rgba(11, 43, 79, 0.06);
+        }
+
+        .es-notes-textarea {
+            width: 100%;
+            min-height: 145px;
+            padding: 1rem 1.1rem;
+            border-radius: 0.95rem;
+            border: 1.5px solid var(--border);
+            background: #fcfbf8;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .es-notes-textarea:focus {
+            border-color: var(--gold);
+            background: #fff;
+        }
+
+        .es-notes-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .es-notes-status {
+            font-size: 0.82rem;
+            color: var(--muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .es-notes-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .es-btn-wa {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.6rem 1.15rem;
+            border-radius: 999px;
+            border: none;
+            background: #16a34a;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .es-btn-wa:hover { filter: brightness(1.08); }
+
+        .es-btn-copy {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.6rem 1.15rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--navy-mid);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .es-btn-copy:hover { filter: brightness(1.12); }
+
+        /* Study Tools Grid */
+        .es-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 1.1rem;
+        }
+
+        .es-tool-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1.1rem;
+            padding: 1.35rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .es-tool-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--gold);
+            box-shadow: 0 12px 26px rgba(11, 43, 79, 0.1);
+        }
+
+        .es-tool-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 0.8rem;
+            background: rgba(11, 43, 79, 0.08);
+            color: var(--navy-mid);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .es-tool-card h3 { font-size: 1rem; color: var(--navy-mid); }
+        .es-tool-card p { font-size: 0.85rem; color: var(--muted); flex: 1; }
+
+        .es-tool-link {
+            font-size: 0.83rem;
+            font-weight: 700;
+            color: var(--blue-accent);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-top: 0.35rem;
+        }
+
+        /* Vista Modo Maestro */
         .es-teacher-grid {
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
@@ -359,18 +976,9 @@
             justify-content: center;
         }
 
-        .es-step-item h4 {
-            font-size: 0.96rem;
-            color: var(--navy-mid);
-            margin-bottom: 0.2rem;
-        }
+        .es-step-item h4 { font-size: 0.96rem; color: var(--navy-mid); margin-bottom: 0.2rem; }
+        .es-step-item p { font-size: 0.88rem; color: var(--muted); }
 
-        .es-step-item p {
-            font-size: 0.88rem;
-            color: var(--muted);
-        }
-
-        /* Timer Card */
         .es-timer-card {
             background: linear-gradient(145deg, #07192d 0%, #0b2b4f 100%);
             color: #fff;
@@ -437,223 +1045,1018 @@
         .es-timer-start { background: var(--gold); color: var(--navy); }
         .es-timer-reset { background: rgba(255, 255, 255, 0.16); color: #fff; }
 
-        /* Study Tools Grid */
-        .es-tools-grid {
+        /* Módulo 4: Modo Maestro Pro */
+        .es-maestro-res-grid {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 1.1rem;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1.2rem;
         }
 
-        .es-tool-card {
+        .es-mres-card {
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 1.1rem;
-            padding: 1.35rem 1.2rem;
+            border-radius: 1.25rem;
+            padding: 1.45rem;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.45rem;
+            box-shadow: 0 8px 24px rgba(11, 43, 79, 0.06);
             transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .es-tool-card:hover {
+        .es-mres-card:hover {
             transform: translateY(-4px);
             border-color: var(--gold);
-            box-shadow: 0 12px 26px rgba(11, 43, 79, 0.1);
+            box-shadow: 0 14px 30px rgba(11, 43, 79, 0.11);
         }
 
-        .es-tool-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 0.8rem;
+        .es-mres-featured {
+            background: linear-gradient(155deg, #07192d 0%, #0b2b4f 100%);
+            color: #fff;
+            border-color: rgba(201, 157, 59, 0.45);
+        }
+
+        .es-mres-featured h3 { color: #fff !important; }
+        .es-mres-featured p { color: #cbd5e1 !important; }
+        .es-mres-featured .es-mres-icon { background: rgba(201, 157, 59, 0.22); color: var(--gold-light); }
+        .es-mres-featured .es-mres-pill { background: rgba(255, 255, 255, 0.12); color: var(--gold-light); }
+        .es-mres-featured .es-mres-cta { color: var(--gold-light); }
+
+        .es-mres-live {
+            background: linear-gradient(155deg, #fffdf7 0%, #f8f1df 100%);
+            border-color: rgba(201, 157, 59, 0.45);
+        }
+
+        .es-mres-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 0.85rem;
             background: rgba(11, 43, 79, 0.08);
             color: var(--navy-mid);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
-            margin-bottom: 0.3rem;
+            font-size: 1.25rem;
+            margin-bottom: 0.2rem;
         }
 
-        .es-tool-card h3 {
-            font-size: 1rem;
-            color: var(--navy-mid);
-        }
-
-        .es-tool-card p {
-            font-size: 0.85rem;
-            color: var(--muted);
-            flex: 1;
-        }
-
-        .es-tool-link {
-            font-size: 0.83rem;
-            font-weight: 700;
-            color: var(--blue-accent);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            margin-top: 0.35rem;
-        }
-
-        /* Videos de Repaso */
-        .es-videos-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 1.5rem;
-        }
-
-        .es-video-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 1.25rem;
-            overflow: hidden;
-            box-shadow: 0 8px 26px rgba(11, 43, 79, 0.07);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .es-video-frame {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #07192d;
-        }
-
-        .es-video-frame iframe {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .es-video-meta {
-            padding: 1.15rem 1.25rem 1.25rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.45rem;
-            flex: 1;
-        }
-
-        .es-video-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
+        .es-mres-pill {
+            display: inline-block;
             width: fit-content;
-            padding: 0.22rem 0.65rem;
+            padding: 0.22rem 0.68rem;
             border-radius: 999px;
-            background: rgba(220, 38, 38, 0.1);
-            color: #b91c1c;
+            background: rgba(11, 43, 79, 0.08);
+            color: var(--navy-mid);
             font-size: 0.72rem;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .es-video-meta h3 {
-            font-size: 1.02rem;
-            color: var(--navy-mid);
-            line-height: 1.35;
-        }
+        .es-mres-card h3 { font-size: 1.08rem; color: var(--navy-mid); line-height: 1.3; }
+        .es-mres-card p { font-size: 0.86rem; color: var(--muted); flex: 1; }
 
-        .es-video-yt-link {
-            margin-top: auto;
-            padding-top: 0.4rem;
+        .es-mres-cta {
+            margin-top: 0.45rem;
             font-size: 0.84rem;
-            font-weight: 700;
+            font-weight: 800;
             color: var(--blue-accent);
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
         }
 
-        .es-video-yt-link:hover { text-decoration: underline; }
-
-        /* Cuaderno de Apuntes */
-        .es-notes-card {
+        /* Banco de Preguntas */
+        .es-qbank-card {
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 1.3rem;
-            padding: 1.6rem;
-            box-shadow: 0 8px 28px rgba(11, 43, 79, 0.06);
+            border-top: 4px solid var(--gold);
+            border-radius: 1.35rem;
+            padding: clamp(1.35rem, 3.5vw, 2rem);
+            box-shadow: 0 10px 30px rgba(11, 43, 79, 0.08);
         }
 
-        .es-notes-textarea {
+        .es-qbank-top {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.7rem;
+            margin-bottom: 1.15rem;
+        }
+
+        .es-qbank-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+
+        .es-q-tag-dia {
+            padding: 0.3rem 0.8rem;
+            border-radius: 999px;
+            background: var(--navy-mid);
+            color: #fff;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .es-q-tag-cat {
+            padding: 0.3rem 0.8rem;
+            border-radius: 999px;
+            background: rgba(201, 157, 59, 0.16);
+            color: #8a6416;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .es-q-counter { font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+
+        .es-q-question {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(1.25rem, 2.5vw, 1.7rem);
+            color: var(--navy);
+            line-height: 1.42;
+            margin-bottom: 1.15rem;
+        }
+
+        .es-q-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.7rem;
+            margin-bottom: 0.9rem;
+        }
+
+        .es-q-verse {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.34rem 0.85rem;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .es-q-hint-toggle {
+            background: transparent;
+            border: 1px dashed var(--gold);
+            color: #8a6416;
+            padding: 0.34rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .es-q-hint-box {
+            background: #fefce8;
+            border-left: 4px solid var(--gold);
+            border-radius: 0.75rem;
+            padding: 0.85rem 1rem;
+            font-size: 0.88rem;
+            color: #713f12;
+            margin-bottom: 1rem;
+        }
+
+        .es-qbank-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.65rem;
+            padding-top: 0.4rem;
+        }
+
+        .es-q-btn-sec {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.65rem 1.05rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            color: var(--navy-mid);
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .es-q-btn-sec:hover { background: #e2e8f0; }
+
+        .es-q-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-top: 1.25rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .es-q-pill {
+            padding: 0.32rem 0.72rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #fcfbf8;
+            color: var(--muted);
+            font-size: 0.76rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .es-q-pill.active {
+            background: var(--navy-mid);
+            color: #fff;
+            border-color: var(--navy-mid);
+        }
+
+        /* Lista de Oración Privada */
+        .es-prayer-form {
+            display: grid;
+            grid-template-columns: 0.8fr 1.4fr auto;
+            gap: 0.75rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .es-input {
             width: 100%;
-            min-height: 150px;
-            padding: 1rem 1.1rem;
-            border-radius: 0.95rem;
+            padding: 0.72rem 1rem;
+            border-radius: 0.8rem;
             border: 1.5px solid var(--border);
             background: #fcfbf8;
+            font-family: inherit;
+            font-size: 0.9rem;
             color: var(--text);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            resize: vertical;
             outline: none;
-            transition: border-color 0.2s ease;
         }
 
-        .es-notes-textarea:focus {
-            border-color: var(--gold);
-            background: #fff;
+        .es-input:focus { border-color: var(--gold); background: #fff; }
+
+        .es-prayer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
         }
 
-        .es-notes-bar {
+        .es-prayer-empty {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.9rem;
+            padding: 1.2rem;
+            background: #faf7f0;
+            border-radius: 0.9rem;
+        }
+
+        .es-prayer-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            border-radius: 0.9rem;
+            background: #fcfbf8;
+            border: 1px solid var(--border);
+        }
+
+        .es-prayer-item.done {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            opacity: 0.82;
+        }
+
+        .es-prayer-item.done .es-prayer-info { text-decoration: line-through; }
+
+        .es-prayer-check {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+
+        .es-prayer-item.done .es-prayer-check { color: #16a34a; }
+
+        .es-prayer-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            font-size: 0.9rem;
+        }
+
+        .es-prayer-info span { color: var(--muted); font-size: 0.84rem; }
+
+        .es-prayer-del {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 0.35rem;
+        }
+
+        .es-prayer-del:hover { color: #dc2626; }
+
+        /* Modo Dar Clase (Pantalla Completa) */
+        .es-fs-overlay {
+            --fs-scale: 1;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #07192d;
+            color: #f8fafc;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .es-fs-overlay.open { display: flex; animation: esFadeSlide 0.25s ease; }
+
+        .es-fs-overlay.es-fs-light {
+            background: #fbf9f5;
+            color: #141f2d;
+        }
+
+        .es-fs-topbar {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
             gap: 0.8rem;
-            margin-top: 1rem;
+            padding: 1rem clamp(1rem, 4vw, 2.5rem);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(0, 0, 0, 0.2);
         }
 
-        .es-notes-status {
+        .es-fs-overlay.es-fs-light .es-fs-topbar {
+            background: #ffffff;
+            border-bottom-color: var(--border);
+        }
+
+        .es-fs-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .es-fs-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+        .es-fs-tool-btn {
+            padding: 0.45rem 0.85rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.1);
+            color: inherit;
             font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .es-fs-overlay.es-fs-light .es-fs-tool-btn {
+            border-color: var(--border);
+            background: #f1f5f9;
+        }
+
+        .es-fs-close-btn {
+            padding: 0.48rem 1rem;
+            border-radius: 999px;
+            border: none;
+            background: #dc2626;
+            color: #fff;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .es-fs-body {
+            max-width: none;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1.5rem clamp(1rem, 3vw, 2.6rem) 2.5rem;
+            display: grid;
+            grid-template-columns: 1.45fr 0.75fr;
+            gap: 1.4rem;
+        }
+
+        .es-fs-main-col, .es-fs-side-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .es-fs-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 1.25rem;
+            padding: 1.4rem;
+        }
+
+        .es-fs-overlay.es-fs-light .es-fs-card {
+            background: #fff;
+            border-color: var(--border);
+            box-shadow: 0 6px 20px rgba(11, 43, 79, 0.06);
+        }
+
+        .es-fs-label {
+            display: inline-block;
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--gold-light);
+            margin-bottom: 0.6rem;
+        }
+
+        .es-fs-overlay.es-fs-light .es-fs-label { color: #8a6416; }
+
+        .es-fs-verse-text {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: calc(1.25rem * var(--fs-scale));
+            line-height: 1.5;
+        }
+
+        .es-fs-q-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .es-fs-q-text {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: calc(1.5rem * var(--fs-scale));
+            line-height: 1.38;
+            margin-bottom: 0.75rem;
+        }
+
+        .es-fs-q-meta {
+            font-size: calc(0.92rem * var(--fs-scale));
+            opacity: 0.82;
+        }
+
+        .es-fs-notes {
+            width: 100%;
+            min-height: 160px;
+            border-radius: 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.22);
+            color: inherit;
+            padding: 0.9rem 1rem;
+            font-family: inherit;
+            font-size: calc(1rem * var(--fs-scale));
+            line-height: 1.6;
+            resize: vertical;
+        }
+
+        .es-fs-overlay.es-fs-light .es-fs-notes {
+            background: #fcfbf8;
+            border-color: var(--border);
+        }
+
+        .es-fs-timer-box { text-align: center; }
+
+        .es-fs-timer-num {
+            font-family: 'Inter', monospace;
+            font-size: clamp(2.8rem, 5vw, 4rem);
+            font-weight: 800;
+            color: var(--gold-light);
+            margin: 0.6rem 0 1rem;
+        }
+
+        .es-fs-overlay.es-fs-light .es-fs-timer-num { color: var(--navy-mid); }
+
+        .es-fs-prayer-mini {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .es-fs-prayer-row {
+            padding: 0.55rem 0.75rem;
+            border-radius: 0.65rem;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .es-fs-overlay.es-fs-light .es-fs-prayer-row {
+            background: #faf7f0;
+        }
+
+        /* Módulo 5: Foro de Estudio en Tiempo Real */
+        .es-foro-banner {
+            position: relative;
+            border-radius: 1.35rem;
+            overflow: hidden;
+            min-height: 175px;
+            display: flex;
+            align-items: flex-end;
+            padding: 1.5rem 1.8rem;
+            margin-bottom: 1.35rem;
+            color: #fff;
+            background: var(--navy);
+        }
+
+        .es-foro-banner img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .es-foro-banner-scrim {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(7, 25, 45, 0.92) 0%, rgba(7, 25, 45, 0.65) 60%, rgba(7, 25, 45, 0.3) 100%);
+        }
+
+        .es-foro-banner-inner {
+            position: relative;
+            z-index: 2;
+            max-width: 650px;
+        }
+
+        .es-foro-banner-inner h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(1.25rem, 2.3vw, 1.6rem);
+            margin: 0.45rem 0 0.3rem;
+            line-height: 1.25;
+        }
+
+        .es-foro-banner-inner p { font-size: 0.88rem; color: #e2e8f0; }
+
+        .es-foro-live-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.28rem 0.8rem;
+            border-radius: 999px;
+            background: rgba(22, 163, 74, 0.22);
+            border: 1px solid rgba(74, 222, 128, 0.6);
+            color: #bbf7d0;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .es-live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 8px #4ade80;
+        }
+
+        .es-foro-grid {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 1.4rem;
+            align-items: start;
+        }
+
+        .es-foro-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+
+        .es-foro-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .es-form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--navy-mid);
+            margin-bottom: 0.3rem;
+        }
+
+        .es-foro-feed-top {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .es-foro-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+        .es-foro-filter {
+            padding: 0.35rem 0.8rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #fcfbf8;
             color: var(--muted);
+            font-size: 0.79rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .es-foro-filter.active {
+            background: var(--navy-mid);
+            color: #fff;
+            border-color: var(--navy-mid);
+        }
+
+        .es-foro-toast {
+            padding: 0.25rem 0.7rem;
+            border-radius: 999px;
+            background: #dcfce7;
+            color: #166534;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .es-foro-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            max-height: 560px;
+            overflow-y: auto;
+            padding-right: 0.2rem;
+        }
+
+        .es-foro-post {
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1rem 1.1rem;
+            background: #fcfbf8;
+        }
+
+        .es-foro-post-head {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.55rem;
+        }
+
+        .es-foro-avatar {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: 50%;
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.92rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .es-foro-post-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.86rem;
+        }
+
+        .es-foro-rol, .es-foro-tipo, .es-foro-answered {
+            padding: 0.14rem 0.55rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+
+        .es-foro-tipo.is-q { background: #fee2e2; color: #b91c1c; }
+        .es-foro-tipo.is-c { background: #e0f2fe; color: #0369a1; }
+        .es-foro-answered { background: #dcfce7; color: #166534; }
+
+        .es-foro-time { font-size: 0.75rem; color: var(--muted); }
+
+        .es-foro-body {
+            font-size: 0.92rem;
+            color: var(--text);
+            white-space: pre-wrap;
+            margin-bottom: 0.65rem;
+        }
+
+        .es-foro-post-foot { display: flex; justify-content: flex-end; }
+
+        .es-foro-reply-btn {
+            background: transparent;
+            border: none;
+            color: var(--blue-accent);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .es-foro-replies {
+            margin-top: 0.75rem;
+            padding-left: 0.95rem;
+            border-left: 3px solid var(--gold);
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+        }
+
+        .es-foro-reply-item {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 0.65rem 0.85rem;
+            font-size: 0.86rem;
+        }
+
+        .es-foro-reply-item p { margin-top: 0.25rem; color: var(--text); }
+
+        .es-foro-reply-form {
+            margin-top: 0.75rem;
+            padding: 0.8rem;
+            border-radius: 0.85rem;
+            background: #fff;
+            border: 1px solid var(--gold);
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+        }
+
+        /* Resúmenes Visuales con Imágenes (Estudiante & Maestro) */
+        .es-summary-showcase {
+            display: grid;
+            grid-template-columns: 0.92fr 1.08fr;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1.45rem;
+            overflow: hidden;
+            box-shadow: 0 12px 32px rgba(11, 43, 79, 0.08);
+            margin-bottom: 1.25rem;
+        }
+
+        .es-summary-photo-col {
+            position: relative;
+            min-height: 270px;
+            background: var(--navy);
+        }
+
+        .es-summary-photo-col img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .es-summary-photo-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(7, 25, 45, 0.15) 0%, rgba(7, 25, 45, 0.84) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1.4rem;
+            color: #fff;
+        }
+
+        .es-summary-photo-overlay h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.35rem;
+            line-height: 1.25;
+            margin-top: 0.35rem;
+        }
+
+        .es-summary-body-col {
+            padding: clamp(1.35rem, 3vw, 2rem);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0.9rem;
+        }
+
+        .es-summary-text {
+            font-size: 0.96rem;
+            color: var(--text);
+            line-height: 1.72;
+            white-space: pre-line;
+        }
+
+        .es-summary-pillars {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.95rem;
+        }
+
+        .es-pillar-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-top: 3px solid var(--gold);
+            border-radius: 1.1rem;
+            padding: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            box-shadow: 0 6px 18px rgba(11, 43, 79, 0.05);
+        }
+
+        .es-pillar-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .es-pillar-card h4 { font-size: 0.94rem; color: var(--navy-mid); }
+        .es-pillar-card p { font-size: 0.82rem; color: var(--muted); flex: 1; }
+        .es-pillar-verse {
+            font-size: 0.76rem;
+            font-weight: 800;
+            color: var(--blue-accent);
+            margin-top: 0.25rem;
+        }
+
+        .es-maestro-brief-showcase {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            background: linear-gradient(135deg, #fffdf8 0%, #f7efe0 55%, #f2e5cb 100%);
+            color: #2b1f12;
+            border-radius: 1.45rem;
+            overflow: hidden;
+            border: 1px solid #e4d3b0;
+            box-shadow: 0 12px 32px rgba(138, 100, 22, 0.12);
+            margin-bottom: 1.25rem;
+        }
+
+        .es-maestro-brief-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            width: fit-content;
+            padding: 0.34rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(180, 128, 30, 0.14);
+            border: 1px solid rgba(180, 128, 30, 0.38);
+            color: #7c5410;
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        .es-maestro-brief-body {
+            padding: clamp(1.4rem, 3.2vw, 2.2rem);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0.85rem;
+        }
+
+        .es-maestro-brief-body h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(1.38rem, 2.4vw, 1.82rem);
+            line-height: 1.25;
+            color: #3a2612;
+        }
+
+        .es-maestro-brief-text {
+            font-size: 0.95rem;
+            color: #4a3a28;
+            line-height: 1.74;
+            white-space: pre-line;
+        }
+
+        .es-maestro-brief-photo {
+            position: relative;
+            min-height: 300px;
+            background: #2b1f12;
+        }
+
+        .es-maestro-brief-photo img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .es-brief-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.95rem;
+        }
+
+        .es-brief-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1.1rem;
+            padding: 1.15rem;
+            box-shadow: 0 6px 20px rgba(11, 43, 79, 0.06);
+        }
+
+        .es-brief-card h4 {
+            font-size: 0.94rem;
+            color: var(--navy-mid);
+            margin-bottom: 0.35rem;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .es-brief-card p {
+            font-size: 0.83rem;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        /* Visor PDF Modal en la misma página */
+        .es-pdf-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(7, 25, 45, 0.82);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .es-pdf-modal.open {
+            display: flex;
+            animation: esFadeSlide 0.22s ease;
+        }
+
+        .es-pdf-dialog {
+            width: min(1080px, 100%);
+            height: min(88vh, 860px);
+            background: #ffffff;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(201, 157, 59, 0.4);
+        }
+
+        .es-pdf-header {
+            background: linear-gradient(135deg, #07192d 0%, #0b2b4f 100%);
+            color: #fff;
+            padding: 0.9rem 1.25rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.7rem;
+            border-bottom: 2px solid rgba(201, 157, 59, 0.45);
+        }
+
+        .es-pdf-title {
+            font-size: 0.98rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+        }
+
+        .es-pdf-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .es-pdf-btn {
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
-        }
-
-        .es-notes-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-        }
-
-        .es-btn-wa {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.6rem 1.15rem;
+            padding: 0.42rem 0.9rem;
             border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .es-pdf-btn:hover { background: rgba(255, 255, 255, 0.24); }
+        .es-pdf-btn-gold { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+        .es-pdf-btn-close { background: #dc2626; border-color: #dc2626; }
+
+        .es-pdf-frame-wrap {
+            flex: 1;
+            background: #1e293b;
+            position: relative;
+        }
+
+        .es-pdf-frame-wrap iframe {
+            width: 100%;
+            height: 100%;
             border: none;
-            background: #16a34a;
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: filter 0.2s ease;
+            display: block;
         }
-
-        .es-btn-wa:hover { filter: brightness(1.08); }
-
-        .es-btn-copy {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.6rem 1.15rem;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            background: var(--navy-mid);
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.85rem;
-            cursor: pointer;
-        }
-
-        .es-btn-copy:hover { filter: brightness(1.12); }
 
         .es-footer {
             text-align: center;
@@ -663,455 +2066,637 @@
             font-size: 0.86rem;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 960px) {
+            .es-audio-card,
             .es-teacher-grid,
-            .es-videos-grid { grid-template-columns: 1fr; }
+            .es-videos-grid,
+            .es-maestro-res-grid,
+            .es-foro-grid,
+            .es-summary-showcase,
+            .es-maestro-brief-showcase,
+            .es-fs-body { grid-template-columns: 1fr; }
+            .es-summary-pillars,
+            .es-brief-grid,
+            .es-family-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .es-tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .es-prayer-form,
+            .es-foro-row-2 { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 640px) {
-            .es-days-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .es-topbar {
+                padding: 0.65rem 0.85rem;
+                gap: 0.55rem;
+                justify-content: space-between;
+            }
+            .es-back-btn {
+                padding: 0.44rem 0.85rem;
+                font-size: 0.8rem;
+            }
+            .es-mode-switch {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .es-mode-btn {
+                flex: 1;
+                justify-content: center;
+                padding: 0.5rem 0.6rem;
+                font-size: 0.8rem;
+            }
+            .es-brand { display: none; }
+
+            .es-hero {
+                min-height: calc(100svh - 108px);
+                padding: 2rem 1rem 4.2rem;
+            }
+            .es-hero h1 { font-size: clamp(1.8rem, 7.2vw, 2.35rem); }
+            .es-hero p { font-size: 0.94rem; margin-bottom: 1.35rem; }
+            .es-hero-actions { flex-direction: column; width: 100%; }
+            .es-hero-actions .es-btn-gold,
+            .es-hero-actions .es-btn-outline {
+                width: 100%;
+                justify-content: center;
+                padding: 0.82rem 1.2rem;
+            }
+
+            .es-container { padding: 1.75rem 0.9rem 3rem; }
+            .es-section { margin-bottom: 2.2rem; }
+            .es-card,
+            .es-checklist-card,
+            .es-notes-card,
+            .es-audio-card,
+            .es-qbank-card,
+            .es-timer-card { padding: 1.15rem; border-radius: 1.1rem; }
+
+            .es-verse-inner { padding: 1.3rem 1.1rem; }
+            .es-verse-quote { font-size: 1.18rem; line-height: 1.5; }
+            .es-verse-levels { width: 100%; }
+            .es-level-btn { flex: 1; text-align: center; padding: 0.42rem 0.5rem; font-size: 0.75rem; }
+
+            .es-summary-photo-col { min-height: 210px; }
+            .es-maestro-brief-photo { min-height: 210px; }
+
+            .es-days-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.45rem; }
+            .es-day-btn { padding: 0.65rem 0.25rem; font-size: 0.76rem; }
+
+            .es-audio-controls { gap: 0.4rem; }
+            .es-speed-pill { padding: 0.42rem 0.68rem; font-size: 0.78rem; }
+            .es-audio-side { min-height: 145px; }
+
+            .es-family-banner,
+            .es-foro-banner { min-height: 150px; padding: 1.15rem; border-radius: 1.1rem; }
+
+            .es-summary-pillars,
+            .es-brief-grid,
+            .es-family-grid,
             .es-tools-grid { grid-template-columns: 1fr; }
-            .es-hero { min-height: 360px; padding: 2.8rem 1.25rem; }
+
+            .es-foro-list { max-height: none; overflow-y: visible; padding-right: 0; }
+            .es-foro-post { padding: 0.9rem; }
+            .es-foro-replies { padding-left: 0.65rem; }
+
+            /* Evitar auto-zoom en iOS al escribir */
+            .es-input,
+            .es-notes-textarea,
+            .es-fs-notes { font-size: 16px; }
+
+            .es-notes-actions { width: 100%; }
+            .es-notes-actions button { flex: 1; justify-content: center; }
+
+            .es-qbank-actions { display: grid; grid-template-columns: 1fr 1fr; }
+            .es-qbank-actions button { justify-content: center; width: 100%; }
+
+            /* Visor PDF Modal pantalla completa en celular */
+            .es-pdf-modal { padding: 0; }
+            .es-pdf-dialog {
+                width: 100%;
+                height: 100vh;
+                height: 100dvh;
+                border-radius: 0;
+                border: none;
+            }
+            .es-pdf-header { padding: 0.75rem 0.9rem; gap: 0.5rem; }
+            .es-pdf-title { font-size: 0.86rem; width: 100%; }
+            .es-pdf-actions { width: 100%; justify-content: space-between; }
+            .es-pdf-btn { flex: 1; justify-content: center; padding: 0.48rem 0.55rem; font-size: 0.75rem; }
+
+            /* Modo Dar Clase en celular */
+            .es-fs-topbar { padding: 0.75rem 0.9rem; }
+            .es-fs-brand { font-size: 0.88rem; width: 100%; }
+            .es-fs-tools { width: 100%; justify-content: space-between; }
+            .es-fs-body { padding: 1rem 0.85rem 2rem; gap: 1rem; }
+            .es-fs-card { padding: 1.05rem; }
+            .es-fs-timer-num { font-size: 2.6rem; }
+        }
+
+        @media (max-width: 380px) {
+            .es-days-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .es-qbank-actions { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 
 <body>
+    <!-- Topbar con Switch Modo Estudiante / Modo Maestro -->
     <header class="es-topbar">
         <a href="index.html" class="es-back-btn">
             <i class="fas fa-arrow-left"></i> Volver a IASD Belén
         </a>
+
+        <div class="es-mode-switch" role="group" aria-label="Cambiar modo de vista">
+            <button type="button" id="esModeBtnEstudiante" class="es-mode-btn active" aria-pressed="true">
+                <i class="fas fa-book-reader"></i> Modo Estudiante
+            </button>
+            <button type="button" id="esModeBtnMaestro" class="es-mode-btn" aria-pressed="false">
+                <i class="fas fa-chalkboard-teacher"></i> Modo Maestro
+            </button>
+        </div>
+
         <div class="es-brand">
             <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/Logo_adventista_jum3od.png" alt="IASD Belén" />
             <span>IASD Belén</span>
         </div>
     </header>
 
-    <section class="es-hero">
-        <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795373884066-ed6f7d64.jpg"
-            alt="Escuela Sabática IASD Belén" class="es-hero-bg" />
-        <div class="es-hero-scrim"></div>
-        <div class="es-hero-inner">
-            <span class="es-badge"><i class="fas fa-book-open"></i> 4° Trimestre 2026 · Estudio Bíblico</span>
-            <h1>Escuela Sabática y Repaso de la Lección</h1>
-            <p>
-                Tu centro de estudio semanal para miembros y maestros de <strong>IASD Belén</strong>: folleto oficial en PDF, seguimiento diario, ayudas para dar la clase y videos de repaso.
-            </p>
-            <div class="es-hero-actions">
-                <a href="https://files.recursos-biblicos.com/Escuela%20Sabatica/Leccion/4to2026/LeccionAdultos4to2026.pdf"
-                    target="_blank" rel="noopener noreferrer" class="es-btn-gold">
-                    <i class="fas fa-file-pdf"></i> Leer / Descargar Folleto PDF
-                </a>
-                <a href="#videosRepaso" class="es-btn-outline">
-                    <i class="fab fa-youtube"></i> Videos de Repaso
-                </a>
-                <a href="#rinconMaestros" class="es-btn-outline">
-                    <i class="fas fa-chalkboard-teacher"></i> Rincón de Maestros
-                </a>
+    <!-- =================================================================== -->
+    <!-- VISTA 1: MODO ESTUDIANTE (Por defecto)                              -->
+    <!-- =================================================================== -->
+    <div id="esViewEstudiante" class="es-view-enter">
+        <section class="es-hero">
+            <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795373884066-ed6f7d64.jpg"
+                alt="Escuela Sabática IASD Belén" class="es-hero-bg" />
+            <div class="es-hero-scrim"></div>
+            <div class="es-hero-inner">
+                <span id="esHeroBadge" class="es-badge"><i class="fas fa-book-open"></i> 4° Trimestre 2026 · El Don de Profecía</span>
+                <h1 id="esHeroTitle">Lección 9: Poniendo a prueba a los profetas</h1>
+                <p id="esHeroSub">
+                    Tu centro de estudio semanal de <strong>IASD Belén</strong>: folleto oficial en PDF, práctica del versículo, audio, videos de repaso y herramientas para toda la familia.
+                </p>
+                <div class="es-hero-actions">
+                    <a id="esHeroPdfLink"
+                        href="https://files.recursos-biblicos.com/Escuela%20Sabatica/Leccion/4to2026/LeccionAdultos4to2026.pdf"
+                        data-pdf-modal="true" data-pdf-title="Folleto Oficial Adultos · 4° Trimestre 2026"
+                        class="es-btn-gold">
+                        <i class="fas fa-file-pdf"></i> Leer / Descargar Folleto PDF
+                    </a>
+                    <a href="#videosRepaso" class="es-btn-outline">
+                        <i class="fab fa-youtube"></i> Videos de Repaso
+                    </a>
+                    <a href="#maestro" data-open-mode="maestro" class="es-btn-outline">
+                        <i class="fas fa-chalkboard-teacher"></i> Ir a Modo Maestro
+                    </a>
+                </div>
             </div>
-        </div>
-    </section>
+            <a href="#versiculoMemoria" class="es-hero-scroll-cue" aria-label="Bajar al estudio">
+                <span>Bajar para estudiar</span>
+                <i class="fas fa-chevron-down"></i>
+            </a>
+        </section>
 
-    <main class="es-container">
-        <!-- 1. Checklist de Estudio Diario -->
-        <section class="es-section">
-            <div class="es-section-head">
-                <span class="es-kicker">Hábito Espiritual</span>
-                <h2 class="es-section-title">Mi Estudio Diario de la Lección</h2>
-                <p class="es-section-sub">Marca cada día que estudies esta semana. Tu progreso se guarda automáticamente en tu dispositivo.</p>
+        <main class="es-container">
+            <!-- 1. Versículo de Memoria Interactivo (#5) -->
+            <section class="es-section" id="versiculoMemoria">
+                <div class="es-section-head">
+                    <span class="es-kicker">Memoriza la Palabra</span>
+                    <h2 class="es-section-title">Versículo de Memoria de la Semana</h2>
+                    <p class="es-section-sub">Aprende el texto clave de forma interactiva: oculta palabras y tócalas para verificar tu memoria.</p>
+                </div>
+
+                <div class="es-verse-card">
+                    <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795381495586-b85efe85.jpg"
+                        alt="Versículo de memoria El Don de Profecía" class="es-verse-bg" />
+                    <div class="es-verse-scrim"></div>
+                    <div class="es-verse-inner">
+                        <div class="es-verse-top">
+                            <span class="es-verse-cita-pill">
+                                <i class="fas fa-bible"></i> <span id="esVerseCita">1 Juan 4:1</span>
+                            </span>
+                            <div class="es-verse-levels">
+                                <button type="button" class="es-level-btn active" data-verse-level="0">Leer completo</button>
+                                <button type="button" class="es-level-btn" data-verse-level="1">Nivel 1</button>
+                                <button type="button" class="es-level-btn" data-verse-level="2">Reto Maestro</button>
+                            </div>
+                        </div>
+
+                        <div id="esVerseInteractiveText" class="es-verse-quote">
+                            “Amados, no creáis a todo espíritu, sino probad los espíritus si son de Dios; porque muchos falsos profetas han salido por el mundo.”
+                        </div>
+
+                        <p id="esVerseHint" class="es-verse-hint">
+                            Lee el versículo en voz alta y luego cambia a Nivel 1 o Reto Maestro para memorizarlo.
+                        </p>
+
+                        <div class="es-verse-actions">
+                            <button type="button" id="esBtnWaVerse" class="es-verse-act-btn">
+                                <i class="fab fa-whatsapp"></i> Compartir por WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 1B. Resumen General Visual de la Lección (Modo Estudiante) -->
+            <section class="es-section" id="resumenEstudiante">
+                <div class="es-section-head">
+                    <span id="esResumenEstKicker" class="es-kicker">Resumen Visual · Lección 9</span>
+                    <h2 class="es-section-title">Resumen General de la Lección</h2>
+                    <p class="es-section-sub">Una vista clara, visual y práctica para entender el mensaje central de esta semana en pocos minutos.</p>
+                </div>
+
+                <div class="es-summary-showcase">
+                    <div class="es-summary-photo-col">
+                        <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795373887517-e668e964.jpg"
+                            alt="Biblia abierta para el estudio de la lección" />
+                        <div class="es-summary-photo-overlay">
+                            <span class="es-badge" style="margin-bottom:0.35rem; width:fit-content;"><i class="fas fa-compass"></i> Idea Central</span>
+                            <h3 id="esResumenEstTitulo">Poniendo a prueba a los profetas</h3>
+                        </div>
+                    </div>
+                    <div class="es-summary-body-col">
+                        <p id="esResumenEstTexto" class="es-summary-text">
+                            En un mundo lleno de voces y mensajes espirituales, Dios no nos deja sin brújula. En esta lección descubrimos que el apóstol Juan nos llama a no creer a todo espíritu, sino a examinar todo a la luz de la Palabra de Dios (1 Juan 4:1).
+                        </p>
+                        <div style="display:flex; flex-wrap:wrap; gap:0.65rem;">
+                            <a href="#videosRepaso" class="es-btn-gold" style="padding:0.62rem 1.25rem; font-size:0.84rem;">
+                                <i class="fab fa-youtube"></i> Ver Videos de Repaso
+                            </a>
+                            <a href="#foroEstudio" class="es-q-btn-sec">
+                                <i class="fas fa-comments"></i> Comentar en el Foro
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="es-summary-pillars">
+                    <div class="es-pillar-card">
+                        <div class="es-pillar-icon" style="background:#e0f2fe; color:#0369a1;"><i class="fas fa-scroll"></i></div>
+                        <h4>1. Armonía con la Biblia</h4>
+                        <p>Todo mensaje verdadero concuerda 100% con la Ley y el Testimonio de las Escrituras.</p>
+                        <span class="es-pillar-verse">Isaías 8:20</span>
+                    </div>
+                    <div class="es-pillar-card">
+                        <div class="es-pillar-icon" style="background:#fef3c7; color:#b45309;"><i class="fas fa-hourglass-half"></i></div>
+                        <h4>2. Cumplimiento Fiel</h4>
+                        <p>Las predicciones dadas por Dios se cumplen, respetando la naturaleza condicional de la gracia.</p>
+                        <span class="es-pillar-verse">Deuteronomio 18:22</span>
+                    </div>
+                    <div class="es-pillar-card">
+                        <div class="es-pillar-icon" style="background:#f3e8ff; color:#7e22ce;"><i class="fas fa-cross"></i></div>
+                        <h4>3. Exalta a Cristo</h4>
+                        <p>Confiesa a Jesucristo como Dios encarnado, Salvador y único centro de nuestra fe.</p>
+                        <span class="es-pillar-verse">1 Juan 4:2-3</span>
+                    </div>
+                    <div class="es-pillar-card">
+                        <div class="es-pillar-icon" style="background:#dcfce7; color:#15803d;"><i class="fas fa-seedling"></i></div>
+                        <h4>4. Por sus Frutos</h4>
+                        <p>Una vida íntegra, humilde y transformadora confirma el origen divino del llamado.</p>
+                        <span class="es-pillar-verse">Mateo 7:15-20</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Checklist de Estudio Diario -->
+            <section class="es-section">
+                <div class="es-section-head">
+                    <span class="es-kicker">Hábito Espiritual</span>
+                    <h2 class="es-section-title">Mi Estudio Diario de la Lección</h2>
+                    <p class="es-section-sub">Marca cada día que estudies esta semana. Tu progreso se guarda automáticamente en tu dispositivo.</p>
+                </div>
+
+                <div class="es-checklist-card">
+                    <div class="es-checklist-top">
+                        <strong id="esProgressText" style="color: var(--navy-mid); font-size: 0.95rem;">0 de 7 días estudiados esta semana</strong>
+                        <button type="button" id="btnResetWeek" class="es-reset-btn">
+                            <i class="fas fa-redo-alt"></i> Nueva semana
+                        </button>
+                    </div>
+                    <div class="es-progress-bar-wrap">
+                        <div id="esProgressBar" class="es-progress-bar"></div>
+                    </div>
+                    <div class="es-days-grid" id="esDaysGrid">
+                        <button type="button" class="es-day-btn" data-day="sab"><i class="far fa-circle"></i><span>Sábado</span></button>
+                        <button type="button" class="es-day-btn" data-day="dom"><i class="far fa-circle"></i><span>Domingo</span></button>
+                        <button type="button" class="es-day-btn" data-day="lun"><i class="far fa-circle"></i><span>Lunes</span></button>
+                        <button type="button" class="es-day-btn" data-day="mar"><i class="far fa-circle"></i><span>Martes</span></button>
+                        <button type="button" class="es-day-btn" data-day="mie"><i class="far fa-circle"></i><span>Miércoles</span></button>
+                        <button type="button" class="es-day-btn" data-day="jue"><i class="far fa-circle"></i><span>Jueves</span></button>
+                        <button type="button" class="es-day-btn" data-day="vie"><i class="far fa-circle"></i><span>Viernes</span></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Videos de Repaso de la Lección (Dinámicos) -->
+            <section class="es-section" id="videosRepaso">
+                <div class="es-section-head">
+                    <span id="esVideosKicker" class="es-kicker">Repaso en Video · Lección 9</span>
+                    <h2 class="es-section-title">Videos de Repaso de Esta Semana</h2>
+                    <p class="es-section-sub">Estudia y repasa la lección directamente desde aquí antes del sábado.</p>
+                </div>
+
+                <div id="esVideosGrid" class="es-videos-grid"></div>
+            </section>
+
+            <!-- 4. Audio Narrado por Locutores Reales (Reproductor Directo 7 Días) -->
+            <section class="es-section" id="audioLeccion">
+                <div class="es-section-head">
+                    <span class="es-kicker">Audio Real · Locutores Humanos</span>
+                    <h2 class="es-section-title">Escucha la Lección Narrada Día por Día</h2>
+                    <p class="es-section-sub">Elige el día de la semana y escucha la lección directamente aquí con voz humana real, sin salir de la página.</p>
+                </div>
+
+                <div class="es-audio-card">
+                    <div>
+                        <div id="esCustomAudioWrap" style="display:none;"></div>
+                        <h3 style="color: var(--navy-mid); font-size: 1.12rem; margin-bottom: 0.55rem;">
+                            <i class="fas fa-headphones-alt" style="color: var(--gold);"></i> <span id="esAudioDayTitle">Lección 9 · Sábado (Introducción)</span>
+                        </h3>
+                        <div id="esAudioDaysBar" class="es-audio-controls" style="margin-top:0; margin-bottom:0.9rem;">
+                            <button type="button" class="es-speed-pill active" data-audio-day="0">Sábado</button>
+                            <button type="button" class="es-speed-pill" data-audio-day="1">Domingo</button>
+                            <button type="button" class="es-speed-pill" data-audio-day="2">Lunes</button>
+                            <button type="button" class="es-speed-pill" data-audio-day="3">Martes</button>
+                            <button type="button" class="es-speed-pill" data-audio-day="4">Miércoles</button>
+                            <button type="button" class="es-speed-pill" data-audio-day="5">Jueves</button>
+                            <button type="button" class="es-speed-pill" data-audio-day="6">Viernes</button>
+                        </div>
+                        <div class="es-audio-player-box" style="margin-bottom:0.75rem;">
+                            <audio id="esMainAudioPlayer" controls preload="none" style="width:100%;">
+                                <source src="https://www.audioescuelasabatica.com/wp-content/uploads/2026/10/LECCION-9-SABADO.mp3" type="audio/mpeg" />
+                                Tu navegador no soporta audio HTML5.
+                            </audio>
+                        </div>
+                        <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:0.6rem;">
+                            <span style="font-size:0.78rem; color:var(--muted);">
+                                <i class="fas fa-microphone" style="color:var(--gold);"></i> Fuente: Audio Escuela Sabática (Voz humana real)
+                            </span>
+                            <a href="https://www.audioescuelasabatica.com/2026/11/13/leccion-09-poniendo-a-prueba-a-los-profetas/" target="_blank" rel="noopener noreferrer" class="es-tool-link" style="margin-top:0;">
+                                Ver página original <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="es-audio-side">
+                        <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795373887517-e668e964.jpg"
+                            alt="Audio Escuela Sabática" />
+                        <div class="es-audio-side-content">
+                            <span style="font-size:0.74rem; text-transform:uppercase; letter-spacing:0.9px; color:var(--gold-light); font-weight:800;">7 Audios MP3 · Gratis</span>
+                            <h4 style="font-size:1.05rem; margin:0.25rem 0 0;">Sábado a Viernes con narración humana real</h4>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Folletos Oficiales de la Iglesia (Adultos y Menores) -->
+            <section class="es-section" id="folletosFamilia">
+                <div class="es-section-head">
+                    <span class="es-kicker">Folletos Oficiales · 4° Trimestre 2026</span>
+                    <h2 class="es-section-title">Folletos de Escuela Sabática</h2>
+                    <p class="es-section-sub">Abre y lee aquí mismo los folletos oficiales de Adultos y Menores sin salir de la página.</p>
+                </div>
+
+                <div class="es-family-banner">
+                    <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795373885715-ed4a874f.jpg"
+                        alt="Familias, jóvenes y niños estudiando la Biblia" />
+                    <div class="es-family-banner-scrim"></div>
+                    <div class="es-family-banner-text">
+                        <span class="es-badge" style="margin-bottom:0.5rem;"><i class="fas fa-users"></i> Familia IASD Belén</span>
+                        <h3 style="font-family:'Playfair Display', serif; font-size:clamp(1.3rem, 2.5vw, 1.75rem); line-height:1.2;">
+                            Un culto familiar cada día fortalece la fe de padres, jóvenes y menores
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="es-family-grid">
+                    <a id="esFamAdultosPdf"
+                        href="https://files.recursos-biblicos.com/Escuela%20Sabatica/Leccion/4to2026/LeccionAdultos4to2026.pdf"
+                        data-pdf-modal="true" data-pdf-title="Folleto General de Adultos · El Don de Profecía (4° Trim. 2026)"
+                        class="es-fam-card">
+                        <span class="es-fam-badge" style="background:#e0f2fe; color:#0369a1;"><i class="fas fa-book-bible"></i> Adultos · General</span>
+                        <h3>Folleto General — El Don de Profecía</h3>
+                        <p>Guía oficial de estudio bíblico del 4° Trimestre 2026 para jóvenes y adultos en PDF.</p>
+                        <span class="es-fam-link">Leer PDF aquí <i class="fas fa-book-open"></i></span>
+                    </a>
+
+                    <a href="https://files.recursos-biblicos.com/Escuela%20Sabatica/InfantilesyJuveniles/Menores/4to2026/Folleto%20Menores%204T%20A%C3%B1o%20C%202026%20DIA.pdf"
+                        data-pdf-modal="true" data-pdf-title="Folleto de Menores · 4° Trimestre 2026 (DIA)"
+                        class="es-fam-card">
+                        <span class="es-fam-badge" style="background:#fef3c7; color:#b45309;"><i class="fas fa-compass"></i> Menores · DIA</span>
+                        <h3>Folleto de Menores — 4° Trimestre 2026</h3>
+                        <p>Folleto oficial de la División Interamericana (Año C · 4° Trimestre 2026) para el estudio de menores.</p>
+                        <span class="es-fam-link">Leer PDF aquí <i class="fas fa-book-open"></i></span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Espacio listo para Módulo 5: Foro de Estudio en Tiempo Real -->
+            <div id="esForoMount"></div>
+
+            <!-- 6. Cuaderno de Apuntes Personal -->
+            <section class="es-section" id="cuadernoApuntes">
+                <div class="es-section-head">
+                    <span class="es-kicker">Notas Personales</span>
+                    <h2 class="es-section-title">Cuaderno de Apuntes de la Lección</h2>
+                    <p class="es-section-sub">Anota tus puntos clave, versículos o preguntas para el sábado. Se guarda solo en tu dispositivo y puedes compartirlo por WhatsApp.</p>
+                </div>
+
+                <div class="es-notes-card">
+                    <textarea id="esNotesTextarea" class="es-notes-textarea"
+                        placeholder="Ej: Textos clave de la lección 9, preguntas para mi clase, reflexiones personales..."></textarea>
+                    <div class="es-notes-bar">
+                        <span id="esNotesStatus" class="es-notes-status">
+                            <i class="fas fa-lock" style="color: var(--gold);"></i> Guardado privado en tu dispositivo
+                        </span>
+                        <div class="es-notes-actions">
+                            <button type="button" id="esBtnCopyNotes" class="es-btn-copy">
+                                <i class="far fa-copy"></i> Copiar apuntes
+                            </button>
+                            <button type="button" id="esBtnWaNotes" class="es-btn-wa">
+                                <i class="fab fa-whatsapp"></i> Enviar por WhatsApp
+                            </button>
+                            <button type="button" id="esBtnClearNotes" class="es-reset-btn">
+                                <i class="fas fa-trash-alt"></i> Limpiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. Herramientas de Estudio Profundo -->
+            <section class="es-section">
+                <div class="es-section-head">
+                    <span class="es-kicker">Biblioteca de Apoyo</span>
+                    <h2 class="es-section-title">Herramientas para Profundizar</h2>
+                    <p class="es-section-sub">Recursos confiables para preparar tu lección o investigar textos difíciles.</p>
+                </div>
+
+                <div class="es-tools-grid">
+                    <a href="https://www.bible.com/es/bible/149/GEN.1.RVR1960" target="_blank" rel="noopener noreferrer" class="es-tool-card">
+                        <div class="es-tool-icon"><i class="fas fa-bible"></i></div>
+                        <h3>Santa Biblia RVR1960</h3>
+                        <p>Consulta rápidamente cualquier capítulo, compara versiones y lee los textos clave de la lección.</p>
+                        <span class="es-tool-link">Abrir Biblia <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                    <a href="https://adventista7.com/biblia/" target="_blank" rel="noopener noreferrer" class="es-tool-card">
+                        <div class="es-tool-icon"><i class="fas fa-book-open"></i></div>
+                        <h3>Biblia con Comentarios</h3>
+                        <p>Notas explicativas y contexto histórico versículo por versículo para enriquecer tu repaso.</p>
+                        <span class="es-tool-link">Ver Comentarios <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                    <a href="https://www.logosklogos.com/interlinears/AT/Gn" target="_blank" rel="noopener noreferrer" class="es-tool-card">
+                        <div class="es-tool-icon"><i class="fas fa-search"></i></div>
+                        <h3>Biblia Interlineal</h3>
+                        <p>Explora el significado original en hebreo y griego de las palabras clave del pasaje.</p>
+                        <span class="es-tool-link">Explorar Original <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                    <a href="https://m.egwwritings.org/es" target="_blank" rel="noopener noreferrer" class="es-tool-card">
+                        <div class="es-tool-icon"><i class="fas fa-feather-alt"></i></div>
+                        <h3>Escritos de Elena G. de White</h3>
+                        <p>Busca citas inspiradas y comentarios del Espíritu de Profecía relacionados con la lección.</p>
+                        <span class="es-tool-link">Abrir EGW Writings <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- VISTA 2: MODO MAESTRO (Transición exclusiva para maestros)          -->
+    <!-- =================================================================== -->
+    <div id="esViewMaestro" class="es-view-hidden">
+        <section class="es-hero">
+            <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795381487351-9eba1b41.jpg"
+                alt="Modo Maestro Escuela Sabática IASD Belén" class="es-hero-bg" />
+            <div class="es-hero-scrim"></div>
+            <div class="es-hero-inner">
+                <span id="esMaestroBadge" class="es-badge"><i class="fas fa-chalkboard-teacher"></i> Modo Maestro · Lección 9</span>
+                <h1 id="esMaestroLessonTitle">Prepara y dirige: "Poniendo a prueba a los profetas"</h1>
+                <p>
+                    Espacio exclusivo para maestros de Escuela Sabática de <strong>IASD Belén</strong>: estructura de clase, cronómetro en vivo y herramientas prácticas para guiar una discusión bíblica transformadora.
+                </p>
+                <div class="es-hero-actions">
+                    <button type="button" id="esHeroBtnDarClase" class="es-btn-gold">
+                        <i class="fas fa-tv"></i> Modo Dar Clase (Pantalla Completa)
+                    </button>
+                    <a href="#bancoPreguntasMaestro" class="es-btn-outline">
+                        <i class="fas fa-dice"></i> Preguntas de la Lección
+                    </a>
+                    <a href="#estudiante" data-open-mode="estudiante" class="es-btn-outline">
+                        <i class="fas fa-book-reader"></i> Volver a Modo Estudiante
+                    </a>
+                </div>
             </div>
+            <a href="#resumenMaestro" class="es-hero-scroll-cue" aria-label="Bajar a herramientas de maestro">
+                <span>Ver guía de maestro</span>
+                <i class="fas fa-chevron-down"></i>
+            </a>
+        </section>
 
-            <div class="es-checklist-card">
-                <div class="es-checklist-top">
-                    <strong id="esProgressText" style="color: var(--navy-mid); font-size: 0.95rem;">0 de 7 días estudiados esta semana</strong>
-                    <button type="button" id="btnResetWeek" class="es-reset-btn">
-                        <i class="fas fa-redo-alt"></i> Nueva semana
+        <main class="es-container">
+            <!-- Espacio listo para Módulo 4 (Folleto Maestro, Preguntas Lección 9, Lista Oración, Modo Dar Clase) -->
+            <div id="esMaestroProMount"></div>
+
+            <!-- Esquema de 35 minutos + Cronómetro -->
+            <section class="es-section" id="rinconMaestros">
+                <div class="es-section-head">
+                    <span class="es-kicker">Guía para el Sábado</span>
+                    <h2 class="es-section-title">Estructura y Cronómetro de Clase</h2>
+                    <p class="es-section-sub">Mantén tu clase participativa, enfocada en Cristo y puntual.</p>
+                </div>
+
+                <div class="es-teacher-grid">
+                    <div class="es-card">
+                        <h3 style="color: var(--navy-mid); font-size: 1.15rem; margin-bottom: 0.3rem;">
+                            <i class="fas fa-list-check" style="color: var(--gold);"></i> Esquema sugerido de 35 minutos
+                        </h3>
+                        <div class="es-steps-list">
+                            <div class="es-step-item">
+                                <span class="es-step-num">1</span>
+                                <div>
+                                    <h4>Bienvenida y Pregunta Rompehielo (5 min)</h4>
+                                    <p>Saluda a las visitas, ora brevemente y abre con una pregunta de la vida cotidiana conectada al tema de la semana.</p>
+                                </div>
+                            </div>
+                            <div class="es-step-item">
+                                <span class="es-step-num">2</span>
+                                <div>
+                                    <h4>Estudio Bíblico Participativo (20 min)</h4>
+                                    <p>Enfócate en 2 o 3 pasajes clave de la Biblia. Invita a distintos hermanos a leer y responder: <em>"¿Qué nos enseña esto sobre el carácter de Dios?"</em></p>
+                                </div>
+                            </div>
+                            <div class="es-step-item">
+                                <span class="es-step-num">3</span>
+                                <div>
+                                    <h4>Aplicación Práctica y Llamado (10 min)</h4>
+                                    <p>Cierra preguntando: <em>"¿Qué decisión práctica podemos tomar esta semana?"</em> y termina con una oración de compromiso.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="es-timer-card">
+                        <div>
+                            <span style="font-size:0.78rem; text-transform:uppercase; letter-spacing:1px; color:var(--gold-light); font-weight:700;">
+                                <i class="fas fa-stopwatch"></i> Cronómetro de Clase
+                            </span>
+                            <h3 style="font-size:1.15rem; margin-top:0.25rem;">Controla el tiempo el sábado</h3>
+                        </div>
+
+                        <div id="esTimerDisplay" class="es-timer-display">35:00</div>
+
+                        <div>
+                            <div class="es-timer-presets">
+                                <button type="button" class="es-preset-btn" data-min="30">30 min</button>
+                                <button type="button" class="es-preset-btn active" data-min="35">35 min</button>
+                                <button type="button" class="es-preset-btn" data-min="40">40 min</button>
+                            </div>
+                            <div class="es-timer-controls">
+                                <button type="button" id="esTimerToggle" class="es-timer-btn es-timer-start">
+                                    <i class="fas fa-play"></i> Iniciar
+                                </button>
+                                <button type="button" id="esTimerReset" class="es-timer-btn es-timer-reset">
+                                    <i class="fas fa-undo"></i> Reiniciar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Visor PDF Integrado -->
+    <div id="esPdfModal" class="es-pdf-modal" aria-hidden="true">
+        <div class="es-pdf-dialog">
+            <div class="es-pdf-header">
+                <div class="es-pdf-title">
+                    <i class="fas fa-file-pdf" style="color:var(--gold-light);"></i>
+                    <span id="esPdfModalTitle">Folleto de Escuela Sabática</span>
+                </div>
+                <div class="es-pdf-actions">
+                    <button type="button" id="esPdfAltViewerBtn" class="es-pdf-btn" title="Alternar visor si no carga en tu celular">
+                        <i class="fas fa-sync-alt"></i> Visor alternativo
+                    </button>
+                    <a id="esPdfDownloadBtn" href="#" target="_blank" rel="noopener noreferrer" class="es-pdf-btn es-pdf-btn-gold">
+                        <i class="fas fa-download"></i> Descargar PDF
+                    </a>
+                    <button type="button" id="esPdfCloseBtn" class="es-pdf-btn es-pdf-btn-close">
+                        <i class="fas fa-times"></i> Cerrar
                     </button>
                 </div>
-                <div class="es-progress-bar-wrap">
-                    <div id="esProgressBar" class="es-progress-bar"></div>
-                </div>
-                <div class="es-days-grid" id="esDaysGrid">
-                    <button type="button" class="es-day-btn" data-day="sab"><i class="far fa-circle"></i><span>Sábado</span></button>
-                    <button type="button" class="es-day-btn" data-day="dom"><i class="far fa-circle"></i><span>Domingo</span></button>
-                    <button type="button" class="es-day-btn" data-day="lun"><i class="far fa-circle"></i><span>Lunes</span></button>
-                    <button type="button" class="es-day-btn" data-day="mar"><i class="far fa-circle"></i><span>Martes</span></button>
-                    <button type="button" class="es-day-btn" data-day="mie"><i class="far fa-circle"></i><span>Miércoles</span></button>
-                    <button type="button" class="es-day-btn" data-day="jue"><i class="far fa-circle"></i><span>Jueves</span></button>
-                    <button type="button" class="es-day-btn" data-day="vie"><i class="far fa-circle"></i><span>Viernes</span></button>
-                </div>
             </div>
-        </section>
-
-        <!-- 2. Videos de Repaso de la Lección -->
-        <section class="es-section" id="videosRepaso">
-            <div class="es-section-head">
-                <span class="es-kicker">Repaso en Video · Lección 9</span>
-                <h2 class="es-section-title">Videos de Repaso de Esta Semana</h2>
-                <p class="es-section-sub">Estudia y repasa la lección directamente desde aquí antes del sábado.</p>
+            <div class="es-pdf-frame-wrap">
+                <iframe id="esPdfIframe" title="Visor de Folleto PDF"></iframe>
             </div>
-
-            <div class="es-videos-grid">
-                <article class="es-video-card">
-                    <div class="es-video-frame">
-                        <iframe src="https://www.youtube.com/embed/p1qEgixAQjs?playsinline=1&rel=0"
-                            title="9. Poniendo a Prueba a los Profetas - El Don de Profecía | Escuela Sabática SUMtv"
-                            loading="lazy"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen></iframe>
-                    </div>
-                    <div class="es-video-meta">
-                        <span class="es-video-tag"><i class="fab fa-youtube"></i> SUMtv · Lección 9</span>
-                        <h3>9. Poniendo a Prueba a los Profetas — El Don de Profecía</h3>
-                        <a href="https://www.youtube.com/watch?v=p1qEgixAQjs" target="_blank" rel="noopener noreferrer" class="es-video-yt-link">
-                            Abrir en YouTube <i class="fas fa-external-link-alt"></i>
-                        </a>
-                    </div>
-                </article>
-
-                <article class="es-video-card">
-                    <div class="es-video-frame">
-                        <iframe src="https://www.youtube.com/embed/ivDsyF21_r8?playsinline=1&rel=0"
-                            title="Repaso Complementario de la Lección 9 · Escuela Sabática"
-                            loading="lazy"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen></iframe>
-                    </div>
-                    <div class="es-video-meta">
-                        <span class="es-video-tag"><i class="fab fa-youtube"></i> Repaso Complementario</span>
-                        <h3>Comentario y Repaso de la Lección de Esta Semana</h3>
-                        <a href="https://www.youtube.com/watch?v=ivDsyF21_r8" target="_blank" rel="noopener noreferrer" class="es-video-yt-link">
-                            Abrir en YouTube <i class="fas fa-external-link-alt"></i>
-                        </a>
-                    </div>
-                </article>
-            </div>
-        </section>
-
-        <!-- 2. Rincón para Maestros -->
-        <section class="es-section" id="rinconMaestros">
-            <div class="es-section-head">
-                <span class="es-kicker">Guía para el Sábado</span>
-                <h2 class="es-section-title">Rincón de Maestros de Escuela Sabática</h2>
-                <p class="es-section-sub">Estructura práctica y cronómetro para que tu clase sea participativa, profunda y puntual.</p>
-            </div>
-
-            <div class="es-teacher-grid">
-                <div class="es-card">
-                    <h3 style="color: var(--navy-mid); font-size: 1.15rem; margin-bottom: 0.3rem;">
-                        <i class="fas fa-list-check" style="color: var(--gold);"></i> Esquema sugerido de 35 minutos
-                    </h3>
-                    <div class="es-steps-list">
-                        <div class="es-step-item">
-                            <span class="es-step-num">1</span>
-                            <div>
-                                <h4>Bienvenida y Pregunta Rompehielo (5 min)</h4>
-                                <p>Saluda a las visitas, ora brevemente y abre con una pregunta de la vida cotidiana conectada al tema de la semana.</p>
-                            </div>
-                        </div>
-                        <div class="es-step-item">
-                            <span class="es-step-num">2</span>
-                            <div>
-                                <h4>Estudio Bíblico Participativo (20 min)</h4>
-                                <p>Enfócate en 2 o 3 pasajes clave de la Biblia. Invita a distintos hermanos a leer y responder: <em>"¿Qué nos enseña esto sobre el carácter de Dios?"</em></p>
-                            </div>
-                        </div>
-                        <div class="es-step-item">
-                            <span class="es-step-num">3</span>
-                            <div>
-                                <h4>Aplicación Práctica y Llamado (10 min)</h4>
-                                <p>Cierra preguntando: <em>"¿Qué decisión práctica podemos tomar esta semana?"</em> y termina con una oración de compromiso.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="es-timer-card">
-                    <div>
-                        <span style="font-size:0.78rem; text-transform:uppercase; letter-spacing:1px; color:var(--gold-light); font-weight:700;">
-                            <i class="fas fa-stopwatch"></i> Cronómetro de Clase
-                        </span>
-                        <h3 style="font-size:1.15rem; margin-top:0.25rem;">Controla el tiempo el sábado</h3>
-                    </div>
-
-                    <div id="esTimerDisplay" class="es-timer-display">35:00</div>
-
-                    <div>
-                        <div class="es-timer-presets">
-                            <button type="button" class="es-preset-btn" data-min="30">30 min</button>
-                            <button type="button" class="es-preset-btn active" data-min="35">35 min</button>
-                            <button type="button" class="es-preset-btn" data-min="40">40 min</button>
-                        </div>
-                        <div class="es-timer-controls">
-                            <button type="button" id="esTimerToggle" class="es-timer-btn es-timer-start">
-                                <i class="fas fa-play"></i> Iniciar
-                            </button>
-                            <button type="button" id="esTimerReset" class="es-timer-btn es-timer-reset">
-                                <i class="fas fa-undo"></i> Reiniciar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 3. Cuaderno de Apuntes Personal -->
-        <section class="es-section" id="cuadernoApuntes">
-            <div class="es-section-head">
-                <span class="es-kicker">Notas Personales</span>
-                <h2 class="es-section-title">Cuaderno de Apuntes de la Lección</h2>
-                <p class="es-section-sub">Anota tus puntos clave, versículos o preguntas para el sábado. Se guarda solo en tu dispositivo y puedes compartirlo por WhatsApp.</p>
-            </div>
-
-            <div class="es-notes-card">
-                <textarea id="esNotesTextarea" class="es-notes-textarea"
-                    placeholder="Ej: Textos clave de la lección 9, preguntas para mi clase, reflexiones personales..."></textarea>
-                <div class="es-notes-bar">
-                    <span id="esNotesStatus" class="es-notes-status">
-                        <i class="fas fa-lock" style="color: var(--gold);"></i> Guardado privado en tu dispositivo
-                    </span>
-                    <div class="es-notes-actions">
-                        <button type="button" id="esBtnCopyNotes" class="es-btn-copy">
-                            <i class="far fa-copy"></i> Copiar apuntes
-                        </button>
-                        <button type="button" id="esBtnWaNotes" class="es-btn-wa">
-                            <i class="fab fa-whatsapp"></i> Enviar por WhatsApp
-                        </button>
-                        <button type="button" id="esBtnClearNotes" class="es-reset-btn">
-                            <i class="fas fa-trash-alt"></i> Limpiar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 4. Herramientas de Estudio Profundo -->
-        <section class="es-section">
-            <div class="es-section-head">
-                <span class="es-kicker">Biblioteca de Apoyo</span>
-                <h2 class="es-section-title">Herramientas para Profundizar</h2>
-                <p class="es-section-sub">Recursos confiables para preparar tu lección o investigar textos difíciles.</p>
-            </div>
-
-            <div class="es-tools-grid">
-                <a href="https://www.bible.com/es/bible/149/GEN.1.RVR1960" target="_blank" rel="noopener noreferrer" class="es-tool-card">
-                    <div class="es-tool-icon"><i class="fas fa-bible"></i></div>
-                    <h3>Santa Biblia RVR1960</h3>
-                    <p>Consulta rápidamente cualquier capítulo, compara versiones y lee los textos clave de la lección.</p>
-                    <span class="es-tool-link">Abrir Biblia <i class="fas fa-arrow-right"></i></span>
-                </a>
-                <a href="https://adventista7.com/biblia/" target="_blank" rel="noopener noreferrer" class="es-tool-card">
-                    <div class="es-tool-icon"><i class="fas fa-book-open"></i></div>
-                    <h3>Biblia con Comentarios</h3>
-                    <p>Notas explicativas y contexto histórico versículo por versículo para enriquecer tu repaso.</p>
-                    <span class="es-tool-link">Ver Comentarios <i class="fas fa-arrow-right"></i></span>
-                </a>
-                <a href="https://www.logosklogos.com/interlinears/AT/Gn" target="_blank" rel="noopener noreferrer" class="es-tool-card">
-                    <div class="es-tool-icon"><i class="fas fa-search"></i></div>
-                    <h3>Biblia Interlineal</h3>
-                    <p>Explora el significado original en hebreo y griego de las palabras clave del pasaje.</p>
-                    <span class="es-tool-link">Explorar Original <i class="fas fa-arrow-right"></i></span>
-                </a>
-                <a href="https://m.egwwritings.org/es" target="_blank" rel="noopener noreferrer" class="es-tool-card">
-                    <div class="es-tool-icon"><i class="fas fa-feather-alt"></i></div>
-                    <h3>Escritos de Elena G. de White</h3>
-                    <p>Busca citas inspiradas y comentarios del Espíritu de Profecía relacionados con la lección.</p>
-                    <span class="es-tool-link">Abrir EGW Writings <i class="fas fa-arrow-right"></i></span>
-                </a>
-            </div>
-        </section>
-    </main>
+        </div>
+    </div>
 
     <footer class="es-footer">
         Iglesia Adventista del Séptimo Día Belén · Escuela Sabática
     </footer>
 
-    <script>
-        (function () {
-            'use strict';
-
-            // 1. Checklist de 7 días (localStorage)
-            const STORAGE_KEY = 'iasd_belen_es_dias_2026';
-            const dayBtns = Array.from(document.querySelectorAll('.es-day-btn'));
-            const progressBar = document.getElementById('esProgressBar');
-            const progressText = document.getElementById('esProgressText');
-            const resetBtn = document.getElementById('btnResetWeek');
-
-            let checkedDays = {};
-            try {
-                checkedDays = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {};
-            } catch (e) { checkedDays = {}; }
-
-            function renderDays() {
-                let count = 0;
-                dayBtns.forEach(btn => {
-                    const key = btn.getAttribute('data-day');
-                    const isDone = !!checkedDays[key];
-                    if (isDone) count++;
-                    btn.classList.toggle('done', isDone);
-                    const icon = btn.querySelector('i');
-                    if (icon) icon.className = isDone ? 'fas fa-check-circle' : 'far fa-circle';
-                });
-                const pct = Math.round((count / 7) * 100);
-                if (progressBar) progressBar.style.width = pct + '%';
-                if (progressText) {
-                    progressText.textContent = count === 7
-                        ? '¡Felicitaciones! Completaste los 7 días de estudio'
-                        : `${count} de 7 días estudiados esta semana`;
-                }
-            }
-
-            dayBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const key = btn.getAttribute('data-day');
-                    checkedDays[key] = !checkedDays[key];
-                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(checkedDays)); } catch (e) { }
-                    renderDays();
-                });
-            });
-
-            if (resetBtn) {
-                resetBtn.addEventListener('click', () => {
-                    checkedDays = {};
-                    try { localStorage.setItem(STORAGE_KEY, '{}'); } catch (e) { }
-                    renderDays();
-                });
-            }
-            renderDays();
-
-            // 2. Cronómetro de clase
-            let totalSeconds = 35 * 60;
-            let remaining = totalSeconds;
-            let timerId = null;
-
-            const displayEl = document.getElementById('esTimerDisplay');
-            const toggleEl = document.getElementById('esTimerToggle');
-            const timerResetEl = document.getElementById('esTimerReset');
-            const presetBtns = Array.from(document.querySelectorAll('.es-preset-btn'));
-
-            function renderTimer() {
-                const m = Math.floor(remaining / 60);
-                const s = remaining % 60;
-                if (displayEl) {
-                    displayEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-                }
-            }
-
-            function stopTimer() {
-                if (timerId) {
-                    clearInterval(timerId);
-                    timerId = null;
-                }
-                if (toggleEl) toggleEl.innerHTML = '<i class="fas fa-play"></i> Iniciar';
-            }
-
-            if (toggleEl) {
-                toggleEl.addEventListener('click', () => {
-                    if (timerId) {
-                        stopTimer();
-                    } else {
-                        if (remaining <= 0) remaining = totalSeconds;
-                        toggleEl.innerHTML = '<i class="fas fa-pause"></i> Pausar';
-                        timerId = setInterval(() => {
-                            if (remaining > 0) {
-                                remaining--;
-                                renderTimer();
-                            } else {
-                                stopTimer();
-                            }
-                        }, 1000);
-                    }
-                });
-            }
-
-            if (timerResetEl) {
-                timerResetEl.addEventListener('click', () => {
-                    stopTimer();
-                    remaining = totalSeconds;
-                    renderTimer();
-                });
-            }
-
-            presetBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const mins = parseInt(btn.getAttribute('data-min'), 10) || 35;
-                    presetBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    stopTimer();
-                    totalSeconds = mins * 60;
-                    remaining = totalSeconds;
-                    renderTimer();
-                });
-            });
-
-            renderTimer();
-
-            // 3. Cuaderno de apuntes personal (localStorage + Copiar + WhatsApp)
-            const NOTES_KEY = 'iasd_belen_es_apuntes_2026';
-            const notesEl = document.getElementById('esNotesTextarea');
-            const notesStatus = document.getElementById('esNotesStatus');
-            const btnCopyNotes = document.getElementById('esBtnCopyNotes');
-            const btnWaNotes = document.getElementById('esBtnWaNotes');
-            const btnClearNotes = document.getElementById('esBtnClearNotes');
-
-            if (notesEl) {
-                try {
-                    notesEl.value = localStorage.getItem(NOTES_KEY) || '';
-                } catch (e) { }
-
-                notesEl.addEventListener('input', () => {
-                    try {
-                        localStorage.setItem(NOTES_KEY, notesEl.value);
-                        if (notesStatus) {
-                            notesStatus.innerHTML = '<i class="fas fa-check-circle" style="color:#16a34a;"></i> Apuntes guardados automáticamente';
-                        }
-                    } catch (e) { }
-                });
-            }
-
-            if (btnCopyNotes && notesEl) {
-                btnCopyNotes.addEventListener('click', () => {
-                    const txt = notesEl.value.trim();
-                    if (!txt) {
-                        if (notesStatus) notesStatus.textContent = 'Escribe tus apuntes primero para poder copiarlos.';
-                        return;
-                    }
-                    const payload = `📖 Apuntes Escuela Sabática · IASD Belén\n\n${txt}`;
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(payload).then(() => {
-                            const orig = btnCopyNotes.innerHTML;
-                            btnCopyNotes.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
-                            setTimeout(() => { btnCopyNotes.innerHTML = orig; }, 1800);
-                        });
-                    }
-                });
-            }
-
-            if (btnWaNotes && notesEl) {
-                btnWaNotes.addEventListener('click', () => {
-                    const txt = notesEl.value.trim();
-                    const msg = txt
-                        ? `📖 *Apuntes Escuela Sabática · IASD Belén*\n\n${txt}`
-                        : `📖 Te invito a repasar la lección de Escuela Sabática esta semana en IASD Belén: ${window.location.href}`;
-                    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
-                });
-            }
-
-            if (btnClearNotes && notesEl) {
-                btnClearNotes.addEventListener('click', () => {
-                    if (!notesEl.value.trim()) return;
-                    if (confirm('¿Deseas limpiar tus apuntes guardados?')) {
-                        notesEl.value = '';
-                        try { localStorage.removeItem(NOTES_KEY); } catch (e) { }
-                        if (notesStatus) {
-                            notesStatus.innerHTML = '<i class="fas fa-lock" style="color: var(--gold);"></i> Apuntes limpiados';
-                        }
-                    }
-                });
-            }
-        })();
-    </script>
+    <script src="js/escuela-sabatica.js"></script>
+    <script src="js/escuela-sabatica-maestro.js"></script>
+    <script src="js/escuela-sabatica-foro.js"></script>
 </body>
 
 </html>
