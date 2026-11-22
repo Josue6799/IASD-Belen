@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OneVoice27 · Misión para Todos | IASD Belén</title>
+    <link rel="icon" type="image/png" href="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/Logo_adventista_jum3od.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #05050a;
+            color: #f1f5f9;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Top bar */
+        .ov-topbar {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.1rem clamp(1.2rem, 5vw, 4rem);
+            background: rgba(5, 5, 10, 0.92);
+            border-bottom: 1px solid rgba(139, 44, 245, 0.22);
+        }
+
+        .ov-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.55rem 1.15rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            color: #fff;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .ov-back-btn:hover {
+            background: rgba(139, 44, 245, 0.25);
+            border-color: rgba(139, 44, 245, 0.65);
+        }
+
+        .ov-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #cbd5e1;
+        }
+
+        .ov-brand img {
+            height: 28px;
+            width: auto;
+        }
+
+        /* Hero */
+        .ov-hero {
+            position: relative;
+            min-height: clamp(500px, 78vh, 720px);
+            display: flex;
+            align-items: center;
+            padding: 4.5rem clamp(1.25rem, 6vw, 5.5rem);
+            background: #05050a;
+            overflow: hidden;
+        }
+
+        .ov-hero-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            opacity: 0.92;
+        }
+
+        .ov-hero-scrim {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(5, 5, 10, 0.92) 0%, rgba(5, 5, 10, 0.55) 55%, rgba(5, 5, 10, 0.25) 100%),
+                        linear-gradient(180deg, rgba(5, 5, 10, 0.15) 0%, #05050a 100%);
+        }
+
+        .ov-hero-inner {
+            position: relative;
+            z-index: 2;
+            max-width: 720px;
+        }
+
+        .ov-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            border-radius: 999px;
+            background: rgba(139, 44, 245, 0.18);
+            border: 1px solid rgba(139, 44, 245, 0.5);
+            color: #d8b4fe;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 1.2rem;
+        }
+
+        .ov-hero h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(2.6rem, 6vw, 4.4rem);
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.08;
+            margin-bottom: 1.1rem;
+        }
+
+        .ov-hero h1 span {
+            background: linear-gradient(90deg, #c084fc, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .ov-hero-lead {
+            font-size: clamp(1.05rem, 1.5vw, 1.22rem);
+            color: #e2e8f0;
+            max-width: 600px;
+            margin-bottom: 1.8rem;
+        }
+
+        .ov-verse-quote {
+            display: inline-block;
+            padding: 0.9rem 1.3rem;
+            border-left: 3px solid #8b2cf5;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 0 0.75rem 0.75rem 0;
+            font-size: 0.96rem;
+            color: #e9d5ff;
+        }
+
+        /* Main container */
+        .ov-container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 clamp(1.2rem, 4vw, 2.5rem);
+        }
+
+        .ov-section {
+            padding: 4.5rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .ov-section-label {
+            display: inline-block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: #a855f7;
+            margin-bottom: 0.65rem;
+        }
+
+        .ov-section-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(1.85rem, 3.4vw, 2.65rem);
+            color: #fff;
+            line-height: 1.2;
+            margin-bottom: 1.1rem;
+        }
+
+        .ov-text {
+            color: #cbd5e1;
+            font-size: 1.02rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Two-column feature blocks */
+        .ov-split {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 2.8rem;
+            align-items: center;
+        }
+
+        .ov-split.reverse .ov-media {
+            order: -1;
+        }
+
+        .ov-media {
+            border-radius: 1.25rem;
+            overflow: hidden;
+            border: 1px solid rgba(139, 44, 245, 0.25);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+            background: #090912;
+        }
+
+        .ov-media img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .ov-stat-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+            margin-top: 1.6rem;
+        }
+
+        .ov-stat-box {
+            padding: 1.1rem 1.2rem;
+            border-radius: 0.9rem;
+            background: #0b0b14;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+        }
+
+        .ov-stat-num {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #dfb75c;
+            line-height: 1.1;
+            margin-bottom: 0.25rem;
+        }
+
+        .ov-stat-desc {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        /* Pillars grid */
+        .ov-pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1.5rem;
+            margin-top: 2.2rem;
+        }
+
+        .ov-pillar-card {
+            background: #0b0b14;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 1.2rem;
+            padding: 1.8rem 1.5rem;
+            transition: border-color 0.25s ease, transform 0.25s ease;
+        }
+
+        .ov-pillar-card:hover {
+            border-color: rgba(139, 44, 245, 0.55);
+            transform: translateY(-4px);
+        }
+
+        .ov-pillar-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.85rem;
+            background: rgba(139, 44, 245, 0.16);
+            color: #c084fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .ov-pillar-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.65rem;
+        }
+
+        .ov-pillar-card p {
+            font-size: 0.94rem;
+            color: #94a3b8;
+            line-height: 1.65;
+        }
+
+        /* Action steps */
+        .ov-steps {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1.2rem;
+            margin-top: 2rem;
+        }
+
+        .ov-step {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            padding: 1.35rem;
+            border-radius: 1rem;
+            background: #0b0b14;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .ov-step-num {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b2cf5, #3b82f6);
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ov-step h4 {
+            font-size: 1rem;
+            color: #fff;
+            margin-bottom: 0.3rem;
+        }
+
+        .ov-step p {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        /* CTA bottom */
+        .ov-cta-box {
+            margin: 2rem 0 4.5rem;
+            padding: 2.8rem 2rem;
+            border-radius: 1.5rem;
+            text-align: center;
+            background: radial-gradient(circle at top, rgba(139, 44, 245, 0.22), rgba(11, 11, 20, 0.98) 70%);
+            border: 1px solid rgba(139, 44, 245, 0.38);
+        }
+
+        .ov-cta-box h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(1.7rem, 3vw, 2.3rem);
+            color: #fff;
+            margin-bottom: 0.7rem;
+        }
+
+        .ov-cta-box p {
+            color: #cbd5e1;
+            max-width: 600px;
+            margin: 0 auto 1.6rem;
+            font-size: 0.98rem;
+        }
+
+        .ov-cta-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.9rem;
+            justify-content: center;
+        }
+
+        .ov-btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.9rem 2rem;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #8b2cf5, #6d28d9);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.94rem;
+            box-shadow: 0 8px 26px rgba(139, 44, 245, 0.4);
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+
+        .ov-btn-primary:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.08);
+        }
+
+        .ov-btn-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.9rem 1.8rem;
+            border-radius: 999px;
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.94rem;
+            transition: background 0.2s ease;
+        }
+
+        .ov-btn-outline:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .ov-footer {
+            text-align: center;
+            padding: 1.8rem 1rem 2.4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 860px) {
+            .ov-split,
+            .ov-pillars-grid,
+            .ov-steps {
+                grid-template-columns: 1fr;
+            }
+
+            .ov-split.reverse .ov-media {
+                order: 0;
+            }
+
+            .ov-hero {
+                min-height: 460px;
+                padding: 3.5rem 1.25rem;
+            }
+
+            .ov-section {
+                padding: 3rem 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="ov-topbar">
+        <a href="index.html" class="ov-back-btn">
+            <i class="fas fa-arrow-left"></i> Volver a IASD Belén
+        </a>
+        <div class="ov-brand">
+            <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/Logo_adventista_jum3od.png" alt="IASD Belén" />
+            <span>IASD Belén</span>
+        </div>
+    </header>
+
+    <section class="ov-hero">
+        <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795373880682-6e389a2a.jpg"
+            alt="OneVoice27" class="ov-hero-bg" />
+        <div class="ov-hero-scrim"></div>
+        <div class="ov-hero-inner">
+            <span class="ov-pill"><i class="fas fa-globe"></i> Movilización Mundial 2027</span>
+            <h1>OneVoice<span>27</span></h1>
+            <p class="ov-hero-lead">
+                <strong>Misión para todos:</strong> la iniciativa global de la Iglesia Adventista del Séptimo Día que une a millones de creyentes, medios de comunicación e iglesias locales para proclamar a Jesucristo como una sola voz.
+            </p>
+            <div class="ov-verse-quote">
+                “He aquí, yo hago nuevas todas las cosas.” — <strong>Apocalipsis 21:5</strong> · <em>La esperanza comienza aquí</em>
+            </div>
+        </div>
+    </section>
+
+    <main class="ov-container">
+        <section class="ov-section">
+            <div class="ov-split">
+                <div>
+                    <span class="ov-section-label">¿Por qué el año 2027?</span>
+                    <h2 class="ov-section-title">2,000 años del bautismo y ministerio de Jesús</h2>
+                    <p class="ov-text">
+                        El punto culminante de <strong>OneVoice27</strong> está programado para <strong>septiembre de 2027</strong>, fecha en la que se conmemoran los <strong>2,000 años del bautismo de Jesucristo</strong> y el inicio de su ministerio público en la tierra (27 d.C. – 2027 d.C.).
+                    </p>
+                    <p class="ov-text">
+                        Más que un evento aislado, es un movimiento espiritual y misionero que prepara a toda la iglesia mundial para presentar al mundo a Jesús como el Mesías, el Salvador y nuestra esperanza de vida eterna.
+                    </p>
+                    <div class="ov-stat-row">
+                        <div class="ov-stat-box">
+                            <div class="ov-stat-num">2,000 años</div>
+                            <div class="ov-stat-desc">Desde el bautismo de Cristo en el río Jordán (27 d.C.)</div>
+                        </div>
+                        <div class="ov-stat-box">
+                            <div class="ov-stat-num">Sept. 2027</div>
+                            <div class="ov-stat-desc">Gran cosecha y movilización misionera mundial</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ov-media">
+                    <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795376360692-7844c9e7.jpg"
+                        alt="2,000 años del bautismo de Jesús" loading="lazy" />
+                </div>
+            </div>
+        </section>
+
+        <section class="ov-section">
+            <span class="ov-section-label">Estrategia Global</span>
+            <h2 class="ov-section-title">Los 3 Pilares de OneVoice27</h2>
+            <p class="ov-text" style="max-width: 720px;">
+                La iniciativa integra el reavivamiento espiritual personal con el alcance masivo en plataformas digitales y el discipulado cercano en cada congregación local.
+            </p>
+            <div class="ov-pillars-grid">
+                <article class="ov-pillar-card">
+                    <div class="ov-pillar-icon"><i class="fas fa-broadcast-tower"></i></div>
+                    <h3>1. El Proyecto</h3>
+                    <p>Sincronizar las redes oficiales de televisión, radio y publicaciones adventistas con las redes sociales y canales digitales de cada miembro para inundar el mundo con un mensaje unificado de esperanza.</p>
+                </article>
+                <article class="ov-pillar-card">
+                    <div class="ov-pillar-icon"><i class="fas fa-bible"></i></div>
+                    <h3>2. La Preparación</h3>
+                    <p>Fomentar un reavivamiento genuino mediante la oración constante, la lectura devocional de <em>El Deseado de Todas las Gentes</em> y el estudio profundo de las profecías de <em>Daniel y Apocalipsis</em>.</p>
+                </article>
+                <article class="ov-pillar-card">
+                    <div class="ov-pillar-icon"><i class="fas fa-people-arrows"></i></div>
+                    <h3>3. El Propósito</h3>
+                    <p>Conectar cada interés nacido en internet o medios con la iglesia local: estudios bíblicos presenciales, grupos pequeños, amistad sincera y discipulado real en nuestra comunidad.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="ov-section">
+            <div class="ov-split reverse">
+                <div>
+                    <span class="ov-section-label">Evangelismo Digital</span>
+                    <h2 class="ov-section-title">Una sola voz en el mundo digital</h2>
+                    <p class="ov-text">
+                        Hoy millones de personas buscan respuestas, paz y propósito a través de su teléfono y redes sociales. <strong>OneVoice27</strong> capacita a cada miembro —jóvenes y adultos— para convertirse en un <strong>misionero digital</strong>.
+                    </p>
+                    <p class="ov-text">
+                        No se trata solo de compartir publicaciones, sino de tender puentes de amistad, orar por quienes nos rodean e invitarlos a experimentar el amor de Dios en nuestros grupos pequeños y cultos en <strong>IASD Belén</strong>.
+                    </p>
+                </div>
+                <div class="ov-media">
+                    <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795376362549-dab2ab26.jpg"
+                        alt="Misión digital global OneVoice27" loading="lazy" />
+                </div>
+            </div>
+        </section>
+
+        <section class="ov-section">
+            <span class="ov-section-label">Tu participación en IASD Belén</span>
+            <h2 class="ov-section-title">¿Cómo puedes unirte hoy?</h2>
+            <div class="ov-steps">
+                <div class="ov-step">
+                    <div class="ov-step-num">1</div>
+                    <div>
+                        <h4>Ora cada día</h4>
+                        <p>Intercede por tu familia, tus amigos y por el derramamiento del Espíritu Santo sobre nuestra iglesia local.</p>
+                    </div>
+                </div>
+                <div class="ov-step">
+                    <div class="ov-step-num">2</div>
+                    <div>
+                        <h4>Estudia la vida de Cristo</h4>
+                        <p>Profundiza en la Biblia, la Escuela Sabática y las profecías centradas en Jesús para compartir con convicción.</p>
+                    </div>
+                </div>
+                <div class="ov-step">
+                    <div class="ov-step-num">3</div>
+                    <div>
+                        <h4>Comparte esperanza en tus redes</h4>
+                        <p>Usa tu WhatsApp y redes sociales para compartir transmisiones, versículos e invitaciones de IASD Belén.</p>
+                    </div>
+                </div>
+                <div class="ov-step">
+                    <div class="ov-step-num">4</div>
+                    <div>
+                        <h4>Acompaña en un Grupo Pequeño</h4>
+                        <p>Participa cada martes en los grupos pequeños de Belén e invita a un amigo a conocer a Jesús de cerca.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="ov-cta-box">
+            <h2>La esperanza comienza aquí</h2>
+            <p>Únete a nuestra iglesia local en este camino hacia septiembre de 2027. Juntos proclamamos el pronto regreso de Cristo.</p>
+            <div class="ov-cta-actions">
+                <a href="index.html" class="ov-btn-primary">
+                    <i class="fas fa-home"></i> Volver a IASD Belén
+                </a>
+                <a href="https://onevoice27.org" target="_blank" rel="noopener noreferrer" class="ov-btn-outline">
+                    <i class="fas fa-external-link-alt"></i> Sitio mundial OneVoice27
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="ov-footer">
+        Iglesia Adventista del Séptimo Día Belén · Iniciativa OneVoice27
+    </footer>
+</body>
+
+</html>
