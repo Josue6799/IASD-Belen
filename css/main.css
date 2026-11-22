@@ -3569,3 +3569,23 @@
     margin-bottom: .5rem;
     display: block;
 }
+
+@media (max-width: 768px) {
+    .notif-dropdown {
+        position: fixed;
+        top: 68px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        max-width: none;
+        max-height: 75vh;
+    }
+
+    .notif-header {
+        padding: .8rem .85rem;
+    }
+
+    .notif-item {
+        padding: .75rem .85rem;
+    }
+}
