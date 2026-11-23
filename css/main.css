@@ -3645,6 +3645,14 @@
     padding: 4.5rem clamp(5rem, 7.5vw, 7rem);
 }
 
+.hero-carousel .hero-picture {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
 .hero-carousel .hero-bg-img {
     width: 100%;
     height: 100%;
@@ -3817,32 +3825,44 @@
         min-height: calc(100svh - 68px) !important;
     }
 
-    /* Imagen completa sin zoom en la parte superior (proporción natural 16:9) */
+    /* Imágenes verticales 9:16 a pantalla completa sin zoom en celular */
+    .hero-carousel .hero-picture {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+    }
+
     .hero-carousel .hero-bg-img {
         position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: auto !important;
+        inset: 0 !important;
         width: 100% !important;
-        height: clamp(235px, 60vw, 46svh) !important;
+        height: 100% !important;
         object-fit: cover !important;
-        object-position: center center !important;
+        object-position: center top !important;
         transform: none !important;
         filter: brightness(1.02) contrast(1.02) !important;
     }
 
-    /* Difuminado suave solo en el borde inferior de la imagen hacia el fondo del texto */
-    .hero-carousel .hero-bg-overlay,
-    .hero-slide-scrim,
-    .hero-scrim-soft {
+    /* Velo muy suave en los slides 9:16 (que ya traen su degradado oscuro integrado abajo) */
+    .hero-slide-left .hero-slide-scrim,
+    .hero-slide-left .hero-scrim-soft {
         background: linear-gradient(
             180deg,
-            rgba(7, 25, 45, 0.04) 0%,
-            rgba(7, 25, 45, 0.08) 28%,
-            rgba(7, 25, 45, 0.86) 46%,
-            #07192d 56%,
-            #07192d 100%
+            rgba(7, 25, 45, 0) 0%,
+            rgba(7, 25, 45, 0) 52%,
+            rgba(7, 25, 45, 0.58) 100%
+        ) !important;
+    }
+
+    /* Slide 1 (foto real de la iglesia en vertical 9:16): sin oscurecer la fachada arriba */
+    .hero-slide-center .hero-bg-overlay {
+        background: linear-gradient(
+            180deg,
+            rgba(7, 25, 45, 0) 0%,
+            rgba(7, 25, 45, 0) 42%,
+            rgba(7, 25, 45, 0.35) 100%
         ) !important;
     }
 
@@ -3851,13 +3871,13 @@
     }
 
     .hero-slide-center {
-        padding: calc(clamp(235px, 60vw, 46svh) - 1.5rem) 1.35rem 3.8rem !important;
+        padding: 2rem 1.35rem 3.5rem !important;
         align-items: flex-end !important;
         justify-content: center !important;
     }
 
     .hero-slide-left {
-        padding: calc(clamp(235px, 60vw, 46svh) - 1rem) 1.5rem 4rem !important;
+        padding: 2rem 1.5rem 4rem !important;
         align-items: flex-end !important;
         justify-content: flex-start !important;
     }
@@ -4294,13 +4314,13 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center center;
+    object-position: center top;
     transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
     display: block;
 }
 
 .schedule-card.schedule-card-photo:hover .schedule-card-bg {
-    transform: scale(1.06);
+    transform: scale(1.05);
 }
 
 .schedule-card-scrim {
@@ -4308,10 +4328,10 @@
     inset: 0;
     background: linear-gradient(
         180deg,
-        rgba(7, 25, 45, 0.22) 0%,
-        rgba(7, 25, 45, 0.12) 32%,
-        rgba(7, 25, 45, 0.72) 64%,
-        rgba(7, 25, 45, 0.94) 100%
+        rgba(7, 25, 45, 0.14) 0%,
+        rgba(7, 25, 45, 0.04) 38%,
+        rgba(7, 25, 45, 0.62) 66%,
+        rgba(7, 25, 45, 0.92) 100%
     );
     pointer-events: none;
 }
