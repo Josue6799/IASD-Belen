@@ -12,51 +12,51 @@
         {
             dia: 'Sábado / Introducción',
             categoria: 'Rompehielos',
-            pregunta: '¿Por qué hoy en día, en medio de tantas redes sociales y voces espirituales, es más urgente que nunca obedecer 1 Juan 4:1?',
+            pregunta: 'Así como un joyero examina un diamante auténtico frente a una imitación, ¿por qué hoy es más urgente que nunca obedecer 1 Juan 4:1?',
             versiculo: '1 Juan 4:1',
-            pista: 'Invite a la clase a compartir un ejemplo cotidiano de cómo verificamos si una noticia o consejo es confiable.'
+            pista: 'Invite a la clase a compartir un ejemplo cotidiano de cómo verificamos si algo valioso o una noticia es realmente confiable.'
         },
         {
             dia: 'Domingo',
-            categoria: 'Discernimiento',
-            pregunta: 'Según 1 Tesalonicenses 5:19-21, ¿qué dos extremos peligrosos debemos evitar frente al don de profecía?',
-            versiculo: '1 Tesalonicenses 5:19-21',
-            pista: 'Evitar tanto el cinismo que desprecia la profecía como la credulidad que acepta todo sin examinarlo.'
+            categoria: 'El papel de lo sobrenatural',
+            pregunta: 'Según Deuteronomio 13:1-5 y Mateo 24:24, ¿por qué los milagros o experiencias sobrenaturales por sí solos NO bastan para validar a un profeta?',
+            versiculo: 'Deuteronomio 13:1-5; Mateo 24:24',
+            pista: 'En el tiempo del fin habrá señales engañosas; lo sobrenatural siempre debe someterse a la verdad revelada en la Palabra de Dios.'
         },
         {
             dia: 'Lunes',
-            categoria: 'La Ley y el Testimonio',
-            pregunta: '¿Por qué la armonía con la Biblia (Isaías 8:20) es la primera y más decisiva prueba de todo mensaje profético?',
+            categoria: 'En armonía con la Biblia',
+            pregunta: '¿Por qué la armonía total con la Biblia (Isaías 8:20) es la regla de oro para evaluar cualquier mensaje profético?',
             versiculo: 'Isaías 8:20',
-            pista: 'Un verdadero profeta nunca contradice la revelación previa de Dios; siempre exalta las Escrituras.'
+            pista: 'Un verdadero profeta nunca contradice la revelación previa de Dios; siempre exalta y dirige hacia las Escrituras.'
         },
         {
             dia: 'Martes',
-            categoria: 'Cumplimiento profético',
-            pregunta: '¿Cómo se equilibra la prueba del cumplimiento de las predicciones (Deuteronomio 18:21-22) con las profecías condicionales como la de Jonás en Nínive?',
+            categoria: 'La encarnación de Cristo',
+            pregunta: 'En 1 Juan 4:2-3, ¿qué significa realmente confesar que Jesucristo ha venido en carne y cómo impacta nuestra fe diaria?',
+            versiculo: '1 Juan 4:2-3',
+            pista: 'Todo verdadero mensaje profético exalta la encarnación, el sacrificio y el señorío de Cristo, nunca al mensajero humano.'
+        },
+        {
+            dia: 'Miércoles',
+            categoria: 'Frutos positivos',
+            pregunta: 'Jesús dijo: "Por sus frutos los conoceréis" (Mateo 7:15-20). ¿Qué frutos concretos deberíamos observar en la vida y el ministerio de un mensajero de Dios?',
+            versiculo: 'Mateo 7:15-20; Gálatas 5:22-23',
+            pista: 'Humildad, integridad, amor por la iglesia, obediencia a la Palabra y transformación genuina en quienes reciben el mensaje.'
+        },
+        {
+            dia: 'Jueves',
+            categoria: 'Profecías cumplidas',
+            pregunta: '¿Cómo se equilibra la prueba del cumplimiento profético (Deuteronomio 18:21-22) con las profecías condicionales como la de Jonás en Nínive?',
             versiculo: 'Deuteronomio 18:21-22; Jeremías 18:7-10',
             pista: 'Las profecías de juicio o bendición pueden ser condicionales al arrepentimiento del pueblo, revelando la misericordia de Dios.'
         },
         {
-            dia: 'Miércoles',
-            categoria: 'Cristo en el centro',
-            pregunta: 'En 1 Juan 4:2-3, ¿qué significa realmente confesar que Jesucristo ha venido en carne y cómo impacta nuestra vida diaria?',
-            versiculo: '1 Juan 4:2-3',
-            pista: 'Todo verdadero mensaje profético exalta la encarnación, el sacrificio y el señorío de Cristo, no al mensajero.'
-        },
-        {
-            dia: 'Jueves',
-            categoria: 'Por sus frutos',
-            pregunta: 'Jesús dijo: "Por sus frutos los conoceréis" (Mateo 7:15-20). ¿Qué frutos concretos deberíamos observar en la vida y el ministerio de un mensajero de Dios?',
-            versiculo: 'Mateo 7:15-20; Gálatas 5:22-23',
-            pista: 'Humildad, integridad, amor por la iglesia, obediencia a la Palabra y transformación en quienes reciben el mensaje.'
-        },
-        {
             dia: 'Viernes',
-            categoria: 'Aplicación para la Iglesia',
-            pregunta: '¿Cómo podemos ayudar a los jóvenes y nuevos creyentes a valorar los escritos proféticos sin reemplazar nunca el estudio directo de la Biblia?',
-            versiculo: '2 Crónicas 20:20',
-            pista: 'Presentar el don profético como la "luz menor" que siempre nos dirige hacia la "luz mayor": la Palabra de Dios.'
+            categoria: 'Gusten y vean',
+            pregunta: 'Según 1 Tesalonicenses 5:19-21, ¿qué dos extremos peligrosos debemos evitar frente al don de profecía en la iglesia?',
+            versiculo: '1 Tesalonicenses 5:19-21; 2 Crónicas 20:20',
+            pista: 'Evitar tanto el cinismo que menosprecia la profecía como la credulidad que acepta todo sin examinarlo con la Biblia.'
         },
         {
             dia: 'Cierre y Decisión',
@@ -519,7 +519,10 @@
         if (maeTexto && semana.resumen_maestro) maeTexto.textContent = semana.resumen_maestro;
 
         if (Array.isArray(semana.preguntas_maestro) && semana.preguntas_maestro.length > 0) {
-            MSTATE.preguntas = semana.preguntas_maestro;
+            const isOldDefaultL9 = semana.numero_leccion === 9
+                && semana.preguntas_maestro[1]
+                && String(semana.preguntas_maestro[1].categoria || '') === 'Discernimiento';
+            MSTATE.preguntas = isOldDefaultL9 ? FALLBACK_PREGUNTAS_L9.slice() : semana.preguntas_maestro;
             MSTATE.qIndex = 0;
         }
         renderCurrentQuestion();

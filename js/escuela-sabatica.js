@@ -295,6 +295,26 @@
                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
             });
         }
+
+        const heroWa = document.getElementById('esHeroBtnShareWa');
+        if (heroWa) {
+            heroWa.addEventListener('click', () => {
+                const s = STATE.semana;
+                const cleanUrl = window.location.href.split('#')[0];
+                const msg = `📖 *Escuela Sabática · IASD Belén*\n*${s.trimestre} — ${s.tema_trimestre}*\n\n✨ *Lección ${s.numero_leccion}: ${s.titulo_leccion}*\n“${s.versiculo_texto}” (${s.versiculo_cita})\n\n🎧 Incluye folletos PDF (Adultos y Menores), audios día por día en voz humana, videos de repaso y foro de preguntas:\n👉 ${cleanUrl}`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+            });
+        }
+
+        const maestroWa = document.getElementById('esMaestroBtnShareWa');
+        if (maestroWa) {
+            maestroWa.addEventListener('click', () => {
+                const s = STATE.semana;
+                const maestroUrl = window.location.href.split('#')[0] + '#maestro';
+                const msg = `👨‍🏫 *Modo Maestro · Escuela Sabática IASD Belén*\n\n✨ *Lección ${s.numero_leccion}: ${s.titulo_leccion}*\nIncluye Comentarios del Maestro (PDF), Notas de Elena G. de White, banco de preguntas de la lección, cronómetro y Modo Dar Clase:\n👉 ${maestroUrl}`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+            });
+        }
     }
 
     // =========================================================================

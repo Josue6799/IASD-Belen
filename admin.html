@@ -77,6 +77,12 @@
                     </div>
                 </div>
 
+                <!-- Recordar sesión en este dispositivo -->
+                <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.84rem; color:#cbd5e1; margin:0.2rem 0 0.85rem; cursor:pointer; user-select:none;">
+                    <input type="checkbox" id="login-remember" checked style="width:16px; height:16px; accent-color:#c99d3b; cursor:pointer;" />
+                    <span>Mantener sesión iniciada en este dispositivo</span>
+                </label>
+
                 <!-- Mensaje de Error Dinámico -->
                 <div id="login-error" class="login-error" style="display: none;" role="alert"></div>
 
@@ -790,7 +796,8 @@
         };
 
         function checkAdminAuth() {
-            const isAuth = sessionStorage.getItem('iasd_admin_authenticated') === 'true';
+            const isAuth = sessionStorage.getItem('iasd_admin_authenticated') === 'true'
+                || localStorage.getItem('iasd_admin_authenticated') === 'true';
             const loginOverlay = document.getElementById('login-admin-overlay');
             const panel = document.getElementById('panelAdminGeneral');
 
@@ -834,6 +841,12 @@
 
             if (email === ADMIN_CREDENTIALS.email.toLowerCase() && password === ADMIN_CREDENTIALS.password) {
                 sessionStorage.setItem('iasd_admin_authenticated', 'true');
+                const rememberChk = document.getElementById('login-remember');
+                if (rememberChk && rememberChk.checked) {
+                    localStorage.setItem('iasd_admin_authenticated', 'true');
+                } else {
+                    localStorage.removeItem('iasd_admin_authenticated');
+                }
                 const loginOverlay = document.getElementById('login-admin-overlay');
                 if (loginOverlay) loginOverlay.style.setProperty('display', 'none', 'important');
                 const panel = document.getElementById('panelAdminGeneral');
@@ -886,6 +899,7 @@
 
         function cerrarSesionAdmin() {
             sessionStorage.removeItem('iasd_admin_authenticated');
+            localStorage.removeItem('iasd_admin_authenticated');
             Object.keys(sessionStorage).forEach(k => {
                 if (k.startsWith('desbloqueado_')) sessionStorage.removeItem(k);
             });

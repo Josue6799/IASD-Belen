@@ -282,6 +282,25 @@
 
         .es-btn-outline:hover { background: rgba(255, 255, 255, 0.22); }
 
+        .es-btn-hero-wa {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.55rem;
+            padding: 0.86rem 1.5rem;
+            border-radius: 999px;
+            background: #16a34a;
+            border: 1.5px solid #22c55e;
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.34);
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+
+        .es-btn-hero-wa:hover { transform: translateY(-2px); filter: brightness(1.07); }
+
         /* Container & Sections — Ancho completo */
         .es-container {
             width: 100%;
@@ -2058,6 +2077,240 @@
             display: block;
         }
 
+        /* Textos Clave de la Semana + Mini-Quiz */
+        .es-textos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1.05rem;
+        }
+
+        .es-texto-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--gold);
+            border-radius: 1.15rem;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            box-shadow: 0 6px 20px rgba(11, 43, 79, 0.05);
+        }
+
+        .es-texto-top {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .es-texto-cita {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            width: fit-content;
+            padding: 0.24rem 0.72rem;
+            border-radius: 999px;
+            background: rgba(201, 157, 59, 0.16);
+            color: #8a6416;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .es-texto-tema {
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--navy-mid);
+        }
+
+        .es-texto-body {
+            font-size: 0.89rem;
+            color: var(--text);
+            line-height: 1.62;
+            font-style: italic;
+            flex: 1;
+        }
+
+        .es-texto-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .es-quiz-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-top: 4px solid var(--blue-accent);
+            border-radius: 1.35rem;
+            padding: clamp(1.3rem, 3vw, 2rem);
+            box-shadow: 0 10px 30px rgba(11, 43, 79, 0.08);
+        }
+
+        .es-quiz-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .es-quiz-question {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+            color: var(--navy);
+            line-height: 1.38;
+            margin-bottom: 1.15rem;
+        }
+
+        .es-quiz-options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .es-quiz-opt {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-align: left;
+            padding: 0.9rem 1rem;
+            border-radius: 0.95rem;
+            border: 1.5px solid var(--border);
+            background: #fcfbf8;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .es-quiz-opt:hover:not(:disabled) {
+            border-color: var(--gold);
+            background: #fffdf6;
+        }
+
+        .es-quiz-letter {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            border-radius: 50%;
+            background: rgba(11, 43, 79, 0.1);
+            color: var(--navy-mid);
+            font-weight: 800;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .es-quiz-opt.correct {
+            background: #ecfdf5;
+            border-color: #16a34a;
+            color: #14532d;
+        }
+
+        .es-quiz-opt.correct .es-quiz-letter { background: #16a34a; color: #fff; }
+
+        .es-quiz-opt.wrong {
+            background: #fef2f2;
+            border-color: #dc2626;
+            color: #7f1d1d;
+        }
+
+        .es-quiz-opt.wrong .es-quiz-letter { background: #dc2626; color: #fff; }
+
+        .es-quiz-feedback {
+            margin-top: 1rem;
+            padding: 0.9rem 1.05rem;
+            border-radius: 0.85rem;
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        .es-quiz-feedback.is-ok { background: #ecfdf5; border-left: 4px solid #16a34a; color: #14532d; }
+        .es-quiz-feedback.is-err { background: #fefce8; border-left: 4px solid var(--gold); color: #713f12; }
+
+        .es-quiz-result {
+            text-align: center;
+            padding: 1rem 0.5rem;
+        }
+
+        .es-quiz-score-circle {
+            width: 96px;
+            height: 96px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+            border: 4px solid var(--gold);
+            color: var(--gold-light);
+            font-size: 1.65rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .es-quiz-result h3 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.6rem;
+            color: var(--navy-mid);
+            margin-bottom: 0.4rem;
+        }
+
+        .es-quiz-result p { color: var(--muted); max-width: 520px; margin: 0 auto 1.25rem; }
+
+        .es-quiz-result-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.7rem;
+        }
+
+        /* Barra de Accesos Rápidos (PC y Celular) */
+        .es-quicknav {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem clamp(0.85rem, 3vw, 2.6rem);
+            box-shadow: 0 4px 16px rgba(11, 43, 79, 0.05);
+        }
+
+        .es-quicknav-list {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 0.1rem;
+        }
+
+        .es-quicknav-list::-webkit-scrollbar { display: none; }
+
+        .es-quicknav-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.42rem;
+            white-space: nowrap;
+            padding: 0.48rem 0.95rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #fcfbf8;
+            color: var(--navy-mid);
+            font-size: 0.82rem;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+
+        .es-quicknav-pill i { color: var(--gold); }
+
+        .es-quicknav-pill:hover {
+            background: var(--navy-mid);
+            color: #fff;
+            border-color: var(--navy-mid);
+        }
+
+        .es-quicknav-pill:hover i { color: var(--gold-light); }
+
         .es-footer {
             text-align: center;
             padding: 1.6rem 1rem 2.2rem;
@@ -2077,7 +2330,9 @@
             .es-fs-body { grid-template-columns: 1fr; }
             .es-summary-pillars,
             .es-brief-grid,
-            .es-family-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .es-family-grid,
+            .es-textos-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .es-quiz-options { grid-template-columns: 1fr; }
             .es-tools-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .es-prayer-form,
             .es-foro-row-2 { grid-template-columns: 1fr; }
@@ -2113,7 +2368,8 @@
             .es-hero p { font-size: 0.94rem; margin-bottom: 1.35rem; }
             .es-hero-actions { flex-direction: column; width: 100%; }
             .es-hero-actions .es-btn-gold,
-            .es-hero-actions .es-btn-outline {
+            .es-hero-actions .es-btn-outline,
+            .es-hero-actions .es-btn-hero-wa {
                 width: 100%;
                 justify-content: center;
                 padding: 0.82rem 1.2rem;
@@ -2149,6 +2405,7 @@
             .es-summary-pillars,
             .es-brief-grid,
             .es-family-grid,
+            .es-textos-grid,
             .es-tools-grid { grid-template-columns: 1fr; }
 
             .es-foro-list { max-height: none; overflow-y: visible; padding-right: 0; }
@@ -2245,6 +2502,9 @@
                     <a href="#maestro" data-open-mode="maestro" class="es-btn-outline">
                         <i class="fas fa-chalkboard-teacher"></i> Ir a Modo Maestro
                     </a>
+                    <button type="button" id="esHeroBtnShareWa" class="es-btn-hero-wa">
+                        <i class="fab fa-whatsapp"></i> Compartir lección por WhatsApp
+                    </button>
                 </div>
             </div>
             <a href="#versiculoMemoria" class="es-hero-scroll-cue" aria-label="Bajar al estudio">
@@ -2252,6 +2512,21 @@
                 <i class="fas fa-chevron-down"></i>
             </a>
         </section>
+
+        <!-- Barra de Accesos Rápidos (Modo Estudiante) -->
+        <nav class="es-quicknav" aria-label="Accesos rápidos de estudio">
+            <div class="es-quicknav-list">
+                <a href="#versiculoMemoria" class="es-quicknav-pill"><i class="fas fa-bible"></i> Versículo</a>
+                <a href="#resumenEstudiante" class="es-quicknav-pill"><i class="fas fa-compass"></i> Resumen</a>
+                <a href="#folletosFamilia" class="es-quicknav-pill"><i class="fas fa-file-pdf"></i> Folletos PDF</a>
+                <a href="#audioLeccion" class="es-quicknav-pill"><i class="fas fa-headphones"></i> Audios 7 Días</a>
+                <a href="#videosRepaso" class="es-quicknav-pill"><i class="fab fa-youtube"></i> Videos</a>
+                <a href="#textosClaveSemana" class="es-quicknav-pill"><i class="fas fa-book-open"></i> Textos Clave</a>
+                <a href="#miniQuizLeccion" class="es-quicknav-pill"><i class="fas fa-trophy"></i> Mini-Quiz</a>
+                <a href="#foroEstudio" class="es-quicknav-pill"><i class="fas fa-comments"></i> Foro en Vivo</a>
+                <a href="#cuadernoApuntes" class="es-quicknav-pill"><i class="fas fa-pen-nib"></i> Apuntes</a>
+            </div>
+        </nav>
 
         <main class="es-container">
             <!-- 1. Versículo de Memoria Interactivo (#5) -->
@@ -2355,45 +2630,46 @@
                 </div>
             </section>
 
-            <!-- 2. Checklist de Estudio Diario -->
-            <section class="es-section">
+            <!-- 3. Folletos Oficiales de la Iglesia (Adultos y Menores) -->
+            <section class="es-section" id="folletosFamilia">
                 <div class="es-section-head">
-                    <span class="es-kicker">Hábito Espiritual</span>
-                    <h2 class="es-section-title">Mi Estudio Diario de la Lección</h2>
-                    <p class="es-section-sub">Marca cada día que estudies esta semana. Tu progreso se guarda automáticamente en tu dispositivo.</p>
+                    <span class="es-kicker">Folletos Oficiales · 4° Trimestre 2026</span>
+                    <h2 class="es-section-title">Folletos de Escuela Sabática</h2>
+                    <p class="es-section-sub">Abre y lee aquí mismo los folletos oficiales de Adultos y Menores sin salir de la página.</p>
                 </div>
 
-                <div class="es-checklist-card">
-                    <div class="es-checklist-top">
-                        <strong id="esProgressText" style="color: var(--navy-mid); font-size: 0.95rem;">0 de 7 días estudiados esta semana</strong>
-                        <button type="button" id="btnResetWeek" class="es-reset-btn">
-                            <i class="fas fa-redo-alt"></i> Nueva semana
-                        </button>
-                    </div>
-                    <div class="es-progress-bar-wrap">
-                        <div id="esProgressBar" class="es-progress-bar"></div>
-                    </div>
-                    <div class="es-days-grid" id="esDaysGrid">
-                        <button type="button" class="es-day-btn" data-day="sab"><i class="far fa-circle"></i><span>Sábado</span></button>
-                        <button type="button" class="es-day-btn" data-day="dom"><i class="far fa-circle"></i><span>Domingo</span></button>
-                        <button type="button" class="es-day-btn" data-day="lun"><i class="far fa-circle"></i><span>Lunes</span></button>
-                        <button type="button" class="es-day-btn" data-day="mar"><i class="far fa-circle"></i><span>Martes</span></button>
-                        <button type="button" class="es-day-btn" data-day="mie"><i class="far fa-circle"></i><span>Miércoles</span></button>
-                        <button type="button" class="es-day-btn" data-day="jue"><i class="far fa-circle"></i><span>Jueves</span></button>
-                        <button type="button" class="es-day-btn" data-day="vie"><i class="far fa-circle"></i><span>Viernes</span></button>
+                <div class="es-family-banner">
+                    <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795373885715-ed4a874f.jpg"
+                        alt="Familias, jóvenes y niños estudiando la Biblia" />
+                    <div class="es-family-banner-scrim"></div>
+                    <div class="es-family-banner-text">
+                        <span class="es-badge" style="margin-bottom:0.5rem;"><i class="fas fa-users"></i> Familia IASD Belén</span>
+                        <h3 style="font-family:'Playfair Display', serif; font-size:clamp(1.3rem, 2.5vw, 1.75rem); line-height:1.2;">
+                            Un culto familiar cada día fortalece la fe de padres, jóvenes y menores
+                        </h3>
                     </div>
                 </div>
-            </section>
 
-            <!-- 3. Videos de Repaso de la Lección (Dinámicos) -->
-            <section class="es-section" id="videosRepaso">
-                <div class="es-section-head">
-                    <span id="esVideosKicker" class="es-kicker">Repaso en Video · Lección 9</span>
-                    <h2 class="es-section-title">Videos de Repaso de Esta Semana</h2>
-                    <p class="es-section-sub">Estudia y repasa la lección directamente desde aquí antes del sábado.</p>
+                <div class="es-family-grid">
+                    <a id="esFamAdultosPdf"
+                        href="https://files.recursos-biblicos.com/Escuela%20Sabatica/Leccion/4to2026/LeccionAdultos4to2026.pdf"
+                        data-pdf-modal="true" data-pdf-title="Folleto General de Adultos · El Don de Profecía (4° Trim. 2026)"
+                        class="es-fam-card">
+                        <span class="es-fam-badge" style="background:#e0f2fe; color:#0369a1;"><i class="fas fa-book-bible"></i> Adultos · General</span>
+                        <h3>Folleto General — El Don de Profecía</h3>
+                        <p>Guía oficial de estudio bíblico del 4° Trimestre 2026 para jóvenes y adultos en PDF.</p>
+                        <span class="es-fam-link">Leer PDF aquí <i class="fas fa-book-open"></i></span>
+                    </a>
+
+                    <a href="https://files.recursos-biblicos.com/Escuela%20Sabatica/InfantilesyJuveniles/Menores/4to2026/Folleto%20Menores%204T%20A%C3%B1o%20C%202026%20DIA.pdf"
+                        data-pdf-modal="true" data-pdf-title="Folleto de Menores · 4° Trimestre 2026 (DIA)"
+                        class="es-fam-card">
+                        <span class="es-fam-badge" style="background:#fef3c7; color:#b45309;"><i class="fas fa-compass"></i> Menores · DIA</span>
+                        <h3>Folleto de Menores — 4° Trimestre 2026</h3>
+                        <p>Folleto oficial de la División Interamericana (Año C · 4° Trimestre 2026) para el estudio de menores.</p>
+                        <span class="es-fam-link">Leer PDF aquí <i class="fas fa-book-open"></i></span>
+                    </a>
                 </div>
-
-                <div id="esVideosGrid" class="es-videos-grid"></div>
             </section>
 
             <!-- 4. Audio Narrado por Locutores Reales (Reproductor Directo 7 Días) -->
@@ -2446,47 +2722,20 @@
                 </div>
             </section>
 
-            <!-- 5. Folletos Oficiales de la Iglesia (Adultos y Menores) -->
-            <section class="es-section" id="folletosFamilia">
+            <!-- 5. Videos de Repaso de la Lección (Dinámicos) -->
+            <section class="es-section" id="videosRepaso">
                 <div class="es-section-head">
-                    <span class="es-kicker">Folletos Oficiales · 4° Trimestre 2026</span>
-                    <h2 class="es-section-title">Folletos de Escuela Sabática</h2>
-                    <p class="es-section-sub">Abre y lee aquí mismo los folletos oficiales de Adultos y Menores sin salir de la página.</p>
+                    <span id="esVideosKicker" class="es-kicker">Repaso en Video · Lección 9</span>
+                    <h2 class="es-section-title">Videos de Repaso de Esta Semana</h2>
+                    <p class="es-section-sub">Estudia y repasa la lección directamente desde aquí antes del sábado.</p>
                 </div>
 
-                <div class="es-family-banner">
-                    <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795373885715-ed4a874f.jpg"
-                        alt="Familias, jóvenes y niños estudiando la Biblia" />
-                    <div class="es-family-banner-scrim"></div>
-                    <div class="es-family-banner-text">
-                        <span class="es-badge" style="margin-bottom:0.5rem;"><i class="fas fa-users"></i> Familia IASD Belén</span>
-                        <h3 style="font-family:'Playfair Display', serif; font-size:clamp(1.3rem, 2.5vw, 1.75rem); line-height:1.2;">
-                            Un culto familiar cada día fortalece la fe de padres, jóvenes y menores
-                        </h3>
-                    </div>
-                </div>
-
-                <div class="es-family-grid">
-                    <a id="esFamAdultosPdf"
-                        href="https://files.recursos-biblicos.com/Escuela%20Sabatica/Leccion/4to2026/LeccionAdultos4to2026.pdf"
-                        data-pdf-modal="true" data-pdf-title="Folleto General de Adultos · El Don de Profecía (4° Trim. 2026)"
-                        class="es-fam-card">
-                        <span class="es-fam-badge" style="background:#e0f2fe; color:#0369a1;"><i class="fas fa-book-bible"></i> Adultos · General</span>
-                        <h3>Folleto General — El Don de Profecía</h3>
-                        <p>Guía oficial de estudio bíblico del 4° Trimestre 2026 para jóvenes y adultos en PDF.</p>
-                        <span class="es-fam-link">Leer PDF aquí <i class="fas fa-book-open"></i></span>
-                    </a>
-
-                    <a href="https://files.recursos-biblicos.com/Escuela%20Sabatica/InfantilesyJuveniles/Menores/4to2026/Folleto%20Menores%204T%20A%C3%B1o%20C%202026%20DIA.pdf"
-                        data-pdf-modal="true" data-pdf-title="Folleto de Menores · 4° Trimestre 2026 (DIA)"
-                        class="es-fam-card">
-                        <span class="es-fam-badge" style="background:#fef3c7; color:#b45309;"><i class="fas fa-compass"></i> Menores · DIA</span>
-                        <h3>Folleto de Menores — 4° Trimestre 2026</h3>
-                        <p>Folleto oficial de la División Interamericana (Año C · 4° Trimestre 2026) para el estudio de menores.</p>
-                        <span class="es-fam-link">Leer PDF aquí <i class="fas fa-book-open"></i></span>
-                    </a>
-                </div>
+                <div id="esVideosGrid" class="es-videos-grid"></div>
             </section>
+
+            <!-- Textos Clave de la Semana + Mini-Quiz Interactivo -->
+            <div id="esTextosClaveMount"></div>
+            <div id="esQuizMount"></div>
 
             <!-- Espacio listo para Módulo 5: Foro de Estudio en Tiempo Real -->
             <div id="esForoMount"></div>
@@ -2583,6 +2832,9 @@
                     <a href="#estudiante" data-open-mode="estudiante" class="es-btn-outline">
                         <i class="fas fa-book-reader"></i> Volver a Modo Estudiante
                     </a>
+                    <button type="button" id="esMaestroBtnShareWa" class="es-btn-hero-wa">
+                        <i class="fab fa-whatsapp"></i> Compartir a Maestros
+                    </button>
                 </div>
             </div>
             <a href="#resumenMaestro" class="es-hero-scroll-cue" aria-label="Bajar a herramientas de maestro">
@@ -2590,6 +2842,17 @@
                 <i class="fas fa-chevron-down"></i>
             </a>
         </section>
+
+        <!-- Barra de Accesos Rápidos (Modo Maestro) -->
+        <nav class="es-quicknav" aria-label="Accesos rápidos del maestro">
+            <div class="es-quicknav-list">
+                <a href="#resumenMaestro" class="es-quicknav-pill"><i class="fas fa-chalkboard-teacher"></i> Resumen Pedagógico</a>
+                <a href="#recursosMaestro" class="es-quicknav-pill"><i class="fas fa-file-pdf"></i> PDF Maestros &amp; EGW</a>
+                <a href="#bancoPreguntasMaestro" class="es-quicknav-pill"><i class="fas fa-dice"></i> Banco de Preguntas</a>
+                <a href="#listaOracionClase" class="es-quicknav-pill"><i class="fas fa-praying-hands"></i> Lista de Oración</a>
+                <a href="#rinconMaestros" class="es-quicknav-pill"><i class="fas fa-stopwatch"></i> Esquema &amp; Cronómetro</a>
+            </div>
+        </nav>
 
         <main class="es-container">
             <!-- Espacio listo para Módulo 4 (Folleto Maestro, Preguntas Lección 9, Lista Oración, Modo Dar Clase) -->
@@ -2697,6 +2960,7 @@
     <script src="js/escuela-sabatica.js"></script>
     <script src="js/escuela-sabatica-maestro.js"></script>
     <script src="js/escuela-sabatica-foro.js"></script>
+    <script src="js/escuela-sabatica-extra.js"></script>
 </body>
 
 </html>
