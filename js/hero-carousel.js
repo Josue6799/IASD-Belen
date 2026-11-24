@@ -40,7 +40,11 @@
             timer = setInterval(() => {
                 const homePage = document.getElementById('home');
                 if (document.visibilityState === 'visible' && homePage && homePage.classList.contains('active')) {
-                    goTo(current + 1);
+                    const rect = root.getBoundingClientRect();
+                    // Solo avanzar automáticamente si el carrusel está visible en pantalla (evita que suba el scroll al usuario)
+                    if (rect.bottom > 80) {
+                        goTo(current + 1);
+                    }
                 }
             }, INTERVAL_MS);
         }

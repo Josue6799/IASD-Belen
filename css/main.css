@@ -3605,12 +3605,14 @@
     min-height: clamp(640px, calc(100vh - 88px), 940px);
     display: block;
     text-align: left;
+    overflow-anchor: none;
 }
 
 .hero-slides-track {
     position: relative;
     width: 100%;
     min-height: clamp(640px, calc(100vh - 88px), 940px);
+    overflow-anchor: none;
 }
 
 .hero-slide {
@@ -4462,5 +4464,422 @@
 
     .schedule-card-cta {
         width: 100%;
+    }
+}
+
+/* ===== REDISEÑO NUESTRA IGLESIA EN NÚMEROS (FULL-WIDTH CON IMÁGENES) ===== */
+.estadisticas-seccion.estadisticas-fullbleed {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 2.5rem 0 3.2rem calc(50% - 50vw) !important;
+    padding: 2.8rem clamp(0.9rem, 2.2vw, 2rem) 3rem !important;
+    box-sizing: border-box !important;
+}
+
+.estadisticas-grid.estadisticas-grid-editorial {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: clamp(0.85rem, 1.4vw, 1.35rem) !important;
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.estadistica-card.estadistica-card-photo {
+    position: relative !important;
+    min-height: 410px !important;
+    padding: 0 !important;
+    border-radius: 1.2rem !important;
+    overflow: hidden !important;
+    background: #07192d !important;
+    border: 1px solid rgba(201, 157, 59, 0.25) !important;
+    box-shadow: 0 14px 34px rgba(7, 25, 45, 0.16) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    text-align: left !important;
+    transition: transform 0.35s ease, box-shadow 0.35s ease !important;
+}
+
+.estadistica-card.estadistica-card-photo:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 22px 44px rgba(7, 25, 45, 0.26) !important;
+}
+
+.estadistica-card-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.estadistica-card.estadistica-card-photo:hover .estadistica-card-bg {
+    transform: scale(1.06);
+}
+
+.estadistica-card-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(7, 25, 45, 0.16) 0%,
+        rgba(7, 25, 45, 0.25) 38%,
+        rgba(7, 25, 45, 0.82) 68%,
+        rgba(7, 25, 45, 0.96) 100%
+    );
+    pointer-events: none;
+}
+
+.estadistica-card-inner {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.35rem 1.4rem 1.6rem;
+    color: #fff;
+}
+
+.estadistica-card.estadistica-card-photo .estadistica-icon-box {
+    width: 48px !important;
+    height: 48px !important;
+    margin: 0 !important;
+    border-radius: 0.9rem !important;
+    background: rgba(7, 25, 45, 0.58) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(223, 183, 92, 0.45) !important;
+    color: #dfb75c !important;
+    font-size: 1.25rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.estadistica-card-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.estadistica-card.estadistica-card-photo .estadistica-numero {
+    font-family: 'Playfair Display', Georgia, serif !important;
+    font-size: clamp(2rem, 2.8vw, 2.75rem) !important;
+    font-weight: 800 !important;
+    color: #e8c468 !important;
+    line-height: 1.1 !important;
+    text-shadow: 0 3px 14px rgba(0, 0, 0, 0.5);
+}
+
+.estadistica-card.estadistica-card-photo .estadistica-label {
+    font-size: 1.08rem !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    margin: 0.2rem 0 0 !important;
+}
+
+.estadistica-card.estadistica-card-photo .estadistica-desc {
+    font-size: 0.88rem !important;
+    color: #dbe7f5 !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+}
+
+@media (max-width: 1120px) {
+    .estadisticas-grid.estadisticas-grid-editorial {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .estadistica-card.estadistica-card-photo {
+        min-height: 360px !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .estadisticas-grid.estadisticas-grid-editorial {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    .estadistica-card.estadistica-card-photo {
+        min-height: 330px !important;
+    }
+}
+
+/* ===== REDISEÑO TRANSMISIONES EN VIVO Y HORARIOS (FULL-WIDTH CON FOTO REAL) ===== */
+.transmisiones-horarios-section.th-fullbleed {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 2rem 0 3.2rem calc(50% - 50vw) !important;
+    padding: 2.6rem clamp(0.9rem, 2.5vw, 2.4rem) 3rem !important;
+    background: linear-gradient(180deg, #f6f2ea 0%, #fbf9f5 100%);
+    border-top: 1px solid #eae2d3;
+    border-bottom: 1px solid #eae2d3;
+    box-sizing: border-box !important;
+}
+
+.th-main-grid.th-main-grid-full {
+    display: grid !important;
+    grid-template-columns: 1.05fr 0.95fr !important;
+    gap: clamp(1.1rem, 2vw, 1.8rem) !important;
+    width: 100% !important;
+    max-width: none !important;
+    align-items: stretch !important;
+}
+
+.th-horarios-card.th-horarios-modern {
+    background: #ffffff !important;
+    border: 1px solid #e6dfd1 !important;
+    border-radius: 1.35rem !important;
+    padding: clamp(1.25rem, 2.5vw, 1.85rem) !important;
+    box-shadow: 0 12px 32px rgba(11, 43, 79, 0.07) !important;
+}
+
+.th-horarios-modern .th-horario-item {
+    border-radius: 0.95rem !important;
+    border: 1px solid #efe9dc !important;
+    border-left: 4px solid #c99d3b !important;
+    background: #fcfbf8 !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.th-horarios-modern .th-horario-item:hover {
+    transform: translateX(4px);
+    box-shadow: 0 6px 18px rgba(11, 43, 79, 0.08);
+}
+
+.th-horarios-modern .th-item-jovenes { border-left-color: #dc2626 !important; }
+.th-horarios-modern .th-item-oracion { border-left-color: #16a34a !important; }
+.th-horarios-modern .th-item-testimonio { border-left-color: #0d6699 !important; }
+
+.th-live-banner.th-live-photo-banner {
+    position: relative !important;
+    border-radius: 1.35rem !important;
+    overflow: hidden !important;
+    background: #07192d !important;
+    border: 1px solid rgba(201, 157, 59, 0.35) !important;
+    box-shadow: 0 16px 38px rgba(7, 25, 45, 0.22) !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.th-live-bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+}
+
+.th-live-bg-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(155deg, rgba(7, 25, 45, 0.86) 0%, rgba(11, 43, 79, 0.78) 55%, rgba(7, 25, 45, 0.92) 100%);
+    pointer-events: none;
+}
+
+.th-live-inner {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding: clamp(1.6rem, 3.2vw, 2.5rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #fff;
+}
+
+.th-live-photo-banner .th-live-title {
+    font-family: 'Playfair Display', Georgia, serif !important;
+    font-size: clamp(1.55rem, 2.6vw, 2.15rem) !important;
+    color: #ffffff !important;
+    margin: 0.75rem 0 0.7rem !important;
+    text-shadow: 0 3px 14px rgba(0, 0, 0, 0.45);
+}
+
+.th-live-photo-banner .th-live-desc {
+    color: #e6eef8 !important;
+    max-width: 520px;
+    margin-bottom: 1.35rem !important;
+}
+
+.th-live-photo-banner .th-platforms-bar {
+    background: rgba(7, 25, 45, 0.56) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 999px !important;
+    padding: 0.55rem 1.2rem !important;
+}
+
+@media (max-width: 960px) {
+    .th-main-grid.th-main-grid-full {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .transmisiones-horarios-section.th-fullbleed {
+        padding: 2rem 0.85rem 2.4rem !important;
+    }
+
+    .th-live-photo-banner .th-platforms-bar {
+        border-radius: 1rem !important;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.55rem;
+    }
+
+    .th-live-photo-banner .th-plat-divider { display: none; }
+}
+
+/* ===== REDISEÑO RECURSOS ESPIRITUALES (FULL-WIDTH 5x2 MODERNO) ===== */
+.recursos-espirituales-section.recursos-fullbleed {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 2.2rem 0 3rem calc(50% - 50vw) !important;
+    padding: 2.6rem clamp(0.9rem, 2.5vw, 2.4rem) 3rem !important;
+    box-sizing: border-box !important;
+}
+
+.recursos-grid.recursos-grid-modern {
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: clamp(0.85rem, 1.3vw, 1.2rem) !important;
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.recursos-grid-modern .recurso-card {
+    position: relative !important;
+    background: #ffffff !important;
+    border: 1px solid #e6dfd1 !important;
+    border-top: 4px solid #0d6699 !important;
+    border-radius: 1.15rem !important;
+    padding: 1.35rem 1.2rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+    gap: 0.45rem !important;
+    box-shadow: 0 8px 24px rgba(11, 43, 79, 0.06) !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+
+.recursos-grid-modern .recurso-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 16px 34px rgba(11, 43, 79, 0.13) !important;
+}
+
+.recursos-grid-modern .recurso-icon-box {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 0.9rem !important;
+    margin: 0 0 0.35rem !important;
+    font-size: 1.2rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.recursos-grid-modern .recurso-card-title {
+    font-size: 1rem !important;
+    font-weight: 800 !important;
+    color: #0b2b4f !important;
+    line-height: 1.28 !important;
+    margin: 0 !important;
+}
+
+.recursos-grid-modern .recurso-card-desc {
+    font-size: 0.84rem !important;
+    color: #596579 !important;
+    line-height: 1.5 !important;
+    margin: 0 0 0.5rem !important;
+    flex: 1 !important;
+}
+
+.recursos-grid-modern .recurso-card-action {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    padding: 0.36rem 0.82rem !important;
+    border-radius: 999px !important;
+    background: #f1f5f9 !important;
+    color: #0b2b4f !important;
+    font-size: 0.78rem !important;
+    font-weight: 800 !important;
+    margin-top: auto !important;
+    transition: background 0.2s ease, color 0.2s ease !important;
+}
+
+.recursos-grid-modern .recurso-card:hover .recurso-card-action {
+    background: #0b2b4f !important;
+    color: #ffffff !important;
+}
+
+/* Acentos por categoría */
+.recurso-accent-blue { border-top-color: #0284c7 !important; }
+.recurso-accent-blue .recurso-icon-box { background: #e0f2fe !important; color: #0369a1 !important; }
+
+.recurso-accent-purple { border-top-color: #7c3aed !important; }
+.recurso-accent-purple .recurso-icon-box { background: #f3e8ff !important; color: #6d28d9 !important; }
+
+.recurso-accent-gold { border-top-color: #c99d3b !important; }
+.recurso-accent-gold .recurso-icon-box { background: #fef3c7 !important; color: #a16207 !important; }
+
+.recurso-accent-teal { border-top-color: #0d9488 !important; }
+.recurso-accent-teal .recurso-icon-box { background: #ccfbf1 !important; color: #0f766e !important; }
+
+.recurso-accent-green { border-top-color: #16a34a !important; }
+.recurso-accent-green .recurso-icon-box { background: #dcfce7 !important; color: #15803d !important; }
+
+.recurso-accent-indigo { border-top-color: #4f46e5 !important; }
+.recurso-accent-indigo .recurso-icon-box { background: #e0e7ff !important; color: #4338ca !important; }
+
+.recurso-accent-amber { border-top-color: #d97706 !important; }
+.recurso-accent-amber .recurso-icon-box { background: #ffedd5 !important; color: #c2410c !important; }
+
+.recurso-accent-crimson { border-top-color: #e11d48 !important; }
+.recurso-accent-crimson .recurso-icon-box { background: #ffe4e6 !important; color: #be123c !important; }
+
+.recurso-accent-featured {
+    background: linear-gradient(150deg, #07192d 0%, #0b2b4f 100%) !important;
+    border-color: rgba(201, 157, 59, 0.45) !important;
+    border-top: 4px solid #c99d3b !important;
+}
+.recurso-accent-featured .recurso-icon-box { background: rgba(201, 157, 59, 0.2) !important; color: #dfb75c !important; }
+.recurso-accent-featured .recurso-card-title { color: #ffffff !important; }
+.recurso-accent-featured .recurso-card-desc { color: #cbd5e1 !important; }
+.recurso-accent-featured .recurso-card-action { background: #c99d3b !important; color: #07192d !important; }
+.recurso-accent-featured:hover .recurso-card-action { background: #dfb75c !important; color: #07192d !important; }
+
+@media (max-width: 1200px) {
+    .recursos-grid.recursos-grid-modern {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .recursos-grid.recursos-grid-modern {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.75rem !important;
+    }
+
+    .recursos-grid-modern .recurso-card {
+        padding: 1.05rem 0.95rem !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .recursos-grid.recursos-grid-modern {
+        grid-template-columns: 1fr !important;
     }
 }
