@@ -27,6 +27,7 @@ rel="stylesheet" />
 <link rel="stylesheet" href="css/quienes-somos.css?v=4.2" />
 <link rel="stylesheet" href="css/clubes.css" />
 <link rel="stylesheet" href="css/biblioteca.css" />
+<link rel="stylesheet" href="css/creencias-editorial.css?v=4.1" />
 <style id="cookie-consent-styles">
 /* ==========================================================================
    POLÍTICAS LEGALES, BANNER DE COOKIES & GOOGLE CONSENT MODE (LEY 1581 / 2012)
@@ -2929,34 +2930,102 @@ Ver Videos <i class="fas fa-arrow-right"></i>
 </div>
 </div>
 <div id="creencias" class="page">
-<button class="back-link" data-csp-click="showPage('home')"><i class="fas fa-arrow-left"></i>
-Volver</button>
-<div class="creencias-hero-header">
-<span class="creencias-badge-pill"><i class="fas fa-bible"></i> Doctrina Bíblica Oficial</span>
-<h2 class="page-title" style="justify-content: center;"><i class="fas fa-cross"></i> Las 28 Creencias
-Fundamentales</h2>
-<p
-style="color:var(--muted-text); max-width:700px; margin:0.5rem auto 1.5rem; text-align:center; font-size:1rem;">
-Las Sagradas Escrituras son la única regla de fe y práctica para los Adventistas del Séptimo Día.
-Descubre los 28 pilares fundamentales de nuestra fe.
+<!-- 1. HERO FOTOGRÁFICO EDITORIAL FULL-WIDTH -->
+<section class="cr-hero-editorial">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795629272251-082f1d6b.jpg"
+alt="Amanecer sobre montañas y nubes - Las 28 Creencias Fundamentales" class="cr-hero-bg" />
+<div class="cr-hero-scrim"></div>
+<button type="button" class="cr-back-pill" data-csp-click="showPage('home')">
+<i class="fas fa-arrow-left"></i> Volver al Inicio
+</button>
+<div class="cr-hero-inner">
+<span class="cr-hero-badge"><i class="fas fa-bible"></i> Doctrina Bíblica Oficial</span>
+<h2 class="cr-hero-title">Las <span>28 Creencias</span> Fundamentales</h2>
+<p class="cr-hero-subtitle">
+Las Sagradas Escrituras son la única regla de fe y práctica para los Adventistas del Séptimo Día. Explora los 28 pilares bíblicos organizados en 6 grandes temas.
 </p>
-</div>
-<div class="cta-creencias-banner">
-<div class="cta-creencias-content">
-<div class="cta-creencias-badge">
-<span>🌟</span> Proyecto Especial Interactivo
-</div>
-<h3 class="cta-creencias-title">Explora nuestras creencias de forma interactiva</h3>
-<p class="cta-creencias-description">
-Haz clic abajo para acceder a un proyecto especial interactivo con las 28 creencias
-fundamentales explicadas en detalle.
-</p>
+<div class="cr-hero-actions">
 <a href="https://proyecto-biblia-fe2b5.web.app/" target="_blank" rel="noopener noreferrer"
-class="btn-cta-creencias" data-csp-click="abrirProyectoCreencias()">
-Ir al proyecto interactivo <i class="fas fa-arrow-right"></i>
+class="cr-hero-btn-gold" data-csp-click="abrirProyectoCreencias()">
+<i class="fas fa-sparkles"></i> Proyecto Interactivo 28 Creencias <i class="fas fa-arrow-right"></i>
 </a>
+<button type="button" class="cr-hero-btn-glass" data-csp-click="CreenciasManager.abrirOIniciarQuiz()">
+<i class="fas fa-brain"></i> Quiz Doctrinal
+</button>
 </div>
 </div>
+</section>
+
+<!-- 2. GALERÍA FOTOGRÁFICA DE LAS 6 CATEGORÍAS -->
+<section class="cr-cats-showcase" aria-label="Categorías de las 28 Creencias">
+<div class="cr-cats-header">
+<span class="cr-cats-eyebrow"><i class="fas fa-layer-group"></i> 6 Grandes Temas Bíblicos</span>
+<h3 class="cr-cats-title">Explora por Categoría</h3>
+<div class="cr-cats-filter-bar">
+<button type="button" id="crBtnVerTodas" class="cr-btn-ver-todas active" data-cat="todas"
+data-csp-click="CreenciasManager.setCategory('todas')">
+<i class="fas fa-th-large"></i> Ver todas las 28 Creencias
+</button>
+<span class="cr-cats-hint">Toca una categoría para filtrar o vuelve a tocarla para ver las 28</span>
+</div>
+</div>
+<div class="cr-cats-grid">
+<button type="button" class="cr-cat-tile" data-cat="dios" data-csp-click="CreenciasManager.toggleCategoryTile('dios')">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795629272251-082f1d6b.jpg" alt="Creencias sobre Dios" loading="lazy" />
+<div class="cr-cat-tile-scrim"></div>
+<span class="cr-cat-count">1 – 5</span>
+<div class="cr-cat-copy">
+<strong>Dios</strong>
+<span>Escrituras y Deidad</span>
+</div>
+</button>
+<button type="button" class="cr-cat-tile" data-cat="hombre" data-csp-click="CreenciasManager.toggleCategoryTile('hombre')">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795629281965-3479e12c.jpg" alt="Creencias sobre El Hombre y la Creación" loading="lazy" />
+<div class="cr-cat-tile-scrim"></div>
+<span class="cr-cat-count">6 – 7</span>
+<div class="cr-cat-copy">
+<strong>El Hombre</strong>
+<span>Creación y Naturaleza</span>
+</div>
+</button>
+<button type="button" class="cr-cat-tile" data-cat="salvacion" data-csp-click="CreenciasManager.toggleCategoryTile('salvacion')">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795629275220-7e9dda7e.jpg" alt="Creencias sobre La Salvación" loading="lazy" />
+<div class="cr-cat-tile-scrim"></div>
+<span class="cr-cat-count">8 – 10</span>
+<div class="cr-cat-copy">
+<strong>La Salvación</strong>
+<span>Gracia y Redención</span>
+</div>
+</button>
+<button type="button" class="cr-cat-tile" data-cat="iglesia" data-csp-click="CreenciasManager.toggleCategoryTile('iglesia')">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795572973480-b6a51a1b.jpg" alt="Creencias sobre La Iglesia" loading="lazy" style="object-position: center 20%;" />
+<div class="cr-cat-tile-scrim"></div>
+<span class="cr-cat-count">11 – 18</span>
+<div class="cr-cat-copy">
+<strong>La Iglesia</strong>
+<span>Comunión y Misión</span>
+</div>
+</button>
+<button type="button" class="cr-cat-tile" data-cat="vida" data-csp-click="CreenciasManager.toggleCategoryTile('vida')">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795629283946-cd23efa4.jpg" alt="Creencias sobre La Vida Cristiana" loading="lazy" />
+<div class="cr-cat-tile-scrim"></div>
+<span class="cr-cat-count">19 – 22</span>
+<div class="cr-cat-copy">
+<strong>Vida Cristiana</strong>
+<span>Ley, Sábado y Salud</span>
+</div>
+</button>
+<button type="button" class="cr-cat-tile" data-cat="final" data-csp-click="CreenciasManager.toggleCategoryTile('final')">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795629287455-e378c03e.jpg" alt="Creencias sobre Acontecimientos Finales" loading="lazy" />
+<div class="cr-cat-tile-scrim"></div>
+<span class="cr-cat-count">23 – 28</span>
+<div class="cr-cat-copy">
+<strong>Eventos Finales</strong>
+<span>Esperanza y Tierra Nueva</span>
+</div>
+</button>
+</div>
+</section>
 <div class="creencias-top-carousel-wrapper" id="creenciasTopCarouselWrapper">
 <div class="carousel-header-row">
 <div class="carousel-badge">

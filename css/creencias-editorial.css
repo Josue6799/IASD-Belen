@@ -1,0 +1,550 @@
+/* ==========================================================================
+   LAS 28 CREENCIAS FUNDAMENTALES · DISEÑO EDITORIAL CON FOTOGRAFÍA + MÓVIL
+   ========================================================================== */
+
+#creencias.page {
+    padding-top: 0;
+}
+
+/* ---------- 1. HERO FOTOGRÁFICO EDITORIAL FULL-WIDTH ---------- */
+.cr-hero-editorial {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    min-height: 440px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #091525;
+    padding: 4.8rem 1.5rem 3.2rem;
+    margin-bottom: 2.8rem;
+    box-sizing: border-box;
+}
+
+.cr-hero-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 45%;
+    filter: brightness(0.52) saturate(1.1);
+    transform: scale(1.03);
+    z-index: 0;
+}
+
+.cr-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 50% 22%, rgba(201, 157, 59, 0.2) 0%, transparent 56%),
+        linear-gradient(180deg, rgba(9, 21, 37, 0.72) 0%, rgba(11, 28, 48, 0.85) 60%, rgba(9, 21, 37, 0.96) 100%);
+    z-index: 1;
+}
+
+.cr-back-pill {
+    position: absolute;
+    top: 1.4rem;
+    left: max(1.2rem, calc(50% - 580px));
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.52rem 1.15rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    color: #ffffff;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.25s ease;
+}
+
+.cr-back-pill:hover {
+    background: #c99d3b;
+    border-color: #c99d3b;
+    color: #0b1c30;
+    transform: translateX(-3px);
+}
+
+.cr-hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    width: 100%;
+    text-align: center;
+}
+
+.cr-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.44rem 1.35rem;
+    border-radius: 999px;
+    background: rgba(201, 157, 59, 0.2);
+    border: 1px solid rgba(229, 190, 99, 0.55);
+    color: #f3d78e;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.cr-hero-title {
+    font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+    color: #ffffff;
+    font-size: clamp(2rem, 4.4vw, 3.35rem);
+    font-weight: 800;
+    line-height: 1.16;
+    margin: 0 0 0.85rem;
+    text-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+.cr-hero-title span {
+    color: #e5be63;
+}
+
+.cr-hero-subtitle {
+    color: rgba(241, 245, 249, 0.92);
+    max-width: 720px;
+    margin: 0 auto 1.7rem;
+    font-size: clamp(0.96rem, 1.8vw, 1.12rem);
+    line-height: 1.65;
+}
+
+.cr-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+.cr-hero-btn-gold {
+    background: linear-gradient(135deg, #c99d3b 0%, #e5be63 100%);
+    color: #0b1c30;
+    padding: 0.8rem 1.7rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.94rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 10px 24px rgba(201, 157, 59, 0.32);
+    transition: all 0.25s ease;
+}
+
+.cr-hero-btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(201, 157, 59, 0.45);
+}
+
+.cr-hero-btn-glass {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    padding: 0.8rem 1.6rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.94rem;
+    text-decoration: none;
+    border: 1.5px solid rgba(255, 255, 255, 0.26);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
+}
+
+.cr-hero-btn-glass:hover {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: #e5be63;
+    transform: translateY(-2px);
+}
+
+/* ---------- 2. GALERÍA FOTOGRÁFICA DE LAS 6 CATEGORÍAS ---------- */
+.cr-cats-showcase {
+    margin: 0 auto 2.8rem;
+}
+
+.cr-cats-header {
+    text-align: center;
+    margin-bottom: 1.6rem;
+}
+
+.cr-cats-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: #a67c22;
+    background: rgba(201, 157, 59, 0.13);
+    padding: 0.36rem 0.9rem;
+    border-radius: 999px;
+    margin-bottom: 0.55rem;
+}
+
+.cr-cats-title {
+    font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+    font-size: clamp(1.45rem, 2.8vw, 1.95rem);
+    color: #0b1c30;
+    margin: 0 0 0.85rem;
+}
+
+.cr-cats-filter-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.cr-btn-ver-todas {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.45rem;
+    border-radius: 999px;
+    border: 1.5px solid rgba(11, 28, 48, 0.2);
+    background: #ffffff;
+    color: #0b1c30;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(11, 28, 48, 0.06);
+    transition: all 0.25s ease;
+    min-height: 44px;
+}
+
+.cr-btn-ver-todas:hover {
+    border-color: #c99d3b;
+    background: #fffbeb;
+    transform: translateY(-1px);
+}
+
+.cr-btn-ver-todas.active {
+    background: linear-gradient(135deg, #0b1c30 0%, #163052 100%);
+    color: #f3d78e;
+    border-color: #c99d3b;
+    box-shadow: 0 8px 22px rgba(11, 28, 48, 0.22);
+}
+
+.cr-cats-hint {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.cr-cat-tile.active {
+    border-color: #e5be63;
+    box-shadow: 0 0 0 3px rgba(229, 190, 99, 0.35), 0 16px 34px rgba(11, 28, 48, 0.28);
+    transform: translateY(-4px);
+}
+
+.cr-cat-tile.active .cr-cat-count {
+    background: linear-gradient(135deg, #c99d3b 0%, #e5be63 100%);
+    color: #0b1c30;
+    border-color: #e5be63;
+}
+
+.cr-cats-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.95rem;
+}
+
+.cr-cat-tile {
+    position: relative;
+    border-radius: 1.2rem;
+    overflow: hidden;
+    aspect-ratio: 4 / 4.6;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.9rem;
+    background: #0b1c30;
+    border: 2px solid transparent;
+    cursor: pointer;
+    text-align: left;
+    box-shadow: 0 10px 26px rgba(11, 28, 48, 0.14);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cr-cat-tile:hover {
+    transform: translateY(-5px);
+    border-color: #e5be63;
+    box-shadow: 0 16px 34px rgba(11, 28, 48, 0.24);
+}
+
+.cr-cat-tile img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    z-index: 0;
+    transition: transform 0.55s ease;
+}
+
+.cr-cat-tile:hover img {
+    transform: scale(1.07);
+}
+
+.cr-cat-tile-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(9, 21, 37, 0.2) 0%, rgba(9, 21, 37, 0.35) 45%, rgba(9, 21, 37, 0.94) 100%);
+    z-index: 1;
+}
+
+.cr-cat-count {
+    position: relative;
+    z-index: 2;
+    align-self: flex-start;
+    padding: 0.24rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(11, 28, 48, 0.82);
+    border: 1px solid rgba(229, 190, 99, 0.55);
+    color: #f3d78e;
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.cr-cat-copy {
+    position: relative;
+    z-index: 2;
+    color: #ffffff;
+}
+
+.cr-cat-copy strong {
+    display: block;
+    font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+    font-size: 1rem;
+    line-height: 1.2;
+    color: #ffffff;
+    margin-bottom: 0.2rem;
+}
+
+.cr-cat-copy span {
+    display: block;
+    font-size: 0.72rem;
+    color: rgba(241, 245, 249, 0.85);
+}
+
+/* ---------- 3. CABECERA FOTOGRÁFICA EN CADA UNA DE LAS 28 TARJETAS ---------- */
+#creencias .creencias-grid {
+    gap: 1.5rem;
+}
+
+#creencias .creencia-item-card {
+    min-height: 365px;
+    perspective: 1200px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#creencias .creencia-item-card .card-inner {
+    border-radius: 1.35rem;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+}
+
+#creencias .creencia-item-card .card-front {
+    padding: 0 !important;
+    border-radius: 1.35rem;
+    background: #ffffff;
+    border: 1px solid rgba(15, 34, 58, 0.09);
+    transform: rotateY(0deg) translateZ(1px);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#creencias .creencia-item-card .card-back {
+    border-radius: 1.35rem;
+    transform: rotateY(180deg) translateZ(1px);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.creencia-photo-banner {
+    position: relative;
+    width: 100%;
+    height: 128px;
+    overflow: hidden;
+    border-radius: 1.3rem 1.3rem 0 0;
+    flex-shrink: 0;
+    background: #0b1c30;
+}
+
+.creencia-photo-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+    transition: transform 0.55s ease;
+}
+
+#creencias .creencia-item-card:hover .creencia-photo-banner img {
+    transform: scale(1.06);
+}
+
+.creencia-photo-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(9, 21, 37, 0.25) 0%, rgba(9, 21, 37, 0.65) 100%);
+}
+
+#creencias .card-front .creencia-card-top {
+    padding: 0.75rem 1rem 0.25rem;
+}
+
+#creencias .card-front .card-front-content {
+    padding: 0.45rem 1.15rem 0.4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex: 1;
+}
+
+#creencias .card-front .creencia-front-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 1.15rem;
+    margin-bottom: 0.55rem;
+}
+
+#creencias .card-front .creencia-front-title {
+    font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+    font-size: 1.15rem;
+    line-height: 1.3;
+    color: #0b1c30;
+    margin: 0;
+}
+
+#creencias .card-front .creencia-flip-hint {
+    padding: 0.55rem 1rem 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #a67c22;
+}
+
+/* ---------- 4. RESPONSIVE MÓVIL (CERO PARPADEO EN FLIP + IMÁGENES ADAPTADAS) ---------- */
+@media (max-width: 1080px) {
+    .cr-cats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .cr-hero-editorial {
+        min-height: 390px;
+        padding: 4.8rem 1rem 2.4rem;
+        margin-bottom: 2rem;
+    }
+
+    .cr-back-pill {
+        top: 0.95rem;
+        left: 0.95rem;
+        font-size: 0.8rem;
+        padding: 0.45rem 0.95rem;
+    }
+
+    .cr-hero-title {
+        font-size: 1.75rem;
+    }
+
+    .cr-hero-subtitle {
+        font-size: 0.93rem;
+    }
+
+    .cr-cats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .cr-cat-tile {
+        aspect-ratio: 4 / 3.4;
+        padding: 0.8rem;
+    }
+
+    /* En celular: cambio de cara limpio sin 3D rotateY -> CERO parpadeo, CERO texto al revés */
+    #creencias .creencia-item-card {
+        perspective: none !important;
+        height: auto !important;
+        min-height: 0 !important;
+    }
+
+    #creencias .creencia-item-card .card-inner {
+        transform-style: flat !important;
+        -webkit-transform-style: flat !important;
+        transition: none !important;
+        transform: none !important;
+        height: auto !important;
+        min-height: 0 !important;
+    }
+
+    #creencias .creencia-item-card.flipped .card-inner {
+        transform: none !important;
+    }
+
+    #creencias .creencia-item-card .card-front,
+    #creencias .creencia-item-card .card-back {
+        position: relative !important;
+        inset: auto !important;
+        height: auto !important;
+        transform: none !important;
+        -webkit-backface-visibility: visible !important;
+        backface-visibility: visible !important;
+    }
+
+    #creencias .creencia-item-card .card-front {
+        display: flex !important;
+    }
+
+    #creencias .creencia-item-card .card-back {
+        display: none !important;
+    }
+
+    #creencias .creencia-item-card.flipped .card-front {
+        display: none !important;
+    }
+
+    #creencias .creencia-item-card.flipped .card-back {
+        display: flex !important;
+    }
+
+    .creencia-photo-banner {
+        height: auto;
+        aspect-ratio: 16 / 9;
+    }
+}
+
+@media (max-width: 480px) {
+    .cr-hero-actions {
+        flex-direction: column;
+    }
+
+    .cr-hero-btn-gold,
+    .cr-hero-btn-glass,
+    .cr-btn-ver-todas {
+        width: 100%;
+        justify-content: center;
+        box-sizing: border-box;
+    }
+}
