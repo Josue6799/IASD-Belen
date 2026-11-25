@@ -22,9 +22,9 @@ rel="stylesheet" />
 <link rel="stylesheet" href="css/pages.css" />
 <link rel="stylesheet" href="css/animations.css" />
 <link rel="stylesheet" href="css/teologia-avanzada.css" />
-<link rel="stylesheet" href="css/historia.css" />
+<link rel="stylesheet" href="css/historia.css?v=4.2" />
 <link rel="stylesheet" href="css/estructura.css" />
-<link rel="stylesheet" href="css/quienes-somos.css?v=4.1" />
+<link rel="stylesheet" href="css/quienes-somos.css?v=4.2" />
 <link rel="stylesheet" href="css/clubes.css" />
 <link rel="stylesheet" href="css/biblioteca.css" />
 <style id="cookie-consent-styles">
@@ -11628,9 +11628,15 @@ Te invitamos cordialmente a visitarnos en la Iglesia Adventista Belén, estudiar
 </div>
 <div id="historia" class="page">
 <div class="historia-wrapper">
-<button class="back-link" data-csp-click="showPage('home')"><i class="fas fa-arrow-left"></i> Volver al
-Inicio</button>
-<div class="historia-hero">
+<!-- 1. HERO FOTOGRÁFICO EDITORIAL FULL-WIDTH -->
+<section class="hist-hero-editorial">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795621978178-24073a7f.jpg"
+alt="Capilla histórica de William Miller en Hampton, Nueva York" class="hist-hero-bg" />
+<div class="hist-hero-scrim"></div>
+<button type="button" class="hist-back-pill" data-csp-click="showPage('home')">
+<i class="fas fa-arrow-left"></i> Volver al Inicio
+</button>
+<div class="hist-hero-inner">
 <div class="historia-badge">
 <i class="fas fa-history"></i> NUESTRA IDENTIDAD HISTÓRICA
 </div>
@@ -11638,92 +11644,130 @@ Inicio</button>
 La Historia de la <span>Iglesia Adventista del Séptimo Día</span>
 </h2>
 <p class="historia-subtitle">
-Un viaje interactivo de fe, profecía y esperanza que comenzó en el siglo XIX y transformó al
-mundo.
+Un recorrido visual por las raíces proféticas, los pioneros de fe y la dirección providencial de Dios desde 1830 hasta nuestra misión mundial de hoy.
 </p>
+<div class="hist-hero-milestones">
+<div class="hist-hero-stat">
+<strong>1844</strong>
+<span>Despertar Profético</span>
 </div>
+<div class="hist-hero-stat">
+<strong>1863</strong>
+<span>Organización Oficial</span>
+</div>
+<div class="hist-hero-stat">
+<strong>1874</strong>
+<span>Primer Misionero</span>
+</div>
+<div class="hist-hero-stat">
+<strong>212+</strong>
+<span>Países Hoy</span>
+</div>
+</div>
+</div>
+</section>
+
+<!-- 2. SOLO 2 PESTAÑAS LIMPIAS: HISTORIA + JUEGO -->
 <div class="historia-tabs-nav" role="tablist">
 <button type="button" class="historia-tab-btn active" data-vista="timeline"
 data-csp-click="cambiarVistaHistoria('timeline')">
-<i class="fas fa-stream"></i> Línea de Tiempo (Acordeón)
-</button>
-<button type="button" class="historia-tab-btn" data-vista="carrusel"
-data-csp-click="cambiarVistaHistoria('carrusel')">
-<i class="fas fa-images"></i> Carrusel Interactivo
+<i class="fas fa-book-open"></i> Nuestra Historia
 </button>
 <button type="button" class="historia-tab-btn" data-vista="juego"
 data-csp-click="cambiarVistaHistoria('juego')">
-<i class="fas fa-gamepad"></i> Juego "Ordena la Historia"
-</button>
-<button type="button" class="historia-tab-btn" data-vista="mapa"
-data-csp-click="cambiarVistaHistoria('mapa')">
-<i class="fas fa-compass"></i> Mapa del Tiempo (Décadas)
+<i class="fas fa-gamepad"></i> Juego: Ordena la Historia
 </button>
 </div>
+
+<!-- PANEL 1: HISTORIA VISUAL EDITORIAL + GALERÍA DE PIONEROS -->
 <div id="historia-view-timeline" class="historia-view-panel active">
-<div class="historia-timeline-controls">
-<div class="timeline-info-text">
-<i class="fas fa-info-circle" style="color: var(--golden);"></i> Haz clic en cualquier hito
-o círculo para expandir sus detalles completos.
-</div>
-<div class="timeline-toggle-all-btns">
-<button type="button" class="timeline-action-btn" data-csp-click="expandirTodoTimeline()">
-<i class="fas fa-angles-down"></i> Expandir Todo
-</button>
-<button type="button" class="timeline-action-btn" data-csp-click="contraerTodoTimeline()">
-<i class="fas fa-angles-up"></i> Contraer Todo
-</button>
-</div>
-</div>
-<div class="historia-timeline-container" id="historiaTimelineContenido">
-</div>
-</div>
-<div id="historia-view-carrusel" class="historia-view-panel">
-<div class="historia-carousel-container">
-<div class="carousel-viewport-wrapper" id="historiaCarruselWrapper">
-<div class="carousel-track" id="historiaCarruselTrack">
-</div>
-</div>
-<div class="carousel-nav-controls">
-<button type="button" class="carousel-arrow-btn" id="carruselBtnPrev"
-data-csp-click="moverCarruselHistoria(-1)" aria-label="Evento anterior">
-<i class="fas fa-chevron-left"></i>
-</button>
-<div class="carousel-dots-wrapper" id="historiaCarruselDots">
-</div>
-<button type="button" class="carousel-arrow-btn" id="carruselBtnNext"
-data-csp-click="moverCarruselHistoria(1)" aria-label="Siguiente evento">
-<i class="fas fa-chevron-right"></i>
-</button>
-</div>
-<p class="carousel-swipe-hint">
-<i class="fas fa-hand-pointer"></i> En dispositivos móviles puedes deslizar horizontalmente
-con el dedo (swipe).
+<div class="hist-story-intro">
+<span class="hist-eyebrow"><i class="fas fa-scroll"></i> Crónica Profética en 7 Hitos</span>
+<h3>De un Pequeño Grupo de Estudio Bíblico a un Movimiento Mundial</h3>
+<p>
+Cada etapa de nuestra historia refleja cómo Dios guio con paciencia, Escritura y esperanza a un pueblo llamado a anunciar el pronto regreso de Cristo.
 </p>
 </div>
+<div class="hist-story-list" id="historiaTimelineContenido"></div>
+
+<!-- GALERÍA DE PIONEROS ADVENTISTAS -->
+<section class="hist-pioneers-band">
+<div class="hist-pioneers-inner">
+<div class="hist-pioneers-header">
+<span class="historia-badge" style="margin-bottom: 0.4rem;"><i class="fas fa-landmark"></i> Archivo Histórico Adventista</span>
+<h3>Pioneros que Marcaron el Camino</h3>
+<p>Hombres y mujeres de oración y estudio bíblico profundo que entregaron su vida al servicio de Dios.</p>
 </div>
+<div class="hist-pioneers-grid">
+<article class="hist-pioneer-card">
+<div class="hist-pioneer-photo">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795621987484-6b114c90.jpg"
+alt="Retrato histórico de William Miller" loading="lazy" />
+</div>
+<div class="hist-pioneer-info">
+<span class="hist-pioneer-years">1782 – 1849</span>
+<h4>William Miller</h4>
+<p>Estudioso incansable de Daniel y Apocalipsis que despertó la esperanza del pronto regreso de Cristo.</p>
+</div>
+</article>
+<article class="hist-pioneer-card">
+<div class="hist-pioneer-photo">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795622045826-60daf315.jpg"
+alt="Retrato histórico de Joseph Bates con la Biblia" loading="lazy" />
+</div>
+<div class="hist-pioneer-info">
+<span class="hist-pioneer-years">1792 – 1872</span>
+<h4>Joseph Bates</h4>
+<p>Capitán retirado, pionero de la reforma pro salud y apóstol del sábado bíblico entre los primeros adventistas.</p>
+</div>
+</article>
+<article class="hist-pioneer-card">
+<div class="hist-pioneer-photo">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795621984610-77efde8a.jpg"
+alt="Retrato histórico de James S. White" loading="lazy" />
+</div>
+<div class="hist-pioneer-info">
+<span class="hist-pioneer-years">1821 – 1881</span>
+<h4>James S. White</h4>
+<p>Cofundador de la iglesia, editor visionario de publicaciones adventistas y promotor de la organización formal.</p>
+</div>
+</article>
+<article class="hist-pioneer-card">
+<div class="hist-pioneer-photo">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795621981353-61609494.jpg"
+alt="Retrato histórico de Elena G. de White" loading="lazy" />
+</div>
+<div class="hist-pioneer-info">
+<span class="hist-pioneer-years">1827 – 1915</span>
+<h4>Elena G. de White</h4>
+<p>Mensajera del Señor cuyos escritos sobre Cristo, salud y educación han bendecido a millones en todo el mundo.</p>
+</div>
+</article>
+</div>
+</div>
+</section>
+</div>
+
+<!-- PANEL 2: JUEGO "ORDENA LA HISTORIA" -->
 <div id="historia-view-juego" class="historia-view-panel">
 <div class="juego-historia-wrapper">
 <div class="juego-instruction-card">
 <h3><i class="fas fa-trophy"></i> Desafío: ¡Ordena la Historia Adventista!</h3>
 <p>
-Pon a prueba tu conocimiento histórico. Ordena los 7 eventos del 1 al 7
-cronológicamente. Puedes usar los botones de subir/bajar (▲ / ▼), hacer clic en dos
-tarjetas para intercambiarlas o arrastrarlas con el mouse.
+Pon a prueba tu conocimiento histórico. Ordena los 7 eventos del 1 al 7 cronológicamente usando los botones de subir/bajar (▲ / ▼), haciendo clic en dos tarjetas para intercambiarlas o arrastrándolas con el mouse.
 </p>
 <div class="juego-stats-bar">
 <div class="juego-stat-item">
-<i class="fas fa-check-circle" style="color: var(--golden-light);"></i>
+<i class="fas fa-check-circle" style="color: #e5be63;"></i>
 Estado: <span class="juego-stat-pill" id="juegoScorePill">0 de 7 correctos</span>
 </div>
 <div class="juego-stat-item">
-<i class="fas fa-lightbulb" style="color: var(--golden-light);"></i>
+<i class="fas fa-lightbulb" style="color: #e5be63;"></i>
 <span>Pista: Comienza en 1830 con William Miller</span>
 </div>
 </div>
 </div>
-<div class="juego-slots-container" id="juegoSlotsContainer">
-</div>
+<div class="juego-slots-container" id="juegoSlotsContainer"></div>
 <div class="juego-actions-bar">
 <button type="button" class="juego-btn-primary" data-csp-click="comprobarJuegoHistoria()">
 <i class="fas fa-circle-check"></i> Comprobar Orden
@@ -11738,86 +11782,41 @@ Estado: <span class="juego-stat-pill" id="juegoScorePill">0 de 7 correctos</span
 <div class="juego-victory-card" id="juegoVictoryCard">
 <h3>🎉 ¡Felicitaciones! ¡Has ordenado la historia a la perfección!</h3>
 <p>
-Conoces con exactitud el camino profético y providencial de la Iglesia Adventista desde
-1830 hasta el presente. ¡Gloria a Dios por conducir a su pueblo!
+Conoces con exactitud el camino profético y providencial de la Iglesia Adventista desde 1830 hasta el presente. ¡Gloria a Dios por conducir a su pueblo!
 </p>
-<button type="button" class="juego-btn-primary" data-csp-click="reiniciarJuegoHistoria()"
-style="margin-top: 0.5rem;">
+<button type="button" class="juego-btn-primary" data-csp-click="reiniciarJuegoHistoria()" style="margin-top: 0.5rem;">
 <i class="fas fa-rotate-right"></i> Jugar de Nuevo
 </button>
 </div>
 </div>
 </div>
-<div id="historia-view-mapa" class="historia-view-panel">
-<div class="mapa-tiempo-wrapper">
-<div class="decadas-selector-bar" role="toolbar" aria-label="Selector de períodos históricos">
-<button type="button" class="decada-chip-btn active" data-decada="todas"
-data-csp-click="filtrarDecadaHistoria('todas')">
-<span class="decada-chip-year">Todos</span>
-<span class="decada-chip-label">1830 - Presente</span>
-</button>
-<button type="button" class="decada-chip-btn" data-decada="1830s"
-data-csp-click="filtrarDecadaHistoria('1830s')">
-<span class="decada-chip-year">1830 - 1844</span>
-<span class="decada-chip-label">Despertar Millerita</span>
-</button>
-<button type="button" class="decada-chip-btn" data-decada="1840s"
-data-csp-click="filtrarDecadaHistoria('1840s')">
-<span class="decada-chip-year">1844 - 1850</span>
-<span class="decada-chip-label">Chasco & Santuario</span>
-</button>
-<button type="button" class="decada-chip-btn" data-decada="1850s"
-data-csp-click="filtrarDecadaHistoria('1850s')">
-<span class="decada-chip-year">1850s</span>
-<span class="decada-chip-label">Espíritu de Profecía</span>
-</button>
-<button type="button" class="decada-chip-btn" data-decada="1860s"
-data-csp-click="filtrarDecadaHistoria('1860s')">
-<span class="decada-chip-year">1863</span>
-<span class="decada-chip-label">Organización Formal</span>
-</button>
-<button type="button" class="decada-chip-btn" data-decada="1870s-1900s"
-data-csp-click="filtrarDecadaHistoria('1870s-1900s')">
-<span class="decada-chip-year">1874 - 1900</span>
-<span class="decada-chip-label">Misión Mundial</span>
-</button>
-<button type="button" class="decada-chip-btn" data-decada="sigloxxi"
-data-csp-click="filtrarDecadaHistoria('sigloxxi')">
-<span class="decada-chip-year">Siglo XXI</span>
-<span class="decada-chip-label">Esperanza Presente</span>
-</button>
-</div>
-<div class="mapa-events-display" id="mapaEventsDisplay">
-</div>
-</div>
-</div>
-<div
-style="background: linear-gradient(135deg, var(--deep-blue), #1a2a4a); padding: 2.5rem; border-radius: 1.5rem; color: var(--pure-white); text-align: center; margin-top: 2.5rem;">
-<h3 style="color: var(--pure-white); font-size: 2rem; margin-bottom: 0.5rem;">
-<i class="fas fa-hand-holding-heart" style="color: var(--golden);"></i> ¿Quieres saber más?
-</h3>
-<p style="font-size: 1.1rem; max-width: 700px; margin: 0 auto 1.5rem; opacity: 0.9;">
-Te invitamos a visitarnos, estudiar la Biblia con nosotros y ser parte de esta familia de fe.
+
+<!-- BANNER DE CIERRE FOTOGRÁFICO -->
+<section class="hist-cta-editorial">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795621986370-22599c0a.jpg"
+alt="Casa histórica de Joseph Bates" class="hist-cta-bg" loading="lazy" />
+<div class="hist-cta-scrim"></div>
+<div class="hist-cta-inner">
+<h3><i class="fas fa-hand-holding-heart" style="color: #e5be63;"></i> ¿Quieres conocer más de nuestra fe?</h3>
+<p>
+Te invitamos a visitarnos en IASD Belén, estudiar la Biblia con nosotros y ser parte de esta familia mundial de esperanza.
 </p>
-<div style="display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center;">
-<a href="javascript:void(0)" data-csp-click="showPage('creencias')"
-style="background: var(--golden); color: var(--deep-blue); padding: 0.7rem 1.8rem; border-radius: 2rem; font-weight: 700; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem;">
-<i class="fas fa-cross"></i> Nuestras creencias
+<div class="hist-cta-actions">
+<a href="javascript:void(0)" data-csp-click="showPage('creencias')" class="hist-cta-btn-gold">
+<i class="fas fa-cross"></i> Nuestras Creencias
 </a>
-<a href="javascript:void(0)" data-csp-click="abrirEnVivo()"
-style="background: rgba(255,255,255,0.1); color: var(--pure-white); padding: 0.7rem 1.8rem; border-radius: 2rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; border: 2px solid rgba(255,255,255,0.2);">
-<i class="fas fa-video"></i> Ver transmisión
+<a href="javascript:void(0)" data-csp-click="abrirEnVivo()" class="hist-cta-btn-glass">
+<i class="fas fa-video"></i> Ver Transmisión
 </a>
-<a href="javascript:void(0)" data-csp-click="showPage('estructura')"
-style="background: rgba(255,255,255,0.1); color: var(--pure-white); padding: 0.7rem 1.8rem; border-radius: 2rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; border: 2px solid rgba(255,255,255,0.2);">
-<i class="fas fa-sitemap"></i> Estructura organizacional
+<a href="javascript:void(0)" data-csp-click="showPage('estructura')" class="hist-cta-btn-glass">
+<i class="fas fa-sitemap"></i> Estructura Global
 </a>
-<button type="button" data-csp-click="abrirModal()"
-style="background: var(--golden); color: var(--deep-blue); padding: 0.7rem 1.8rem; border-radius: 2rem; font-weight: 700; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 1rem;">
-<i class="fas fa-envelope"></i> ✉️ ¡Queremos conocerte!
+<button type="button" data-csp-click="abrirModal()" class="hist-cta-btn-gold">
+<i class="fas fa-envelope"></i> ¡Queremos conocerte!
 </button>
 </div>
 </div>
+</section>
 </div>
 </div>
 <div id="estructura" class="page">
@@ -12679,7 +12678,7 @@ style="border-radius: 2rem; font-size: 0.82rem; border-color: var(--golden); col
 <script src="js/recursos-espirituales.js"></script>
 <script src="js/hero-carousel.js"></script>
 <script src="js/teologia-avanzada.js"></script>
-<script src="js/historia.js"></script>
+<script src="js/historia.js?v=4.2"></script>
 <script src="js/estructura.js"></script>
 <script src="js/quienes-somos.js?v=4.1"></script>
 <div id="modalTourSantuario" class="santuario-tour-modal hidden" aria-hidden="true" role="dialog"

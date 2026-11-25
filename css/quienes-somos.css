@@ -626,8 +626,9 @@
 .qs-flip-card {
     background-color: transparent;
     perspective: 1200px;
-    height: 390px;
+    height: 395px;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .qs-flip-card-inner {
@@ -635,8 +636,9 @@
     width: 100%;
     height: 100%;
     text-align: left;
-    transition: transform 0.68s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.62s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
     border-radius: 1.4rem;
     box-shadow: 0 12px 30px rgba(11, 28, 48, 0.08);
 }
@@ -648,6 +650,7 @@
 .qs-flip-back,
 .qs-flip-front {
     position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     -webkit-backface-visibility: hidden;
@@ -657,13 +660,18 @@
     flex-direction: column;
     justify-content: space-between;
     box-sizing: border-box;
-    overflow: hidden;
 }
 
 .qs-flip-front {
     background: #ffffff;
     border: 1px solid rgba(15, 34, 58, 0.09);
     padding: 0;
+    transform: rotateY(0deg) translateZ(1px);
+    z-index: 2;
+}
+
+.qs-flip-card.flipped .qs-flip-front {
+    pointer-events: none;
 }
 
 .qs-flip-media {
@@ -671,6 +679,7 @@
     height: 148px;
     width: 100%;
     overflow: hidden;
+    border-radius: 1.35rem 1.35rem 0 0;
     flex-shrink: 0;
 }
 
@@ -678,6 +687,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center center;
     display: block;
     transition: transform 0.55s ease;
 }
@@ -707,14 +717,13 @@
     width: 40px;
     height: 40px;
     border-radius: 11px;
-    background: rgba(11, 28, 48, 0.82);
+    background: rgba(11, 28, 48, 0.88);
     border: 1px solid rgba(229, 190, 99, 0.55);
     color: #e5be63;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.1rem;
-    backdrop-filter: blur(6px);
     transition: all 0.3s ease;
 }
 
@@ -729,12 +738,11 @@
     font-weight: 700;
     padding: 0.28rem 0.72rem;
     border-radius: 999px;
-    background: rgba(11, 28, 48, 0.78);
+    background: rgba(11, 28, 48, 0.88);
     color: #f3d78e;
-    border: 1px solid rgba(229, 190, 99, 0.4);
+    border: 1px solid rgba(229, 190, 99, 0.45);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    backdrop-filter: blur(6px);
 }
 
 .qs-flip-front-body {
@@ -775,9 +783,26 @@
 .qs-flip-back {
     background: linear-gradient(155deg, #0b1c30 0%, #162e4d 100%);
     color: #ffffff;
-    transform: rotateY(180deg);
+    transform: rotateY(180deg) translateZ(1px);
     border: 1.5px solid rgba(229, 190, 99, 0.65);
     padding: 1.5rem;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.qs-flip-card.flipped .qs-flip-back {
+    pointer-events: auto;
+}
+
+@keyframes qsCardSwapIn {
+    from {
+        opacity: 0;
+        transform: scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .qs-flip-back-header {
@@ -1711,20 +1736,64 @@
         gap: 1rem;
     }
     .qs-life-card {
-        min-height: 250px;
+        min-height: 0;
+        aspect-ratio: 4 / 3;
         border-radius: 1.25rem;
     }
     .qs-flip-grid {
         grid-template-columns: 1fr;
+        gap: 1.25rem;
     }
+    /* En celular: transición limpia sin 3D rotateY para cero parpadeo, cero texto al revés y cero encimado */
     .qs-flip-card {
-        height: 400px;
+        perspective: none;
+        height: auto;
+    }
+    .qs-flip-card-inner {
+        transform-style: flat;
+        -webkit-transform-style: flat;
+        transition: none;
+        height: auto;
+    }
+    .qs-flip-card.flipped .qs-flip-card-inner {
+        transform: none;
+    }
+    .qs-flip-front,
+    .qs-flip-back {
+        position: relative;
+        inset: auto;
+        height: auto;
+        transform: none !important;
+        -webkit-backface-visibility: visible;
+        backface-visibility: visible;
+        pointer-events: auto;
+    }
+    .qs-flip-front {
+        display: flex;
+        animation: qsCardSwapIn 0.25s ease;
+    }
+    .qs-flip-back {
+        display: none;
+        min-height: 310px;
+        padding: 1.35rem;
+        animation: qsCardSwapIn 0.25s ease;
+    }
+    .qs-flip-card.flipped .qs-flip-front {
+        display: none;
+    }
+    .qs-flip-card.flipped .qs-flip-back {
+        display: flex;
+    }
+    .qs-flip-card:hover .qs-flip-media img {
+        transform: none;
     }
     .qs-flip-media {
-        height: 165px;
+        height: auto;
+        aspect-ratio: 16 / 9;
     }
     .qs-mv-photo-head {
-        height: 175px;
+        height: auto;
+        aspect-ratio: 16 / 9;
     }
     .qs-cta-bg {
         object-position: center 20%;
@@ -1755,6 +1824,6 @@
         grid-template-columns: 1fr;
     }
     .qs-flip-card {
-        height: 405px;
+        height: auto;
     }
 }
