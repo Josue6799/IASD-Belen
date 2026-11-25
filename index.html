@@ -23,7 +23,7 @@ rel="stylesheet" />
 <link rel="stylesheet" href="css/animations.css" />
 <link rel="stylesheet" href="css/teologia-avanzada.css" />
 <link rel="stylesheet" href="css/historia.css?v=4.2" />
-<link rel="stylesheet" href="css/estructura.css" />
+<link rel="stylesheet" href="css/estructura.css?v=4.1" />
 <link rel="stylesheet" href="css/quienes-somos.css?v=4.2" />
 <link rel="stylesheet" href="css/clubes.css" />
 <link rel="stylesheet" href="css/biblioteca.css" />
@@ -11821,9 +11821,15 @@ Te invitamos a visitarnos en IASD Belén, estudiar la Biblia con nosotros y ser 
 </div>
 <div id="estructura" class="page">
 <div class="estructura-wrapper">
-<button class="back-link" data-csp-click="showPage('home')"><i class="fas fa-arrow-left"></i> Volver al
-Inicio</button>
-<div class="estructura-hero">
+<!-- 1. HERO FOTOGRÁFICO EDITORIAL FULL-WIDTH -->
+<section class="est-hero-editorial">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795625796812-c53afb12.jpg"
+alt="Sede Mundial de la Asociación General de los Adventistas del Séptimo Día" class="est-hero-bg" />
+<div class="est-hero-scrim"></div>
+<button type="button" class="est-back-pill" data-csp-click="showPage('home')">
+<i class="fas fa-arrow-left"></i> Volver al Inicio
+</button>
+<div class="est-hero-inner">
 <div class="estructura-badge">
 <i class="fas fa-sitemap"></i> ORGANIGRAMA Y GOBERNANZA GLOBAL
 </div>
@@ -11831,109 +11837,147 @@ Inicio</button>
 Nuestra Estructura <span>Organizacional</span>
 </h2>
 <p class="estructura-subtitle">
-Descubre cómo estamos organizados de forma democrática y representativa desde la comunidad local
-hasta la sede mundial para proclamar el evangelio a todas las naciones.
+Descubre cómo estamos organizados de forma democrática y representativa desde cada iglesia local hasta la sede mundial para proclamar el evangelio a todas las naciones.
+</p>
+<div class="est-quick-nav">
+<button type="button" class="est-quick-pill" data-csp-click="estScrollTo('estNivelesSec')"><i class="fas fa-diagram-project"></i> 4 Niveles</button>
+<button type="button" class="est-quick-pill" data-csp-click="estScrollTo('estInstSec')"><i class="fas fa-hospital"></i> Instituciones</button>
+<button type="button" class="est-quick-pill" data-csp-click="estScrollTo('estMapaSec')"><i class="fas fa-globe-americas"></i> 13 Divisiones</button>
+<button type="button" class="est-quick-pill" data-csp-click="estScrollTo('estStatsSec')"><i class="fas fa-chart-pie"></i> Estadísticas</button>
+<button type="button" class="est-quick-pill" data-csp-click="estScrollTo('estQuizSec')"><i class="fas fa-trophy"></i> Quiz</button>
+</div>
+</div>
+</section>
+
+<!-- 2. LOS 4 NIVELES DE GOBERNANZA REPRESENTATIVA -->
+<section id="estNivelesSec" class="est-section">
+<div class="est-section-header">
+<span class="est-eyebrow"><i class="fas fa-diagram-project"></i> Organización Representativa</span>
+<h3 class="est-section-title">Los 4 Niveles de Nuestra Iglesia</h3>
+<p class="est-section-subtitle">
+Nuestra autoridad nace en las congregaciones locales y asciende de forma democrática hasta la Asociación General, manteniendo unidad doctrinal y misión global.
 </p>
 </div>
-<div class="estructura-tabs-nav" role="tablist">
-<button type="button" class="estructura-tab-btn active" data-vista="arbol"
-data-csp-click="cambiarVistaEstructura('arbol')">
-<i class="fas fa-diagram-project"></i> Diagrama de Árbol (Jerarquía)
-</button>
-<button type="button" class="estructura-tab-btn" data-vista="mapa"
-data-csp-click="cambiarVistaEstructura('mapa')">
-<i class="fas fa-globe-americas"></i> Mapa Mundial de Divisiones
-</button>
-<button type="button" class="estructura-tab-btn" data-vista="stats"
-data-csp-click="cambiarVistaEstructura('stats')">
-<i class="fas fa-chart-pie"></i> Estadísticas Globales (Count-up)
-</button>
-<button type="button" class="estructura-tab-btn" data-vista="quiz"
-data-csp-click="cambiarVistaEstructura('quiz')">
-<i class="fas fa-trophy"></i> Quiz de la Estructura
-</button>
+<div id="arbolJerarquiaContenido"></div>
+</section>
+
+<!-- 3. RED MUNDIAL DE INSTITUCIONES ADVENTISTAS -->
+<section id="estInstSec" class="est-inst-band">
+<div class="est-inst-inner">
+<div class="est-section-header">
+<span class="est-eyebrow"><i class="fas fa-hand-holding-heart"></i> Servicio Integral</span>
+<h3 class="est-section-title">Instituciones Adventistas al Servicio del Mundo</h3>
+<p class="est-section-subtitle">
+Siguiendo el ejemplo de Jesús —enseñar, sanar y predicar—, operamos una red mundial de educación, salud y servicio humanitario.
+</p>
 </div>
-<div id="estructura-view-arbol" class="estructura-view-panel active">
-<div class="arbol-controls-bar">
-<div class="arbol-info-text">
-<i class="fas fa-info-circle" style="color: var(--golden);"></i> Haz clic en cualquier nivel
-para desplegar u ocultar sus detalles y funciones.
+<div class="est-inst-grid">
+<article class="est-inst-card">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795625800740-b95de9d5.jpg"
+alt="Campus de Southern Adventist University" class="est-inst-bg" loading="lazy" />
+<div class="est-inst-scrim"></div>
+<span class="est-inst-tag"><i class="fas fa-graduation-cap"></i> 9.419+ Instituciones</span>
+<div class="est-inst-copy">
+<h4>Educación Adventista</h4>
+<p>Escuelas, colegios y universidades formando mente, cuerpo y espíritu con valores cristianos en todo el planeta.</p>
 </div>
-<div class="arbol-action-btns">
-<button type="button" class="arbol-btn" data-csp-click="expandirTodoArbol()">
-<i class="fas fa-angles-down"></i> Expandir Todos
-</button>
-<button type="button" class="arbol-btn" data-csp-click="contraerTodoArbol()">
-<i class="fas fa-angles-up"></i> Contraer Todos
-</button>
+</article>
+<article class="est-inst-card">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795625805404-a2a2de83.jpg"
+alt="Hospital AdventHealth - Red Mundial de Salud Adventista" class="est-inst-bg" loading="lazy" />
+<div class="est-inst-scrim"></div>
+<span class="est-inst-tag"><i class="fas fa-hospital"></i> 229+ Hospitales</span>
+<div class="est-inst-copy">
+<h4>Ministerio de Salud</h4>
+<p>Hospitales, clínicas y sanatorios comprometidos con la sanidad física, mental y espiritual de cada persona.</p>
+</div>
+</article>
+<article class="est-inst-card">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795625799099-618b7504.jpg"
+alt="Globo de Misión Mundial en Andrews University" class="est-inst-bg" loading="lazy" />
+<div class="est-inst-scrim"></div>
+<span class="est-inst-tag"><i class="fas fa-globe-americas"></i> 212+ Países</span>
+<div class="est-inst-copy">
+<h4>Misión y ADRA Global</h4>
+<p>Casas editoras, cadenas de radio/TV y ayuda humanitaria ADRA llevando esperanza práctica a más de 118 países.</p>
+</div>
+</article>
 </div>
 </div>
-<div id="arbolJerarquiaContenido">
+</section>
+
+<!-- 4. MAPA MUNDIAL INTERACTIVO DE DIVISIONES -->
+<section id="estMapaSec" class="est-section">
+<div class="est-section-header">
+<span class="est-eyebrow"><i class="fas fa-globe-americas"></i> Presencia en los 5 Continentes</span>
+<h3 class="est-section-title">Mapa Mundial de las 13 Divisiones</h3>
+<p class="est-section-subtitle">
+Toca cualquier pin en el mapa o selecciona una división en la lista para conocer su sede, membresía y territorios.
+</p>
 </div>
-</div>
-<div id="estructura-view-mapa" class="estructura-view-panel">
 <div class="mapa-interactivo-container">
-<div class="mapa-interactivo-header">
-<p>
-Para atender eficazmente a cada región, la Asociación General cuenta con 13 Divisiones y
-territorios adscritos. Haz clic en los pines del mapa o en la lista inferior para
-explorar detalles de cada territorio.
-</p>
-</div>
 <div class="mapa-stage-wrapper" id="mapaStageWrapper">
 <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/Mapa_sfjxhm.png"
-alt="Mapa Mundial de Divisiones Adventistas" class="mapa-stage-image" />
-<div id="mapaPinesLayer">
+alt="Mapa Mundial de Divisiones Adventistas" class="mapa-stage-image" loading="lazy" />
+<div id="mapaPinesLayer"></div>
 </div>
+<div id="mapaDivisionPreview"></div>
+<div class="divisiones-grid-container" id="divisionesGridContainer"></div>
 </div>
-<div id="mapaDivisionPreview">
+</section>
+
+<!-- 5. ESTADÍSTICAS GLOBALES -->
+<section id="estStatsSec" class="est-stats-band">
+<div class="est-stats-inner">
+<div class="est-section-header" style="margin-bottom: 2.2rem;">
+<span class="estructura-badge" style="margin-bottom: 0.5rem;"><i class="fas fa-chart-pie"></i> Impacto Mundial</span>
+<h3 class="est-section-title" style="color: #ffffff;">La Iglesia Adventista en Cifras</h3>
+<p class="est-section-subtitle" style="color: rgba(226, 232, 240, 0.85);">
+Una confraternidad global unida en fe, educación, salud y servicio humanitario para bendición de la humanidad.
+</p>
 </div>
-<div class="divisiones-grid-container" id="divisionesGridContainer">
+<div class="stats-grid-wrapper" id="estadisticasGridContainer"></div>
 </div>
+</section>
+
+<!-- 6. QUIZ DE LA ESTRUCTURA -->
+<section id="estQuizSec" class="est-section">
+<div class="est-section-header">
+<span class="est-eyebrow"><i class="fas fa-trophy"></i> Pon a Prueba lo Aprendido</span>
+<h3 class="est-section-title">Quiz de la Estructura Adventista</h3>
+<p class="est-section-subtitle">
+Responde estas 6 preguntas rápidas y comprueba cuánto conoces sobre la organización mundial de nuestra iglesia.
+</p>
 </div>
-</div>
-<div id="estructura-view-stats" class="estructura-view-panel">
-<div class="stats-header-block">
+<div class="quiz-wrapper" id="quizContainer"></div>
+</section>
+
+<!-- 7. BANNER DE CIERRE FOTOGRÁFICO -->
+<section class="est-cta-editorial">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795625800740-b95de9d5.jpg"
+alt="Campus Universitario Adventista" class="est-cta-bg" loading="lazy" />
+<div class="est-cta-scrim"></div>
+<div class="est-cta-inner">
+<h3><i class="fas fa-hand-holding-heart" style="color: #e5be63;"></i> ¿Quieres conocer más de nuestra familia de fe?</h3>
 <p>
-La Iglesia Adventista del Séptimo Día es un movimiento de esperanza integral presente en
-cientos de países, operando hospitales, escuelas, universidades y casas editoriales para
-bendición de la humanidad.
+Te invitamos a visitarnos en IASD Belén, estudiar la Biblia con nosotros y formar parte activa de esta misión mundial de esperanza.
 </p>
-</div>
-<div class="stats-grid-wrapper" id="estadisticasGridContainer">
-</div>
-</div>
-<div id="estructura-view-quiz" class="estructura-view-panel">
-<div class="quiz-wrapper" id="quizContainer">
-</div>
-</div>
-<div
-style="background: linear-gradient(135deg, var(--deep-blue), #1a2a4a); padding: 2.5rem; border-radius: 1.5rem; color: var(--pure-white); text-align: center; margin-top: 2.5rem;">
-<h3 style="color: var(--pure-white); font-size: 2rem; margin-bottom: 0.5rem;">
-<i class="fas fa-hand-holding-heart" style="color: var(--golden);"></i> ¿Quieres saber más?
-</h3>
-<p style="font-size: 1.1rem; max-width: 700px; margin: 0 auto 1.5rem; opacity: 0.9;">
-Te invitamos a visitarnos, estudiar la Biblia con nosotros y ser parte de esta familia de fe.
-</p>
-<div style="display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center;">
-<a href="javascript:void(0)" data-csp-click="showPage('creencias')"
-style="background: var(--golden); color: var(--deep-blue); padding: 0.7rem 1.8rem; border-radius: 2rem; font-weight: 700; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem;">
-<i class="fas fa-cross"></i> Nuestras creencias
+<div class="est-cta-actions">
+<a href="javascript:void(0)" data-csp-click="showPage('creencias')" class="est-cta-btn-gold">
+<i class="fas fa-cross"></i> Nuestras Creencias
 </a>
-<a href="javascript:void(0)" data-csp-click="abrirEnVivo()"
-style="background: rgba(255,255,255,0.1); color: var(--pure-white); padding: 0.7rem 1.8rem; border-radius: 2rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; border: 2px solid rgba(255,255,255,0.2);">
-<i class="fas fa-video"></i> Ver transmisión
+<a href="javascript:void(0)" data-csp-click="abrirEnVivo()" class="est-cta-btn-glass">
+<i class="fas fa-video"></i> Ver Transmisión
 </a>
-<a href="javascript:void(0)" data-csp-click="showPage('historia')"
-style="background: rgba(255,255,255,0.1); color: var(--pure-white); padding: 0.7rem 1.8rem; border-radius: 2rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; border: 2px solid rgba(255,255,255,0.2);">
+<a href="javascript:void(0)" data-csp-click="showPage('historia')" class="est-cta-btn-glass">
 <i class="fas fa-history"></i> Nuestra Historia
 </a>
-<button type="button" data-csp-click="abrirModal()"
-style="background: var(--golden); color: var(--deep-blue); padding: 0.7rem 1.8rem; border-radius: 2rem; font-weight: 700; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 1rem;">
-<i class="fas fa-envelope"></i> ✉️ ¡Queremos conocerte!
+<button type="button" data-csp-click="abrirModal()" class="est-cta-btn-gold">
+<i class="fas fa-envelope"></i> ¡Queremos conocerte!
 </button>
 </div>
 </div>
+</section>
 </div>
 </div>
 <div id="diezmo" class="page">
@@ -12679,7 +12723,7 @@ style="border-radius: 2rem; font-size: 0.82rem; border-color: var(--golden); col
 <script src="js/hero-carousel.js"></script>
 <script src="js/teologia-avanzada.js"></script>
 <script src="js/historia.js?v=4.2"></script>
-<script src="js/estructura.js"></script>
+<script src="js/estructura.js?v=4.0"></script>
 <script src="js/quienes-somos.js?v=4.1"></script>
 <div id="modalTourSantuario" class="santuario-tour-modal hidden" aria-hidden="true" role="dialog"
 aria-label="Tour Interactivo del Santuario">
