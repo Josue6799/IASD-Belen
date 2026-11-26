@@ -21,13 +21,14 @@ rel="stylesheet" />
 <link rel="stylesheet" href="css/components.css?v=3.0" />
 <link rel="stylesheet" href="css/pages.css" />
 <link rel="stylesheet" href="css/animations.css" />
-<link rel="stylesheet" href="css/teologia-avanzada.css" />
+<link rel="stylesheet" href="css/teologia-avanzada.css?v=4.0" />
 <link rel="stylesheet" href="css/historia.css?v=4.2" />
 <link rel="stylesheet" href="css/estructura.css?v=4.1" />
 <link rel="stylesheet" href="css/quienes-somos.css?v=4.2" />
 <link rel="stylesheet" href="css/clubes.css" />
 <link rel="stylesheet" href="css/biblioteca.css" />
 <link rel="stylesheet" href="css/creencias-editorial.css?v=4.1" />
+<link rel="stylesheet" href="css/doctrinas-editorial.css?v=4.0" />
 <style id="cookie-consent-styles">
 /* ==========================================================================
    POLÍTICAS LEGALES, BANNER DE COOKIES & GOOGLE CONSENT MODE (LEY 1581 / 2012)
@@ -4943,34 +4944,35 @@ data-csp-click="CreenciasManager.cerrarModalVersiculo()">
 </div>
 </div>
 <div id="doctrinas" class="page">
-<button class="back-link" data-csp-click="showPage('home')"><i class="fas fa-arrow-left"></i> Volver al
-Inicio</button>
-<div class="doctrinas-hero-wrapper" id="doctrinasHeroHeader">
-<div class="doctrinas-parallax-bg"></div>
-<div class="doctrinas-hero-content">
-<div class="doctrinas-floating-badge">
+<!-- HERO FOTOGRÁFICO EDITORIAL FULL-WIDTH -->
+<section class="doc-hero-editorial" id="doctrinasHeroHeader">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795657783231-a00e8165.jpg"
+alt="Amanecer dorado sobre montañas y lago - Las 6 Doctrinas Fundamentales" class="doc-hero-bg" />
+<div class="doc-hero-scrim"></div>
+<button type="button" class="doc-back-pill" data-csp-click="showPage('home')">
+<i class="fas fa-arrow-left"></i> Volver al Inicio
+</button>
+<div class="doc-hero-inner">
+<div class="doc-hero-badge">
 <i class="fas fa-scroll"></i> Pilares de la Fe Adventista
 </div>
-<h2 class="doctrinas-hero-title">Las 6 Doctrinas Fundamentales</h2>
-<p class="doctrinas-hero-subtitle">
-Enseñanzas bíblicas centrales que forman el fundamento vivo de nuestra fe, esperanza y adoración
-al Creador.
+<h2 class="doc-hero-title">Las <span>6 Doctrinas</span> Fundamentales</h2>
+<p class="doc-hero-subtitle">
+Enseñanzas bíblicas centrales que forman el fundamento vivo de nuestra fe, esperanza y adoración al Creador.
 </p>
-<div class="doctrinas-hero-actions">
-<button type="button" class="btn-hero-action primary"
-data-csp-click="DoctrinasManager.abrirQuiz()">
+<div class="doc-hero-actions">
+<button type="button" class="doc-hero-btn-gold" data-csp-click="DoctrinasManager.abrirQuiz()">
 <i class="fas fa-circle-question"></i> Quiz Doctrinal
 </button>
-<button type="button" class="btn-hero-action secondary"
-data-csp-click="DoctrinasManager.scrollToMatching()">
+<button type="button" class="doc-hero-btn-glass" data-csp-click="DoctrinasManager.scrollToMatching()">
 <i class="fas fa-puzzle-piece"></i> Juego de Relacionar
 </button>
-<span class="doctrinas-hero-badge" id="doctrinasHeroProgressBadge">
+<span class="doc-hero-progress-pill" id="doctrinasHeroProgressBadge">
 <i class="fas fa-graduation-cap"></i> Progreso: <strong>0/6</strong>
 </span>
 </div>
 </div>
-</div>
+</section>
 <div class="doctrinas-progreso-card">
 <div class="doctrinas-progreso-header">
 <div class="doctrinas-progreso-info">
@@ -12785,7 +12787,7 @@ style="border-radius: 2rem; font-size: 0.82rem; border-color: var(--golden); col
 <script src="js/router.js"></script>
 <script src="js/calendar.js"></script>
 <script src="js/creencias.js"></script>
-<script src="js/doctrinas.js"></script>
+<script src="js/doctrinas.js?v=4.0"></script>
 <script src="js/transmisiones.js?v=2"></script>
 <script src="js/animations.js"></script>
 <script src="js/recursos-espirituales.js"></script>
