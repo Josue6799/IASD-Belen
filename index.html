@@ -29,6 +29,7 @@ rel="stylesheet" />
 <link rel="stylesheet" href="css/biblioteca.css" />
 <link rel="stylesheet" href="css/creencias-editorial.css?v=4.1" />
 <link rel="stylesheet" href="css/doctrinas-editorial.css?v=4.0" />
+<link rel="stylesheet" href="css/aventureros-editorial.css?v=4.0" />
 <style id="cookie-consent-styles">
 /* ==========================================================================
    POLÍTICAS LEGALES, BANNER DE COOKIES & GOOGLE CONSENT MODE (LEY 1581 / 2012)
@@ -5142,11 +5143,14 @@ Volver</button>
 <div class="club-blob blob-3"></div>
 </div>
 <div class="club-main-content">
-<button class="back-link" data-csp-click="showPage('home')"><i class="fas fa-arrow-left"></i> Volver
-al Inicio</button>
-<div class="club-hero hero-aventureros" id="hero-aventureros">
+<div class="club-hero hero-aventureros av-hero-editorial" id="hero-aventureros">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795660959588-1a5b2472.jpg"
+alt="Bosque soleado de la creación de Dios - Club de Aventureros" class="av-hero-bg" />
+<div class="av-hero-scrim"></div>
 <canvas class="club-particles-canvas" id="canvas-particles-aventureros"></canvas>
 <div class="club-hero-bg-overlay"></div>
+<button class="av-back-pill" data-csp-click="showPage('home')"><i class="fas fa-arrow-left"></i> Volver
+al Inicio</button>
 <div class="club-hero-content">
 <div class="club-hero-logo-box">
 <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/aventureros_houqik.webp"
@@ -5154,7 +5158,7 @@ alt="Logo Club de Aventureros" class="club-hero-logo-img" />
 </div>
 <span class="club-hero-badge"><i class="fas fa-seedling"></i> Club de Aventureros · 6 a 9
 años</span>
-<h1 class="club-hero-title">Club de Aventureros</h1>
+<h1 class="club-hero-title">Club de <span>Aventureros</span></h1>
 <p class="club-hero-subtitle">Descubriendo el amor de Jesús, los valores familiares y las
 maravillas de la creación a través de juegos formativos, compañerismo y servicio.</p>
 <div class="club-hero-chips">
@@ -5183,8 +5187,13 @@ class="fas fa-calendar-alt"></i> Calendario</span>
 nuestros niños en Cristo Jesús.</p>
 </div>
 <div class="club-ideales-grid">
-<div class="tilt-card" id="tilt-voto-aventureros">
+<div class="tilt-card av-ideal-card" id="tilt-voto-aventureros">
 <div class="tilt-card-glow"></div>
+<div class="av-ideal-media">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795660959974-ba9af4bf.jpg"
+alt="Manos de niño cuidando una semilla en crecimiento" loading="lazy" />
+<span class="av-ideal-media-badge"><i class="fas fa-hand-holding-heart"></i> VOTO DEL AVENTURERO</span>
+</div>
 <div class="tilt-card-inner">
 <div class="tilt-card-header">
 <span class="tilt-card-badge tilt-badge-voto"><i
@@ -5198,8 +5207,13 @@ class="fas fa-hand-holding-heart"></i> VOTO</span>
 </div>
 </div>
 </div>
-<div class="tilt-card" id="tilt-lema-aventureros">
+<div class="tilt-card av-ideal-card" id="tilt-lema-aventureros">
 <div class="tilt-card-glow"></div>
+<div class="av-ideal-media">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795660960374-add3f8ee.jpg"
+alt="Familia caminando unida al atardecer junto al agua" loading="lazy" />
+<span class="av-ideal-media-badge"><i class="fas fa-heart"></i> LEMA DEL AVENTURERO</span>
+</div>
 <div class="tilt-card-inner">
 <div class="tilt-card-header">
 <span class="tilt-card-badge tilt-badge-lema"><i class="fas fa-tag"></i> LEMA</span>
@@ -5216,6 +5230,13 @@ class="fas fa-hand-holding-heart"></i> VOTO</span>
 <div class="pergamino-wrapper">
 <div class="pergamino-card" id="pergamino-aventureros-himno">
 <div class="pergamino-roller"></div>
+<div class="av-pergamino-banner">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795660960804-5fadc9a9.jpg"
+alt="Amanecer dorado sobre las montañas y el río - Creación de Dios" loading="lazy" />
+<div class="av-pergamino-banner-caption">
+<span class="av-pergamino-kicker"><i class="fas fa-music"></i> Alabanza y Creación</span>
+</div>
+</div>
 <button type="button" class="pergamino-trigger"
 data-csp-click="ClubesManager.togglePergamino('pergamino-aventureros-himno')"
 aria-label="Desenrollar Himno de los Aventureros">
@@ -5254,6 +5275,13 @@ maravillas mostrando su amor."
 </div>
 <div class="pergamino-card" id="pergamino-aventureros-ley">
 <div class="pergamino-roller"></div>
+<div class="av-pergamino-banner">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795660961259-14dd0c72.jpg"
+alt="Niños explorando la naturaleza con alegría en el bosque" loading="lazy" />
+<div class="av-pergamino-banner-caption">
+<span class="av-pergamino-kicker"><i class="fas fa-scroll"></i> Carácter y Compañerismo</span>
+</div>
+</div>
 <button type="button" class="pergamino-trigger"
 data-csp-click="ClubesManager.togglePergamino('pergamino-aventureros-ley')"
 aria-label="Desenrollar Ley del Aventurero">
@@ -5325,22 +5353,25 @@ aria-label="Desenrollar Ley del Aventurero">
 <div class="pergamino-roller"></div>
 </div>
 </div>
-<div class="club-subcard-section" id="seccion-uniforme-aventureros"
-style="border-left: 6px solid var(--golden);">
-<div class="club-subcard-header">
-<i class="fas fa-tshirt"></i>
-<h3>Uniforme de Gala y Catálogo</h3>
+<div class="club-subcard-section av-uniforme-section" id="seccion-uniforme-aventureros">
+<div class="av-uniforme-banner">
+<img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/anuncios/1795660961668-40586ef8.jpg"
+alt="Pañoleta oficial bordada del Club de Aventureros" loading="lazy" />
+<div class="av-uniforme-banner-content">
+<span class="av-pergamino-kicker"><i class="fas fa-award"></i> Identidad Oficial del Club</span>
+<h3><i class="fas fa-tshirt"></i> Uniforme de Gala y Catálogo</h3>
+<p>Presentación oficial para miembros y líderes del Club de Aventureros.</p>
 </div>
-<div
-style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+</div>
+<div class="av-uniforme-body">
+<div class="av-uniforme-grid">
 <div class="uniforme-card">
 <div class="uniforme-img-wrapper">
 <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/Uniforme_de_gala_Aventureros_g2bsw5.png"
 alt="Uniforme de gala de Aventureros - Miembros" loading="lazy">
 </div>
-<p
-style="padding: 0.9rem 0.5rem; font-weight: 600; color: var(--deep-blue); margin: 0; font-size: 0.95rem; font-family: 'Inter', sans-serif;">
-<i class="fas fa-users" style="color: var(--golden); font-size: 0.8rem;"></i>
+<p class="av-uniforme-label">
+<i class="fas fa-users"></i>
 Uniforme de gala - Miembros
 </p>
 </div>
@@ -5349,19 +5380,18 @@ Uniforme de gala - Miembros
 <img src="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/Uniforme_de_gala_Aventureros_lider_uq1kld.png"
 alt="Uniforme de gala de Aventureros - Líder" loading="lazy">
 </div>
-<p
-style="padding: 0.9rem 0.5rem; font-weight: 600; color: var(--deep-blue); margin: 0; font-size: 0.95rem; font-family: 'Inter', sans-serif;">
-<i class="fas fa-user-tie" style="color: var(--golden); font-size: 0.8rem;"></i>
+<p class="av-uniforme-label">
+<i class="fas fa-user-tie"></i>
 Uniforme de gala - Líder
 </p>
 </div>
 </div>
-<div style="margin-top: 1.8rem; text-align: center;">
+<div class="av-catalogo-wrap">
 <a href="https://pub-5ad02146ce66485a88aad0fa2fd1e620.r2.dev/CATALOGO_2025_JA_jfk4pc.pdf"
-target="_blank" rel="noopener noreferrer" class="btn btn-golden btn-catalogo-pulse"
-style="display: inline-flex; align-items: center; gap: 0.7rem; background: var(--golden); color: var(--deep-blue); padding: 0.85rem 2.2rem; border-radius: 3rem; font-weight: 700; font-size: 0.95rem; text-decoration: none; font-family: 'Inter', sans-serif;">
-<i class="fas fa-file-pdf" style="font-size: 1.1rem;"></i> Ver Catálogo Completo
+target="_blank" rel="noopener noreferrer" class="btn btn-golden btn-catalogo-pulse av-catalogo-btn">
+<i class="fas fa-file-pdf"></i> Ver Catálogo Completo
 </a>
+</div>
 </div>
 </div>
 <div class="calendario-club" id="seccion-calendario-aventureros">
@@ -5394,10 +5424,8 @@ data-csp-change="CalendarManager.irAFecha('aventureros', this.value)">
 <h3>📋 Eventos del día</h3>
 <div id="listaEventosAventureros"></div>
 </div>
-<div
-style="margin-top:1rem; padding:1rem; background:var(--cream); border-radius:1rem; border-left:4px solid var(--golden);">
-<h4 style="font-size:0.85rem; color:var(--deep-blue); margin-bottom:0.5rem;">📅 Días con
-eventos:</h4>
+<div class="av-resumen-eventos">
+<h4>📅 Días con eventos:</h4>
 <div id="listaResumenAventureros" style="font-size:0.75rem;"></div>
 </div>
 </div>

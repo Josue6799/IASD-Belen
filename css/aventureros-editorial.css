@@ -1,0 +1,742 @@
+/* ==========================================================================
+   CLUB DE AVENTUREROS · DISEÑO EDITORIAL ADVENTISTA + FOTOS R2 + MÓVIL
+   ========================================================================== */
+
+#aventureros.page {
+    padding-top: 0;
+}
+
+#aventureros .club-page-container {
+    overflow: visible;
+    padding-bottom: 4rem;
+}
+
+#aventureros .club-blobs-layer {
+    display: none;
+}
+
+/* ---------- 1. HERO FOTOGRÁFICO EDITORIAL FULL-WIDTH ---------- */
+#aventureros .av-hero-editorial {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    min-height: 490px;
+    border-radius: 0;
+    border: none;
+    border-bottom: 3px solid rgba(201, 157, 59, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #091525;
+    padding: 5rem 1.5rem 3.4rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 20px 50px rgba(9, 21, 37, 0.25);
+    box-sizing: border-box;
+}
+
+#aventureros .av-hero-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 45%;
+    filter: brightness(0.52) saturate(1.12) contrast(1.05);
+    transform: scale(1.03);
+    z-index: 0;
+}
+
+#aventureros .av-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 50% 24%, rgba(201, 157, 59, 0.24) 0%, transparent 56%),
+        linear-gradient(180deg, rgba(9, 21, 37, 0.72) 0%, rgba(11, 28, 48, 0.84) 58%, rgba(9, 21, 37, 0.96) 100%);
+    z-index: 1;
+}
+
+#aventureros .av-back-pill {
+    position: absolute;
+    top: 1.4rem;
+    left: max(1.2rem, calc(50% - 580px));
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.52rem 1.15rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.25s ease;
+}
+
+#aventureros .av-back-pill:hover {
+    background: #c99d3b;
+    border-color: #c99d3b;
+    color: #0b1c30;
+    transform: translateX(-3px);
+}
+
+#aventureros .club-hero-content {
+    position: relative;
+    z-index: 3;
+    max-width: 880px;
+}
+
+#aventureros .club-hero-logo-box {
+    width: 112px;
+    height: 112px;
+    border: 3px solid #e5be63;
+    box-shadow: 0 0 36px rgba(229, 190, 99, 0.42), 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+
+#aventureros .club-hero-badge {
+    background: rgba(201, 157, 59, 0.22);
+    border: 1px solid rgba(229, 190, 99, 0.58);
+    color: #f3d78e;
+    font-size: 0.8rem;
+    letter-spacing: 1.4px;
+}
+
+#aventureros .club-hero-title {
+    font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+    font-size: clamp(2.1rem, 4.6vw, 3.45rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+#aventureros .club-hero-title span {
+    color: #e5be63;
+}
+
+#aventureros .club-hero-subtitle {
+    color: rgba(241, 245, 249, 0.93);
+    max-width: 700px;
+    font-size: clamp(0.96rem, 1.7vw, 1.12rem);
+    line-height: 1.65;
+}
+
+#aventureros .club-hero-chips {
+    gap: 0.65rem;
+    margin-top: 0.9rem;
+}
+
+#aventureros .club-hero-chip {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    padding: 0.52rem 1.2rem;
+    font-size: 0.84rem;
+}
+
+#aventureros .club-hero-chip:hover {
+    background: #c99d3b;
+    border-color: #c99d3b;
+    color: #0b1c30;
+}
+
+/* ---------- 2. ENCABEZADOS DE SECCIÓN EDITORIAL ---------- */
+#aventureros .club-section-header {
+    margin: 0 auto 2.2rem;
+    max-width: 780px;
+}
+
+#aventureros .club-section-tag {
+    background: rgba(201, 157, 59, 0.14);
+    color: #8f681b;
+    border: 1px solid rgba(201, 157, 59, 0.38);
+    font-size: 0.78rem;
+    letter-spacing: 1.3px;
+}
+
+#aventureros .club-section-title {
+    font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+    font-size: clamp(1.65rem, 3.2vw, 2.35rem);
+    color: #0b1c30;
+    margin: 0.35rem 0 0.5rem;
+}
+
+#aventureros .club-section-desc {
+    color: #475569;
+    font-size: 0.98rem;
+    line-height: 1.65;
+    max-width: 640px;
+}
+
+/* ---------- 3. IDEALES DEL AVENTURERO (TARJETAS EDITORIALES CON FOTO R2) ---------- */
+#aventureros .club-ideales-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.8rem;
+    margin-bottom: 3.2rem;
+}
+
+#aventureros .av-ideal-card {
+    background: #ffffff;
+    border-radius: 1.35rem;
+    border: 1px solid rgba(11, 28, 48, 0.09);
+    box-shadow: 0 12px 32px rgba(11, 28, 48, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+#aventureros .av-ideal-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 42px rgba(11, 28, 48, 0.14);
+    border-color: rgba(201, 157, 59, 0.55);
+}
+
+#aventureros .av-ideal-media {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    background: #0b1c30;
+}
+
+#aventureros .av-ideal-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    filter: brightness(0.92) saturate(1.06) contrast(1.04);
+    transition: transform 0.55s ease;
+}
+
+#aventureros .av-ideal-card:hover .av-ideal-media img {
+    transform: scale(1.05);
+}
+
+#aventureros .av-ideal-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(9, 21, 37, 0.12) 0%, rgba(9, 21, 37, 0.72) 100%);
+    pointer-events: none;
+}
+
+#aventureros .av-ideal-media-badge {
+    position: absolute;
+    left: 1.25rem;
+    bottom: 1rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.38rem 1rem;
+    border-radius: 999px;
+    background: rgba(9, 21, 37, 0.82);
+    border: 1px solid rgba(229, 190, 99, 0.65);
+    color: #f3d78e;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    backdrop-filter: blur(6px);
+}
+
+#aventureros .av-ideal-card .tilt-card-inner {
+    padding: 1.7rem 1.8rem 1.5rem;
+    gap: 0.85rem;
+    flex: 1;
+}
+
+#aventureros .av-ideal-card .tilt-card-text {
+    font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+    font-size: clamp(1.18rem, 2vw, 1.38rem);
+    color: #0b1c30;
+    line-height: 1.55;
+}
+
+#aventureros .av-ideal-card .tilt-card-footer {
+    color: #64748b;
+    border-top-color: rgba(11, 28, 48, 0.08);
+    padding-top: 0.85rem;
+}
+
+/* ---------- 4. PERGAMINOS EDITORIALES (HIMNO Y LEY CON FOTOS R2) ---------- */
+#aventureros .pergamino-wrapper {
+    gap: 2rem;
+    margin-bottom: 3.2rem;
+}
+
+#aventureros .pergamino-card {
+    border-radius: 1.4rem;
+    background: #ffffff;
+    border: 1px solid rgba(11, 28, 48, 0.1);
+    box-shadow: 0 12px 34px rgba(11, 28, 48, 0.08);
+}
+
+#aventureros .pergamino-card.abierto {
+    border-color: rgba(201, 157, 59, 0.65);
+    box-shadow: 0 18px 46px rgba(11, 28, 48, 0.14);
+}
+
+#aventureros .pergamino-roller {
+    height: 6px;
+    background: linear-gradient(90deg, #0b1c30 0%, #c99d3b 50%, #0b1c30 100%);
+    box-shadow: none;
+}
+
+#aventureros .pergamino-roller::before,
+#aventureros .pergamino-roller::after {
+    display: none;
+}
+
+#aventureros .av-pergamino-banner {
+    position: relative;
+    width: 100%;
+    height: 175px;
+    overflow: hidden;
+    background: #0b1c30;
+}
+
+#aventureros .av-pergamino-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+    display: block;
+    filter: brightness(0.74) saturate(1.08);
+    transition: transform 0.6s ease;
+}
+
+#aventureros .pergamino-card:hover .av-pergamino-banner img {
+    transform: scale(1.03);
+}
+
+#aventureros .av-pergamino-banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(9, 21, 37, 0.15) 0%, rgba(9, 21, 37, 0.78) 100%);
+}
+
+#aventureros .av-pergamino-banner-caption {
+    position: absolute;
+    left: 1.6rem;
+    right: 1.6rem;
+    bottom: 1rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    color: #ffffff;
+}
+
+#aventureros .av-pergamino-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(201, 157, 59, 0.25);
+    border: 1px solid rgba(229, 190, 99, 0.6);
+    color: #f3d78e;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+#aventureros .pergamino-trigger {
+    background: linear-gradient(135deg, #fbf9f4 0%, #f5efe0 100%);
+    padding: 1.35rem 1.8rem;
+}
+
+#aventureros .pergamino-trigger:hover {
+    background: linear-gradient(135deg, #f8f3e6 0%, #efe5cb 100%);
+}
+
+#aventureros .pergamino-sello {
+    background: linear-gradient(135deg, #0b1c30 0%, #1d3557 100%);
+    border: 2px solid #c99d3b;
+    color: #f3d78e;
+    box-shadow: 0 6px 16px rgba(11, 28, 48, 0.22);
+}
+
+#aventureros .pergamino-trigger-info h3 {
+    font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+    font-size: 1.32rem;
+    color: #0b1c30;
+}
+
+#aventureros .pergamino-trigger-info p {
+    color: #64748b;
+    font-size: 0.86rem;
+}
+
+#aventureros .pergamino-btn-action {
+    background: #0b1c30;
+    color: #f3d78e;
+    border: 1px solid #c99d3b;
+    padding: 0.5rem 1.2rem;
+}
+
+#aventureros .pergamino-card.abierto .pergamino-btn-action {
+    background: #c99d3b;
+    color: #0b1c30;
+    border-color: #c99d3b;
+}
+
+#aventureros .pergamino-body {
+    background: linear-gradient(180deg, #fcfaf5 0%, #f8f4ea 100%);
+}
+
+#aventureros .himno-lyrics {
+    color: #1e293b;
+}
+
+#aventureros .ley-list-heading {
+    color: #0b1c30;
+    font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+    font-size: 1.2rem;
+}
+
+#aventureros .ley-item {
+    background: #ffffff;
+    border: 1px solid rgba(11, 28, 48, 0.08);
+    border-left: 4px solid #c99d3b;
+}
+
+#aventureros .ley-num {
+    background: linear-gradient(135deg, #0b1c30 0%, #1d3557 100%);
+    color: #f3d78e;
+}
+
+#aventureros .ley-text {
+    color: #0b1c30;
+}
+
+/* ---------- 5. UNIFORME DE GALA Y CATÁLOGO EDITORIAL ---------- */
+#aventureros .av-uniforme-section {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    padding: 0;
+    margin-bottom: 3rem;
+    border: 1px solid rgba(11, 28, 48, 0.09);
+    border-left: none !important;
+    box-shadow: 0 14px 36px rgba(11, 28, 48, 0.08);
+    overflow: hidden;
+}
+
+#aventureros .av-uniforme-banner {
+    position: relative;
+    height: 195px;
+    width: 100%;
+    overflow: hidden;
+    background: #0b1c30;
+    display: flex;
+    align-items: flex-end;
+}
+
+#aventureros .av-uniforme-banner img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 45%;
+    filter: brightness(0.55) saturate(1.1);
+}
+
+#aventureros .av-uniforme-banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(9, 21, 37, 0.25) 0%, rgba(9, 21, 37, 0.9) 100%);
+}
+
+#aventureros .av-uniforme-banner-content {
+    position: relative;
+    z-index: 2;
+    padding: 1.6rem 2rem;
+    color: #ffffff;
+    width: 100%;
+}
+
+#aventureros .av-uniforme-banner-content h3 {
+    font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+    font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+    margin: 0.45rem 0 0.2rem;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+#aventureros .av-uniforme-banner-content h3 i {
+    color: #e5be63;
+}
+
+#aventureros .av-uniforme-banner-content p {
+    margin: 0;
+    color: rgba(241, 245, 249, 0.88);
+    font-size: 0.92rem;
+}
+
+#aventureros .av-uniforme-body {
+    padding: 2rem;
+}
+
+#aventureros .av-uniforme-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.6rem;
+}
+
+#aventureros .av-uniforme-section .uniforme-card {
+    background: linear-gradient(180deg, #faf8f4 0%, #ffffff 100%);
+    border: 1px solid rgba(201, 157, 59, 0.28);
+    border-radius: 1.2rem;
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 6px 20px rgba(11, 28, 48, 0.05);
+}
+
+#aventureros .av-uniforme-section .uniforme-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(11, 28, 48, 0.12);
+    border-color: #c99d3b;
+}
+
+#aventureros .av-uniforme-section .uniforme-img-wrapper {
+    background: #ffffff;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+}
+
+#aventureros .av-uniforme-section .uniforme-img-wrapper img {
+    max-width: 100%;
+    max-height: 300px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+#aventureros .av-uniforme-label {
+    padding: 0.95rem 1rem;
+    font-weight: 700;
+    color: #0b1c30;
+    margin: 0;
+    font-size: 0.95rem;
+    border-top: 1px solid rgba(11, 28, 48, 0.06);
+    background: #fbf9f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+#aventureros .av-uniforme-label i {
+    color: #c99d3b;
+}
+
+#aventureros .av-catalogo-wrap {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+#aventureros .av-catalogo-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    background: linear-gradient(135deg, #c99d3b 0%, #e5be63 100%);
+    color: #0b1c30;
+    padding: 0.9rem 2.2rem;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 0.95rem;
+    text-decoration: none;
+    box-shadow: 0 10px 24px rgba(201, 157, 59, 0.34);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+#aventureros .av-catalogo-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(201, 157, 59, 0.48);
+}
+
+/* ---------- 6. CALENDARIO DEL CLUB EDITORIAL ---------- */
+#aventureros #seccion-calendario-aventureros.calendario-club {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(11, 28, 48, 0.09);
+    border-top: 4px solid #c99d3b;
+    box-shadow: 0 14px 36px rgba(11, 28, 48, 0.08);
+    padding: 2rem;
+}
+
+#aventureros .av-resumen-eventos {
+    margin-top: 1.2rem;
+    padding: 1.1rem 1.25rem;
+    background: #fbf9f4;
+    border-radius: 1rem;
+    border: 1px solid rgba(201, 157, 59, 0.25);
+    border-left: 4px solid #c99d3b;
+}
+
+#aventureros .av-resumen-eventos h4 {
+    font-size: 0.9rem;
+    color: #0b1c30;
+    margin: 0 0 0.5rem;
+}
+
+/* ==========================================================================
+   ADAPTACIÓN COMPLETA A CELULAR (<= 768px y <= 480px)
+   ========================================================================== */
+@media (max-width: 768px) {
+    #aventureros .av-hero-editorial {
+        min-height: 410px;
+        padding: 4.3rem 1rem 2.4rem;
+        margin-bottom: 2rem;
+    }
+
+    #aventureros .av-back-pill {
+        top: 0.9rem;
+        left: 0.9rem;
+        padding: 0.45rem 0.95rem;
+        font-size: 0.8rem;
+    }
+
+    #aventureros .club-hero-logo-box {
+        width: 84px;
+        height: 84px;
+    }
+
+    #aventureros .club-hero-title {
+        font-size: 1.85rem;
+    }
+
+    #aventureros .club-hero-subtitle {
+        font-size: 0.92rem;
+    }
+
+    #aventureros .club-hero-chips {
+        gap: 0.45rem;
+    }
+
+    #aventureros .club-hero-chip {
+        font-size: 0.76rem;
+        padding: 0.42rem 0.85rem;
+    }
+
+    #aventureros .club-ideales-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        margin-bottom: 2.2rem;
+    }
+
+    /* Desactivar inclinación 3D en celular para cero parpadeos */
+    #aventureros .tilt-card,
+    #aventureros .av-ideal-card {
+        transform: none !important;
+    }
+
+    #aventureros .av-ideal-media {
+        height: 185px;
+    }
+
+    #aventureros .av-ideal-card .tilt-card-inner {
+        padding: 1.25rem 1.2rem;
+    }
+
+    #aventureros .av-ideal-card .tilt-card-text {
+        font-size: 1.08rem;
+    }
+
+    #aventureros .av-pergamino-banner {
+        height: 135px;
+    }
+
+    #aventureros .av-pergamino-banner-caption {
+        left: 1rem;
+        right: 1rem;
+        bottom: 0.75rem;
+    }
+
+    #aventureros .pergamino-trigger {
+        padding: 1.2rem 1rem;
+    }
+
+    #aventureros .pergamino-content-inner {
+        padding: 1.4rem 1rem;
+    }
+
+    #aventureros .av-uniforme-banner {
+        height: 155px;
+    }
+
+    #aventureros .av-uniforme-banner-content {
+        padding: 1.15rem 1.15rem;
+    }
+
+    #aventureros .av-uniforme-body {
+        padding: 1.25rem 1rem 1.5rem;
+    }
+
+    #aventureros .av-uniforme-grid {
+        grid-template-columns: 1fr;
+        gap: 1.15rem;
+    }
+
+    #aventureros .av-uniforme-section .uniforme-img-wrapper {
+        min-height: 210px;
+        padding: 1rem;
+    }
+
+    #aventureros .av-uniforme-section .uniforme-img-wrapper img {
+        max-height: 240px;
+    }
+
+    #aventureros .av-catalogo-btn {
+        width: 100%;
+        padding: 0.85rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    #aventureros #seccion-calendario-aventureros.calendario-club {
+        padding: 1.1rem 0.85rem;
+        border-radius: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #aventureros .av-hero-editorial {
+        min-height: 375px;
+        padding: 4rem 0.85rem 2rem;
+    }
+
+    #aventureros .club-hero-title {
+        font-size: 1.65rem;
+    }
+
+    #aventureros .av-ideal-media {
+        height: 165px;
+    }
+
+    #aventureros .av-pergamino-banner {
+        height: 120px;
+    }
+
+    #aventureros .av-uniforme-banner {
+        height: 140px;
+    }
+}
